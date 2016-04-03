@@ -1,0 +1,62 @@
+Tech Specification:
+	- Front End (The last thing to do)
+	    - Web/mobile friendly
+	    - Language: PHP, HTML, NODE.
+	    - Emphasis: Keep it simple and highly responsive
+
+	- Backend Service:
+	    - Web Server
+	    - Language
+		- Java
+	    - List of Containerized Microservices:
+		- MySQL
+
+	- Database:
+	    - Containerize?
+	    - MySQL
+	    - Radis
+
+	- Others:
+	    - Languages/Text repository?
+	    - Less priority: use your own sprint management
+	    - Find how are you going to host it.
+	    - How to release code?
+
+	Schema:
+		- Word Record:
+		    - Word ID
+		    - Word Spelling
+
+		- Meaning example
+		    - Meaning ID
+		    - Meaning
+
+		- Word-Meaning Relation
+		    - fk Word ID
+		    - fk Meaning ID
+		    - Word usage for that meaning
+		    - Meaning closesness
+		    - Meaning type (Noun/Verb/Adverb)
+
+		Extra: For Synnonym
+		- Word to Word Relation Record:
+		    - Word id
+			- list of other word record
+			   - other word id
+			   - other word similarity value
+
+User Specification:
+	- English to Bangla dictionary
+	- Bangla to Bangla dictionary
+	- Bangla to English dictionary
+	- Bangla synonyms
+	- Make sure all words are unique?
+	- Definition of a word?
+	- First requirements first
+
+Resources:
+
+- Dictionary files and definitions, csv?
+    - DB source one Ankur:
+        - https://sourceforge.net/projects/anubadok/files/anubadok/0.2.1/
+        - space and line separated values
