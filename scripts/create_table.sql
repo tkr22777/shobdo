@@ -8,6 +8,7 @@ CREATE TABLE Word (
 
 CREATE TABLE Meaning (
 	meaning_id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	meaning_type INT(4) UNSIGNED,
 	meaning VARCHAR(64) NOT NULL,
 	meaningExample VARCHAR(255)
 );
