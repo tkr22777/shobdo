@@ -24,5 +24,5 @@ CREATE TABLE WordMeaning (
 
 /* sample values */
 insert into Word ( word ) Values ( "achieve" );
-insert into Meaning ( meaning, meaningExample ) Values ( "Arjon", "Amar kono arjon nei" );
+insert into Meaning ( meaning_type, meaning, meaningExample ) Values ( "VERB", "Arjon", "Amar kono arjon nei" );
 insert into WordMeaning (word_id, meaning_id, word_meaning_score) Values (1, 1, 3);
