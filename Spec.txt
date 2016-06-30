@@ -60,3 +60,6 @@ Resources:
     - DB source one Ankur:
         - https://sourceforge.net/projects/anubadok/files/anubadok/0.2.1/
         - space and line separated values
+
+Check:
+https://github.com/danielnaber/openthesaurus
