@@ -1,8 +1,12 @@
 package controllers;
 
 import javax.inject.*;
+
+import org.slf4j.LoggerFactory;
 import play.*;
 import play.mvc.*;
+import redis.clients.jedis.Jedis;
+
 
 import services.Counter;
 
@@ -16,9 +20,14 @@ import services.Counter;
 public class CountController extends Controller {
 
     private final Counter counter;
+    private final String key = "count";
+    Jedis jedis;
+    Logger.ALogger log;
 
     @Inject
     public CountController(Counter counter) {
+       jedis = new Jedis("localhost");
+       log = Logger.of(CountController.class);
        this.counter = counter;
     }
 
@@ -29,7 +38,20 @@ public class CountController extends Controller {
      * requests by an entry in the <code>routes</code> config file.
      */
     public Result count() {
-        return ok(Integer.toString(counter.nextCount()));
+
+        String count = jedis.get(key);
+
+        log.info("Count found from db:" + count);
+
+        if(count == null) {
+            count = Integer.toString(1);
+        } else {
+            count = Integer.toString(Integer.parseInt(count) + 1);
+        }
+
+        jedis.set(key,count);
+
+        return ok(count);
     }
 
 }
