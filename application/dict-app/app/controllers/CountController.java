@@ -26,7 +26,16 @@ public class CountController extends Controller {
 
     @Inject
     public CountController(Counter counter) {
-       jedis = new Jedis("localhost");
+
+       try {
+
+           jedis = new Jedis("localhost");
+
+       } catch (Exception ex) {
+
+           log.info("Exception Occured while connecting to Redis. Message:" + ex.getMessage() );
+       }
+
        log = Logger.of(CountController.class);
        this.counter = counter;
     }
@@ -39,7 +48,10 @@ public class CountController extends Controller {
      */
     public Result count() {
 
-        String count = jedis.get(key);
+        String count = null;
+
+        if(jedis != null)
+            count = jedis.get(key);
 
         log.info("Count found from db:" + count);
 
@@ -49,7 +61,8 @@ public class CountController extends Controller {
             count = Integer.toString(Integer.parseInt(count) + 1);
         }
 
-        jedis.set(key,count);
+        if(jedis != null)
+            jedis.set(key,count);
 
         return ok(count);
     }

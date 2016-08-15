@@ -5,35 +5,35 @@ package objects;
  */
 public class Word {
 
-    String word_id;
-    String word_spelling;
+    String wordId;
+    String wordSpelling;
 
-    public Word(String word_id, String word_spelling) {
-        this.word_id = word_id;
-        this.word_spelling = word_spelling;
+    public Word(String wordId, String wordSpelling) {
+        this.wordId = wordId;
+        this.wordSpelling = wordSpelling;
     }
 
-    public String getWord_id() {
-        return word_id;
+    public String getWordId() {
+        return wordId;
     }
 
-    public void setWord_id(String word_id) {
-        this.word_id = word_id;
+    public void setWordId(String wordId) {
+        this.wordId = wordId;
     }
 
-    public String getWord_spelling() {
-        return word_spelling;
+    public String getWordSpelling() {
+        return wordSpelling;
     }
 
-    public void setWord_spelling(String word_spelling) {
-        this.word_spelling = word_spelling;
+    public void setWordSpelling(String wordSpelling) {
+        this.wordSpelling = wordSpelling;
     }
 
     @Override
     public String toString() {
         return "Word{" +
-                "word_id='" + word_id + '\'' +
-                ", word_spelling='" + word_spelling + '\'' +
+                "wordId='" + wordId + '\'' +
+                ", wordSpelling='" + wordSpelling + '\'' +
                 '}';
     }
 }

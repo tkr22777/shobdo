@@ -1,5 +1,6 @@
 package controllers;
 
+import logics.WordLogic;
 import play.mvc.Controller;
 import play.mvc.Result;
 import scala.Int;
@@ -14,7 +15,9 @@ public class WordController extends Controller{
     }
 
     public Result length(String word, int length){
+
         int s_size = word.length();
+
         int len = Int.unbox(length);
 
         if(s_size == len)
@@ -23,5 +26,13 @@ public class WordController extends Controller{
             return ok("Ups, the length of " + word + " is bigger than you thought!" );
         else
             return ok("Ups, the length of " + word + " is smaller than you thought!" );
+    }
+
+    public Result getDictWord(String word){
+
+        WordLogic logic = new WordLogic();
+
+        return ok( logic.getDictWord( word ).getWordId() );
+
     }
 }

@@ -15,3 +15,5 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /hello/*word/*length        controllers.WordController.length(word: String, length: Int)
 
 GET     /dict                       controllers.WordController.index()
+
+GET     /dict/*word                 controllers.WordController.getDictWord(word: String)
