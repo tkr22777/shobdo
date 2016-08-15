@@ -10,6 +10,8 @@ import scala.Int;
  */
 public class WordController extends Controller{
 
+    WordLogic logic = new WordLogic();
+
     public Result index(){
         return ok("বাংলা অভিধান এ স্বাগতম!" );
     }
@@ -30,9 +32,13 @@ public class WordController extends Controller{
 
     public Result getDictWord(String word){
 
-        WordLogic logic = new WordLogic();
-
         return ok( logic.getDictWord( word ).getWordId() );
 
     }
+
+    public Result setDictWord(String word, String meaning) {
+
+        return ok( logic.setDictWord(word,meaning).getWordId() );
+    }
+
 }

@@ -5,8 +5,8 @@ package objects;
  */
 public class Word {
 
-    String wordId;
-    String wordSpelling;
+    private String wordId;
+    private String wordSpelling;
 
     public Word(String wordId, String wordSpelling) {
         this.wordId = wordId;

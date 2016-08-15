@@ -17,3 +17,5 @@ GET     /hello/*word/*length        controllers.WordController.length(word: Stri
 GET     /dict                       controllers.WordController.index()
 
 GET     /dict/*word                 controllers.WordController.getDictWord(word: String)
+
+POST    /dict/*word/*meaning        controllers.WordController.setDictWord(word: String, meaning: String)
