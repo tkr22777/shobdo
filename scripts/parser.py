@@ -4,9 +4,9 @@ import sys, io, re
 file_loc="../data/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt"
 dict_file = open(file_loc,"r")
 #TotalLines 23528
-LINES_TO_TEST = 1000
-#LINES_TO_TEST = 10
-DEBUG = True
+#LINES_TO_TEST = 1000
+LINES_TO_TEST = 5
+DEBUG = False
 INFO = True
 TypeTable = {}
 i = 0
@@ -40,7 +40,7 @@ def getEng(line):
 def theRest(line):
 	ENG_END_POS = getEngEndPos(line)
 	the_rest = line[ENG_END_POS + 1:].strip()
-	if INFO: print "The Rest\t\t:'%s'" %(the_rest)
+	if DEBUG: print "The Rest\t\t:'%s'" %(the_rest)
 	return the_rest
 
 def findType(a_definition):
@@ -78,20 +78,21 @@ def main():
 
 		line = readline(dict_file)
 
-		word = getWord(line)
-		if INFO: print "Bangla Word\t\t#%d:\t'%s'" %(i,word)
-
-		eng = getEng(line)
-		if INFO: print "English Pronunciation\t#%d:\t'%s'" %(i,eng)
+		print "Word #%d:" %(i)
 
 		the_rest = theRest(line)
-		if len(getDifferntDefinitions(the_rest)) > 10:
+
+		if len(getDifferntDefinitions(the_rest)) < 2:
+
 			j = j + 1
+
+			word = getWord(line)
+			if INFO: print "Bangla Word\t\t#%d:\t'%s'" %(i,word)
+
+			eng = getEng(line)
+			if INFO: print "English Pronunciation\t#%d:\t'%s'" %(i,eng)
+
+			if INFO: print "Transaltion\t\t#%d:\t'%s'" %(i,the_rest)
 			print
-			print line
-			'''
-			if j is 1:
-				break
-				'''
 				
 if __name__ == "__main__": main()

@@ -5,6 +5,7 @@
 	    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 	    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	    <title>Dictionary</title>
 
 	    <style>
@@ -26,6 +27,13 @@
 	<body>
 		<div class="container-fluid bg-1 text-center">
 		    <h2 style="font-size: 100%">Dictionary</h2>
+		</div>
+		<!--div ng-app="" ng-init="name=1"-->
+			<div>
+ 			<p>Name : <input type="text" ng-model="name"></p>
+ 			<h1>Hello {{name * 4}}</h1>
+			<p ng-bind="name"></p>
+			<p>My first expression: {{ 5 + 5 + name}}</p>
 		</div>
 
 		<div class="container-fluid bg-2 text-center" id="about" name="about">
