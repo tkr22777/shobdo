@@ -1,6 +1,7 @@
 #Play Activator
 curl -O https://downloads.typesafe.com/typesafe-activator/1.3.10/typesafe-activator-1.3.10.zip
-unzip typesafe-activator-1.3.6.zip -d /
+yum install unzip
+unzip typesafe-activator-1.3.10.zip -d /
 PATH=$PATH:/activator-dist-1.3.10/bin/
 
 #Download java 8
