@@ -31,6 +31,18 @@ public class Bangla{
 
     public static String getSentence(String startHex, String endHex, int numberOfWords, int maxWordLength) {
 
+        if(startHex == null)
+            startHex = "995";
+
+        if(endHex == null)
+            endHex = "9A8";
+
+        if(numberOfWords == -1)
+            numberOfWords = randomInRange(1, 10);
+
+        if(maxWordLength < 1)
+            maxWordLength = randomInRange(1, 7);
+
         String sentence = "";
 
         for(int i = 0 ; i < numberOfWords ; i++){
@@ -38,7 +50,7 @@ public class Bangla{
             if( i != 0)
                 sentence += " ";
 
-            int number = randomInRange( 1 , maxWordLength);
+            int number = randomInRange(1, maxWordLength);
             String word = getWord(startHex, endHex, number);
             sentence += word;
         }
@@ -68,6 +80,9 @@ public class Bangla{
         int end = Integer.parseInt(endHex, 16);
 
         String retString = "";
+
+        if(wordLength < 1)
+            wordLength = randomInRange(1, 10);
 
         for(int i = 0 ; i < wordLength ; i++){
 
