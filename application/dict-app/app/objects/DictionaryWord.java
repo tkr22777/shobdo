@@ -43,7 +43,7 @@ public class DictionaryWord extends BaseWord {
     public String toString() {
         return "DictionaryWord{" +
                 "arrangementType='" + arrangementType + '\'' +
-                ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches +
+                ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches.toString() +
                 '}';
     }
 }

@@ -42,4 +42,11 @@ public class MeaningForPartsOfSpeech {
         return total;
     }
 
+    @Override
+    public String toString() {
+        return "MeaningForPartsOfSpeech{" +
+                "type='" + type + '\'' +
+                ", meanings=" + meanings +
+                '}';
+    }
 };

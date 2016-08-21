@@ -6,15 +6,15 @@ package objects;
 public class Meaning {
 
     String id;
-    String type; // the type of the meaning (redundant? since it will always be part of the higher category
+    String partOfSpeech; // the partOfSpeech of the meaning (redundant? since it will always be part of the higher category
     String meaning; //The meaning
     String example; //exmaple of the word used with the context of this meaning
 
     int strength; //how strongly does this meaning apply to the word invisible
 
-    public Meaning(String id, String type, String meaning, String example) {
+    public Meaning(String id, String partOfSpeech, String meaning, String example) {
         this.id = id;
-        this.type = type;
+        this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
         this.example = example;
     }
@@ -27,12 +27,12 @@ public class Meaning {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
+    public String getPartOfSpeech() {
+        return partOfSpeech;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setPartOfSpeech(String partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
     }
 
     public String getMeaning() {
@@ -63,7 +63,7 @@ public class Meaning {
     public String toString() {
         return "Meaning{" +
                 "id='" + id + '\'' +
-                ", type='" + type + '\'' +
+                ", partOfSpeech='" + partOfSpeech + '\'' +
                 ", meaning='" + meaning + '\'' +
                 ", example='" + example + '\'' +
                 ", strength=" + strength +
