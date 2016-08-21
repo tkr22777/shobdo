@@ -27,6 +27,8 @@ public class CountController extends Controller {
     @Inject
     public CountController(Counter counter) {
 
+       log = Logger.of(CountController.class);
+
        try {
 
            jedis = new Jedis("localhost");
@@ -36,7 +38,6 @@ public class CountController extends Controller {
            log.info("Exception Occured while connecting to Redis. Message:" + ex.getMessage() );
        }
 
-       log = Logger.of(CountController.class);
        this.counter = counter;
     }
 
