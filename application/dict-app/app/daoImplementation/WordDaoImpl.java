@@ -4,6 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import daos.WordDao;
+import objects.DictionaryWord;
 import org.bson.Document;
 
 import static com.mongodb.client.model.Filters.and;
@@ -34,12 +35,22 @@ public class WordDaoImpl implements WordDao {
         Document exitingWord  = collection.find( and( eq( "Spelling", wordName ) , eq("Meaning", Meaning) ) ) .first() ;
 
         if( exitingWord != null )
-            return "Word Meaning Already Exists";
+            return "BaseWord Meaning Already Exists";
 
         Document wordEntry = new Document("Spelling", wordName)
                 .append("Meaning", Meaning);
         collection.insertOne(wordEntry);
         return wordName + "ID";
 
+    }
+
+    @Override
+    public String setDictionaryWord(DictionaryWord dictionaryWord) {
+        return null;
+    }
+
+    @Override
+    public DictionaryWord getDictionaryWord(String wordId, String wordSpeelling) {
+        return null;
     }
 }

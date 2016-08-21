@@ -3,12 +3,14 @@ package objects;
 /**
  * Created by tahsinkabir on 6/16/16.
  */
-public class Word {
+public class BaseWord {
 
     private String wordId;
     private String wordSpelling;
+    private int timesSearched;
+    private String linkToPronunciation;
 
-    public Word(String wordId, String wordSpelling) {
+    public BaseWord(String wordId, String wordSpelling) {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
     }
@@ -29,11 +31,20 @@ public class Word {
         this.wordSpelling = wordSpelling;
     }
 
+    public int getTimesSearched() {
+        return timesSearched;
+    }
+
+    public void setTimesSearched(int timesSearched) {
+        this.timesSearched = timesSearched;
+    }
+
     @Override
     public String toString() {
-        return "Word{" +
+        return "BaseWord{" +
                 "wordId='" + wordId + '\'' +
                 ", wordSpelling='" + wordSpelling + '\'' +
+                ", timesSearched=" + timesSearched +
                 '}';
     }
 }
