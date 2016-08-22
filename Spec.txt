@@ -1,7 +1,7 @@
 Tech Specification:
 	- Front End (The last thing to do)
 	    - Web/mobile friendly
-	    - Language: PHP, HTML, NODE.
+	    - Language: Bootstrap, Angular, Play Java
 	    - Emphasis: Keep it simple and highly responsive
 
 	- Backend Service:
@@ -9,11 +9,12 @@ Tech Specification:
 	    - Language
 		- Java
 	    - List of Containerized Microservices:
-		- MySQL
+		- Redis and Play Together?
+		- MongoDb
 
 	- Database:
 	    - Containerize?
-	    - MySQL
+	    - MongoDb
 	    - Radis
 
 	- Others:
@@ -23,36 +24,18 @@ Tech Specification:
 	    - How to release code?
 
 	Schema:
-		- Word Record:
-		    - Word ID
-		    - Word Spelling
-
-		- Meaning example
-		    - Meaning ID
-		    - Meaning
-
-		- Word-Meaning Relation
-		    - fk Word ID
-		    - fk Meaning ID
-		    - Word usage for that meaning
-		    - Meaning closesness
-		    - Meaning type (Noun/Verb/Adverb)
-
-		Extra: For Synnonym
-		- Word to Word Relation Record:
-		    - Word id
-			- list of other word record
-			   - other word id
-			   - other word similarity value
+		Mongo Schema from Play Java Code:
 
 User Specification:
+
 	- English to Bangla dictionary
 	- Bangla to Bangla dictionary
 	- Bangla to English dictionary
 	- Bangla synonyms
-	- Make sure all words are unique?
-	- Definition of a word?
-	- First requirements first
+
+Tips:
+	- suggest and match a word from cache when users type using Ovro 
+	- image if noun?
 
 Resources:
 
