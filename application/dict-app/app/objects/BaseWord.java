@@ -47,4 +47,20 @@ public class BaseWord {
                 ", timesSearched=" + timesSearched +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseWord baseWord = (BaseWord) o;
+
+        return wordSpelling != null ? wordSpelling.equals(baseWord.wordSpelling) : baseWord.wordSpelling == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return wordSpelling != null ? wordSpelling.hashCode() : 0;
+    }
 }

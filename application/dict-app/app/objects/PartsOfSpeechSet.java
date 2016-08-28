@@ -1,5 +1,6 @@
 package objects;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,8 +11,11 @@ import java.util.Set;
 //This object/class could be used to nomalize if there are mistakes in the parts of speech entry
 public class PartsOfSpeechSet {
 
-    private Set<String> partsOfSpeeches;
+    private Set<String> partsOfSpeeches = new HashSet<String>( Arrays.asList( "বিশেষ্য" , "বিশেষণ", "সর্বনাম", "অব্যয়" , "ক্রিয়া" ) );
 
+    public PartsOfSpeechSet(){
+
+    }
 
     public Set<String> getPartsOfSpeeches() {
         return partsOfSpeeches;

@@ -1,11 +1,15 @@
 package daoImplementation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.util.JSON;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
+import utilities.LogPrint;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -13,14 +17,24 @@ import static com.mongodb.client.model.Filters.eq;
 /**
  * Created by tahsinkabir on 8/14/16.
  */
-public class WordDaoImpl implements WordDao {
+public class WordDaoMongoImpl implements WordDao {
 
     public final String DICTIONARY_DATABASE_NAME = "Dictionary";
     public final String WORD_COLLECTION_NAME = "Words";
 
-    MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-    MongoDatabase mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
-    MongoCollection<Document> collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
+    MongoClient mongoClient;
+    MongoDatabase mongoDatabase;
+    MongoCollection<Document> collection;
+
+    private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
+
+    public WordDaoMongoImpl(){
+
+        mongoClient = new MongoClient( "localhost" , 27017 );
+        mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
+        collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
+
+    }
 
     @Override
     public String getDictWord(String wordName) {
@@ -46,6 +60,28 @@ public class WordDaoImpl implements WordDao {
 
     @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
+
+        log.info("Saving word to database: " + dictionaryWord.toString());
+
+
+        try {
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
+            //log.info("Json String for Dictionary Word: " + jsonString);
+
+
+            Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
+            log.info(wordDocument.toString());
+            collection.insertOne(wordDocument);
+
+        } catch ( Exception ex ){
+
+            log.info( "Failed to map dictionary word object to jsonString. Ex: " + ex.getMessage() );
+
+        }
+
         return null;
     }
 

@@ -10,7 +10,7 @@ import scala.Int;
  */
 public class WordController extends Controller{
 
-    WordLogic logic = new WordLogic();
+    WordLogic logic = WordLogic.factory(null);
 
     public Result index(){
         return ok("বাংলা অভিধান এ স্বাগতম!" );

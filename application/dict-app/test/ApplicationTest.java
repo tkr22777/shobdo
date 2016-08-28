@@ -1,30 +1,16 @@
-import java.awt.image.LookupOp;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer;
+import logics.WordLogic;
 import objects.DictionaryWord;
 import objects.Meaning;
 import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
 import org.junit.*;
 
-import play.Logger;
-import play.mvc.*;
-import play.test.*;
-import play.data.DynamicForm;
-import play.data.validation.ValidationError;
-import play.data.validation.Constraints.RequiredValidator;
-import play.i18n.Lang;
-import play.libs.F;
-import play.libs.F.*;
-import play.twirl.api.Content;
-import scala.App;
-import scala.io.StdIn;
 import utilities.Bangla;
 import utilities.LogPrint;
+import utilities.Util;
 
-import static play.test.Helpers.*;
 import static org.junit.Assert.*;
 
 
@@ -37,6 +23,16 @@ import static org.junit.Assert.*;
 public class ApplicationTest {
 
     LogPrint log;
+
+    String start = "995"; //ক
+    String end = "9A8";   //ন
+
+    int numberOfWords = 10;
+
+    PartsOfSpeechSet partsOfSpeech = new PartsOfSpeechSet();
+    Set<DictionaryWord> dictionary = new HashSet<>();
+
+    WordLogic wordLogic;
 
     @Test @Ignore
     public void simpleCheck() {
@@ -56,80 +52,103 @@ public class ApplicationTest {
 
         log = new LogPrint(ApplicationTest.class);
 
+        dictionary = generateDictionaryWithRandomWords(numberOfWords);
+
+        wordLogic = WordLogic.factory(null);
+
     }
 
-    @Test
-    public void testBangla() {
+    public Set<DictionaryWord> generateDictionaryWithRandomWords(int numberOfWords){
 
-        String start = "995"; //ক
-        String end = "9A8";   //ন
-
-        log.info("START!");
-
-        PartsOfSpeechSet partsOfSpeech = new PartsOfSpeechSet();
-        partsOfSpeech.setPartsOfSpeeches( new HashSet<String>(Arrays.asList( "বিশেষ্য" , "বিশেষণ", "সর্বনাম", "অব্যয়" , "ক্রিয়া" ) ) );
-
-        log.info(partsOfSpeech.toString());
-
-        int numberOfWords = 10;
-
-        Set<DictionaryWord> dictionary = new HashSet<>();
+        Set<DictionaryWord> words = new HashSet<>();
 
         for(int i = 0 ; i < numberOfWords ; i++) {
 
-            String wordSpelling;
-            String wordId;
+            DictionaryWord word = generateRandomWord( partsOfSpeech);
+            words.add(word);
+        }
 
-            int wordLength = Bangla.randomInRange(2, 9);
-            wordSpelling = Bangla.getWord(start, end, wordLength);
-            wordId = "WD_" + UUID.randomUUID();
+        return words;
+    }
 
-            DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
+    public DictionaryWord generateRandomWord( PartsOfSpeechSet partsOfSpeech ) {
 
-            ArrayList<MeaningForPartsOfSpeech> meaningsForPartsOfSpeech = new ArrayList<>();
+        String wordSpelling;
+        String wordId;
 
-            for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
+        int wordLength = Util.randomInRange(2, 9);
+        wordSpelling = Bangla.getWord(start, end, wordLength);
+        wordId = "WD_" + UUID.randomUUID();
 
-                MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
+        DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
 
-                int numberOfMeaningForPOS = Bangla.randomInRange(1,3);
+        ArrayList<MeaningForPartsOfSpeech> meaningsForPartsOfSpeech = new ArrayList<>();
 
-                for(int j = 0; j < numberOfMeaningForPOS ; j++) {
+        for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
 
-                    String meaning;
-                    wordLength = Bangla.randomInRange(2, 9);
-                    meaning = Bangla.getWord(start, end, wordLength);
+            MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
+            meanings.setType(pos);
 
-                    String example;
-                    int preSentenceLen = Bangla.randomInRange(2, 6);
-                    int postSentenceLen = Bangla.randomInRange(2, 4);
-                    example = Bangla.getSentence(start, end, preSentenceLen, 12);
-                    example += " " + meaning + " ";
-                    example += Bangla.getSentence(start, end, postSentenceLen, 12);
+            int numberOfMeaningForPOS = Util.randomInRange(1,3);
 
-                    String meaningId = "MN_" + UUID.randomUUID();
+            for(int j = 0; j < numberOfMeaningForPOS ; j++) {
 
-                    Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example);
+                String meaning;
+                wordLength = Util.randomInRange(2, 9);
+                meaning = Bangla.getWord(start, end, wordLength);
 
-                    meanings.setAMeaning(meaningForPOS);
+                String example;
+                int preSentenceLen = Util.randomInRange(2, 6);
+                int postSentenceLen = Util.randomInRange(2, 4);
+                example = Bangla.getSentence(start, end, preSentenceLen, 12);
+                example += " " + meaning + " ";
+                example += Bangla.getSentence(start, end, postSentenceLen, 12);
 
-                }
+                String meaningId = "MN_" + UUID.randomUUID();
 
-                meaningsForPartsOfSpeech.add(meanings);
+                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example);
+
+                meanings.setAMeaning(meaningForPOS);
 
             }
 
-            dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
-
-            dictionary.add(dictionaryWord);
+            meaningsForPartsOfSpeech.add(meanings);
 
         }
+
+        dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
+
+        return dictionaryWord;
+    }
+
+    @Test @Ignore
+    public void testBangla() {
+
+        log.info("START!");
 
         int i = 0;
         for(DictionaryWord word: dictionary){
             log.info(" Word "+ i + " :" + word.toString());
             i++;
         }
+
+    }
+
+    @Test @Ignore
+    public void storeWordTest() {
+
+        DictionaryWord word = generateRandomWord(partsOfSpeech);
+
+        wordLogic.saveDictionaryWord(word);
+
+    }
+
+    @Test
+    public void storeWords() {
+
+        Set<DictionaryWord> words = generateDictionaryWithRandomWords(2400);
+        for(DictionaryWord word:words)
+            wordLogic.saveDictionaryWord(word);
 
     }
 

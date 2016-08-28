@@ -1,6 +1,6 @@
 package logics;
 
-import daoImplementation.WordDaoImpl;
+import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.BaseWord;
 import objects.DictionaryWord;
@@ -14,30 +14,60 @@ import java.util.List;
  */
 public class WordLogic {
 
-    WordDao wordDaoMongo = new WordDaoImpl();
-    LogPrint log = new LogPrint(WordLogic.class);
+    private static final String DB_MONGO = "MONGODB";
+    private static final String DB_DEFAULT = DB_MONGO;
+
+    private WordDao wordDao;
+
+    private LogPrint log = new LogPrint(WordLogic.class);
+
+    private WordLogic( WordDao wordDao) {
+
+        this.wordDao = wordDao;
+
+    }
+
+    public static WordLogic factory(String dbName) { //to select which database to use
+
+        if(dbName == null)
+            dbName = DB_DEFAULT;
+
+        WordDao wordDao;
+
+        if(DB_MONGO.equalsIgnoreCase(dbName))
+            wordDao = new WordDaoMongoImpl();
+        else                                    //if(DB_DEFAULT.equalsIgnoreCase(dbName))
+            wordDao = new WordDaoMongoImpl();   // Default
+
+        return new WordLogic( wordDao );
+
+    }
 
     public BaseWord getDictWord(String wordName){
 
-        return new BaseWord( wordDaoMongo.getDictWord(wordName), wordName);
+        return new BaseWord( wordDao.getDictWord(wordName), wordName);
 
     }
 
     public BaseWord setDictWord(String wordName, String Meaning){
 
-        return new BaseWord( wordDaoMongo.setDictWord(wordName,Meaning), wordName);
+        return new BaseWord( wordDao.setDictWord(wordName,Meaning), wordName);
 
     }
 
     public DictionaryWord retriveDictionaryWord( String wordSpelling, String wordId, String arrangement){
 
+        if(arrangement != null)
+            log.info("Arrangement not avaiable in current version");
         return null;
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
 
         verifyDictionaryWord(dictionaryWord);
-        //wordDaoMongo
+
+        wordDao.setDictionaryWord(dictionaryWord);
+
      }
 
     public List<String> searchWordSpellingByString(String searchString, int limit){
