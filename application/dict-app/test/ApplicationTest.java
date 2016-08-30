@@ -159,8 +159,6 @@ public class ApplicationTest {
 
         String prefix = "কক";
 
-        prefix =  "ক";
-
         List<String> results = wordLogic.searchWordSpellingByString( prefix, 10) ;
 
         long total_time = System.nanoTime() - current_time;

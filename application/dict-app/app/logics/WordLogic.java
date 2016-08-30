@@ -33,6 +33,7 @@ public class WordLogic {
     private final String REDIS_SERACH_WORD_BY_SPELLING = "SRC_WD_BY_SPL";
 
     /*Redis expire time*/
+    private boolean USE_REDIS_EXPIRATION_TIME = false;
     private final int REDIS_EXPIRE_TIME = 10; //in seconds
 
     private LogPrint log = new LogPrint(WordLogic.class);
@@ -142,7 +143,8 @@ public class WordLogic {
             }
 
 
-            jedis.expire( key, REDIS_EXPIRE_TIME);
+            if(USE_REDIS_EXPIRATION_TIME)
+                jedis.expire( key, REDIS_EXPIRE_TIME);
         }
 
         return words;
