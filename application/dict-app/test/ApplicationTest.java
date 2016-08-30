@@ -143,12 +143,30 @@ public class ApplicationTest {
 
     }
 
-    @Test
+    @Test @Ignore
     public void storeWords() {
 
         Set<DictionaryWord> words = generateDictionaryWithRandomWords(2400);
         for(DictionaryWord word:words)
             wordLogic.saveDictionaryWord(word);
+
+    }
+
+    @Test
+    public void searchWords() {
+
+        long current_time = System.nanoTime();
+
+        String prefix = "কক";
+
+        prefix =  "ক";
+
+        List<String> results = wordLogic.searchWordSpellingByString( prefix, 10) ;
+
+        long total_time = System.nanoTime() - current_time;
+
+        log.info("Words for prefix: \"" + prefix + "\":" + results.toString() );
+        log.info("[Total Time:" + ( total_time / 1000000.0 ) + "ms]" );
 
     }
 

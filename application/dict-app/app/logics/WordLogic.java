@@ -4,10 +4,15 @@ import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.BaseWord;
 import objects.DictionaryWord;
+import org.omg.CORBA.Object;
+import redis.clients.jedis.Jedis;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * Created by tahsinkabir on 8/14/16.
@@ -19,11 +24,45 @@ public class WordLogic {
 
     private WordDao wordDao;
 
+    //Is it a better idea to have a class wordCache or something?
+    private static boolean USE_REDIS = true;
+    private static final String REDIS_HOSTNAME="localhost";
+    private Jedis jedis;
+
+    /* Redis key words */
+    private final String REDIS_SERACH_WORD_BY_SPELLING = "SRC_WD_BY_SPL";
+
+    /*Redis expire time*/
+    private final int REDIS_EXPIRE_TIME = 10; //in seconds
+
     private LogPrint log = new LogPrint(WordLogic.class);
 
-    private WordLogic( WordDao wordDao) {
+    private WordLogic( WordDao wordDao, boolean useRedis) {
 
         this.wordDao = wordDao;
+
+        if(useRedis){
+
+            jedis = getJedis(REDIS_HOSTNAME);
+
+        }
+
+    }
+
+    public Jedis getJedis( String hostname){
+
+        Jedis jedis = null;
+
+        try {
+
+            jedis = new Jedis(hostname);
+
+        } catch (Exception ex) {
+
+            log.info("Exception Occured while connecting to Redis. Message:" + ex.getMessage() );
+        }
+
+        return jedis;
 
     }
 
@@ -39,7 +78,7 @@ public class WordLogic {
         else                                    //if(DB_DEFAULT.equalsIgnoreCase(dbName))
             wordDao = new WordDaoMongoImpl();   // Default
 
-        return new WordLogic( wordDao );
+        return new WordLogic( wordDao, USE_REDIS);
 
     }
 
@@ -73,13 +112,40 @@ public class WordLogic {
     public List<String> searchWordSpellingByString(String searchString, int limit){
 
         //all that logic :D
-
         //Cache all the spellings together for search greatness!!
         //Check if there is are ways to search by string on the indexed string
         //It sould be very basic
+        //You may return a smart object that specifies each close words and also suggestion if it didn't match
+        //Also how to find closest neighbour of a Bangla word?
+        //you may be able to do that locally
 
-        return new ArrayList<>();
+        String key = REDIS_SERACH_WORD_BY_SPELLING + searchString;
 
+        log.info("key:" + key);
+
+        if( jedis != null ) {
+
+            Set<String> words = jedis.smembers(key);
+
+            if( words != null && words.size() > 0) {
+                log.debug("Search result found and returning from redis. Count: " + words.size());
+                return new ArrayList<>(words);
+            }
+        }
+
+        ArrayList<String> words = wordDao.searchDictionaryWord(searchString);
+
+        if ( jedis != null && words != null && words.size() > 0 ) {
+
+            for(String word: words) {
+                jedis.sadd(key, word);
+            }
+
+
+            jedis.expire( key, REDIS_EXPIRE_TIME);
+        }
+
+        return words;
     }
 
     protected void verifyDictionaryWord(DictionaryWord dictionaryWord){
@@ -97,7 +163,6 @@ public class WordLogic {
             log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings size is zero(0).");
 
     }
-
 
     //The following are for future feature
 

@@ -1,15 +1,22 @@
 package daoImplementation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.DBObject;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
+import com.mongodb.client.model.Projections;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
 import utilities.LogPrint;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -71,7 +78,6 @@ public class WordDaoMongoImpl implements WordDao {
             //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
             //log.info("Json String for Dictionary Word: " + jsonString);
 
-
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
             log.info(wordDocument.toString());
             collection.insertOne(wordDocument);
@@ -89,4 +95,29 @@ public class WordDaoMongoImpl implements WordDao {
     public DictionaryWord getDictionaryWord(String wordId, String wordSpeelling) {
         return null;
     }
+
+    @Override
+    public ArrayList<String> searchDictionaryWord(String wordSpeelling) {
+
+        final String WORD_SPELLING = "wordSpelling";
+
+        Pattern p = Pattern.compile("^" + wordSpeelling + ".*");
+
+        BasicDBObject query = new BasicDBObject(WORD_SPELLING, p);
+
+        MongoCursor<Document> words = collection.find(query).projection(Projections.include(WORD_SPELLING)).batchSize(5).iterator();
+
+        Set<String> result = new HashSet<>();
+
+        while(words.hasNext()) {
+
+            Document bleh = words.tryNext();
+            result.add( bleh.get(WORD_SPELLING).toString() );
+
+        }
+
+        return new ArrayList<>(result);
+    }
+
+
 }

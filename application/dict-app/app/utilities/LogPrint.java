@@ -16,7 +16,13 @@ public class LogPrint {
 
     public void info(String log){
 
-        System.out.println("[" + class_type.toString() + "]:" + log );
+        System.out.println("[INFO][" + class_type.toString() + "]:" + log );
+
+    }
+
+    public void debug(String log){
+
+        System.out.println("[DEBUG][" + class_type.toString() + "]:" + log );
 
     }
 
