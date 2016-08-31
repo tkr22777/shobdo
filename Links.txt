@@ -1,2 +1,2 @@
 Bangla Unicode: http://www.fileformat.info/info/unicode/block/bengali/list.htm
-
+Google Input Tools For Different Languages: http://stackoverflow.com/questions/28707899/how-to-use-google-input-tools-in-website (You may even copy everything)
