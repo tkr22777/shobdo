@@ -17,8 +17,10 @@ public interface WordDao {
 
     public String setDictionaryWord(DictionaryWord dictionaryWord);
 
-    public DictionaryWord getDictionaryWord( String wordId, String wordSpeelling);
+    public DictionaryWord getDictionaryWordByWordId(String wordId);
 
-    public ArrayList<String> searchDictionaryWord(String wordSpeelling); //returns the spelling of the words that matches
+    public DictionaryWord getDictionaryWordBySpelling(String spelling);
+
+    public ArrayList<String> getWordsWithPrefixMatch(String wordSpelling); //returns the spelling of the words that matches
 
 }

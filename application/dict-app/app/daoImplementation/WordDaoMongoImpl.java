@@ -8,9 +8,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import com.mongodb.util.Util;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
+import utilities.DictUtil;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
@@ -74,13 +76,12 @@ public class WordDaoMongoImpl implements WordDao {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
-
-            //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
-            //log.info("Json String for Dictionary Word: " + jsonString);
-
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
             log.info(wordDocument.toString());
             collection.insertOne(wordDocument);
+
+            //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
+            //log.info("Json String for Dictionary Word: " + jsonString);
 
         } catch ( Exception ex ){
 
@@ -92,18 +93,50 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public DictionaryWord getDictionaryWord(String wordId, String wordSpeelling) {
-        return null;
+    public DictionaryWord getDictionaryWordByWordId(String wordId) {
+
+        final String WORD_ID = "wordId";
+
+        BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
+
+        Document word = collection.find(query).first();
+
+        if(word == null)
+            return null;
+
+        DictionaryWord dictionaryWord = (DictionaryWord) DictUtil
+                .getObjectFromDocument( word, DictionaryWord.class);
+
+        return dictionaryWord;
     }
 
     @Override
-    public ArrayList<String> searchDictionaryWord(String wordSpeelling) {
+    public DictionaryWord getDictionaryWordBySpelling(String spelling) {
 
         final String WORD_SPELLING = "wordSpelling";
 
-        Pattern p = Pattern.compile("^" + wordSpeelling + ".*");
+        BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
 
-        BasicDBObject query = new BasicDBObject(WORD_SPELLING, p);
+        Document word = collection.find(query).first();
+
+        if(word == null)
+            return null;
+
+        DictionaryWord dictionaryWord = (DictionaryWord) DictUtil
+                .getObjectFromDocument( word, DictionaryWord.class);
+
+        return dictionaryWord;
+
+    }
+
+    @Override
+    public ArrayList<String> getWordsWithPrefixMatch(String spelling) {
+
+        final String WORD_SPELLING = "wordSpelling";
+
+        Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
+
+        BasicDBObject query = new BasicDBObject(WORD_SPELLING, prefixForSpellPattern);
 
         MongoCursor<Document> words = collection.find(query).projection(Projections.include(WORD_SPELLING)).batchSize(5).iterator();
 

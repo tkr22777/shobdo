@@ -95,11 +95,21 @@ public class WordLogic {
 
     }
 
-    public DictionaryWord retriveDictionaryWord( String wordSpelling, String wordId, String arrangement){
+    public DictionaryWord getDictionaryWordBySpelling( String spelling, String arrangement){
 
         if(arrangement != null)
             log.info("Arrangement not avaiable in current version");
-        return null;
+
+        return wordDao.getDictionaryWordBySpelling(spelling);
+    }
+
+    public DictionaryWord getDictionaryWordByWordId( String wordId, String arrangement) {
+
+        if (arrangement != null)
+            log.info("Arrangement not avaiable in current version");
+
+        return wordDao.getDictionaryWordByWordId(wordId);
+
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
@@ -110,7 +120,7 @@ public class WordLogic {
 
      }
 
-    public List<String> searchWordSpellingByString(String searchString, int limit){
+    public List<String> searchWordsBySpelling(String spelling, int limit){
 
         //all that logic :D
         //Cache all the spellings together for search greatness!!
@@ -120,7 +130,7 @@ public class WordLogic {
         //Also how to find closest neighbour of a Bangla word?
         //you may be able to do that locally
 
-        String key = REDIS_SERACH_WORD_BY_SPELLING + searchString;
+        String key = REDIS_SERACH_WORD_BY_SPELLING + spelling;
 
         log.info("key:" + key);
 
@@ -134,7 +144,7 @@ public class WordLogic {
             }
         }
 
-        ArrayList<String> words = wordDao.searchDictionaryWord(searchString);
+        ArrayList<String> words = wordDao.getWordsWithPrefixMatch(spelling);
 
         if ( jedis != null && words != null && words.size() > 0 ) {
 

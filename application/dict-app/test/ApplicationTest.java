@@ -9,7 +9,7 @@ import org.junit.*;
 
 import utilities.Bangla;
 import utilities.LogPrint;
-import utilities.Util;
+import utilities.DictUtil;
 
 import static org.junit.Assert.*;
 
@@ -76,7 +76,7 @@ public class ApplicationTest {
         String wordSpelling;
         String wordId;
 
-        int wordLength = Util.randomInRange(2, 9);
+        int wordLength = DictUtil.randomInRange(2, 9);
         wordSpelling = Bangla.getWord(start, end, wordLength);
         wordId = "WD_" + UUID.randomUUID();
 
@@ -89,24 +89,25 @@ public class ApplicationTest {
             MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
             meanings.setType(pos);
 
-            int numberOfMeaningForPOS = Util.randomInRange(1,3);
+            int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
 
             for(int j = 0; j < numberOfMeaningForPOS ; j++) {
 
                 String meaning;
-                wordLength = Util.randomInRange(2, 9);
+                wordLength = DictUtil.randomInRange(2, 9);
                 meaning = Bangla.getWord(start, end, wordLength);
 
                 String example;
-                int preSentenceLen = Util.randomInRange(2, 6);
-                int postSentenceLen = Util.randomInRange(2, 4);
+                int preSentenceLen = DictUtil.randomInRange(2, 6);
+                int postSentenceLen = DictUtil.randomInRange(2, 4);
                 example = Bangla.getSentence(start, end, preSentenceLen, 12);
                 example += " " + meaning + " ";
                 example += Bangla.getSentence(start, end, postSentenceLen, 12);
 
                 String meaningId = "MN_" + UUID.randomUUID();
 
-                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example);
+                int strengh = DictUtil.randomInRange( 0 , 10);
+                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strengh);
 
                 meanings.setAMeaning(meaningForPOS);
 
@@ -146,25 +147,46 @@ public class ApplicationTest {
     @Test @Ignore
     public void storeWords() {
 
-        Set<DictionaryWord> words = generateDictionaryWithRandomWords(2400);
+        Set<DictionaryWord> words = generateDictionaryWithRandomWords(1217);
         for(DictionaryWord word:words)
             wordLogic.saveDictionaryWord(word);
 
     }
 
-    @Test
-    public void searchWords() {
+    @Test @Ignore
+    public void searchWordsByPrefill() {
 
         long current_time = System.nanoTime();
 
-        String prefix = "কক";
+        String prefix = "ক";
 
-        List<String> results = wordLogic.searchWordSpellingByString( prefix, 10) ;
+        List<String> results = wordLogic.searchWordsBySpelling( prefix, 10) ;
 
         long total_time = System.nanoTime() - current_time;
 
         log.info("Words for prefix: \"" + prefix + "\":" + results.toString() );
         log.info("[Total Time:" + ( total_time / 1000000.0 ) + "ms]" );
+
+    }
+
+    @Test @Ignore
+    public void getWordBySpelling() {
+
+        long current_time = System.nanoTime();
+
+        String wordSpelling = "কঙঘছদঢণদ";
+
+        DictionaryWord word = wordLogic.getDictionaryWordBySpelling(wordSpelling, null);
+
+        long total_time = System.nanoTime() - current_time;
+
+        if (word != null) {
+            log.info("Word for spelling: \"" + wordSpelling + "\" :" + word.toString());
+        } else {
+            log.info("Word for spelling: \"" + wordSpelling + "\":" + "Not Found" );
+        }
+
+        log.info("[Total Time:" + (total_time / 1000000.0) + "ms]");
 
     }
 

@@ -12,11 +12,16 @@ public class Meaning {
 
     int strength; //how strongly does this meaning apply to the word invisible
 
-    public Meaning(String id, String partOfSpeech, String meaning, String example) {
+    public Meaning(){
+
+    }
+
+    public Meaning(String id, String partOfSpeech, String meaning, String example, int strength) {
         this.id = id;
         this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
         this.example = example;
+        this.strength = strength;
     }
 
     public String getId() {

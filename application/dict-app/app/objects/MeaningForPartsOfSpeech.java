@@ -1,6 +1,7 @@
 package objects;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by tahsinkabir on 6/16/16.
@@ -8,7 +9,16 @@ import java.util.ArrayList;
 public class MeaningForPartsOfSpeech {
 
     String type;
-    ArrayList<Meaning> meanings; //this can have difference order
+    ArrayList<Meaning> meanings; //these can have difference in order
+
+    public MeaningForPartsOfSpeech() {
+
+    }
+
+    public MeaningForPartsOfSpeech(String type, Collection<Meaning> meanings) {
+        this.type = type;
+        this.meanings = new ArrayList(meanings);
+    }
 
     public String getType() {
         return type;
@@ -35,7 +45,7 @@ public class MeaningForPartsOfSpeech {
 
     }
 
-    public int getCombinedStrength(){
+    public int generateCombinedStrength(){
         int total = 0;
         for(Meaning meaning: meanings)
             total += meaning.getStrength();

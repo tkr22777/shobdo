@@ -1,6 +1,7 @@
 package objects;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -19,8 +20,24 @@ public class DictionaryWord extends BaseWord {
 
     ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
 
+    public DictionaryWord(){
+        super();
+    }
+
     public DictionaryWord(String wordId, String wordSpelling) {
         super(wordId, wordSpelling);
+    }
+
+    public DictionaryWord(String wordId, String wordSpelling, String arrangementType, ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
+        super(wordId, wordSpelling);
+        this.arrangementType = arrangementType;
+        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
+    }
+
+    public DictionaryWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation, String arrangementType, Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
+        super(wordId, wordSpelling, timesSearched, linkToPronunciation);
+        this.arrangementType = arrangementType;
+        this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
     }
 
     public String getArrangementType() {

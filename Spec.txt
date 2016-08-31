@@ -32,6 +32,7 @@ User Specification:
 	- Bangla to Bangla dictionary
 	- Bangla to English dictionary
 	- Bangla synonyms
+	- User login and history with facebook
 
 Tips:
 	- suggest and match a word from cache when users type using Ovro 

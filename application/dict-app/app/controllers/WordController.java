@@ -41,4 +41,21 @@ public class WordController extends Controller{
         return ok( logic.setDictWord(word,meaning).getWordId() );
     }
 
+    public Result searchWordsBySpelling(String spelling){
+
+        int limit = Integer.MAX_VALUE;
+
+        return ok( logic.searchWordsBySpelling( spelling, limit).toString() );
+    }
+
+    public Result getWordBySpelling(String spelling){
+
+        return ok( logic.getDictionaryWordBySpelling( spelling, null).toString() );
+    }
+
+    public Result getWordByWordId(String wordId){
+
+        return ok( logic.getDictionaryWordByWordId( wordId, null).toString() );
+    }
+
 }

@@ -1,5 +1,7 @@
 package objects;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * Created by tahsinkabir on 6/16/16.
  */
@@ -10,9 +12,20 @@ public class BaseWord {
     private int timesSearched;
     private String linkToPronunciation;
 
+    public BaseWord(){
+
+    }
+
     public BaseWord(String wordId, String wordSpelling) {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
+    }
+
+    public BaseWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation) {
+        this.wordId = wordId;
+        this.wordSpelling = wordSpelling;
+        this.timesSearched = timesSearched;
+        this.linkToPronunciation = linkToPronunciation;
     }
 
     public String getWordId() {
