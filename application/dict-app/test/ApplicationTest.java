@@ -194,7 +194,7 @@ public class ApplicationTest {
     @Test
     public void heyJude(){
 
-        new SamsadExporter().main();
+        log.info(new SamsadExporter().getDictiionary().toString());
 
     }
 

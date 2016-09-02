@@ -1,5 +1,8 @@
 package objects;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.LogPrint;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -15,6 +18,8 @@ public class DictionaryWord extends BaseWord {
     //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
     //or as (arranged by combined strength for each of the parts of speech and words worders within them):
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
+
+    private LogPrint log = new LogPrint(DictionaryWord.class);
 
     String arrangementType = null; //There will be only one arrangement for start
 
@@ -34,8 +39,14 @@ public class DictionaryWord extends BaseWord {
         this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
     }
 
-    public DictionaryWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation, String arrangementType, Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
-        super(wordId, wordSpelling, timesSearched, linkToPronunciation);
+    public DictionaryWord(String wordId,
+                          String wordSpelling,
+                          int timesSearched,
+                          String linkToPronunciation,
+                          String arrangementType,
+                          Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
+                          String extraMeta) {
+        super(wordId, wordSpelling, timesSearched, linkToPronunciation, extraMeta);
         this.arrangementType = arrangementType;
         this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
     }
@@ -58,9 +69,16 @@ public class DictionaryWord extends BaseWord {
 
     @Override
     public String toString() {
-        return "DictionaryWord{" +
-                "arrangementType='" + arrangementType + '\'' +
-                ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches.toString() +
-                '}';
+
+        String to_return = "DefaultToStringOfDictionaryWord";
+        try {
+            to_return =  new ObjectMapper().writeValueAsString(this);
+
+        } catch (Exception ex){
+
+            log.info("Error converting object to string. Exception:" + ex.getStackTrace().toString());
+
+        }
+        return to_return;
     }
 }

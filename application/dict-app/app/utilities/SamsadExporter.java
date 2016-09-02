@@ -5,6 +5,7 @@ import objects.DictionaryWord;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,23 +23,27 @@ public class SamsadExporter {
 
     public DictionaryWord createWord(String line) {
 
-        log.info(line);
+        //log.info(line);
 
         DictionaryWord word = new DictionaryWord();
 
-        word.setWordSpelling(line);
+        List<String> list = new ArrayList<>( Arrays.asList( line.split("\\[") ) );
+
+        word.setWordSpelling( list.get(0) );
+
+        word.setExtraMeta(list.get(1));
 
         return word;
 
     }
 
-    public void main() {
+    public List<DictionaryWord> getDictiionary() {
 
         ReadFile readFileB2B = new ReadFile(BANGLA_TO_BANGLA_FILE_LOCATION);
 
         String line = "";
 
-        int lines_to_read = 10;
+        int lines_to_read = 100;
 
         List<DictionaryWord> words = new ArrayList<DictionaryWord>(lines_to_read);
 
@@ -48,5 +53,7 @@ public class SamsadExporter {
 
             words.add( createWord(line) );
         }
+
+        return words;
     }
 }

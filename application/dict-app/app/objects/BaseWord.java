@@ -11,21 +11,23 @@ public class BaseWord {
     private String wordSpelling;
     private int timesSearched;
     private String linkToPronunciation;
+    private String extraMeta;
 
     public BaseWord(){
 
     }
 
-    public BaseWord(String wordId, String wordSpelling) {
-        this.wordId = wordId;
-        this.wordSpelling = wordSpelling;
-    }
-
-    public BaseWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation) {
+    public BaseWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation, String extraMeta) {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
         this.timesSearched = timesSearched;
         this.linkToPronunciation = linkToPronunciation;
+        this.extraMeta = extraMeta;
+    }
+
+    public BaseWord(String wordId, String wordSpelling) {
+        this.wordId = wordId;
+        this.wordSpelling = wordSpelling;
     }
 
     public String getWordId() {
@@ -52,13 +54,12 @@ public class BaseWord {
         this.timesSearched = timesSearched;
     }
 
-    @Override
-    public String toString() {
-        return "BaseWord{" +
-                "wordId='" + wordId + '\'' +
-                ", wordSpelling='" + wordSpelling + '\'' +
-                ", timesSearched=" + timesSearched +
-                '}';
+    public String getExtraMeta() {
+        return extraMeta;
+    }
+
+    public void setExtraMeta(String extraMeta) {
+        this.extraMeta = extraMeta;
     }
 
     @Override
@@ -75,5 +76,16 @@ public class BaseWord {
     @Override
     public int hashCode() {
         return wordSpelling != null ? wordSpelling.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseWord{" +
+                "wordId='" + wordId + '\'' +
+                ", wordSpelling='" + wordSpelling + '\'' +
+                ", timesSearched=" + timesSearched +
+                ", linkToPronunciation='" + linkToPronunciation + '\'' +
+                ", extraMeta='" + extraMeta + '\'' +
+                '}';
     }
 }
