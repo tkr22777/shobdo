@@ -29,6 +29,11 @@ public class DictionaryWord extends BaseWord {
         super();
     }
 
+    //To Do, create word from jsonString
+    public DictionaryWord(String wordInJsonString){
+        super();
+    }
+
     public DictionaryWord(String wordId, String wordSpelling) {
         super(wordId, wordSpelling);
     }
@@ -71,7 +76,9 @@ public class DictionaryWord extends BaseWord {
     public String toString() {
 
         String to_return = "DefaultToStringOfDictionaryWord";
+
         try {
+
             to_return =  new ObjectMapper().writeValueAsString(this);
 
         } catch (Exception ex){

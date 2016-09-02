@@ -31,6 +31,7 @@ public class WordLogic {
 
     /* Redis key words */
     private final String REDIS_SERACH_WORD_BY_SPELLING = "SRC_WD_BY_SPL";
+    private final String REDIS_GET_WORD_BY_SPELLING = "GET_WD_BY_SPL";
 
     /*Redis expire time*/
     private boolean USE_REDIS_EXPIRATION_TIME = false;
@@ -100,7 +101,31 @@ public class WordLogic {
         if(arrangement != null)
             log.info("Arrangement not avaiable in current version");
 
-        return wordDao.getDictionaryWordBySpelling(spelling);
+        String key = REDIS_GET_WORD_BY_SPELLING + spelling;
+
+        log.info("key:" + key);
+
+        if( jedis != null ) {
+
+            String dictionaryWord = jedis.smembers(key);
+
+            if( word != null ) {
+                log.debug("Word [" + spelling + "] found and returning from redis.");
+                return new DictionaryWord(dictionaryWord);
+            }
+        }
+
+        DictionaryWord word = wordDao.getDictionaryWordBySpelling(spelling);
+
+        if ( jedis != null && word != null ) {
+
+            jedis.add(key, word.toString());
+
+            if(USE_REDIS_EXPIRATION_TIME)
+                jedis.expire( key, REDIS_EXPIRE_TIME);
+        }
+
+        return word;
     }
 
     public DictionaryWord getDictionaryWordByWordId( String wordId, String arrangement) {
