@@ -10,6 +10,7 @@ import org.junit.*;
 import utilities.Bangla;
 import utilities.LogPrint;
 import utilities.DictUtil;
+import utilities.SamsadExporter;
 
 import static org.junit.Assert.*;
 
@@ -187,6 +188,13 @@ public class ApplicationTest {
         }
 
         log.info("[Total Time:" + (total_time / 1000000.0) + "ms]");
+
+    }
+
+    @Test
+    public void heyJude(){
+
+        new SamsadExporter().main();
 
     }
 
