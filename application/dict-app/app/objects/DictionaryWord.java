@@ -5,7 +5,6 @@ import utilities.LogPrint;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Created by tahsinkabir on 8/21/16.
@@ -26,13 +25,31 @@ public class DictionaryWord extends BaseWord {
     ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
 
     public DictionaryWord(){
+
         super();
     }
 
-    //To Do, create word from jsonString
     public DictionaryWord(String wordInJsonString){
+
         super();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        DictionaryWord word = null;
+
+        try {
+
+            word = mapper.readValue(wordInJsonString, DictionaryWord.class);
+
+        } catch (Exception ex){
+
+            log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+
+        }
+
+
     }
+
 
     public DictionaryWord(String wordId, String wordSpelling) {
         super(wordId, wordSpelling);
@@ -72,8 +89,7 @@ public class DictionaryWord extends BaseWord {
         this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
     }
 
-    @Override
-    public String toString() {
+    public String toJsonString() {
 
         String to_return = "DefaultToStringOfDictionaryWord";
 
@@ -87,5 +103,14 @@ public class DictionaryWord extends BaseWord {
 
         }
         return to_return;
+    }
+
+    @Override
+    public String toString() {
+        return "DictionaryWord{" +
+                ", arrangementType='" + arrangementType + '\'' +
+                ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches +
+                ", " + super.toString() +
+                '}';
     }
 }

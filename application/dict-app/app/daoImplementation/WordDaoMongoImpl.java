@@ -2,20 +2,17 @@ package daoImplementation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
-import com.mongodb.util.Util;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -130,7 +127,7 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public ArrayList<String> getWordsWithPrefixMatch(String spelling) {
+    public Set<String> getWordsWithPrefixMatch(String spelling) {
 
         final String WORD_SPELLING = "wordSpelling";
 
@@ -149,8 +146,7 @@ public class WordDaoMongoImpl implements WordDao {
 
         }
 
-        return new ArrayList<>(result);
+        return result;
     }
-
 
 }

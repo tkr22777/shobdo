@@ -1,6 +1,9 @@
 package cache;
 
-public class WordCache{
+import redis.clients.jedis.Jedis;
+import utilities.LogPrint;
+
+public class RedisCache {
     
     private static boolean USE_REDIS = true;
     private static final String DEFAULT_REDIS_HOSTNAME="localhost";
@@ -15,9 +18,9 @@ public class WordCache{
     private boolean USE_REDIS_EXPIRATION_TIME = false;
     private final int REDIS_EXPIRE_TIME = 10; //in seconds
     
-    private LogPrint log = new LogPrint(WordCache.class);
+    private LogPrint log = new LogPrint(RedisCache.class);
     
-    public WordCache() {
+    public RedisCache() {
             
         jedis = new Jedis( getHostname() );
          
