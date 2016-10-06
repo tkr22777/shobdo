@@ -155,13 +155,13 @@ public class ApplicationTest {
     }
 
     @Test @Ignore
-    public void searchWordsByPrefill() {
+    public void searchWordsByPrefix() {
 
         long current_time = System.nanoTime();
 
         String prefix = "ক";
 
-        List<String> results = wordLogic.searchWordsBySpelling( prefix, 10) ;
+        Set<String> results = wordLogic.searchWordsBySpelling( prefix, 10) ;
 
         long total_time = System.nanoTime() - current_time;
 

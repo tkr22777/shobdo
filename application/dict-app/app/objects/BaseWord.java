@@ -1,7 +1,5 @@
 package objects;
 
-import com.mongodb.BasicDBObject;
-
 /**
  * Created by tahsinkabir on 6/16/16.
  */
@@ -62,6 +60,14 @@ public class BaseWord {
         this.extraMeta = extraMeta;
     }
 
+    public String getLinkToPronunciation() {
+        return linkToPronunciation;
+    }
+
+    public void setLinkToPronunciation(String linkToPronunciation) {
+        this.linkToPronunciation = linkToPronunciation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -88,4 +94,5 @@ public class BaseWord {
                 ", extraMeta='" + extraMeta + '\'' +
                 '}';
     }
+
 }

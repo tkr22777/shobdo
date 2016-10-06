@@ -1,18 +1,14 @@
 package logics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.BaseWord;
 import objects.DictionaryWord;
-import org.omg.CORBA.Object;
 import redis.clients.jedis.Jedis;
 import utilities.LogPrint;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 /**
  * Created by tahsinkabir on 8/14/16.
@@ -31,6 +27,7 @@ public class WordLogic {
 
     /* Redis key words */
     private final String REDIS_SERACH_WORD_BY_SPELLING = "SRC_WD_BY_SPL";
+    private final String REDIS_GET_WORD_BY_SPELLING = "GET_WD_BY_SPL";
 
     /*Redis expire time*/
     private boolean USE_REDIS_EXPIRATION_TIME = false;
@@ -100,7 +97,47 @@ public class WordLogic {
         if(arrangement != null)
             log.info("Arrangement not avaiable in current version");
 
-        return wordDao.getDictionaryWordBySpelling(spelling);
+        String key = REDIS_GET_WORD_BY_SPELLING + spelling;
+
+        log.info("key:" + key);
+
+        DictionaryWord word = null;
+
+        if( jedis != null ) {
+
+            String wordJsonString = jedis.get(key);
+
+            if( wordJsonString != null ) {
+
+                log.debug("Word [" + spelling + "] found and returning from redis.");
+
+                ObjectMapper mapper = new ObjectMapper();
+
+                try {
+
+                    word = mapper.readValue( wordJsonString, DictionaryWord.class);
+
+                } catch (Exception ex){
+
+                    log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+
+                }
+
+                return word;
+            }
+        }
+
+        word = wordDao.getDictionaryWordBySpelling(spelling);
+
+        if ( jedis != null && word != null ) {
+
+            jedis.set(key, word.toJsonString());
+
+            if(USE_REDIS_EXPIRATION_TIME)
+                jedis.expire( key, REDIS_EXPIRE_TIME);
+        }
+
+        return word;
     }
 
     public DictionaryWord getDictionaryWordByWordId( String wordId, String arrangement) {
@@ -120,7 +157,7 @@ public class WordLogic {
 
      }
 
-    public List<String> searchWordsBySpelling(String spelling, int limit){
+    public Set<String> searchWordsBySpelling(String spelling, int limit){
 
         //all that logic :D
         //Cache all the spellings together for search greatness!!
@@ -134,17 +171,19 @@ public class WordLogic {
 
         log.info("key:" + key);
 
+        Set<String> words = null;
+
         if( jedis != null ) {
 
-            Set<String> words = jedis.smembers(key);
+            words = jedis.smembers(key);
 
             if( words != null && words.size() > 0) {
                 log.debug("Search result found and returning from redis. Count: " + words.size());
-                return new ArrayList<>(words);
+                return words;
             }
         }
 
-        ArrayList<String> words = wordDao.getWordsWithPrefixMatch(spelling);
+        words = wordDao.getWordsWithPrefixMatch(spelling);
 
         if ( jedis != null && words != null && words.size() > 0 ) {
 
