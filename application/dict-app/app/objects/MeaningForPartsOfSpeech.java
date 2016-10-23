@@ -8,7 +8,7 @@ import java.util.Collection;
  */
 public class MeaningForPartsOfSpeech {
 
-    String type;
+    String type; //type refers to the partOfSpeech?
     ArrayList<Meaning> meanings; //these can have difference in order
 
     public MeaningForPartsOfSpeech() {

@@ -10,7 +10,7 @@ public class Meaning {
     String meaning; //The meaning
     String example; //exmaple of the word used with the context of this meaning
 
-    int strength; //how strongly does this meaning apply to the word invisible
+    int strength; //how strongly does this meaning apply to the word
 
     public Meaning(){
 

@@ -55,7 +55,11 @@ public class DictionaryWord extends BaseWord {
         super(wordId, wordSpelling);
     }
 
-    public DictionaryWord(String wordId, String wordSpelling, String arrangementType, ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
+
+    public DictionaryWord(String wordId, String wordSpelling, String arrangementType,
+                          ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches)
+    {
+
         super(wordId, wordSpelling);
         this.arrangementType = arrangementType;
         this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
