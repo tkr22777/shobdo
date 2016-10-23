@@ -6,11 +6,11 @@ package objects;
 public class Meaning {
 
     String id;
-    String partOfSpeech; // the partOfSpeech of the meaning (redundant? since it will always be part of the higher category
+    String partOfSpeech; //The partOfSpeech of the meaning (redundant?)
     String meaning; //The meaning
-    String example; //exmaple of the word used with the context of this meaning
+    String example; //Example of the word used with the context of this meaning
 
-    int strength; //how strongly does this meaning apply to the word
+    int strength; //how strongly does this meaning apply to the word, -1 means unset
 
     public Meaning(){
 
@@ -66,12 +66,19 @@ public class Meaning {
 
     @Override
     public String toString() {
-        return "Meaning{" +
-                "id='" + id + '\'' +
-                ", partOfSpeech='" + partOfSpeech + '\'' +
-                ", meaning='" + meaning + '\'' +
-                ", example='" + example + '\'' +
-                ", strength=" + strength +
+
+        return customToString();
+    }
+
+    public String customToString() {
+
+        return "Meaning {" +
+                //"\n\n\t\t\t\tid = '" + id + '\'' +
+                //"\n\n\t\t\t\tpartOfSpeech = '" + partOfSpeech + '\'' +
+                "\n\n\t\t\t\tmeaning = '" + meaning + '\'' +
+                //"\n\n\t\t\t\texample = '" + example + '\'' +
+                //"\n\n\t\t\t\tstrength = " + strength +
                 '}';
     }
+
 }

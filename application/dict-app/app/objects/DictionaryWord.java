@@ -5,6 +5,7 @@ import utilities.LogPrint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by tahsinkabir on 8/21/16.
@@ -71,7 +72,7 @@ public class DictionaryWord extends BaseWord {
                           String linkToPronunciation,
                           String arrangementType,
                           Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
-                          String extraMeta) {
+                          Map<String,String> extraMeta) {
         super(wordId, wordSpelling, timesSearched, linkToPronunciation, extraMeta);
         this.arrangementType = arrangementType;
         this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
@@ -87,6 +88,14 @@ public class DictionaryWord extends BaseWord {
 
     public ArrayList<MeaningForPartsOfSpeech> getMeaningForPartsOfSpeeches() {
         return meaningForPartsOfSpeeches;
+    }
+
+    public void addMeaningForPartsOfSpeech(MeaningForPartsOfSpeech aMeaningForPartsOfSpeech) {
+
+        if(meaningForPartsOfSpeeches == null)
+            meaningForPartsOfSpeeches = new ArrayList<>();
+
+        meaningForPartsOfSpeeches.add(aMeaningForPartsOfSpeech);
     }
 
     public void setMeaningForPartsOfSpeeches(ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
@@ -111,10 +120,15 @@ public class DictionaryWord extends BaseWord {
 
     @Override
     public String toString() {
-        return "DictionaryWord{" +
-                ", arrangementType='" + arrangementType + '\'' +
-                ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches +
-                ", " + super.toString() +
-                '}';
+
+        return customToString();
+    }
+
+    public String customToString(){
+        return "\n\n\tDictionary Word { " +
+                //"\n\n\t\t Arrangement Type = '" + arrangementType + '\'' +
+                "\n\n\t\t Meaning For Parts Of Speeches = " + meaningForPartsOfSpeeches +
+                "\n\n\t\t " + super.toString() +
+                "\n\n\t}";
     }
 }

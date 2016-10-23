@@ -35,19 +35,6 @@ public class ApplicationTest {
 
     WordLogic wordLogic;
 
-    @Test @Ignore
-    public void simpleCheck() {
-        int a = 1 + 1;
-        assertEquals(2, a);
-    }
-
-    @Test @Ignore
-    public void renderTemplate() {
-        //Content html = views.html.ndex.render("Your new application is ready.");
-        //assertEquals("text/html", html.contentType());
-        //assertTrue(html.body().contains("Your new application is ready."));
-    }
-
     @Before
     public void setup() {
 
@@ -123,6 +110,21 @@ public class ApplicationTest {
         return dictionaryWord;
     }
 
+    /*
+
+    @Test @Ignore
+    public void simpleCheck() {
+        int a = 1 + 1;
+        assertEquals(2, a);
+    }
+
+    @Test @Ignore
+    public void renderTemplate() {
+        //Content html = views.html.ndex.render("Your new application is ready.");
+        //assertEquals("text/html", html.contentType());
+        //assertTrue(html.body().contains("Your new application is ready."));
+    }
+
     @Test @Ignore
     public void testBangla() {
 
@@ -191,11 +193,25 @@ public class ApplicationTest {
 
     }
 
-    @Test
-    public void heyJude(){
+    */
 
-        log.info(new SamsadExporter().getDictiionary().toString());
+    @Test
+    public void heyJude() throws Exception {
+
+        List<DictionaryWord> words = new SamsadExporter().getDictiionary();
+
+        int total = 0;
+        for(DictionaryWord word: words) {
+
+            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE SPELLING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE MEANING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE TYPE")) ) {
+                log.info("Next word: \n" + word.toString());
+                total++;
+            }
+
+        }
+        log.info("Total words: " + total);
 
     }
-
 }

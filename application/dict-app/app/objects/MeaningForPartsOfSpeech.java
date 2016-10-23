@@ -8,8 +8,8 @@ import java.util.Collection;
  */
 public class MeaningForPartsOfSpeech {
 
-    String type; //type refers to the partOfSpeech?
-    ArrayList<Meaning> meanings; //these can have difference in order
+    String type; //type refers to the partOfSpeech
+    ArrayList<Meaning> meanings = new ArrayList<>(); //the order of their meaning matters
 
     public MeaningForPartsOfSpeech() {
 
@@ -36,6 +36,15 @@ public class MeaningForPartsOfSpeech {
         this.meanings = meanings;
     }
 
+    public void addMeaning(Meaning aMeaning) {
+
+        if(meanings == null)
+            meanings = new ArrayList<>();
+
+        meanings.add(aMeaning);
+
+    }
+
     public void setAMeaning(Meaning meaning) {
 
         if (meanings == null)
@@ -54,9 +63,15 @@ public class MeaningForPartsOfSpeech {
 
     @Override
     public String toString() {
-        return "MeaningForPartsOfSpeech{" +
-                "type='" + type + '\'' +
-                ", meanings=" + meanings +
-                '}';
+        return customToString();
     }
+
+    public String customToString() {
+
+        return " MeaningForPartsOfSpeech {" +
+                "\n\t\t\ttype = " + type + '\'' +
+                "\n\t\t\tmeanings = " + meanings +
+                "\n}";
+    }
+
 };
