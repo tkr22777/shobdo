@@ -203,10 +203,12 @@ public class ApplicationTest {
         int total = 0;
         for(DictionaryWord word: words) {
 
-            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE SPELLING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE MEANING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE TYPE")) ) {
+            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_SPELLING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_MEANING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
                 log.info("Next word: \n" + word.toString());
+
+                //wordLogic.saveDictionaryWord(word);
                 total++;
             }
 

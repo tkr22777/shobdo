@@ -85,103 +85,105 @@ public class SamsadExporter {
     public DictionaryWord createWord(String line) {
 
         DictionaryWord word = new DictionaryWord();
+        word.setWordId( "WD_" + UUID.randomUUID() );
 
-        word.setExtraMetaValue("Main String", line, false);
-
-        List<String> list = new ArrayList<>( Arrays.asList( line.split("\\[") ) );
+        word.setExtraMetaValue( "OriginString", line, false);
 
         //Spelling
+        List<String> list = new ArrayList<>( Arrays.asList( line.split("\\[") ) );
         String spelling = list.get(0).trim();
-        word.setWordSpelling( spelling );
+        word.setWordSpelling( spelling);
 
         String meaning = list.get(1).trim();
+
         int  index = meaning.indexOf(']');
         String engPronunciation = meaning.substring(0,index);
-        word.setExtraMetaValue( "Eng Pronunciation", engPronunciation, false);
 
+        word.setExtraMetaValue( "English Pronunciation", engPronunciation, false);
         word.setExtraMetaValue( "EXAMPLE SET", "NO", false);
 
         meaning = meaning.substring(index+1).trim();
-        word.setExtraMetaValue("Meaning", meaning, false);
+        word.setExtraMetaValue( "MeaningString", meaning, false);
 
         boolean simpleSpelling = true;
 
         if(spelling.contains("sup")) {
             supBucket.add(spelling);
             simpleSpelling = false;
-            word.setExtraMetaValue("Spelling Contains 'sup'", "YES", false);
+            word.setExtraMetaValue("SpellingContainsSup", "YES", false);
         }
 
-        if (spelling.contains(",")) {
+        if(spelling.contains(",")) {
             commaBucket.add(spelling);
             simpleSpelling = false;
-            word.setExtraMetaValue("Spelling Contains ','", "YES", false);
+            word.setExtraMetaValue("SpellingContainsComma", "YES", false);
         }
 
         if (spelling.contains("-")) {
             dashBucket.add(spelling);
             simpleSpelling = false;
-            word.setExtraMetaValue("Spelling Contains '-'", "YES", false);
+            word.setExtraMetaValue("SpellingContainsDash", "YES", false);
         }
 
         if (spelling.contains(" ")) {
             spaceBucket.add(spelling);
             simpleSpelling = false;
-            word.setExtraMetaValue("Spelling Contains ' '", "YES", false);
+            word.setExtraMetaValue("SpellingContainsSpace", "YES", false);
         }
 
         if( simpleSpelling ) {
             simpleBucket.add(spelling);
-            word.setExtraMetaValue("SIMPLE SPELLING", "YES", false);
+            word.setExtraMetaValue("SIMPLE_SPELLING", "YES", false);
         }
 
         boolean simpleMeaning = true;
 
         if(meaning.contains("<b>")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("Meaning Contains ' '", "<b>", false);
+            word.setExtraMetaValue("MeaningContainsB", "<b>", false);
         }
 
         if(meaning.contains("☐")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("Meaning Contains ' '", "☐", false);
+            word.setExtraMetaValue("MeaningContainsBox", "☐", false);
         }
 
         if(meaning.contains("<eng")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("Meaning Contains ' '", "<eng", false);
+            word.setExtraMetaValue("MeaningContainsEng", "<eng", false);
         }
 
         if(meaning.contains("sup")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("Meaning Contains ' '", "sup", false);
+            word.setExtraMetaValue("MeaningContainsSup", "sup", false);
         }
 
         if( meaning.substring(0,1).equalsIgnoreCase("(")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("Starts with", "(", false);
+            word.setExtraMetaValue("StartsWithBracket", "(", false);
         }
 
         if( simpleMeaning ) {
 
             simpleMeaningBucket.add(meaning);
 
-            word.setExtraMetaValue("SIMPLE MEANING", "YES", false);
+            word.setExtraMetaValue("SIMPLE_MEANING", "YES", false);
 
             int indexOfDot = meaning.indexOf(".");
 
             String typePrefix = null;
+
             if(indexOfDot > 0 && indexOfDot < 5) {
 
                 typePrefix = meaning.substring(0, indexOfDot).trim();
 
-                if(MAP_OF_TYPES.get(typePrefix) != null) {
+                if( MAP_OF_TYPES.get(typePrefix) != null) {
 
                     understandableSimpleMeaningBucket.add( meaning );
 
                     typeMeaningSet.add(typePrefix);
 
-                    word.setExtraMetaValue("UNDERSTANDABLE TYPE", "YES", false);
+                    word.setExtraMetaValue("UNDERSTANDABLE_TYPE", "YES", false);
 
                     String meaningId = "MN_" + UUID.randomUUID();
 
@@ -202,11 +204,9 @@ public class SamsadExporter {
 
                 }
             }
-
         }
 
         return word;
-
     }
 
     public void labTest(){
