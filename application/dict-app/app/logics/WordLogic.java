@@ -1,6 +1,6 @@
 package logics;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cache.WordCache;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.BaseWord;
@@ -19,50 +19,9 @@ public class WordLogic {
     private static final String DB_DEFAULT = DB_MONGO;
 
     private WordDao wordDao;
-
-    //Is it a better idea to have a class wordCache or something?
-    private static boolean USE_REDIS = true;
-    private static final String REDIS_HOSTNAME="localhost";
-    private Jedis jedis;
-
-    /* Redis key words */
-    private final String REDIS_SERACH_WORD_BY_SPELLING = "SRC_WD_BY_SPL";
-    private final String REDIS_GET_WORD_BY_SPELLING = "GET_WD_BY_SPL";
-
-    /*Redis expire time*/
-    private boolean USE_REDIS_EXPIRATION_TIME = false;
-    private final int REDIS_EXPIRE_TIME = 10; //in seconds
+    private WordCache wordCache;
 
     private LogPrint log = new LogPrint(WordLogic.class);
-
-    private WordLogic( WordDao wordDao, boolean useRedis) {
-
-        this.wordDao = wordDao;
-
-        if(useRedis){
-
-            jedis = getJedis(REDIS_HOSTNAME);
-
-        }
-
-    }
-
-    public Jedis getJedis( String hostname){
-
-        Jedis jedis = null;
-
-        try {
-
-            jedis = new Jedis(hostname);
-
-        } catch (Exception ex) {
-
-            log.info("Exception Occured while connecting to Redis. Message:" + ex.getMessage() );
-        }
-
-        return jedis;
-
-    }
 
     public static WordLogic factory(String dbName) { //to select which database to use
 
@@ -76,77 +35,30 @@ public class WordLogic {
         else                                    //if(DB_DEFAULT.equalsIgnoreCase(dbName))
             wordDao = new WordDaoMongoImpl();   // Default
 
-        return new WordLogic( wordDao, USE_REDIS);
-
+        return new WordLogic( wordDao );
     }
 
-    public BaseWord getDictWord(String wordName){
+    private WordLogic( WordDao wordDao) {
 
-        return new BaseWord( wordDao.getDictWord(wordName), wordName);
+        this.wordDao = wordDao;
 
+        this.wordCache = new WordCache();
     }
 
-    public BaseWord setDictWord(String wordName, String Meaning){
+    public Jedis getJedis( String hostname){
 
-        return new BaseWord( wordDao.setDictWord(wordName,Meaning), wordName);
+        Jedis jedis = null;
 
-    }
+        try {
 
-    public DictionaryWord getDictionaryWordBySpelling( String spelling, String arrangement){
+            jedis = new Jedis(hostname);
 
-        if(arrangement != null)
-            log.info("Arrangement not avaiable in current version");
+        } catch (Exception ex) {
 
-        String key = REDIS_GET_WORD_BY_SPELLING + spelling;
-
-        log.info("key:" + key);
-
-        DictionaryWord word = null;
-
-        if( jedis != null ) {
-
-            String wordJsonString = jedis.get(key);
-
-            if( wordJsonString != null ) {
-
-                log.debug("Word [" + spelling + "] found and returning from redis.");
-
-                ObjectMapper mapper = new ObjectMapper();
-
-                try {
-
-                    word = mapper.readValue( wordJsonString, DictionaryWord.class);
-
-                } catch (Exception ex){
-
-                    log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
-
-                }
-
-                return word;
-            }
+            log.info("Exception occurred while connecting to Redis. Message:" + ex.getMessage() );
         }
 
-        word = wordDao.getDictionaryWordBySpelling(spelling);
-
-        if ( jedis != null && word != null ) {
-
-            jedis.set(key, word.toJsonString());
-
-            if(USE_REDIS_EXPIRATION_TIME)
-                jedis.expire( key, REDIS_EXPIRE_TIME);
-        }
-
-        return word;
-    }
-
-    public DictionaryWord getDictionaryWordByWordId( String wordId, String arrangement) {
-
-        if (arrangement != null)
-            log.info("Arrangement not avaiable in current version");
-
-        return wordDao.getDictionaryWordByWordId(wordId);
-
+        return jedis;
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
@@ -154,47 +66,45 @@ public class WordLogic {
         verifyDictionaryWord(dictionaryWord);
 
         wordDao.setDictionaryWord(dictionaryWord);
+    }
 
-     }
+    public DictionaryWord getDictionaryWordBySpelling( String spelling){
+
+        DictionaryWord word = wordCache.getDictionaryWordBySpellingFromCache(spelling);
+
+        if( word != null )
+            return word;
+
+        word = wordDao.getDictionaryWordBySpelling(spelling);
+
+        wordCache.cacheDictionaryWord(word);
+
+        return word;
+    }
+
+    public DictionaryWord getDictionaryWordByWordId( String wordId) {
+
+        return wordDao.getDictionaryWordByWordId(wordId);
+    }
+
+    /**
+     Cache all the spellings together for search!!
+     Check if there is are ways to search by string on the indexed string, it should be very basic!
+     ** You may return a smart object that specifies each close words and also suggestion if it didn't match
+     How to find closest neighbour of a Bangla word? you may be able to do that locally?
+     **/
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
 
-        //all that logic :D
-        //Cache all the spellings together for search greatness!!
-        //Check if there is are ways to search by string on the indexed string
-        //It sould be very basic
-        //You may return a smart object that specifies each close words and also suggestion if it didn't match
-        //Also how to find closest neighbour of a Bangla word?
-        //you may be able to do that locally
+        Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
 
-        String key = REDIS_SERACH_WORD_BY_SPELLING + spelling;
-
-        log.info("key:" + key);
-
-        Set<String> words = null;
-
-        if( jedis != null ) {
-
-            words = jedis.smembers(key);
-
-            if( words != null && words.size() > 0) {
-                log.debug("Search result found and returning from redis. Count: " + words.size());
-                return words;
-            }
-        }
+        if(words != null && words.size() > 0)
+            return words;
 
         words = wordDao.getWordsWithPrefixMatch(spelling);
 
-        if ( jedis != null && words != null && words.size() > 0 ) {
-
-            for(String word: words) {
-                jedis.sadd(key, word);
-            }
-
-
-            if(USE_REDIS_EXPIRATION_TIME)
-                jedis.expire( key, REDIS_EXPIRE_TIME);
-        }
+        if ( words != null && words.size() > 0 )
+            wordCache.cacheSearchWordsBySpelling(spelling,words);
 
         return words;
     }
@@ -205,7 +115,7 @@ public class WordLogic {
 
             log.info("Dictionary Word is null.");
 
-        else if(dictionaryWord.getMeaningForPartsOfSpeeches() != null)
+        else if(dictionaryWord.getMeaningForPartsOfSpeeches() == null)
 
             log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings array is null.");
 
@@ -215,7 +125,7 @@ public class WordLogic {
 
     }
 
-    //The following are for future feature
+    //Word arrangement is a future feature
 
     public void reArrangeBy(DictionaryWord dictionaryWord, String arrangement){
 
@@ -226,11 +136,10 @@ public class WordLogic {
 
         } else {
 
-            reArrange_(arrangement);
+            _reArrange(arrangement);
             storeOnCache( dictionaryWord, arrangement);
             return;
         }
-
     }
 
 
@@ -239,7 +148,7 @@ public class WordLogic {
         return null;
     }
 
-    private void reArrange_(String arrangement){
+    private void _reArrange(String arrangement){
 
     }
 

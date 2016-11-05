@@ -110,8 +110,6 @@ public class ApplicationTest {
         return dictionaryWord;
     }
 
-    /*
-
     @Test @Ignore
     public void simpleCheck() {
         int a = 1 + 1;
@@ -125,7 +123,7 @@ public class ApplicationTest {
         //assertTrue(html.body().contains("Your new application is ready."));
     }
 
-    @Test @Ignore
+    @Test
     public void testBangla() {
 
         log.info("START!");
@@ -157,11 +155,11 @@ public class ApplicationTest {
     }
 
     @Test @Ignore
-    public void searchWordsByPrefix() {
+    public void searchWordsByPrefix() throws Exception{
 
         long current_time = System.nanoTime();
 
-        String prefix = "ক";
+        String prefix = "ত";
 
         Set<String> results = wordLogic.searchWordsBySpelling( prefix, 10) ;
 
@@ -177,9 +175,9 @@ public class ApplicationTest {
 
         long current_time = System.nanoTime();
 
-        String wordSpelling = "কঙঘছদঢণদ";
+        String wordSpelling = "পিটটান";
 
-        DictionaryWord word = wordLogic.getDictionaryWordBySpelling(wordSpelling, null);
+        DictionaryWord word = wordLogic.getDictionaryWordBySpelling(wordSpelling);
 
         long total_time = System.nanoTime() - current_time;
 
@@ -193,7 +191,6 @@ public class ApplicationTest {
 
     }
 
-    */
 
     @Test
     public void heyJude() throws Exception {
@@ -208,7 +205,7 @@ public class ApplicationTest {
              && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
                 log.info("Next word: \n" + word.toString());
 
-                //wordLogic.saveDictionaryWord(word);
+                wordLogic.saveDictionaryWord(word);
                 total++;
             }
 

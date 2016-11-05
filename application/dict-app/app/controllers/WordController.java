@@ -16,7 +16,7 @@ public class WordController extends Controller{
         return ok("বাংলা অভিধান এ স্বাগতম!" );
     }
 
-    public Result length(String word, int length){
+    public Result testLength(String word, int length){
 
         int s_size = word.length();
 
@@ -30,17 +30,6 @@ public class WordController extends Controller{
             return ok("Ups, the length of " + word + " is smaller than you thought!" );
     }
 
-    public Result getDictWord(String word){
-
-        return ok( logic.getDictWord( word ).getWordId() );
-
-    }
-
-    public Result setDictWord(String word, String meaning) {
-
-        return ok( logic.setDictWord(word,meaning).getWordId() );
-    }
-
     public Result searchWordsBySpelling(String spelling){
 
         int limit = Integer.MAX_VALUE;
@@ -50,12 +39,12 @@ public class WordController extends Controller{
 
     public Result getWordBySpelling(String spelling){
 
-        return ok( logic.getDictionaryWordBySpelling( spelling, null).toString() );
+        return ok( logic.getDictionaryWordBySpelling(spelling).toString() );
     }
 
     public Result getWordByWordId(String wordId){
 
-        return ok( logic.getDictionaryWordByWordId( wordId, null).toString() );
+        return ok( logic.getDictionaryWordByWordId( wordId ).toString() );
     }
 
 }

@@ -11,11 +11,6 @@ import java.util.Set;
  */
 public interface WordDao {
 
-
-    public String getDictWord(String wordName);
-
-    public String setDictWord(String wordName, String Meaning);
-
     public String setDictionaryWord(DictionaryWord dictionaryWord);
 
     public DictionaryWord getDictionaryWordByWordId(String wordId);

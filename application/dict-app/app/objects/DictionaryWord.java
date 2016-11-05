@@ -47,8 +47,6 @@ public class DictionaryWord extends BaseWord {
             log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
 
         }
-
-
     }
 
 
@@ -102,20 +100,10 @@ public class DictionaryWord extends BaseWord {
         this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
     }
 
-    public String toJsonString() {
+    public String toJsonString() throws Exception{
 
-        String to_return = "DefaultToStringOfDictionaryWord";
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
 
-        try {
-
-            to_return =  new ObjectMapper().writeValueAsString(this);
-
-        } catch (Exception ex){
-
-            log.info("Error converting object to string. Exception:" + ex.getStackTrace().toString());
-
-        }
-        return to_return;
     }
 
     @Override

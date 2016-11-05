@@ -10,15 +10,14 @@ GET     /count                      controllers.CountController.count
 GET     /message                    controllers.AsyncController.message
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-#There are the main application routes for the dict
-GET     /hello/*word/*length                    controllers.WordController.length(word: String, length: Int)
+#These are the main application routes for the dict
+GET     /hello/*word/*length                controllers.WordController.length(word: String, length: Int)
 
-GET     /dict                                   controllers.WordController.index()
+GET     /dict                               controllers.WordController.index()
 
-GET     /dict/*word                             controllers.WordController.getDictWord(word: String)
+GET     /dict/word/*spelling                controllers.WordController.getWordBySpelling(spelling: String)
 
-POST    /dict/*word/*meaning                    controllers.WordController.setDictWord(word: String, meaning: String)
+GET     /dict/word/search/*spelling         controllers.WordController.searchWordsBySpelling(spelling: String)
 
-GET     /dict/search/word/*spelling             controllers.WordController.searchWordsBySpelling(spelling: String)

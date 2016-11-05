@@ -28,6 +28,9 @@ public class WordDaoMongoImpl implements WordDao {
     public final String DICTIONARY_DATABASE_NAME = "Dictionary";
     public final String WORD_COLLECTION_NAME = "Words";
 
+    private final String WORD_ID = "wordId";
+    private final String WORD_SPELLING = "wordSpelling";
+
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
     MongoCollection<Document> collection;
@@ -43,32 +46,9 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public String getDictWord(String wordName) {
-
-        Document word = collection.find(eq("Spelling",wordName)).first();
-        return word.get("Meaning").toString();
-    }
-
-    @Override
-    public String setDictWord(String wordName, String Meaning) {
-
-        Document exitingWord  = collection.find( and( eq( "Spelling", wordName ) , eq("Meaning", Meaning) ) ) .first() ;
-
-        if( exitingWord != null )
-            return "BaseWord Meaning Already Exists";
-
-        Document wordEntry = new Document("Spelling", wordName)
-                .append("Meaning", Meaning);
-        collection.insertOne(wordEntry);
-        return wordName + "ID";
-
-    }
-
-    @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
 
         log.info("Saving word to database: " + dictionaryWord.toString());
-
 
         try {
 
@@ -92,8 +72,6 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public DictionaryWord getDictionaryWordByWordId(String wordId) {
 
-        final String WORD_ID = "wordId";
-
         BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
 
         Document word = collection.find(query).first();
@@ -109,8 +87,6 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public DictionaryWord getDictionaryWordBySpelling(String spelling) {
-
-        final String WORD_SPELLING = "wordSpelling";
 
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
 
@@ -135,7 +111,7 @@ public class WordDaoMongoImpl implements WordDao {
 
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, prefixForSpellPattern);
 
-        MongoCursor<Document> words = collection.find(query).projection(Projections.include(WORD_SPELLING)).batchSize(5).iterator();
+        MongoCursor<Document> words = collection.find(query).projection(Projections.include(WORD_SPELLING)).batchSize(100).iterator();
 
         Set<String> result = new HashSet<>();
 
