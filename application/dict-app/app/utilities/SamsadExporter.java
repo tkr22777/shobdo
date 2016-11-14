@@ -16,8 +16,6 @@ public class SamsadExporter {
 
     private LogPrint log = new LogPrint(SamsadExporter.class);
 
-    public static final ArrayList<String> blueBucket = new ArrayList<>();
-    public static final ArrayList<String> glassBucket = new ArrayList<>();
     public static final ArrayList<String> supBucket = new ArrayList<>();
     public static final ArrayList<String> commaBucket = new ArrayList<>();
     public static final ArrayList<String> dashBucket = new ArrayList<>();

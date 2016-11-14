@@ -1,19 +1,19 @@
-import java.util.*;
-
 import logics.WordLogic;
 import objects.DictionaryWord;
 import objects.Meaning;
 import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
-import org.junit.*;
-
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import utilities.Bangla;
-import utilities.LogPrint;
 import utilities.DictUtil;
+import utilities.LogPrint;
 import utilities.SamsadExporter;
 
-import static org.junit.Assert.*;
+import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -126,23 +126,18 @@ public class ApplicationTest {
     @Test
     public void testBangla() {
 
-        log.info("START!");
-
         int i = 0;
         for(DictionaryWord word: dictionary){
             log.info(" Word "+ i + " :" + word.toString());
             i++;
         }
-
     }
 
     @Test @Ignore
     public void storeWordTest() {
 
         DictionaryWord word = generateRandomWord(partsOfSpeech);
-
         wordLogic.saveDictionaryWord(word);
-
     }
 
     @Test @Ignore
@@ -161,13 +156,42 @@ public class ApplicationTest {
 
         String prefix = "ত";
 
-        Set<String> results = wordLogic.searchWordsBySpelling( prefix, 10) ;
+        Set<String> results = wordLogic.searchWordsBySpelling(prefix, 10);
 
         long total_time = System.nanoTime() - current_time;
 
-        log.info("Words for prefix: \"" + prefix + "\":" + results.toString() );
-        log.info("[Total Time:" + ( total_time / 1000000.0 ) + "ms]" );
+        log.info("Words for prefix: \"" + prefix + "\":" + results.toString());
+        log.info("[Total Time:" + (total_time / 1000000.0) + "ms]");
+    }
 
+    @Test @Ignore
+    public void searchWordsByPrefixPerformanceTune() throws Exception{
+
+        int i = 0;
+
+        while (i < 10) {
+
+            long current_time = System.nanoTime();
+
+            String prefix = "ত";
+
+            Set<String> results = null;// play.api.cache.Cache.get(prefix, );
+
+            if(results != null) {
+                log.info("Found in memory");
+            } else {
+                log.info("Not found in memory");
+                results = wordLogic.searchWordsBySpelling(prefix, 10);
+                //if(i == 4)
+                    //play.api.cache.Cache.set(prefix, results, 20000, );
+            }
+
+            long total_time = System.nanoTime() - current_time;
+
+            log.info("Words for prefix: \"" + prefix + "\":" + results.toString());
+            log.info("[Total Time:" + (total_time / 1000000.0) + "ms]");
+            i++;
+        }
     }
 
     @Test @Ignore
@@ -211,6 +235,5 @@ public class ApplicationTest {
 
         }
         log.info("Total words: " + total);
-
     }
 }

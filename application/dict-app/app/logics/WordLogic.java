@@ -3,7 +3,6 @@ package logics;
 import cache.WordCache;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
-import objects.BaseWord;
 import objects.DictionaryWord;
 import redis.clients.jedis.Jedis;
 import utilities.LogPrint;

@@ -13,11 +13,8 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 #These are the main application routes for the dict
-GET     /hello/*word/*length                controllers.WordController.length(word: String, length: Int)
-
 GET     /dict                               controllers.WordController.index()
 
 GET     /dict/word/*spelling                controllers.WordController.getWordBySpelling(spelling: String)
 
 GET     /dict/word/search/*spelling         controllers.WordController.searchWordsBySpelling(spelling: String)
-

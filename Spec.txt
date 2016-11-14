@@ -32,10 +32,10 @@ User Specification:
 	- Bangla to Bangla dictionary
 	- Bangla to English dictionary
 	- Bangla synonyms
-	- User login and history with facebook
+	- User login and history with Facebook
 
 Tips:
-	- suggest and match a word from cache when users type using Ovro 
+	- suggest and match a word from cache when users type using Ovro
 	- image if noun?
 
 Resources:
