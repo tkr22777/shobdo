@@ -4,7 +4,7 @@ import cache.WordCache;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.DictionaryWord;
-import redis.clients.jedis.Jedis;
+import utilities.Constants;
 import utilities.LogPrint;
 
 import java.util.Set;
@@ -14,8 +14,6 @@ import java.util.Set;
  */
 public class WordLogic {
 
-    private static final String DB_MONGO = "MONGODB";
-    private static final String DB_DEFAULT = DB_MONGO;
 
     private WordDao wordDao;
     private WordCache wordCache;
@@ -25,14 +23,14 @@ public class WordLogic {
     public static WordLogic factory(String dbName) { //to select which database to use
 
         if(dbName == null)
-            dbName = DB_DEFAULT;
+            dbName = Constants.DB_DEFAULT;
 
         WordDao wordDao;
 
-        if(DB_MONGO.equalsIgnoreCase(dbName))
+        if(Constants.DB_MONGO.equalsIgnoreCase(dbName))
             wordDao = new WordDaoMongoImpl();
-        else                                    //if(DB_DEFAULT.equalsIgnoreCase(dbName))
-            wordDao = new WordDaoMongoImpl();   // Default
+        else
+            wordDao = new WordDaoMongoImpl();
 
         return new WordLogic( wordDao );
     }
@@ -42,22 +40,6 @@ public class WordLogic {
         this.wordDao = wordDao;
 
         this.wordCache = new WordCache();
-    }
-
-    public Jedis getJedis( String hostname){
-
-        Jedis jedis = null;
-
-        try {
-
-            jedis = new Jedis(hostname);
-
-        } catch (Exception ex) {
-
-            log.info("Exception occurred while connecting to Redis. Message:" + ex.getMessage() );
-        }
-
-        return jedis;
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
@@ -95,17 +77,23 @@ public class WordLogic {
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
 
+        log.info("Im searching for:" + spelling);
+
         Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
 
         if(words != null && words.size() > 0)
             return words;
 
-        words = wordDao.getWordsWithPrefixMatch(spelling);
+        words = wordDao.getWordsWithPrefixMatch(spelling, limit);
 
         if ( words != null && words.size() > 0 )
             wordCache.cacheSearchWordsBySpelling(spelling,words);
 
         return words;
+    }
+
+    public long totalWordCount(){
+        return wordDao.totalWordCount();
     }
 
     protected void verifyDictionaryWord(DictionaryWord dictionaryWord){

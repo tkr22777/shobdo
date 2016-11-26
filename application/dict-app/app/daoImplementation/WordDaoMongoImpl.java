@@ -40,6 +40,7 @@ public class WordDaoMongoImpl implements WordDao {
     public WordDaoMongoImpl(){
 
         mongoClient = new MongoClient( "localhost" , 27017 );
+        //mongoClient = new MongoClient( "172.17.0.1" , 27017 );
         mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
         collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
 
@@ -103,7 +104,7 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public Set<String> getWordsWithPrefixMatch(String spelling) {
+    public Set<String> getWordsWithPrefixMatch(String spelling, int limit) {
 
         final String WORD_SPELLING = "wordSpelling";
 
@@ -111,7 +112,12 @@ public class WordDaoMongoImpl implements WordDao {
 
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, prefixForSpellPattern);
 
-        MongoCursor<Document> words = collection.find(query).projection(Projections.include(WORD_SPELLING)).batchSize(100).iterator();
+        MongoCursor<Document> words = collection
+                .find(query)
+                .projection(Projections.include(WORD_SPELLING))
+                .limit(limit)
+                .batchSize(100)
+                .iterator();
 
         Set<String> result = new HashSet<>();
 
@@ -123,6 +129,11 @@ public class WordDaoMongoImpl implements WordDao {
         }
 
         return result;
+    }
+
+    @Override
+    public long totalWordCount() {
+        return collection.count();
     }
 
 }

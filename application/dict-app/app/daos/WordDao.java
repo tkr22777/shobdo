@@ -17,6 +17,8 @@ public interface WordDao {
 
     public DictionaryWord getDictionaryWordBySpelling(String spelling);
 
-    public Set<String> getWordsWithPrefixMatch(String wordSpelling); //returns the spelling of the words that matches
+    public Set<String> getWordsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
+
+    public long totalWordCount();
 
 }
