@@ -4,7 +4,7 @@
 
 
 
-#   0. SEARCH WORD BY SPELLING
+#   0. SPLASH DICTIONARY MESSAGE
 # These are the main application routes for the Dictionary application
 
 GET     /dict                       controllers.WordController.index()
