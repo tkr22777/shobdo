@@ -1,6 +1,8 @@
 package objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.Constants;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
@@ -12,22 +14,61 @@ import java.util.Map;
  */
 public class DictionaryWord extends BaseWord {
 
-    //arrangementType is the way the meanings of this word is arranged now
-    //e.g. by POS or by strength of the meaning where not arranged by POSs V, N , N , P, V
-    //The following array list can be represented as (arrange by meaning strength):
-    //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
-    //or as (arranged by combined strength for each of the parts of speech and words worders within them):
-    //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
-
     private LogPrint log = new LogPrint(DictionaryWord.class);
 
-    String arrangementType = null; //There will be only one arrangement for start
+    //arrangementType is the way the meanings of this word are arranged now
+    //e.g. by parts of speech or by strength of the meaning (are not arranged by parts of speech, such as V, N , N , P, V)
+    //The following array list can be represented as (arranged by meaning strength):
+    //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
+    //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
+    //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
+
+    //Arrangement partsOfSpeech will be used in V2
+    String arrangementType = null;
+
+    public String getArrangementType() {
+        return arrangementType;
+    }
+
+    public void setArrangementType(String arrangementType) {
+        this.arrangementType = arrangementType;
+    }
 
     ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
 
-    public DictionaryWord(){
+    public DictionaryWord() {
 
         super();
+    }
+
+    public DictionaryWord(String wordId,
+                          String wordSpelling)
+    {
+        super(wordId, wordSpelling);
+    }
+
+    public DictionaryWord(String wordId,
+                          String wordSpelling,
+                          String arrangementType,
+                          ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches)
+    {
+
+        super(wordId, wordSpelling);
+        this.arrangementType = arrangementType;
+        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
+    }
+
+    public DictionaryWord(String wordId,
+                          String wordSpelling,
+                          int timesSearched,
+                          String linkToPronunciation,
+                          String arrangementType,
+                          Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
+                          Map<String,String> extraMeta)
+    {
+        super(wordId, wordSpelling, timesSearched, linkToPronunciation, extraMeta);
+        this.arrangementType = arrangementType;
+        this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
     }
 
     public DictionaryWord(String wordInJsonString){
@@ -45,47 +86,16 @@ public class DictionaryWord extends BaseWord {
         } catch (Exception ex){
 
             log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
-
         }
-    }
 
-
-    public DictionaryWord(String wordId, String wordSpelling) {
-        super(wordId, wordSpelling);
-    }
-
-
-    public DictionaryWord(String wordId, String wordSpelling, String arrangementType,
-                          ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches)
-    {
-
-        super(wordId, wordSpelling);
-        this.arrangementType = arrangementType;
-        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
-    }
-
-    public DictionaryWord(String wordId,
-                          String wordSpelling,
-                          int timesSearched,
-                          String linkToPronunciation,
-                          String arrangementType,
-                          Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
-                          Map<String,String> extraMeta) {
-        super(wordId, wordSpelling, timesSearched, linkToPronunciation, extraMeta);
-        this.arrangementType = arrangementType;
-        this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
-    }
-
-    public String getArrangementType() {
-        return arrangementType;
-    }
-
-    public void setArrangementType(String arrangementType) {
-        this.arrangementType = arrangementType;
     }
 
     public ArrayList<MeaningForPartsOfSpeech> getMeaningForPartsOfSpeeches() {
         return meaningForPartsOfSpeeches;
+    }
+
+    public void setMeaningForPartsOfSpeeches(ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
+        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
     }
 
     public void addMeaningForPartsOfSpeech(MeaningForPartsOfSpeech aMeaningForPartsOfSpeech) {
@@ -96,27 +106,37 @@ public class DictionaryWord extends BaseWord {
         meaningForPartsOfSpeeches.add(aMeaningForPartsOfSpeech);
     }
 
-    public void setMeaningForPartsOfSpeeches(ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
-        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
-    }
+    public String toJsonString() {
 
-    public String toJsonString() throws Exception{
+        String jsonString = null;
 
-        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        try {
 
+            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+
+        } catch (JsonProcessingException exception) {
+
+            log.info("DW001: Json Processing Exception Message: " + exception.getMessage());
+        }
+
+        return jsonString;
     }
 
     @Override
     public String toString() {
 
-        return customToString();
+        if(Constants.CUSTOM_STRING)
+           return customToStringDictionaryWord();
+        else
+            return toJsonString();
     }
 
-    public String customToString(){
+    public String customToStringDictionaryWord(){
         return "\n\n\tDictionary Word { " +
                 //"\n\n\t\t Arrangement Type = '" + arrangementType + '\'' +
                 "\n\n\t\t Meaning For Parts Of Speeches = " + meaningForPartsOfSpeeches +
                 "\n\n\t\t " + super.toString() +
                 "\n\n\t}";
     }
+
 }

@@ -16,7 +16,7 @@ public class DictUtil {
 
     private static LogPrint log = new LogPrint(DictUtil.class);
 
-    public static int randomInRange(int lowest, int highest){
+    public static int randomInRange(int lowest, int highest) {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
@@ -46,14 +46,14 @@ public class DictUtil {
 
         for(int i = 0 ; i < numberOfWords ; i++) {
 
-            DictionaryWord word = generateRandomWord( new PartsOfSpeechSet() );
+            DictionaryWord word = generateARandomWord( new PartsOfSpeechSet() );
             words.add(word);
         }
 
         return words;
     }
 
-    public static DictionaryWord generateRandomWord(PartsOfSpeechSet partsOfSpeech ) {
+    public static DictionaryWord generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
 
         String start = "995"; //ক
         String end = "9A8";   //ন
@@ -72,7 +72,7 @@ public class DictUtil {
         for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
 
             MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
-            meanings.setType(pos);
+            meanings.setPartsOfSpeech(pos);
 
             int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
 
@@ -91,20 +91,17 @@ public class DictUtil {
 
                 String meaningId = "MN_" + UUID.randomUUID();
 
-                int strengh = DictUtil.randomInRange( 0 , 10);
-                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strengh);
+                int strength = DictUtil.randomInRange( 0 , 10);
+                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strength);
 
-                meanings.setAMeaning(meaningForPOS);
-
+                meanings.addMeaning(meaningForPOS);
             }
 
             meaningsForPartsOfSpeech.add(meanings);
-
         }
 
         dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
 
         return dictionaryWord;
     }
-
 }

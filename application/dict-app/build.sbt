@@ -1,6 +1,6 @@
 name := """dict-app"""
 
-version := "0.1-SNAPSHOT"
+version := "0.11-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 

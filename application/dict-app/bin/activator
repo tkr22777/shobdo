@@ -165,11 +165,11 @@ get_mem_opts () {
 }
 
 require_arg () {
-  local type="$1"
+  local partsOfSpeech="$1"
   local opt="$2"
   local arg="$3"
   if [[ -z "$arg" ]] || [[ "${arg:0:1}" == "-" ]]; then
-    echo "$opt requires <$type> argument"
+    echo "$opt requires <$partsOfSpeech> argument"
     exit 1
   fi
 }

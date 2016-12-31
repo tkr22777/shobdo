@@ -4,38 +4,38 @@
 
 
 
-#   0. SEARCH WORD BY SPELLING
+# 0. SPLASH DICTIONARY MESSAGE:
 # These are the main application routes for the Dictionary application
 
 GET     /dict                       controllers.WordController.index()
 
 
 
-#   1. SEARCH WORD BY SPELLING
+# 1. SEARCH WORD BY SPELLING:
 # The request body contains spelling
 
-POST    /dict/wordsearch           controllers.WordController.searchWordsBySpelling()
+POST    /dict/search           controllers.WordController.searchWordsBySpelling()
 
 
 
-#   2. GET WORD BY SPELLING
+# 2. GET WORD BY SPELLING:
 # The request body contains spelling
 
 POST    /dict/word                 controllers.WordController.getWordBySpelling()
 
 
 
-#   3. GENERATE RANDOM DICTIONARY
+# 3. GENERATE RANDOM DICTIONARY:
 # The request body contains wordCount
 
 POST    /dict/generate             controllers.WordController.createRandomDictionary()
 
 
 
-#   4. A TEST RUOUTE TO TEST THE RUNNING APPLICATION
+# 4. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
 # The request body contains name
 
-POST    /temp                      controllers.WordController.testPost()
+POST    /temp                      controllers.AdminController.testPost()
 
 
 
