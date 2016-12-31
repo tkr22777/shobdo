@@ -126,12 +126,12 @@ public class DictionaryWord extends BaseWord {
     public String toString() {
 
         if(Constants.CUSTOM_STRING)
-           return customToString();
+           return customToStringDictionaryWord();
         else
             return toJsonString();
     }
 
-    public String customToString(){
+    public String customToStringDictionaryWord(){
         return "\n\n\tDictionary Word { " +
                 //"\n\n\t\t Arrangement Type = '" + arrangementType + '\'' +
                 "\n\n\t\t Meaning For Parts Of Speeches = " + meaningForPartsOfSpeeches +

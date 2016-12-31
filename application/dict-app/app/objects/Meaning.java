@@ -75,7 +75,7 @@ public class Meaning {
     public String toString() {
 
         if(Constants.CUSTOM_STRING)
-            return customToString();
+            return customToStringMeaning();
         else
             return toJsonString();
     }
@@ -96,7 +96,7 @@ public class Meaning {
         return jsonString;
     }
 
-    public String customToString() {
+    public String customToStringMeaning() {
 
         return "Meaning {" +
                 //"\n\n\t\t\t\tid = '" + id + '\'' +

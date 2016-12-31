@@ -86,10 +86,11 @@ public class MeaningForPartsOfSpeech {
 
     public String customToString() {
 
-        return " MeaningForPartsOfSpeech {" +
+        return " MeaningForPartsOfSpeech { } "; /* +
                 "\n\t\t\tpartsOfSpeech = " + partsOfSpeech + '\'' +
                 "\n\t\t\tmeanings = " + meanings +
                 "\n}";
+                */
     }
 
 };

@@ -157,11 +157,12 @@ public class BaseWord {
 
         return  toReturn;
     }
+
     @Override
     public String toString() {
 
         if(Constants.CUSTOM_STRING)
-            return customToString();
+            return customToStringBaseWord();
         else
             return toJsonString();
     }
@@ -182,7 +183,7 @@ public class BaseWord {
         return jsonString;
     }
 
-    public String customToString() {
+    public String customToStringBaseWord() {
 
         return "Base Word {" +
                 //"\n\n\t\t\t Word Id = '" + wordId + "'" +
