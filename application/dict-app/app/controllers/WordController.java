@@ -27,26 +27,13 @@ public class WordController extends Controller{
 
     private static LogPrint log = new LogPrint(WordController.class);
 
-    public Result index(){
+    public Result index() {
+
         return ok("বাংলা অভিধান এ স্বাগতম!" );
     }
 
-    public Result testLength(String word, int length){
-
-        int s_size = word.length();
-
-        int len = Int.unbox(length);
-
-        if(s_size == len)
-            return ok("Yay! You made the correct character count of the word: " + word );
-        if(s_size > len)
-            return ok("Ups, the length of " + word + " is bigger than you thought!" );
-        else
-            return ok("Ups, the length of " + word + " is smaller than you thought!" );
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
-    public Result searchWordsBySpelling(){
+    public Result searchWordsBySpelling() {
 
         //For some reason the limit value is not equal to the size of array that is returned
         int limit = Integer.MAX_VALUE;
@@ -69,7 +56,7 @@ public class WordController extends Controller{
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result getWordBySpelling(){
+    public Result getWordBySpelling() {
 
         JsonNode json = request().body().asJson();
         String spelling;
@@ -89,7 +76,7 @@ public class WordController extends Controller{
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result getWordByWordId(){
+    public Result getWordByWordId() {
 
         JsonNode json = request().body().asJson();
 
@@ -132,16 +119,7 @@ public class WordController extends Controller{
         for(DictionaryWord word:words)
             logic.saveDictionaryWord(word);
 
-        return ok();
-    }
-
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result testPost() {
-
-        JsonNode json = request().body().asJson();
-
-        return ok("Got name: " + json.get("name").asText());
-
+        return ok("Generated and added " + wordCount + " random words on the dictionary!");
     }
 
 }
