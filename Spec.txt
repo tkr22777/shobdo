@@ -28,8 +28,8 @@ Tech Specification:
 
 User Specification:
 
+	- Bangla to Bangla dictionary P0
 	- English to Bangla dictionary
-	- Bangla to Bangla dictionary
 	- Bangla to English dictionary
 	- Bangla synonyms
 	- User login and history with Facebook
