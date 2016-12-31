@@ -1,19 +1,25 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import logics.WordLogic;
 import objects.DictionaryWord;
-import objects.Meaning;
-import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import utilities.Bangla;
+import play.core.j.JavaResultExtractor;
+import play.mvc.Http.*;
+import play.mvc.Result;
+import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 import utilities.SamsadExporter;
 
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static play.test.Helpers.*;
 
 /**
  *
@@ -25,12 +31,8 @@ public class ApplicationTest {
 
     LogPrint log;
 
-    String start = "995"; //ক
-    String end = "9A8";   //ন
-
     int numberOfWords = 10;
 
-    PartsOfSpeechSet partsOfSpeech = new PartsOfSpeechSet();
     Set<DictionaryWord> dictionary = new HashSet<>();
 
     WordLogic wordLogic;
@@ -40,74 +42,9 @@ public class ApplicationTest {
 
         log = new LogPrint(ApplicationTest.class);
 
-        dictionary = generateDictionaryWithRandomWords(numberOfWords);
+        dictionary = DictUtil.generateDictionaryWithRandomWords(numberOfWords);
 
-        wordLogic = WordLogic.factory(null);
-
-    }
-
-    public Set<DictionaryWord> generateDictionaryWithRandomWords(int numberOfWords){
-
-        Set<DictionaryWord> words = new HashSet<>();
-
-        for(int i = 0 ; i < numberOfWords ; i++) {
-
-            DictionaryWord word = generateRandomWord( partsOfSpeech);
-            words.add(word);
-        }
-
-        return words;
-    }
-
-    public DictionaryWord generateRandomWord( PartsOfSpeechSet partsOfSpeech ) {
-
-        String wordSpelling;
-        String wordId;
-
-        int wordLength = DictUtil.randomInRange(2, 9);
-        wordSpelling = Bangla.getWord(start, end, wordLength);
-        wordId = "WD_" + UUID.randomUUID();
-
-        DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
-
-        ArrayList<MeaningForPartsOfSpeech> meaningsForPartsOfSpeech = new ArrayList<>();
-
-        for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
-
-            MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
-            meanings.setType(pos);
-
-            int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
-
-            for(int j = 0; j < numberOfMeaningForPOS ; j++) {
-
-                String meaning;
-                wordLength = DictUtil.randomInRange(2, 9);
-                meaning = Bangla.getWord(start, end, wordLength);
-
-                String example;
-                int preSentenceLen = DictUtil.randomInRange(2, 6);
-                int postSentenceLen = DictUtil.randomInRange(2, 4);
-                example = Bangla.getSentence(start, end, preSentenceLen, 12);
-                example += " " + meaning + " ";
-                example += Bangla.getSentence(start, end, postSentenceLen, 12);
-
-                String meaningId = "MN_" + UUID.randomUUID();
-
-                int strengh = DictUtil.randomInRange( 0 , 10);
-                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strengh);
-
-                meanings.setAMeaning(meaningForPOS);
-
-            }
-
-            meaningsForPartsOfSpeech.add(meanings);
-
-        }
-
-        dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
-
-        return dictionaryWord;
+        wordLogic = WordLogic.factory(Constants.DB_MONGO);
     }
 
     @Test @Ignore
@@ -136,17 +73,21 @@ public class ApplicationTest {
     @Test @Ignore
     public void storeWordTest() {
 
-        DictionaryWord word = generateRandomWord(partsOfSpeech);
+        DictionaryWord word = DictUtil.generateRandomWord(new PartsOfSpeechSet());
         wordLogic.saveDictionaryWord(word);
     }
 
     @Test @Ignore
     public void storeWords() {
 
-        Set<DictionaryWord> words = generateDictionaryWithRandomWords(1217);
+        Set<DictionaryWord> words = DictUtil.generateDictionaryWithRandomWords(1217);
         for(DictionaryWord word:words)
             wordLogic.saveDictionaryWord(word);
+    }
 
+    @Test @Ignore
+    public void totalWords() {
+        log.info("Total Words In Dictionary:" + wordLogic.totalWordCount());
     }
 
     @Test @Ignore
@@ -212,28 +153,71 @@ public class ApplicationTest {
         }
 
         log.info("[Total Time:" + (total_time / 1000000.0) + "ms]");
-
     }
 
-
-    @Test
-    public void heyJude() throws Exception {
+    @Test @Ignore
+    public void createDictionaryFromSamsad() throws Exception {
 
         List<DictionaryWord> words = new SamsadExporter().getDictiionary();
 
         int total = 0;
         for(DictionaryWord word: words) {
 
+            if(total == 5) break;
             if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_SPELLING"))
              && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_MEANING"))
              && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
+
                 log.info("Next word: \n" + word.toString());
 
-                wordLogic.saveDictionaryWord(word);
+//              wordLogic.saveDictionaryWord(word);
                 total++;
             }
-
         }
+
         log.info("Total words: " + total);
+    }
+
+    @Test @Ignore
+    public void testConfig() throws Exception {
+
+    }
+
+    @Test @Ignore //Didnt work
+    public void rootRoute() {
+
+        running(fakeApplication(), new Runnable() {
+
+            public void run() {
+
+                RequestBuilder request = new RequestBuilder()
+                        .method(GET).uri("/");
+
+                Result result = route(request);
+
+                assertEquals(OK, result.status());
+            }
+        });
+    }
+
+
+    @Test @Ignore //Didnt work
+    public void createRandomDictionary_RoutePOSTTest() {
+
+        //running(fakeApplication(), new Runnable() {
+        running(fakeApplication(), () -> {
+
+                Map<String, String> body = new HashMap<>();
+
+                body.put("keyT", "valueT");
+
+                RequestBuilder request = new RequestBuilder()
+                        .method(POST)
+                        .bodyForm(body)
+                        .uri("/dict/generate");
+
+                Result result = route(request);
+                assertEquals(OK, result.status());
+        });
     }
 }

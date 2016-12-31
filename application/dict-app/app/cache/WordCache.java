@@ -9,8 +9,9 @@ import java.util.Set;
 
 public class WordCache {
 
-    private static boolean USE_REDIS = true;
-    private static final String DEFAULT_REDIS_HOSTNAME = "localhost";
+    private static boolean USE_REDIS = false;
+    //private static final String DEFAULT_REDIS_HOSTNAME = "localhost";
+    private static final String DEFAULT_REDIS_HOSTNAME = "172.17.0.1"; //"localhost";
 
     private Jedis jedis;
 
