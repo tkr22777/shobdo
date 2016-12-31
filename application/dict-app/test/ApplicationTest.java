@@ -1,13 +1,9 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import logics.WordLogic;
 import objects.DictionaryWord;
 import objects.PartsOfSpeechSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import play.core.j.JavaResultExtractor;
 import play.mvc.Http.*;
 import play.mvc.Result;
 import utilities.Constants;
@@ -15,7 +11,6 @@ import utilities.DictUtil;
 import utilities.LogPrint;
 import utilities.SamsadExporter;
 
-import java.io.ByteArrayInputStream;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -73,7 +68,7 @@ public class ApplicationTest {
     @Test @Ignore
     public void storeWordTest() {
 
-        DictionaryWord word = DictUtil.generateRandomWord(new PartsOfSpeechSet());
+        DictionaryWord word = DictUtil.generateARandomWord(new PartsOfSpeechSet());
         wordLogic.saveDictionaryWord(word);
     }
 

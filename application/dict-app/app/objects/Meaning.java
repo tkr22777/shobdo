@@ -1,9 +1,16 @@
 package objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.Constants;
+import utilities.LogPrint;
+
 /**
  * Created by tahsinkabir on 6/16/16.
  */
 public class Meaning {
+
+    private LogPrint log = new LogPrint(Meaning.class);
 
     String id;
     String partOfSpeech; //The partOfSpeech of the meaning (redundant?)
@@ -67,7 +74,26 @@ public class Meaning {
     @Override
     public String toString() {
 
-        return customToString();
+        if(Constants.CUSTOM_STRING)
+            return customToString();
+        else
+            return toJsonString();
+    }
+
+    public String toJsonString() {
+
+        String jsonString = null;
+
+        try {
+
+            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+
+        } catch (JsonProcessingException exception) {
+
+            log.info("MN001: Json Processing Exception Message: " + exception.getMessage());
+        }
+
+        return jsonString;
     }
 
     public String customToString() {
@@ -80,5 +106,4 @@ public class Meaning {
                 //"\n\n\t\t\t\tstrength = " + strength +
                 '}';
     }
-
 }

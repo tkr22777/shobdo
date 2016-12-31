@@ -1,5 +1,10 @@
 package objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.Constants;
+import utilities.LogPrint;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -8,24 +13,27 @@ import java.util.Collection;
  */
 public class MeaningForPartsOfSpeech {
 
-    String type; //type refers to the partOfSpeech
+    private LogPrint log = new LogPrint(MeaningForPartsOfSpeech.class);
+
+    String partsOfSpeech;
+
     ArrayList<Meaning> meanings = new ArrayList<>(); //the order of their meaning matters
 
     public MeaningForPartsOfSpeech() {
 
     }
 
-    public MeaningForPartsOfSpeech(String type, Collection<Meaning> meanings) {
-        this.type = type;
+    public MeaningForPartsOfSpeech(String partsOfSpeech, Collection<Meaning> meanings) {
+        this.partsOfSpeech = partsOfSpeech;
         this.meanings = new ArrayList(meanings);
     }
 
-    public String getType() {
-        return type;
+    public String getPartsOfSpeech() {
+        return partsOfSpeech;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setPartsOfSpeech(String partsOfSpeech) {
+        this.partsOfSpeech = partsOfSpeech;
     }
 
     public ArrayList<Meaning> getMeanings() {
@@ -42,16 +50,6 @@ public class MeaningForPartsOfSpeech {
             meanings = new ArrayList<>();
 
         meanings.add(aMeaning);
-
-    }
-
-    public void setAMeaning(Meaning meaning) {
-
-        if (meanings == null)
-            meanings = new ArrayList<>();
-
-        meanings.add(meaning);
-
     }
 
     public int generateCombinedStrength(){
@@ -63,13 +61,33 @@ public class MeaningForPartsOfSpeech {
 
     @Override
     public String toString() {
-        return customToString();
+
+        if(Constants.CUSTOM_STRING)
+            return customToString();
+        else
+            return toJsonString();
+    }
+
+    public String toJsonString() {
+
+        String jsonString = null;
+
+        try {
+
+            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+
+        } catch (JsonProcessingException exception) {
+
+            log.info("DW001: Json Processing Exception Message: " + exception.getMessage());
+        }
+
+        return jsonString;
     }
 
     public String customToString() {
 
         return " MeaningForPartsOfSpeech {" +
-                "\n\t\t\ttype = " + type + '\'' +
+                "\n\t\t\tpartsOfSpeech = " + partsOfSpeech + '\'' +
                 "\n\t\t\tmeanings = " + meanings +
                 "\n}";
     }

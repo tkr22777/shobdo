@@ -1,6 +1,10 @@
 package objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.Constants;
 import utilities.DictUtil;
+import utilities.LogPrint;
 
 import java.util.*;
 
@@ -9,8 +13,11 @@ import java.util.*;
  */
 public class BaseWord {
 
+    private LogPrint log = new LogPrint(BaseWord.class);
+
     private String wordId;
     private String wordSpelling;
+    private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private int timesSearched;
     private String linkToPronunciation;
     private Map<String,String> extraMetaMap; //extra meta map can be kept for info that is difficult to parse
@@ -32,6 +39,14 @@ public class BaseWord {
     public BaseWord(String wordId, String wordSpelling) {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
+    }
+
+    public ArrayList<String> getOtherSpellings() {
+        return otherSpellings;
+    }
+
+    public void setOtherSpellings(ArrayList<String> otherSpellings) {
+        this.otherSpellings = otherSpellings;
     }
 
     public String getWordId() {
@@ -142,15 +157,32 @@ public class BaseWord {
 
         return  toReturn;
     }
-
     @Override
     public String toString() {
 
-        return customBaseWordToString();
-
+        if(Constants.CUSTOM_STRING)
+            return customToString();
+        else
+            return toJsonString();
     }
 
-    public String customBaseWordToString(){
+    public String toJsonString() {
+
+        String jsonString = null;
+
+        try {
+
+            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+
+        } catch (JsonProcessingException exception) {
+
+            log.info("BW001: Json Processing Exception Message: " + exception.getMessage());
+        }
+
+        return jsonString;
+    }
+
+    public String customToString() {
 
         return "Base Word {" +
                 //"\n\n\t\t\t Word Id = '" + wordId + "'" +

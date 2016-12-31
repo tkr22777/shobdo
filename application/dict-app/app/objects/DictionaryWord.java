@@ -2,6 +2,7 @@ package objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.Constants;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class DictionaryWord extends BaseWord {
     //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
 
-    //Arrangement type will be used in V2
+    //Arrangement partsOfSpeech will be used in V2
     String arrangementType = null;
 
     public String getArrangementType() {
@@ -124,9 +125,7 @@ public class DictionaryWord extends BaseWord {
     @Override
     public String toString() {
 
-        boolean customString = true;
-
-        if(customString)
+        if(Constants.CUSTOM_STRING)
            return customToString();
         else
             return toJsonString();
