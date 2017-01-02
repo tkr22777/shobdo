@@ -47,6 +47,8 @@ public class WordLogic {
         verifyDictionaryWord(dictionaryWord);
 
         wordDao.setDictionaryWord(dictionaryWord);
+
+        wordCache.cacheDictionaryWord(dictionaryWord);
     }
 
     public DictionaryWord getDictionaryWordBySpelling( String spelling){
@@ -76,8 +78,6 @@ public class WordLogic {
      **/
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
-
-        log.info("Im searching for:" + spelling);
 
         Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
 
