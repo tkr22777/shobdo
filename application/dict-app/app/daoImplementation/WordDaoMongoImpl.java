@@ -39,8 +39,8 @@ public class WordDaoMongoImpl implements WordDao {
 
     public WordDaoMongoImpl(){
 
-        mongoClient = new MongoClient( "localhost" , 27017 );
-        //mongoClient = new MongoClient( "172.17.0.1" , 27017 );
+        //mongoClient = new MongoClient( "localhost" , 27017 );
+        mongoClient = new MongoClient( "172.17.0.1" , 27017 );
         mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
         collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
 
