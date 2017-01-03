@@ -33,7 +33,11 @@ public class AdminController extends Controller {
 
         JsonNode json = request().body().asJson();
 
-        return ok("Got name: " + json.get("name").asText());
+        String name = json.get("name").asText();
+
+        log.info("@AC001 Name:"  + name);
+
+        return ok("Got name: " + name);
     }
 
 }

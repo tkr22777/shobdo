@@ -37,13 +37,17 @@ public class WordDaoMongoImpl implements WordDao {
 
     private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
-    public WordDaoMongoImpl(){
+    public WordDaoMongoImpl() {
 
-        //mongoClient = new MongoClient( "localhost" , 27017 );
-        mongoClient = new MongoClient( "172.17.0.1" , 27017 );
+        String hostname = "mongo";
+        //hostname = "172.17.0.1";
+        int port = 27017;
+
+        log.info( "@WDMI001 Connecting to mongodb [host:" + hostname + "][port:" + port + "]" );
+
+        mongoClient = new MongoClient( hostname, port );
         mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
         collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
-
     }
 
     @Override

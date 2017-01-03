@@ -1,0 +1,13 @@
+version: '2'
+services:
+ dict-app:
+  build: .
+  ports:
+  - "9000:9000"
+  depends_on:
+  - "redis"
+  - "mongo"
+ redis:
+  image: "redis:latest"
+ mongo:
+  image: "mongo:latest"

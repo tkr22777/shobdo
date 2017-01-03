@@ -10,8 +10,8 @@ import java.util.Set;
 public class WordCache {
 
     private static boolean USE_REDIS = false;
-    //private static final String DEFAULT_REDIS_HOSTNAME = "localhost";
-    private static final String DEFAULT_REDIS_HOSTNAME = "172.17.0.1"; //"localhost";
+    private static final String DEFAULT_REDIS_HOSTNAME = "redis";
+    //private static final String DEFAULT_REDIS_HOSTNAME = "172.17.0.1"; //"localhost";
 
     private Jedis jedis;
 
@@ -33,6 +33,7 @@ public class WordCache {
 
     public String getHostname() { //You may return environment from here
 
+        log.info("@WC001 Connect to redis host [" +  DEFAULT_REDIS_HOSTNAME + "] with default port." );
         return DEFAULT_REDIS_HOSTNAME;
     }
 
