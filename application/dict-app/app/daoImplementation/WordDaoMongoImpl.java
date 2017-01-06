@@ -17,9 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-
 /**
  * Created by tahsinkabir on 8/14/16.
  */
@@ -37,19 +34,23 @@ public class WordDaoMongoImpl implements WordDao {
 
     private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
-    public WordDaoMongoImpl(){
+    public WordDaoMongoImpl() {
 
-        //mongoClient = new MongoClient( "localhost" , 27017 );
-        mongoClient = new MongoClient( "172.17.0.1" , 27017 );
+        String hostname = "mongo";
+        //hostname = "172.17.0.1";
+        int port = 27017;
+
+        log.info( "@WDMI001 Connecting to mongodb [host:" + hostname + "][port:" + port + "]" );
+
+        mongoClient = new MongoClient( hostname, port );
         mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
         collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
-
     }
 
     @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
 
-        log.info("Saving word to database: " + dictionaryWord.toString());
+        log.info("@WDMI001 Saving word to database: " + dictionaryWord.toString());
 
         try {
 
@@ -57,9 +58,6 @@ public class WordDaoMongoImpl implements WordDao {
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
             log.info(wordDocument.toString());
             collection.insertOne(wordDocument);
-
-            //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
-            //log.info("Json String for Dictionary Word: " + jsonString);
 
         } catch ( Exception ex ){
 
@@ -105,8 +103,6 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Set<String> getWordsWithPrefixMatch(String spelling, int limit) {
-
-        final String WORD_SPELLING = "wordSpelling";
 
         Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
 

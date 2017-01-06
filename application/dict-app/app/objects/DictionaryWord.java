@@ -1,8 +1,8 @@
 package objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import utilities.Constants;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
@@ -108,18 +108,7 @@ public class DictionaryWord extends BaseWord {
 
     public String toJsonString() {
 
-        String jsonString = null;
-
-        try {
-
-            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-
-        } catch (JsonProcessingException exception) {
-
-            log.info("DW001: Json Processing Exception Message: " + exception.getMessage());
-        }
-
-        return jsonString;
+        return JsonUtil.toJsonString(this);
     }
 
     @Override
