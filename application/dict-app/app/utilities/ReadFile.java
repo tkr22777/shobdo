@@ -15,7 +15,6 @@ public class ReadFile {
     public ReadFile(String fileLocation) {
 
         reader = getReader(fileLocation);
-
     }
 
     public String getLine() {
@@ -25,7 +24,7 @@ public class ReadFile {
         if(reader == null)
             return line;
 
-        try{
+        try {
 
             line = reader.readLine();
 
@@ -53,14 +52,13 @@ public class ReadFile {
 
         BufferedReader reader = null;
 
-        try{
+        try {
 
             reader = new BufferedReader( new FileReader(fileLocation));
 
         } catch (Exception ex){
 
             log.info("Error reading opening file. Exception:" + ex.getStackTrace().toString());
-
         }
 
         return reader;

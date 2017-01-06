@@ -34,7 +34,7 @@ public class Bangla {
         return sentence;
     }
 
-    public static String getWord(String startHex, String endHex, int wordLength){
+    public static String getWord(String startHex, String endHex, int wordLength) {
 
         int start = Integer.parseInt(startHex, 16);
         int end = Integer.parseInt(endHex, 16);
@@ -44,7 +44,7 @@ public class Bangla {
         if(wordLength < 1)
             wordLength = DictUtil.randomInRange(1, 10);
 
-        for(int i = 0 ; i < wordLength ; i++){
+        for(int i = 0 ; i < wordLength ; i++) {
 
             int number = DictUtil.randomInRange(start, end);
             char c = (char) number;

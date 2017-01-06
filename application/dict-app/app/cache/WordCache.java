@@ -1,8 +1,8 @@
 package cache;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import objects.DictionaryWord;
 import redis.clients.jedis.Jedis;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.Set;
@@ -28,7 +28,6 @@ public class WordCache {
     public WordCache() {
 
         jedis = getJedis(getHostname());
-
     }
 
     public String getHostname() { //You may return environment from here
@@ -66,16 +65,7 @@ public class WordCache {
 
             log.debug("Word [" + spelling + "] found and returning from redis.");
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            try {
-
-                return mapper.readValue(wordJsonString, DictionaryWord.class);
-
-            } catch (Exception ex) {
-
-                log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
-            }
+            return (DictionaryWord) JsonUtil.toObjectFromJsonString(wordJsonString, DictionaryWord.class);
         }
 
         return null;
@@ -134,11 +124,11 @@ public class WordCache {
 
     }
 
-    public String getKeyForSpelling(String spelling){
+    public String getKeyForSpelling(String spelling) {
         return GET_WORD_BY_SPELLING_PFX + spelling;
     }
 
-    public String getKeyForSearch(String spelling){
+    public String getKeyForSearch(String spelling) {
         return SERACH_WORD_BY_SPELLING_PFX + spelling;
     }
 }

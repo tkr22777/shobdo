@@ -17,9 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-
 /**
  * Created by tahsinkabir on 8/14/16.
  */
@@ -53,7 +50,7 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
 
-        log.info("Saving word to database: " + dictionaryWord.toString());
+        log.info("@WDMI001 Saving word to database: " + dictionaryWord.toString());
 
         try {
 
@@ -61,9 +58,6 @@ public class WordDaoMongoImpl implements WordDao {
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
             log.info(wordDocument.toString());
             collection.insertOne(wordDocument);
-
-            //String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dictionaryWord);
-            //log.info("Json String for Dictionary Word: " + jsonString);
 
         } catch ( Exception ex ){
 
@@ -109,8 +103,6 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Set<String> getWordsWithPrefixMatch(String spelling, int limit) {
-
-        final String WORD_SPELLING = "wordSpelling";
 
         Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
 

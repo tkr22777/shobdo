@@ -11,3 +11,6 @@ services:
   image: "redis:latest"
  mongo:
   image: "mongo:latest"
+  volumes:
+  - "../../data/mongodump:/mongoshobdodump"
+
