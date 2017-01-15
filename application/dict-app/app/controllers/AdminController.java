@@ -1,6 +1,9 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import play.data.DynamicForm;
+import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -28,16 +31,35 @@ public class AdminController extends Controller {
             return ok("Ups, the length of " + word + " is smaller than you thought!" );
     }
 
+    public Result testGet() {
+
+        log.info("In testGet!");
+
+        ObjectNode result = Json.newObject();
+        result.put("Application", "Dictionary");
+        result.put("Language", "Bengali");
+
+        return ok(result);
+    }
+
     @BodyParser.Of(BodyParser.Json.class)
     public Result testPost() {
 
         JsonNode json = request().body().asJson();
 
+        if(json.get("name") == null)
+            return badRequest("No field with \"name\" ");
+
         String name = json.get("name").asText();
 
         log.info("@AC001 Name:"  + name);
 
-        return ok("Got name: " + name);
-    }
+        ObjectNode result = Json.newObject();
 
+        result.put("Name", name);
+        result.put("Length", name.length());
+        result.put("StartsWith", name.charAt(0) + "");
+
+        return ok(result);
+    }
 }

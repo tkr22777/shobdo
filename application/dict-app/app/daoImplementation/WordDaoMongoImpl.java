@@ -50,19 +50,17 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
 
-        log.info("@WDMI001 Saving word to database: " + dictionaryWord.toString());
+        log.info("@WDMI001 setDictionaryWord Saving word to database: " + dictionaryWord.toString());
 
         try {
 
             ObjectMapper mapper = new ObjectMapper();
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
-            log.info(wordDocument.toString());
             collection.insertOne(wordDocument);
 
         } catch ( Exception ex ){
 
             log.info( "Failed to map dictionary word object to jsonString. Ex: " + ex.getMessage() );
-
         }
 
         return null;
@@ -70,6 +68,8 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public DictionaryWord getDictionaryWordByWordId(String wordId) {
+
+        log.info("@WDMI002 getDictionaryWordByWordId getting word from database, wordId: " + wordId);
 
         BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
 
@@ -87,6 +87,8 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public DictionaryWord getDictionaryWordBySpelling(String spelling) {
 
+        log.info("@WDMI003 getDictionaryWordBySpelling getting word from database, spelling: " + spelling);
+
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
 
         Document word = collection.find(query).first();
@@ -98,11 +100,12 @@ public class WordDaoMongoImpl implements WordDao {
                 .getObjectFromDocument( word, DictionaryWord.class);
 
         return dictionaryWord;
-
     }
 
     @Override
-    public Set<String> getWordsWithPrefixMatch(String spelling, int limit) {
+    public Set<String> getWordSpellingsWithPrefixMatch(String spelling, int limit) {
+
+        log.info("@WDMI004 getWordSpellingsWithPrefixMatch getting similar spelling from database, spelling: " + spelling);
 
         Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
 
@@ -121,7 +124,6 @@ public class WordDaoMongoImpl implements WordDao {
 
             Document bleh = words.tryNext();
             result.add( bleh.get(WORD_SPELLING).toString() );
-
         }
 
         return result;

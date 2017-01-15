@@ -5,7 +5,7 @@ curl -X GET http://192.168.99.100:9000/dict
 echo ""
 
 #Testing post route
-curl -H "Content-Type: application/json" -X POST -d '{"name":"SIN"}' http://192.168.99.100:9000/temp
+curl -H "Content-Type: application/json" -X POST -d '{"name":"SIN"}' http://192.168.99.100:9000/posttest
 echo ""
 
 #Generating a test dictionary

@@ -3,6 +3,7 @@ package utilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import objects.DictionaryWord;
 
 /**
  * Created by tahsink on 1/6/17.
@@ -13,62 +14,72 @@ public class JsonUtil {
 
     public static Object toObjectFromJsonString(String jsonString, Class<?> class_type ) {
 
-        Object toReturn = null;
+        if(jsonString == null || class_type == null)
+            return null;
 
-        if (jsonString != null) {
+        ObjectMapper mapper = new ObjectMapper();
 
-            ObjectMapper mapper = new ObjectMapper();
+        try {
 
-            try {
+            return mapper.readValue(jsonString, class_type);
 
-                toReturn = mapper.readValue(jsonString, class_type);
+        } catch (Exception ex) {
 
-            } catch (Exception ex) {
-
-                log.info("@JU Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
-
-                return null;
-            }
+            log.info("@JU001: Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+            return null;
         }
-
-        return toReturn;
     }
 
     public static String toJsonString(Object object) {
 
-        String jsonString = null;
+        if(object == null)
+            return null;
 
         try {
 
-            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
 
-        } catch (JsonProcessingException exception) {
+        } catch (Exception ex) {
 
-            log.info("@JU001: Json Processing Exception Message: " + exception.getMessage());
+            log.info("@JU002: Error converting object to json string. Exception: " + ex.getStackTrace().toString());
+            return null;
         }
-
-        return jsonString;
     }
 
     public static JsonNode toJsonNodeFromJsonString(String jsonString) {
 
-        JsonNode jsonNode = null;
+        if (jsonString == null)
+            return null;
 
-        if (jsonString != null) {
+        ObjectMapper mapper = new ObjectMapper();
 
-            ObjectMapper mapper = new ObjectMapper();
+        try {
 
-            try {
+            return mapper.readTree(jsonString);
 
-                jsonNode = mapper.readTree(jsonString);
+        } catch (Exception ex) {
 
-            } catch (Exception ex) {
+            log.info("@JU003: Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+            return null;
+        }
+    }
 
-                log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
-                return null;
-            }
+    public static Object jsonNodeToObject( JsonNode jsonNode, Class<?> class_type ) {
+
+        if(jsonNode == null || class_type == null)
+            return null;
+
+        ObjectMapper jsonObjectmapper = new ObjectMapper();
+
+        try {
+
+            return jsonObjectmapper.treeToValue(jsonNode, class_type);
+
+        } catch (JsonProcessingException ex) {
+
+            log.info("@JU004: Error converting jsonNode to Object. Exception:" + ex.getStackTrace().toString());
+            return null;
         }
 
-        return jsonNode;
     }
 }

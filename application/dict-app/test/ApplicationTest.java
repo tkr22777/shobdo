@@ -1,15 +1,16 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import logics.WordLogic;
 import objects.DictionaryWord;
 import objects.PartsOfSpeechSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import play.mvc.BodyParser;
 import play.mvc.Http.*;
 import play.mvc.Result;
-import utilities.Constants;
-import utilities.DictUtil;
-import utilities.LogPrint;
-import utilities.SamsadExporter;
+import play.test.WithServer;
+import utilities.*;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ import static play.test.Helpers.*;
  * If you are interested in mocking a whole application, see the wiki for more details.
  *
  */
-public class ApplicationTest {
+public class ApplicationTest extends WithServer {
 
     LogPrint log;
 
@@ -179,31 +180,11 @@ public class ApplicationTest {
     }
 
     @Test @Ignore //Didnt work
-    public void rootRoute() {
-
-        running(fakeApplication(), new Runnable() {
-
-            public void run() {
-
-                RequestBuilder request = new RequestBuilder()
-                        .method(GET).uri("/");
-
-                Result result = route(request);
-
-                assertEquals(OK, result.status());
-            }
-        });
-    }
-
-
-    @Test @Ignore //Didnt work
     public void createRandomDictionary_RoutePOSTTest() {
 
-        //running(fakeApplication(), new Runnable() {
-        running(fakeApplication(), () -> {
+        running( fakeApplication(), () -> {
 
                 Map<String, String> body = new HashMap<>();
-
                 body.put("keyT", "valueT");
 
                 RequestBuilder request = new RequestBuilder()
@@ -213,6 +194,56 @@ public class ApplicationTest {
 
                 Result result = route(request);
                 assertEquals(OK, result.status());
+        });
+    }
+
+    @Test
+    public void rootRouteTest() {
+
+        running( fakeApplication(), () -> {
+
+                Result result = route(fakeRequest(GET, "/"));
+                assertEquals(OK, result.status());
+                assertEquals("The Bangla Dictionary!",contentAsString(result));
+            }
+        );
+    }
+
+    @Test
+    public void getRequestTest() {
+
+        running( fakeApplication(), () -> {
+
+            RequestBuilder request = fakeRequest(GET, "/gettest");
+            Result result = route(request);
+
+            assertEquals(OK, result.status());
+
+            JsonNode jsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
+
+            assertEquals("Dictionary", jsonNode.get("Application").asText());
+            assertEquals("Bengali", jsonNode.get("Language").asText());
+        });
+    }
+
+    @Test
+    public void postRequestTest() {
+
+        running( fakeApplication(), () -> {
+
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString("{\"name\":\"SIN\"}");
+
+            RequestBuilder request = fakeRequest(POST,"/posttest").bodyJson(bodyJson);
+
+            Result result = route(request);
+
+            assertEquals(OK, result.status());
+
+            JsonNode jsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
+
+            assertEquals("SIN", jsonNode.get("Name").asText());
+            assertEquals("3", jsonNode.get("Length").asText());
+            assertEquals("S", jsonNode.get("StartsWith").asText());
         });
     }
 }

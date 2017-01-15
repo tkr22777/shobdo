@@ -20,7 +20,7 @@ public class BaseWord {
     private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private int timesSearched;
     private String linkToPronunciation;
-    private Map<String,String> extraMetaMap; //extra meta map can be kept for info that is difficult to parse
+    private Map<String,String> extraMetaMap; //used for any extra keyed metadata
 
     public BaseWord(){
 
