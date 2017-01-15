@@ -1,6 +1,8 @@
 package controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import logics.WordLogic;
 import objects.DictionaryWord;
 import play.data.DynamicForm;
@@ -11,6 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import scala.Int;
 import utilities.DictUtil;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import javax.inject.Inject;
@@ -29,7 +32,11 @@ public class WordController extends Controller{
 
     public Result index() {
 
-        return ok("বাংলা অভিধান এ স্বাগতম!" );
+        String welcome = "বাংলা অভিধান এ স্বাগতম!";
+
+        log.info(welcome);
+
+        return ok(welcome);
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -48,7 +55,7 @@ public class WordController extends Controller{
 
         } catch (Exception ex) {
 
-            log.info("Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC002 Property 'spelling' not found in the json body. Body found:" + json.textValue());
             return badRequest();
         }
 
@@ -59,7 +66,7 @@ public class WordController extends Controller{
     public Result getWordBySpelling() {
 
         JsonNode json = request().body().asJson();
-        String spelling;
+        String spelling = "null";
 
         try {
 
@@ -67,8 +74,7 @@ public class WordController extends Controller{
 
         } catch (Exception ex) {
 
-            log.info("Exception: " + ex.getMessage());
-
+            log.info("WC001 getWordBySpelling [Spelling:" + spelling  + "]  Exception: " + ex.getMessage());
             return badRequest();
         }
 
@@ -122,4 +128,15 @@ public class WordController extends Controller{
         return ok("Generated and added " + wordCount + " random words on the dictionary!");
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createWord() {
+
+        JsonNode json = request().body().asJson();
+
+        DictionaryWord word = (DictionaryWord) JsonUtil.jsonNodeToObject(json, DictionaryWord.class);
+
+        log.info(word.toString());
+
+        return ok();
+    }
 }

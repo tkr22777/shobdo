@@ -2,14 +2,17 @@ package cache;
 
 import objects.DictionaryWord;
 import redis.clients.jedis.Jedis;
+import utilities.BenchmarkLogger;
 import utilities.JsonUtil;
 import utilities.LogPrint;
+import utilities.RedisUtil;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class WordCache {
 
-    private static boolean USE_REDIS = false;
+    private static boolean USE_REDIS = true;
     private static final String DEFAULT_REDIS_HOSTNAME = "redis";
     //private static final String DEFAULT_REDIS_HOSTNAME = "172.17.0.1"; //"localhost";
 
@@ -23,6 +26,7 @@ public class WordCache {
     private boolean USE_REDIS_EXPIRATION_TIME = false;
     private final int REDIS_EXPIRE_TIME = 10; //in seconds
 
+    private BenchmarkLogger bmLog = new BenchmarkLogger(WordCache.class);
     private LogPrint log = new LogPrint(WordCache.class);
 
     public WordCache() {
@@ -32,7 +36,7 @@ public class WordCache {
 
     public String getHostname() { //You may return environment from here
 
-        log.info("@WC001 Connect to redis host [" +  DEFAULT_REDIS_HOSTNAME + "] with default port." );
+        log.info("@WC001 Connect to redis [host:" +  DEFAULT_REDIS_HOSTNAME + "][port:6379]." );
         return DEFAULT_REDIS_HOSTNAME;
     }
 
@@ -46,7 +50,7 @@ public class WordCache {
 
         } catch (Exception ex) {
 
-            log.info("Exception occurred while connecting to Redis. Message:" + ex.getMessage());
+            log.info("@WC002 Error connecting to Redis. Message:" + ex.getMessage());
         }
 
         return jedis;
@@ -54,18 +58,22 @@ public class WordCache {
 
     public DictionaryWord getDictionaryWordBySpellingFromCache(String spelling) {
 
-        if ( (!USE_REDIS) || jedis == null || spelling == null)
+        if ( (!USE_REDIS) || jedis == null || spelling == null )
             return null;
 
-        String key = GET_WORD_BY_SPELLING_PFX + spelling;
+        String key = getKeyForSpelling(spelling);
+
+        bmLog.start();
 
         String wordJsonString = jedis.get(key);
 
         if (wordJsonString != null) {
 
-            log.debug("Word [" + spelling + "] found and returning from redis.");
+            DictionaryWord wordFound = (DictionaryWord) JsonUtil.toObjectFromJsonString(wordJsonString, DictionaryWord.class);
 
-            return (DictionaryWord) JsonUtil.toObjectFromJsonString(wordJsonString, DictionaryWord.class);
+            bmLog.end("@WC003 Word [" + spelling + "] found in cache and returning");
+
+            return wordFound;
         }
 
         return null;
@@ -80,14 +88,18 @@ public class WordCache {
 
         try {
 
+            bmLog.start();
+
             jedis.set(key, word.toJsonString());
+
+            bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] storing in cache.");
 
             if (USE_REDIS_EXPIRATION_TIME)
                 jedis.expire(key, REDIS_EXPIRE_TIME);
 
         } catch (Exception ex){
 
-            log.info("Error while storing JSON string of word");
+            log.info("@WC007 Error while storing JSON string of word");
         }
     }
 
@@ -98,10 +110,14 @@ public class WordCache {
 
         String key = getKeyForSearch(spelling);
 
+        bmLog.start();
+
         Set<String> words = jedis.smembers(key);
 
         if( words != null && words.size() > 0) {
-            log.debug("Search result found and returning from redis. Count: " + words.size());
+
+            bmLog.end("@WC005 Search result found and returning from cache. Count: " + words.size() + ".");
+
             return words;
         }
 
@@ -115,6 +131,8 @@ public class WordCache {
 
         String key = getKeyForSearch(spelling);
 
+        bmLog.start();
+
         for(String word: words) {
             jedis.sadd(key, word);
         }
@@ -122,13 +140,14 @@ public class WordCache {
         if(USE_REDIS_EXPIRATION_TIME)
             jedis.expire( key, REDIS_EXPIRE_TIME);
 
+        bmLog.end("@WC006 Storing search results on cache. Count: " + words.size() + ".");
     }
 
     public String getKeyForSpelling(String spelling) {
-        return GET_WORD_BY_SPELLING_PFX + spelling;
+        return RedisUtil.buildRedisKey( Arrays.asList( GET_WORD_BY_SPELLING_PFX, spelling) );
     }
 
     public String getKeyForSearch(String spelling) {
-        return SERACH_WORD_BY_SPELLING_PFX + spelling;
+        return RedisUtil.buildRedisKey( Arrays.asList( SERACH_WORD_BY_SPELLING_PFX, spelling));
     }
 }

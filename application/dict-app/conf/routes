@@ -35,8 +35,11 @@ POST    /dict/generate             controllers.WordController.createRandomDictio
 # 4. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
 # The request body contains name
 
-POST    /temp                      controllers.AdminController.testPost()
+POST    /posttest                  controllers.AdminController.testPost()
 
+GET     /gettest                   controllers.AdminController.testGet()
+
+POST    /dict/word/create          controllers.WordController.createWord()
 
 
 ##THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES

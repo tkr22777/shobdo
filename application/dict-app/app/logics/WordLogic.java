@@ -14,7 +14,6 @@ import java.util.Set;
  */
 public class WordLogic {
 
-
     private WordDao wordDao;
     private WordCache wordCache;
 
@@ -32,14 +31,14 @@ public class WordLogic {
         else
             wordDao = new WordDaoMongoImpl();
 
-        return new WordLogic( wordDao );
+        return new WordLogic( wordDao, new WordCache() );
     }
 
-    private WordLogic( WordDao wordDao) {
+    public WordLogic( WordDao wordDao, WordCache wordCache) {
 
         this.wordDao = wordDao;
 
-        this.wordCache = new WordCache();
+        this.wordCache = wordCache;
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
@@ -51,7 +50,10 @@ public class WordLogic {
         wordCache.cacheDictionaryWord(dictionaryWord);
     }
 
-    public DictionaryWord getDictionaryWordBySpelling( String spelling){
+    public DictionaryWord getDictionaryWordBySpelling( String spelling ){
+
+        if(spelling == null)
+            throw new IllegalArgumentException("WLEX: getDictionaryWordBySpelling word spelling is null or empty");
 
         DictionaryWord word = wordCache.getDictionaryWordBySpellingFromCache(spelling);
 
@@ -67,6 +69,9 @@ public class WordLogic {
 
     public DictionaryWord getDictionaryWordByWordId( String wordId) {
 
+        if(wordId == null)
+            throw new IllegalArgumentException("WLEX: getDictionaryWordByWordId wordId is null or empty");
+
         return wordDao.getDictionaryWordByWordId(wordId);
     }
 
@@ -79,12 +84,15 @@ public class WordLogic {
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
 
+        if(spelling == null)
+            throw new IllegalArgumentException("WLEX: searchWordsBySpelling spelling is null or empty");
+
         Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
 
         if(words != null && words.size() > 0)
             return words;
 
-        words = wordDao.getWordsWithPrefixMatch(spelling, limit);
+        words = wordDao.getWordSpellingsWithPrefixMatch(spelling, limit);
 
         if ( words != null && words.size() > 0 )
             wordCache.cacheSearchWordsBySpelling(spelling,words);
