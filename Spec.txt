@@ -1,30 +1,18 @@
 Tech Specification:
 	- Front End (The last thing to do)
-	    - Web/mobile friendly
-	    - Language: Bootstrap, Angular, Play Java
+	    - Language: TBD
 	    - Emphasis: Keep it simple and highly responsive
 
 	- Backend Service:
-	    - Web Server
 	    - Language
 		- Java
-	    - List of Containerized Microservices:
-		- Redis and Play Together?
+	    - Persitance/Datastore:
+		- Redis
 		- MongoDb
-
-	- Database:
-	    - Containerize?
-	    - MongoDb
-	    - Radis
-
 	- Others:
 	    - Languages/Text repository?
-	    - Less priority: use your own sprint management
-	    - Find how are you going to host it.
-	    - How to release code?
-
 	Schema:
-		Mongo Schema from Play Java Code:
+		Mongo Schema from Play Java Code
 
 User Specification:
 
@@ -35,8 +23,7 @@ User Specification:
 	- User login and history with Facebook
 
 Tips:
-	- suggest and match a word from cache when users type using Ovro
-	- image if noun?
+	- match a word from cache as users are typing and suggest them
 
 Resources:
 

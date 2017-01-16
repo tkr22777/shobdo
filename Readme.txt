@@ -1,4 +1,8 @@
-This repository will contain (some) parts of the Bangla web dictionary. So far I have decided to use:
-	1. Play Java
-	2. MongoDB
-	3. Redis
+A Bangla Dictionary Webservice. 
+Services can be found at the application directory.
+List of services:
+a. dict-app:
+ 	dict-app is build using:
+		a. Play Java
+		b. MongoDB
+		c. Redis (might have a flag to turn it on and off it as most data is static and small can be kept in JVM's memory)

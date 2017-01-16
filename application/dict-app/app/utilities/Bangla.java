@@ -8,10 +8,10 @@ public class Bangla {
     public static String getSentence(String startHex, String endHex, int numberOfWords, int maxWordLength) {
 
         if(startHex == null)
-            startHex = "995";
+            startHex = "995"; //ক
 
         if(endHex == null)
-            endHex = "9A8";
+            endHex = "9A8"; //ন
 
         if(numberOfWords == -1)
             numberOfWords = DictUtil.randomInRange(1, 10);

@@ -1,1 +1,3 @@
-This is where our first test application will live
+Current services:
+	1. dict-app: A docker composed version of the dictionary service
+
