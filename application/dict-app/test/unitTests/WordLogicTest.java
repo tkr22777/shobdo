@@ -37,7 +37,6 @@ public class WordLogicTest {
     public void setup() {
 
         setupMocks();
-
         setupObjects();
     }
 
@@ -48,15 +47,12 @@ public class WordLogicTest {
         mockWordCache = mock(WordCache.class);
 
         wordLogic = new WordLogic(mockWordDao, mockWordCache);
-
     }
 
     public void setupObjects() {
 
         theWord = new DictionaryWord();
         theWord.setWordSpelling(wordSpelling);
-
-
     }
 
     @Test
@@ -79,7 +75,6 @@ public class WordLogicTest {
         wordLogic.getDictionaryWordBySpelling(wordSpelling);
 
         verify(mockWordDao, never()).getDictionaryWordBySpelling(anyString());
-
         verify(mockWordCache, never()).cacheDictionaryWord(any(DictionaryWord.class));
     }
 
@@ -92,8 +87,6 @@ public class WordLogicTest {
         wordLogic.getDictionaryWordBySpelling(wordSpelling);
 
         verify(mockWordDao, times(1) ).getDictionaryWordBySpelling(wordSpelling);
-
         verify(mockWordCache, times(1) ).cacheDictionaryWord(theWord);
     }
-
 }
