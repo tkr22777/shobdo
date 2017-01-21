@@ -3,7 +3,7 @@
 # Based on Centos
 ############################################################
 
-FROM base-app
+FROM centos-java
 
 MAINTAINER Tahsin Kabir
 

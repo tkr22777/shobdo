@@ -1,4 +1,6 @@
 #!/bin/bash
 echo "Root Output:"
-curl http://localhost:9000
+curl http://"$(dinghy ip)":9000
 echo ""
+
+

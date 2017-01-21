@@ -1,9 +1,11 @@
-###########################################
+########################################
 # Dockerfile to build the dictionary app
-# Based on Centos
-###########################################
+# You need the centos-java image or 
+# build the centos-java image from the 
+# docker directory
+#########################################
 
-FROM base-app
+FROM centos-java
 
 MAINTAINER Tahsin Kabir
 

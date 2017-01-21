@@ -1,3 +1,7 @@
-Useful links to aid in development:
+Links to deploy locally builing:
+	1. Docker compose: https://github.com/docker/compose/releases
+	2. Dinghy: https://github.com/codekitchen/dinghy
+
+Links to aid in development:
 Bangla Unicode: http://www.fileformat.info/info/unicode/block/bengali/list.htm
 Google Input Tools For Different Languages: http://stackoverflow.com/questions/28707899/how-to-use-google-input-tools-in-website (You may even copy everything)
