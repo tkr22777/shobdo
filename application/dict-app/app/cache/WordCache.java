@@ -13,8 +13,9 @@ import java.util.Set;
 public class WordCache {
 
     private static boolean USE_REDIS = true;
-    private static final String DEFAULT_REDIS_HOSTNAME = "redis";
-    //private static final String DEFAULT_REDIS_HOSTNAME = "172.17.0.1"; //"localhost";
+    private static String DEFAULT_REDIS_HOSTNAME = "redis";
+    //private static String DEFAULT_REDIS_HOSTNAME = "172.17.0.1";
+    //private static String DEFAULT_REDIS_HOSTNAME = "localhost";
 
     private Jedis jedis;
 
@@ -23,7 +24,7 @@ public class WordCache {
     private final String GET_WORD_BY_SPELLING_PFX = "GWBS_";
 
     /*Redis expire time*/
-    private boolean USE_REDIS_EXPIRATION_TIME = false;
+    private boolean USE_REDIS_EXPIRATION_TIME = true;
     private final int REDIS_EXPIRE_TIME = 10; //in seconds
 
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordCache.class);

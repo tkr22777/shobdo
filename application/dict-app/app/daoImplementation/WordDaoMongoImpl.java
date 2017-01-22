@@ -37,6 +37,7 @@ public class WordDaoMongoImpl implements WordDao {
     public WordDaoMongoImpl() {
 
         String hostname = "mongo";
+        //hostname = "localhost";
         //hostname = "172.17.0.1";
         int port = 27017;
 

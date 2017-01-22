@@ -17,6 +17,7 @@ import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,7 +27,7 @@ public class WordController extends Controller{
 
     @Inject WSClient wsClient;
 
-    WordLogic logic = WordLogic.factory(null);
+    private final WordLogic logic = WordLogic.factory(null);
 
     private static LogPrint log = new LogPrint(WordController.class);
 
@@ -46,20 +47,22 @@ public class WordController extends Controller{
         int limit = Integer.MAX_VALUE;
 
         JsonNode json = request().body().asJson();
-
         String spelling;
+        Set<String> wordSpellings = new HashSet<>();
 
         try {
 
             spelling = json.get("spelling").asText();
+            wordSpellings = logic.searchWordsBySpelling( spelling, limit);
 
         } catch (Exception ex) {
 
             log.info("WC002 Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC003 Exception Stacktrace:" + ex.getStackTrace());
             return badRequest();
         }
 
-        return ok( Json.toJson( logic.searchWordsBySpelling( spelling, limit).toString() ) );
+        return ok( Json.toJson( wordSpellings ) );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
