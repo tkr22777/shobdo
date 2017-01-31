@@ -5,7 +5,7 @@
 # docker directory
 #########################################
 
-FROM centos-java
+FROM stupefied/centos-java8
 
 MAINTAINER Tahsin Kabir
 

@@ -7,13 +7,12 @@ import sun.rmi.runtime.Log;
  */
 public class BenchmarkLogger {
 
-    Class<?> class_type;
     LogPrint log;
     Long startTime;
 
     public BenchmarkLogger(Class<?> class_type) {
 
-        this.class_type = class_type;
+        log = new LogPrint(class_type);
     }
 
     public BenchmarkLogger(LogPrint log) {
