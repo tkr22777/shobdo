@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Splash screen
-IP="192.168.99.100"
+IP="192.168.99.102"
 PORT="9000"
 echo "curl sanity tests:"
 
@@ -26,5 +26,5 @@ echo ""
 
 #Get word by spelling in the dictionary
 #echo "Testing get word POST:"
-#curl -H "Content-Type: application/json" -X POST -d '{"spelling":"ঙ"}' http://192.168.99.100:$PORT/dict/word
+curl -H "Content-Type: application/json" -X POST -d '{"spelling":"ঙ"}' http://$IP:$PORT/dict/word
 #echo ""

@@ -1,7 +1,7 @@
 version: '2'
 services:
- dict-app:
-  build: .
+ shobdo:
+  image: "stupefied/shobdo:latest"
   ports:
   - "9000:9000"
   depends_on:
