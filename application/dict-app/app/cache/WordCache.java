@@ -25,7 +25,7 @@ public class WordCache {
 
     /*Redis expire time*/
     private boolean USE_REDIS_EXPIRATION_TIME = true;
-    private final int REDIS_EXPIRE_TIME = 10; //in seconds
+    private final int REDIS_EXPIRE_TIME = 60 * 60 * 6; //in seconds
 
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordCache.class);
     private LogPrint log = new LogPrint(WordCache.class);
