@@ -9,6 +9,10 @@ import redis.clients.jedis.Jedis;
 
 
 import services.Counter;
+import utilities.LogPrint;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This controller demonstrates how to use dependency injection to
@@ -22,12 +26,12 @@ public class CountController extends Controller {
     private final Counter counter;
     private final String key = "count";
     Jedis jedis;
-    Logger.ALogger log;
+    LogPrint log;
 
     @Inject
     public CountController(Counter counter) {
 
-       log = Logger.of(CountController.class);
+       log = new LogPrint(CountController.class);
 
        try {
 

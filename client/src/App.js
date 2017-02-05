@@ -15,8 +15,8 @@ class App extends Component {
     }
     searchForSuggestions(searchTerm) {
         console.info('searching ' + searchTerm);
-        axios.post('http://172.17.0.1:9000/dict/search', {
-            spelling: searchTerm
+        axios.post('http://138.68.224.203:9000/dict/search', {
+            "spelling": searchTerm
           })
           .then(function (response) {
             console.log(response);

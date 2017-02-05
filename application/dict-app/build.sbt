@@ -14,6 +14,8 @@ libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.2.2"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.5.0"
 
+libraryDependencies += filters
+
 libraryDependencies ++= Seq(
   javaJdbc,
   cache,

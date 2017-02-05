@@ -81,7 +81,15 @@ public class WordController extends Controller{
             return badRequest();
         }
 
-        return ok( Json.toJson(logic.getDictionaryWordBySpelling(spelling)) );
+        DictionaryWord word = logic.getDictionaryWordBySpelling(spelling);
+
+
+
+        if( word == null )
+            return ok("No word found for spelling:\"" + spelling + "\"");
+        else
+            return ok( Json.toJson(word) );
+
     }
 
     @BodyParser.Of(BodyParser.Json.class)
