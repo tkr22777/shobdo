@@ -18,5 +18,5 @@ services:
  mongo:
   image: "mongo:latest"
   volumes:
-  - "../../data/mongodump:/mongoshobdodump"
+  - "data/mongodump:/mongoshobdodump"
 
