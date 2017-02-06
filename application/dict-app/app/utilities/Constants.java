@@ -10,4 +10,6 @@ public class Constants {
 
     public static final boolean CUSTOM_STRING = false;
 
+    public static final int SEARCH_SPELLING_LIMIT = 40;
+
 }

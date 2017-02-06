@@ -96,6 +96,9 @@ public class WordLogic {
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
      How to find closest neighbour of a Bangla word? you may be able to do that locally?
      **/
+    public Set<String> searchWordsBySpelling(String spelling) {
+        return searchWordsBySpelling(spelling, Constants.SEARCH_SPELLING_LIMIT);
+    }
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
 

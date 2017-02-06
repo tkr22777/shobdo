@@ -12,6 +12,7 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import scala.Int;
+import utilities.Constants;
 import utilities.DictUtil;
 import utilities.JsonUtil;
 import utilities.LogPrint;
@@ -43,22 +44,23 @@ public class WordController extends Controller{
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        //For some reason the limit value is not equal to the size of array that is returned
-        int limit = Integer.MAX_VALUE;
+        String spelling;
 
         JsonNode json = request().body().asJson();
-        String spelling;
+
         Set<String> wordSpellings = new HashSet<>();
 
         try {
 
             spelling = json.get("spelling").asText();
-            wordSpellings = logic.searchWordsBySpelling( spelling, limit);
+
+            if(spelling.length() > 0)
+                wordSpellings = logic.searchWordsBySpelling(spelling);
 
         } catch (Exception ex) {
 
-            log.info("WC002 Property 'spelling' not found in the json body. Body found:" + json.textValue());
-            log.info("WC003 Exception Stacktrace:" + ex.getStackTrace());
+            log.info("WC001 Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace());
             return badRequest();
         }
 
@@ -68,8 +70,9 @@ public class WordController extends Controller{
     @BodyParser.Of(BodyParser.Json.class)
     public Result getWordBySpelling() {
 
+        String spelling;
+
         JsonNode json = request().body().asJson();
-        String spelling = "null";
 
         try {
 
@@ -77,13 +80,12 @@ public class WordController extends Controller{
 
         } catch (Exception ex) {
 
-            log.info("WC001 getWordBySpelling [Spelling:" + spelling  + "]  Exception: " + ex.getMessage());
+            log.info("WC003 Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace());
             return badRequest();
         }
 
         DictionaryWord word = logic.getDictionaryWordBySpelling(spelling);
-
-
 
         if( word == null )
             return ok("No word found for spelling:\"" + spelling + "\"");
@@ -105,16 +107,22 @@ public class WordController extends Controller{
 
         } catch (Exception ex) {
 
-            log.info("Exception: " + ex.getMessage());
+            log.info("WC005 Property 'wordId' not found in the json body. Body found:" + json.textValue());
+            log.info("WC006 Exception Stacktrace:" + ex.getStackTrace());
 
             return badRequest();
         }
 
-        return ok( Json.toJson(logic.getDictionaryWordByWordId( wordId )) );
+        DictionaryWord word = logic.getDictionaryWordByWordId( wordId );
+
+        if(word == null)
+            return ok("No word found for wordId:\"" + wordId + "\"");
+        else
+            return ok( Json.toJson(word) );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result createRandomDictionary() {
+    public Result createRandomDictionary() { //remove this route for eventual deployment
 
         JsonNode json = request().body().asJson();
 
@@ -126,7 +134,8 @@ public class WordController extends Controller{
 
         } catch (Exception ex) {
 
-            log.info("Exception: " + ex.getMessage());
+            log.info("WC007 Property 'wordCount' not found in the json body. Body found:" + json.textValue());
+            log.info("WC008 Exception Stacktrace:" + ex.getStackTrace());
 
             return badRequest();
         }
