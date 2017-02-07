@@ -79,7 +79,7 @@ public class WordLogicTest {
     }
 
     @Test
-    public void getDictionaryWordBySpelling_notCached_callDBandCache() {
+    public void getDictionaryWordBySpelling_notCached_callDatabaseAndCache() {
 
         when(mockWordCache.getDictionaryWordBySpellingFromCache(wordSpelling)).thenReturn(null);
         when(mockWordDao.getDictionaryWordBySpelling(wordSpelling)).thenReturn(theWord);

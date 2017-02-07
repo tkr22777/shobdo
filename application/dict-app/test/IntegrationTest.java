@@ -17,5 +17,4 @@ public class IntegrationTest {
             assertTrue(browser.pageSource().contains("Your new application is ready."));
         });
     }
-
 }

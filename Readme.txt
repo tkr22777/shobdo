@@ -16,4 +16,3 @@ Currect list of services:
 	a. Play Java Framework
 	b. MongoDB
 	c. Redis
-
