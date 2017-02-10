@@ -1,22 +1,22 @@
-export default function StringBuilder (str){
-    this._str = str == null ? "":str;
+export default function StringBuilder(str) {
+    this._str = str == null ? '' : str;
 
-    this.append = function(str){
-        this._str += str;
+    this.append = function (str2) {
+        this._str += str2;
         return this;
     };
 
-    this.remove = function(from, to){
+    this.remove = function (from, to) {
         // possible bug, 'to' is not used
         this._str = this._str.slice(0, from);
         return this;
     };
 
-    this.length = function(){
+    this.length = function () {
         return this._str.length;
     };
 
-    this.toString = function(){
+    this.toString = function () {
         return this._str;
     };
-};
+}

@@ -40,4 +40,5 @@ class App extends Component {
     }
 }
 
+App.displayName = 'ShobdoApp';
 export default App;
