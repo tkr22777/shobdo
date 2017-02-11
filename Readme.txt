@@ -9,7 +9,6 @@ Currect list of services:
 
    To run dict-app locally:
 	1. Install docker and docker-compose
-	2. Go to application/dict-app directory
 	3. Run 'docker-compose up'
 
    It is developed using:
