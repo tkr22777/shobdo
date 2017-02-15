@@ -10,6 +10,7 @@ import com.mongodb.client.model.Projections;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
+import utilities.BenchmarkLogger;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
@@ -32,18 +33,19 @@ public class WordDaoMongoImpl implements WordDao {
     MongoDatabase mongoDatabase;
     MongoCollection<Document> collection;
 
+    private BenchmarkLogger bmLog = new BenchmarkLogger(WordDaoMongoImpl.class);
     private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
     public WordDaoMongoImpl() {
 
-        String hostname = "mongo";
-        //hostname = "localhost";
-        //hostname = "172.17.0.1";
-        int port = 27017;
+        String MONGODB_HOSTNAME = "mongo";
+        int MONGODB_PORT = 27017;
 
-        log.info( "@WDMI001 Connecting to mongodb [host:" + hostname + "][port:" + port + "]" );
+        //MONGODB_HOSTNAME = "localhost";
+        //MONGODB_HOSTNAME = "172.17.0.1";
+        log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
 
-        mongoClient = new MongoClient( hostname, port );
+        mongoClient = new MongoClient( MONGODB_HOSTNAME, MONGODB_PORT );
         mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
         collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
     }
@@ -51,13 +53,14 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public String setDictionaryWord(DictionaryWord dictionaryWord) {
 
-        log.info("@WDMI001 setDictionaryWord Saving word to database: " + dictionaryWord.toString());
+        bmLog.start();
 
         try {
 
             ObjectMapper mapper = new ObjectMapper();
             Document wordDocument = Document.parse( mapper.writeValueAsString(dictionaryWord) );
             collection.insertOne(wordDocument);
+            bmLog.end("@WDMI001 setDictionaryWord Saving word to database: " + dictionaryWord.getWordSpelling());
 
         } catch ( Exception ex ){
 
@@ -70,46 +73,52 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public DictionaryWord getDictionaryWordByWordId(String wordId) {
 
-        log.info("@WDMI002 getDictionaryWordByWordId getting word from database, wordId: " + wordId);
+        bmLog.start();
 
         BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
+        Document wordDocument = collection.find(query).first();
 
-        Document word = collection.find(query).first();
+        if(wordDocument == null) {
 
-        if(word == null)
+            bmLog.end("@WDMI002 getDictionaryWordByWordId word not found in database for wordId: " + wordId);
             return null;
 
-        DictionaryWord dictionaryWord = (DictionaryWord) DictUtil
-                .getObjectFromDocument( word, DictionaryWord.class);
+        } else  {
 
-        return dictionaryWord;
+            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            bmLog.end("@WDMI002 getDictionaryWordByWordId word [spelling:" + word.getWordSpelling()
+                    + "] found from database for wordId: " + wordId);
+            return word;
+        }
     }
 
     @Override
     public DictionaryWord getDictionaryWordBySpelling(String spelling) {
 
-        log.info("@WDMI003 getDictionaryWordBySpelling getting word from database, spelling: " + spelling);
+        bmLog.start();
 
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
+        Document wordDocument = collection.find(query).first();
 
-        Document word = collection.find(query).first();
+        if(wordDocument == null) {
 
-        if(word == null)
+            bmLog.end("@WDMI004 getDictionaryWordByWordId word not found in database for spelling: " + spelling);
             return null;
 
-        DictionaryWord dictionaryWord = (DictionaryWord) DictUtil
-                .getObjectFromDocument( word, DictionaryWord.class);
+        } else {
 
-        return dictionaryWord;
+            bmLog.end("@WDMI005 getDictionaryWordByWordId word found in database for spelling: " + spelling);
+            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            return word;
+        }
     }
 
     @Override
     public Set<String> getWordSpellingsWithPrefixMatch(String spelling, int limit) {
 
-        log.info("@WDMI004 getWordSpellingsWithPrefixMatch getting similar spelling from database, spelling: " + spelling);
+        bmLog.start();
 
         Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
-
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, prefixForSpellPattern);
 
         MongoCursor<Document> words = collection
@@ -123,10 +132,11 @@ public class WordDaoMongoImpl implements WordDao {
 
         while(words.hasNext()) {
 
-            Document bleh = words.tryNext();
-            result.add( bleh.get(WORD_SPELLING).toString() );
+            Document document = words.tryNext();
+            result.add( document.get(WORD_SPELLING).toString() );
         }
 
+        bmLog.end("@WDMI006 getWordSpellingsWithPrefixMatch getting similar spelling from database for spelling: " + spelling);
         return result;
     }
 

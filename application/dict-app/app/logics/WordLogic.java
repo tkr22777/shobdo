@@ -23,15 +23,7 @@ public class WordLogic {
 
     public static WordLogic factory(String dbName) { //to select which database to use
 
-        if(dbName == null)
-            dbName = Constants.DB_DEFAULT;
-
-        WordDao wordDao;
-
-        if(Constants.DB_MONGO.equalsIgnoreCase(dbName))
-            wordDao = new WordDaoMongoImpl();
-        else
-            wordDao = new WordDaoMongoImpl();
+        WordDao wordDao = new WordDaoMongoImpl();
 
         return new WordLogic( wordDao, new WordCache() );
     }
@@ -45,7 +37,7 @@ public class WordLogic {
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
 
-        verifyDictionaryWord(dictionaryWord);
+        //verifyDictionaryWord(dictionaryWord);
 
         wordDao.setDictionaryWord(dictionaryWord);
 
@@ -54,31 +46,23 @@ public class WordLogic {
 
     public DictionaryWord getDictionaryWordBySpelling( String spelling ){
 
-        if(spelling == null)
+        if(spelling == null || spelling == "")
             throw new IllegalArgumentException("WLEX: getDictionaryWordBySpelling word spelling is null or empty");
 
-        bmLog.start();
-        DictionaryWord word = wordCache.getDictionaryWordBySpellingFromCache(spelling);
+        DictionaryWord cachedWord = wordCache.getDictionaryWordBySpellingFromCache(spelling);
 
-        if( word != null ) {
-            bmLog.end("@WL001 Word [" + spelling + "] found in cache and returning");
-            return word;
-        } else {
-            bmLog.end("@WL001 Word [" + spelling + "] not found in cache.");
-        }
+        if(cachedWord != null)
+            return cachedWord;
 
-        bmLog.start();
-        word = wordDao.getDictionaryWordBySpelling(spelling);
-        bmLog.end("@WL001 Word [" + spelling + "] found in database and returning");
+        DictionaryWord wordFromDB = wordDao.getDictionaryWordBySpelling(spelling);
 
-        bmLog.start();
-        wordCache.cacheDictionaryWord(word);
-        bmLog.end("@WL002 Caching retrieved Word [" + spelling + "] from database to cache.");
+        wordCache.cacheDictionaryWord(wordFromDB);
 
-        return word;
+        return wordFromDB;
+
     }
 
-    public DictionaryWord getDictionaryWordByWordId( String wordId) {
+    private DictionaryWord getDictionaryWordByWordId( String wordId) {
 
         if(wordId == null)
             throw new IllegalArgumentException("WLEX: getDictionaryWordByWordId wordId is null or empty");
