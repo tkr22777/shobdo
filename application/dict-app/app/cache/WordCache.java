@@ -14,8 +14,6 @@ public class WordCache {
 
     private static boolean USE_REDIS = true;
     private static String DEFAULT_REDIS_HOSTNAME = "redis";
-    //private static String DEFAULT_REDIS_HOSTNAME = "172.17.0.1";
-    //private static String DEFAULT_REDIS_HOSTNAME = "localhost";
 
     private Jedis jedis;
 
@@ -35,8 +33,10 @@ public class WordCache {
         jedis = getJedis(getHostname());
     }
 
-    public String getHostname() { //You may return environment from here
+    public String getHostname() {
 
+        //DEFAULT_REDIS_HOSTNAME = "172.17.0.1";
+        //DEFAULT_REDIS_HOSTNAME = "localhost";
         log.info("@WC001 Connect to redis [host:" +  DEFAULT_REDIS_HOSTNAME + "][port:6379]." );
         return DEFAULT_REDIS_HOSTNAME;
     }
@@ -59,30 +59,29 @@ public class WordCache {
 
     public DictionaryWord getDictionaryWordBySpellingFromCache(String spelling) {
 
-        if ( (!USE_REDIS) || jedis == null || spelling == null )
+        if( !USE_REDIS || jedis == null || spelling == null )
             return null;
 
-        String key = getKeyForSpelling(spelling);
-
         bmLog.start();
-
+        String key = getKeyForSpelling(spelling);
         String wordJsonString = jedis.get(key);
 
         if (wordJsonString != null) {
 
             DictionaryWord wordFound = (DictionaryWord) JsonUtil.toObjectFromJsonString(wordJsonString, DictionaryWord.class);
-
             bmLog.end("@WC003 Word [" + spelling + "] found in cache and returning");
-
             return wordFound;
-        }
 
-        return null;
+        } else {
+
+            bmLog.end("@WC003 Word [" + spelling + "] not found in cache.");
+            return null;
+        }
     }
 
     public void cacheDictionaryWord(DictionaryWord word) {
 
-        if ( (!USE_REDIS) || jedis == null || word == null)
+        if(!USE_REDIS || jedis == null || word == null)
             return;
 
         String key = getKeyForSpelling(word.getWordSpelling());
@@ -90,15 +89,13 @@ public class WordCache {
         try {
 
             bmLog.start();
-
             jedis.set(key, word.toJsonString());
-
             bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] storing in cache.");
 
             if (USE_REDIS_EXPIRATION_TIME)
                 jedis.expire(key, REDIS_EXPIRE_TIME);
 
-        } catch (Exception ex){
+        } catch (Exception ex) {
 
             log.info("@WC007 Error while storing JSON string of word");
         }
@@ -106,19 +103,16 @@ public class WordCache {
 
     public Set<String> getSearchWordsBySpellingFromCache(String spelling){
 
-        if ( (!USE_REDIS) || jedis == null || spelling == null)
+        if ( !USE_REDIS || jedis == null || spelling == null)
             return null;
 
-        String key = getKeyForSearch(spelling);
-
         bmLog.start();
-
+        String key = getKeyForSearch(spelling);
         Set<String> words = jedis.smembers(key);
 
         if( words != null && words.size() > 0) {
 
             bmLog.end("@WC005 Search result found and returning from cache. Count: " + words.size() + ".");
-
             return words;
         }
 
@@ -127,12 +121,11 @@ public class WordCache {
 
     public void cacheSearchWordsBySpelling(String spelling, Set<String> words){
 
-        if ( (!USE_REDIS) || jedis == null || spelling == null)
+        if( !USE_REDIS || jedis == null || spelling == null)
             return;
 
-        String key = getKeyForSearch(spelling);
-
         bmLog.start();
+        String key = getKeyForSearch(spelling);
 
         for(String word: words) {
             jedis.sadd(key, word);

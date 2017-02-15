@@ -28,7 +28,7 @@ public class WordController extends Controller{
 
     @Inject WSClient wsClient;
 
-    private final WordLogic logic = WordLogic.factory(null);
+    private final WordLogic logic = WordLogic.factory(Constants.DB_MONGO);
 
     private static LogPrint log = new LogPrint(WordController.class);
 
@@ -60,7 +60,7 @@ public class WordController extends Controller{
         } catch (Exception ex) {
 
             log.info("WC001 Property 'spelling' not found in the json body. Body found:" + json.textValue());
-            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace());
+            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
             return badRequest();
         }
 
@@ -73,6 +73,7 @@ public class WordController extends Controller{
         String spelling;
 
         JsonNode json = request().body().asJson();
+        log.info("Json: " + json.textValue());
 
         try {
 
@@ -81,7 +82,7 @@ public class WordController extends Controller{
         } catch (Exception ex) {
 
             log.info("WC003 Property 'spelling' not found in the json body. Body found:" + json.textValue());
-            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace());
+            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace().toString());
             return badRequest();
         }
 
@@ -108,7 +109,7 @@ public class WordController extends Controller{
         } catch (Exception ex) {
 
             log.info("WC005 Property 'wordId' not found in the json body. Body found:" + json.textValue());
-            log.info("WC006 Exception Stacktrace:" + ex.getStackTrace());
+            log.info("WC006 Exception Stacktrace:" + ex.getStackTrace().toString());
 
             return badRequest();
         }
@@ -135,7 +136,7 @@ public class WordController extends Controller{
         } catch (Exception ex) {
 
             log.info("WC007 Property 'wordCount' not found in the json body. Body found:" + json.textValue());
-            log.info("WC008 Exception Stacktrace:" + ex.getStackTrace());
+            log.info("WC008 Exception Stacktrace:" + ex.getStackTrace().toString());
 
             return badRequest();
         }
