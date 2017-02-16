@@ -153,33 +153,6 @@ public class ApplicationTest extends WithServer {
     }
 
     @Test @Ignore
-    public void createDictionaryFromSamsad() throws Exception {
-
-        Collection<DictionaryWord> words = new SamsadExporter().getDictiionary();
-
-        int total = 0;
-        for(DictionaryWord word: words) {
-
-            /*
-            if(total == 0) break;
-
-            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_SPELLING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_MEANING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
-
-                log.info("Next word: \n" + word.toString());
-
-                wordLogic.saveDictionaryWord(word);
-                total++;
-            }
-            */
-            total++;
-        }
-
-        log.info("Total words: " + total);
-    }
-
-    @Test @Ignore
     public void testConfig() throws Exception {
 
     }
