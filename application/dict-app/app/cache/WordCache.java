@@ -84,13 +84,13 @@ public class WordCache {
         if(!USE_REDIS || jedis == null || word == null)
             return;
 
+        bmLog.start();
         String key = getKeyForSpelling(word.getWordSpelling());
 
         try {
 
-            bmLog.start();
             jedis.set(key, word.toJsonString());
-            bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] storing in cache.");
+            bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] stored in cache.");
 
             if (USE_REDIS_EXPIRATION_TIME)
                 jedis.expire(key, REDIS_EXPIRE_TIME);
@@ -114,9 +114,12 @@ public class WordCache {
 
             bmLog.end("@WC005 Search result found and returning from cache. Count: " + words.size() + ".");
             return words;
-        }
 
-        return null;
+        } else {
+
+            bmLog.end("@WC005 Search result not found on cache for spelling: \'" + spelling + "\'");
+            return null;
+        }
     }
 
     public void cacheSearchWordsBySpelling(String spelling, Set<String> words){
@@ -126,6 +129,11 @@ public class WordCache {
 
         bmLog.start();
         String key = getKeyForSearch(spelling);
+
+        if(words == null) { //invalidate existing value
+            jedis.del(key);
+            return;
+        }
 
         for(String word: words) {
             jedis.sadd(key, word);

@@ -13,6 +13,7 @@ import play.test.WithServer;
 import utilities.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static play.test.Helpers.*;
@@ -40,7 +41,7 @@ public class ApplicationTest extends WithServer {
 
         dictionary = DictUtil.generateDictionaryWithRandomWords(numberOfWords);
 
-        wordLogic = WordLogic.factory(Constants.DB_MONGO);
+        wordLogic = WordLogic.factory();
     }
 
     @Test @Ignore
@@ -154,21 +155,25 @@ public class ApplicationTest extends WithServer {
     @Test @Ignore
     public void createDictionaryFromSamsad() throws Exception {
 
-        List<DictionaryWord> words = new SamsadExporter().getDictiionary();
+        Collection<DictionaryWord> words = new SamsadExporter().getDictiionary();
 
         int total = 0;
         for(DictionaryWord word: words) {
 
-            if(total == 5) break;
+            /*
+            if(total == 0) break;
+
             if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_SPELLING"))
              && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_MEANING"))
              && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
 
                 log.info("Next word: \n" + word.toString());
 
-//              wordLogic.saveDictionaryWord(word);
+                wordLogic.saveDictionaryWord(word);
                 total++;
             }
+            */
+            total++;
         }
 
         log.info("Total words: " + total);

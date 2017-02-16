@@ -6,8 +6,12 @@ import objects.Meaning;
 import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
 import org.bson.Document;
+import org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet;
+import play.api.libs.iteratee.Enumeratee;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Created by tahsinkabir on 8/27/16.
@@ -20,21 +24,23 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
+    public static DictionaryWord getDictionaryWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
+
+        dictionaryDocument.remove("_id");
+        return (DictionaryWord) getObjectFromDocument(dictionaryDocument, class_type);
+    }
+
     public static Object getObjectFromDocument(Document doc, Class<?> class_type) {
 
-        doc.remove("_id");
-
         ObjectMapper mapper = new ObjectMapper();
-
         Object object = null;
 
         try {
 
             object = mapper.readValue( doc.toJson(), class_type );
 
-        } catch ( Exception ex ){
-
-            log.info( "Failed to map json word to dictionary word object. Ex: " + ex.getMessage() );
+        } catch(Exception ex) {
+            log.info( "Failed to map document " + doc + " to " + class_type + " object. Ex: " + ex.getMessage() );
         }
 
         return object;
@@ -103,5 +109,48 @@ public class DictUtil {
         dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
 
         return dictionaryWord;
+    }
+
+    public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {
+
+        if(strings == null)
+            return;
+
+        List<?> toPrint = strings;
+
+        if(randomize) {
+            toPrint = new ArrayList<>(strings);
+            Collections.shuffle(toPrint);
+        }
+
+        for(int i = start ; i < toPrint.size() && i <  start + limit ; i++) {
+
+            log.info( "#" + i + " " + tag + ": '"+ toPrint.get(i).toString() + "'");
+        }
+    }
+
+    public static Map<String, DictionaryWord> removeKeyValuesForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+
+        return map.entrySet().stream()
+                .filter( e-> !keys.contains( e.getKey() ) )
+                .collect(
+                        Collectors.toMap(
+                                e -> e.getKey(),
+                                e -> e.getValue()
+                        )
+                );
+    }
+
+    public static Map<String,DictionaryWord> filterForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+
+        return map.entrySet().stream()
+                .filter( e -> keys.contains(e.getKey()))
+                .collect(
+                        Collectors.toMap(
+                                e->e.getKey(),
+                                e->e.getValue()
+                        )
+                );
+
     }
 }

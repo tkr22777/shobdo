@@ -13,21 +13,19 @@ import java.util.*;
  */
 public class BaseWord {
 
-    private LogPrint log = new LogPrint(BaseWord.class);
-
     private String wordId;
     private String wordSpelling;
     private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private int timesSearched;
     private String linkToPronunciation;
-    private Map<String,String> extraMetaMap; //used for any extra keyed metadata
+    private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
 
     public BaseWord(){
 
     }
 
     public BaseWord(String wordId, String wordSpelling, int timesSearched, String linkToPronunciation,
-                    Map<String,String> extraMetaMap)
+                    Map<String,List<String>> extraMetaMap)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
@@ -73,31 +71,37 @@ public class BaseWord {
         this.timesSearched = timesSearched;
     }
 
-    public Map<String,String> getExtraMetaMap() {
+    public Map<String,List<String>> getExtraMetaMap() {
         return extraMetaMap;
     }
 
-    public void setExtraMetaMap(Map<String,String> extraMetaMap) {
-        this.extraMetaMap = extraMetaMap;
+    public void setExtraMetaMap( Map<String,List<String>>  map) {
+        this.extraMetaMap = map;
     }
 
-    public void setExtraMetaValue(String key, String value, boolean overwriteIfValueExists){
+    public void setExtraMetaValue(String key, String value){
 
-        if(extraMetaMap == null) extraMetaMap = new HashMap<>();
-
-        if( extraMetaMap.get(key) == null || overwriteIfValueExists ) {
-            extraMetaMap.put(key, value);
-        } else {
-            setExtraMetaValue(key + DictUtil.randomInRange(0,9), value, overwriteIfValueExists);
-        }
+        setExtraMetaValue(key, Arrays.asList(value));
     }
 
-    public String retrieveExtraMetaValueForKey(String key){
+    public void setExtraMetaValue(String key, List<String> newValues){
 
-        if(extraMetaMap != null)
-            return extraMetaMap.get(key);
-        else
-            return null;
+        if(extraMetaMap == null)
+            extraMetaMap = new HashMap<>();
+
+        List<String> values = extraMetaMap.get(key);
+
+        if( values == null )
+            values = new ArrayList<>();
+
+        values.addAll(newValues);
+
+        extraMetaMap.put(key, values);
+    }
+
+    public List<String> retrieveExtraMetaValueForKey(String key){
+
+        return extraMetaMap.get(key);
     }
 
     public void removeExtraMetaValueForKey(String key){
@@ -133,7 +137,6 @@ public class BaseWord {
         BaseWord baseWord = (BaseWord) o;
 
         return wordSpelling != null ? wordSpelling.equals(baseWord.wordSpelling) : baseWord.wordSpelling == null;
-
     }
 
     @Override
@@ -177,6 +180,7 @@ public class BaseWord {
 
         } catch (JsonProcessingException exception) {
 
+            LogPrint log = new LogPrint(BaseWord.class);
             log.info("BW001: Json Processing Exception Message: " + exception.getMessage());
         }
 

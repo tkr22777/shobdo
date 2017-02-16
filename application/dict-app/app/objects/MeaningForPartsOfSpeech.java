@@ -13,10 +13,7 @@ import java.util.Collection;
  */
 public class MeaningForPartsOfSpeech {
 
-    private LogPrint log = new LogPrint(MeaningForPartsOfSpeech.class);
-
     String partsOfSpeech;
-
     ArrayList<Meaning> meanings = new ArrayList<>(); //the order of their meaning matters
 
     public MeaningForPartsOfSpeech() {
@@ -78,6 +75,7 @@ public class MeaningForPartsOfSpeech {
 
         } catch (JsonProcessingException exception) {
 
+            LogPrint log = new LogPrint(MeaningForPartsOfSpeech.class);
             log.info("DW001: Json Processing Exception Message: " + exception.getMessage());
         }
 

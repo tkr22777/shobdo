@@ -28,7 +28,7 @@ public class WordController extends Controller{
 
     @Inject WSClient wsClient;
 
-    private final WordLogic logic = WordLogic.factory(Constants.DB_MONGO);
+    private final WordLogic logic = WordLogic.factory();
 
     private static LogPrint log = new LogPrint(WordController.class);
 
@@ -44,7 +44,7 @@ public class WordController extends Controller{
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        String spelling;
+        String spelling = "";
 
         JsonNode json = request().body().asJson();
 
