@@ -7,14 +7,13 @@ import utilities.LogPrint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by tahsinkabir on 8/21/16.
  */
 public class DictionaryWord extends BaseWord {
-
-    private LogPrint log = new LogPrint(DictionaryWord.class);
 
     //arrangementType is the way the meanings of this word are arranged now
     //e.g. by parts of speech or by strength of the meaning (are not arranged by parts of speech, such as V, N , N , P, V)
@@ -23,8 +22,35 @@ public class DictionaryWord extends BaseWord {
     //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
 
-    //Arrangement partsOfSpeech will be used in V2
-    String arrangementType = null;
+    int version = 0;
+    boolean reviewed = false;
+    boolean diplayToPublic = false;
+    String arrangementType = null; //Arrangement partsOfSpeech will be used in V2
+    ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public boolean isReviewed() {
+        return reviewed;
+    }
+
+    public void setReviewed(boolean reviewed) {
+        this.reviewed = reviewed;
+    }
+
+    public boolean isDiplayToPublic() {
+        return diplayToPublic;
+    }
+
+    public void setDiplayToPublic(boolean diplayToPublic) {
+        this.diplayToPublic = diplayToPublic;
+    }
 
     public String getArrangementType() {
         return arrangementType;
@@ -34,11 +60,9 @@ public class DictionaryWord extends BaseWord {
         this.arrangementType = arrangementType;
     }
 
-    ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
-
     public DictionaryWord() {
-
         super();
+
     }
 
     public DictionaryWord(String wordId,
@@ -64,7 +88,7 @@ public class DictionaryWord extends BaseWord {
                           String linkToPronunciation,
                           String arrangementType,
                           Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
-                          Map<String,String> extraMeta)
+                          Map<String,List<String>> extraMeta)
     {
         super(wordId, wordSpelling, timesSearched, linkToPronunciation, extraMeta);
         this.arrangementType = arrangementType;
@@ -81,10 +105,11 @@ public class DictionaryWord extends BaseWord {
 
         try {
 
-            word = mapper.readValue(wordInJsonString, DictionaryWord.class);
+           word = mapper.readValue(wordInJsonString, DictionaryWord.class);
 
         } catch (Exception ex){
 
+            LogPrint log = new LogPrint(DictionaryWord.class);
             log.info("Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
         }
 

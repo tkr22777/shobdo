@@ -10,13 +10,10 @@ import utilities.LogPrint;
  */
 public class Meaning {
 
-    private LogPrint log = new LogPrint(Meaning.class);
-
     String id;
     String partOfSpeech; //The partOfSpeech of the meaning (redundant?)
     String meaning; //The meaning
     String example; //Example of the word used with the context of this meaning
-
     int strength; //how strongly does this meaning apply to the word, -1 means unset
 
     public Meaning(){
@@ -90,6 +87,7 @@ public class Meaning {
 
         } catch (JsonProcessingException exception) {
 
+            LogPrint log = new LogPrint(Meaning.class);
             log.info("MN001: Json Processing Exception Message: " + exception.getMessage());
         }
 
