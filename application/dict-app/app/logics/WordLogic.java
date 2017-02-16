@@ -8,7 +8,9 @@ import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.LogPrint;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by tahsinkabir on 8/14/16.
@@ -21,7 +23,7 @@ public class WordLogic {
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordLogic.class);
     private LogPrint log = new LogPrint(WordLogic.class);
 
-    public static WordLogic factory(String dbName) { //to select which database to use
+    public static WordLogic factory() { //to select which database to use
 
         WordDao wordDao = new WordDaoMongoImpl();
 
@@ -62,7 +64,7 @@ public class WordLogic {
 
     }
 
-    private DictionaryWord getDictionaryWordByWordId( String wordId) {
+    public DictionaryWord getDictionaryWordByWordId( String wordId) {
 
         if(wordId == null)
             throw new IllegalArgumentException("WLEX: getDictionaryWordByWordId wordId is null or empty");
@@ -86,18 +88,13 @@ public class WordLogic {
 
     public Set<String> searchWordsBySpelling(String spelling, int limit){
 
-        if(spelling == null)
+        if(spelling == null || spelling.equals(""))
             throw new IllegalArgumentException("WLEX: searchWordsBySpelling spelling is null or empty");
 
-        bmLog.start();
         Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
 
-        if(words != null && words.size() > 0) {
-            bmLog.end("@WL003 search result for spelling:\"" + spelling + "\" found in cache and returning");
+        if(words != null && words.size() > 0)
             return words;
-        } else {
-            bmLog.end("@WL003 search result for spelling:\"" + spelling + "\" not found in cache");
-        }
 
         bmLog.start();
         words = wordDao.getWordSpellingsWithPrefixMatch(spelling, limit);
@@ -105,17 +102,14 @@ public class WordLogic {
         if ( words != null && words.size() > 0 ) {
 
             bmLog.end("@WL003 search result [size:" + words.size() + "] for spelling:\"" + spelling + "\" found in database and returning");
-
-            bmLog.start();
             wordCache.cacheSearchWordsBySpelling(spelling, words);
-            bmLog.end("@WL002 Caching retrieved search result [size:" + words.size() + "] for spelling:\"" + spelling + "\" to cache.");
+            return words;
 
         } else {
 
             bmLog.end("@WL003 search result for spelling:\"" + spelling + "\" not found in database");
+            return new HashSet<>();
         }
-
-        return words;
     }
 
     public long totalWordCount(){
@@ -138,6 +132,37 @@ public class WordLogic {
 
     }
 
+    public static DictionaryWord copyToNewDictWordObject(DictionaryWord providedWord) {
+
+        DictionaryWord toReturnWord = new DictionaryWord();
+
+        toReturnWord.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
+
+        if(providedWord != null) {
+
+            if(providedWord.getArrangementType() != null)
+                toReturnWord.setArrangementType( new String(providedWord.getArrangementType()) );
+
+            toReturnWord.setVersion( providedWord.getVersion() + 1 );
+
+            if(providedWord.getWordSpelling() != null)
+                toReturnWord.setWordSpelling(providedWord.getWordSpelling());
+
+            if(providedWord.getOtherSpellings() != null)
+                toReturnWord.setOtherSpellings(providedWord.getOtherSpellings());
+
+            toReturnWord.setTimesSearched(providedWord.getTimesSearched());
+
+            if(providedWord.getLinkToPronunciation() != null)
+                toReturnWord.setLinkToPronunciation(providedWord.getLinkToPronunciation());
+
+            if(providedWord.getExtraMetaMap() != null)
+                toReturnWord.setExtraMetaMap( providedWord.getExtraMetaMap() );
+        }
+
+        return toReturnWord;
+    }
+
     //Word arrangement is a future feature
 
     public void reArrangeBy(DictionaryWord dictionaryWord, String arrangement){
@@ -154,7 +179,6 @@ public class WordLogic {
             return;
         }
     }
-
 
     private DictionaryWord getFromCache(String wordId, String arrangement){
 
