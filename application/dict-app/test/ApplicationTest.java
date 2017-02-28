@@ -1,5 +1,10 @@
+import cache.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.typesafe.config.ConfigFactory;
 import logics.WordLogic;
 import objects.DictionaryWord;
 import objects.PartsOfSpeechSet;
@@ -13,6 +18,7 @@ import play.test.WithServer;
 import utilities.*;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -224,4 +230,56 @@ public class ApplicationTest extends WithServer {
             assertEquals("S", jsonNode.get("StartsWith").asText());
         });
     }
+
+    @Test @Ignore //Ignore because it is not a functionality test
+    public void tempTestConfig() {
+
+        String configString = "shobdo.config";
+
+        String config = ConfigFactory.load().getString(configString);
+        log.info("Config for \"" + configString + "\":" + config);
+    }
+
+    @Test @Ignore //Ignore because it is not a functionality test
+    public void testGuava() {
+
+        List<DictionaryWord> words = new ArrayList<>( DictUtil.generateDictionaryWithRandomWords(2) );
+
+        DictionaryWord theWord = words.get(0);
+
+        String spelling = theWord.getWordSpelling();
+
+        WordLogic logic = WordLogic.factory();
+
+        logic.saveDictionaryWord(theWord);
+
+        LoadingCache<String, DictionaryWord> dictionaryWordLoadingCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(20, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(20, TimeUnit.MILLISECONDS)
+                .build(new CacheLoader<String, DictionaryWord>() {
+                    @Override
+                    public DictionaryWord load(String key) throws Exception {
+                        WordLogic logic = WordLogic.factory();
+                        return logic.getDictionaryWordBySpelling(spelling);
+                    }
+                });
+
+        for(int i = 0 ; i < 10 ; i++) {
+
+            long start = System.currentTimeMillis();
+            DictionaryWord wordFromCache = logic.getDictionaryWordBySpelling(spelling);
+            log.info("Word From Cache, Spelling: " + wordFromCache.getWordSpelling());
+            log.info("Word From Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
+
+            start = System.currentTimeMillis();
+            try {
+                DictionaryWord wordFromOtherCache = dictionaryWordLoadingCache.get(spelling);
+                log.info("Word From Guava Cache, Spelling: " + wordFromOtherCache.getWordSpelling());
+                log.info("Word From Guava Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
+            } catch (Exception ex) {
+                log.info("Error getting object from guava cache");
+            }
+        }
+    }
+
 }
