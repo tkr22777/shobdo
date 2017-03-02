@@ -13,7 +13,7 @@ RUN curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
 
 RUN yum install -y nodejs
 
-#The copy the binary from the local target dir! Do not mount because we dont want to mount in production
+#Copy the source from the local target dir, we want an independent, self-sufficient image to run
 ADD . /client
 
 WORKDIR /client
