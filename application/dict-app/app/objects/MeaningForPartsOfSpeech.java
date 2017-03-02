@@ -3,6 +3,7 @@ package objects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import utilities.Constants;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
@@ -56,39 +57,20 @@ public class MeaningForPartsOfSpeech {
         return total;
     }
 
-    @Override
     public String toString() {
 
-        if(Constants.CUSTOM_STRING)
-            return customToString();
-        else
+        if(Constants.JSON_STRING)
             return toJsonString();
+        else
+            return "MeaningForPartsOfSpeech{" +
+                    "partsOfSpeech='" + partsOfSpeech + '\'' +
+                    ", meanings=" + meanings +
+                    '}';
     }
 
     public String toJsonString() {
 
-        String jsonString = null;
-
-        try {
-
-            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-
-        } catch (JsonProcessingException exception) {
-
-            LogPrint log = new LogPrint(MeaningForPartsOfSpeech.class);
-            log.info("DW001: Json Processing Exception Message: " + exception.getMessage());
-        }
-
-        return jsonString;
-    }
-
-    public String customToString() {
-
-        return " MeaningForPartsOfSpeech { } "; /* +
-                "\n\t\t\tpartsOfSpeech = " + partsOfSpeech + '\'' +
-                "\n\t\t\tmeanings = " + meanings +
-                "\n}";
-                */
+        return JsonUtil.toJsonString(this);
     }
 
 };

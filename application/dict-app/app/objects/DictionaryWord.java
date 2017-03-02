@@ -131,26 +131,23 @@ public class DictionaryWord extends BaseWord {
         meaningForPartsOfSpeeches.add(aMeaningForPartsOfSpeech);
     }
 
+    @Override
+    public String toString() {
+
+        if(Constants.JSON_STRING)
+            return toJsonString();
+        else
+            return "DictionaryWord{" +
+                    "version=" + version +
+                    ", reviewed=" + reviewed +
+                    ", diplayToPublic=" + diplayToPublic +
+                    ", arrangementType='" + arrangementType + '\'' +
+                    ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches +
+                    '}';
+    }
+
     public String toJsonString() {
 
         return JsonUtil.toJsonString(this);
     }
-
-    @Override
-    public String toString() {
-
-        if(Constants.CUSTOM_STRING)
-           return customToStringDictionaryWord();
-        else
-            return toJsonString();
-    }
-
-    public String customToStringDictionaryWord(){
-        return "\n\n\tDictionary Word { " +
-                //"\n\n\t\t Arrangement Type = '" + arrangementType + '\'' +
-                "\n\n\t\t Meaning For Parts Of Speeches = " + meaningForPartsOfSpeeches +
-                "\n\n\t\t " + super.toString() +
-                "\n\n\t}";
-    }
-
 }
