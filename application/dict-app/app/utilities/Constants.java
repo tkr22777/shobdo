@@ -9,7 +9,7 @@ public class Constants {
 
     public static final String DB_DEFAULT = DB_MONGO;
 
-    public static final boolean CUSTOM_STRING = false;
+    public static final boolean JSON_STRING = true;
 
     public static final int SEARCH_SPELLING_LIMIT = 40;
 

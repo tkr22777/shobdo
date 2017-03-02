@@ -3,6 +3,7 @@ package objects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import utilities.Constants;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 /**
@@ -71,37 +72,20 @@ public class Meaning {
     @Override
     public String toString() {
 
-        if(Constants.CUSTOM_STRING)
-            return customToStringMeaning();
-        else
+        if(Constants.JSON_STRING)
             return toJsonString();
+        else
+            return "Meaning{" +
+                    "id='" + id + '\'' +
+                    ", partOfSpeech='" + partOfSpeech + '\'' +
+                    ", meaning='" + meaning + '\'' +
+                    ", example='" + example + '\'' +
+                    ", strength=" + strength +
+                    '}';
     }
 
     public String toJsonString() {
 
-        String jsonString = null;
-
-        try {
-
-            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-
-        } catch (JsonProcessingException exception) {
-
-            LogPrint log = new LogPrint(Meaning.class);
-            log.info("MN001: Json Processing Exception Message: " + exception.getMessage());
-        }
-
-        return jsonString;
-    }
-
-    public String customToStringMeaning() {
-
-        return "Meaning {" +
-                //"\n\n\t\t\t\tid = '" + id + '\'' +
-                //"\n\n\t\t\t\tpartOfSpeech = '" + partOfSpeech + '\'' +
-                "\n\n\t\t\t\tmeaning = '" + meaning + '\'' +
-                //"\n\n\t\t\t\texample = '" + example + '\'' +
-                //"\n\n\t\t\t\tstrength = " + strength +
-                '}';
+        return JsonUtil.toJsonString(this);
     }
 }

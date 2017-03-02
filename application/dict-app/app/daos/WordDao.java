@@ -21,4 +21,6 @@ public interface WordDao {
 
     public long totalWordCount();
 
+    public void deleteAllWords();
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import utilities.Constants;
 import utilities.DictUtil;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.*;
@@ -130,72 +131,24 @@ public class BaseWord {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BaseWord baseWord = (BaseWord) o;
-
-        return wordSpelling != null ? wordSpelling.equals(baseWord.wordSpelling) : baseWord.wordSpelling == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return wordSpelling != null ? wordSpelling.hashCode() : 0;
-    }
-
-    public String metaMapString(){
-
-        String toReturn = " {\n";
-
-        int i = 1;
-        for(String key: this.extraMetaMap.keySet() ){
-
-            toReturn += "\n\t\t\t\tKey "+i + ": '"+ key + "'" +
-                        "\n\t\t\t\tValue:'" + extraMetaMap.get(key) + "'\n";
-            i++;
-        }
-
-        toReturn += "\t\t\t}";
-
-        return  toReturn;
-    }
-
-    @Override
     public String toString() {
 
-        if(Constants.CUSTOM_STRING)
-            return customToStringBaseWord();
-        else
+        if(Constants.JSON_STRING)
             return toJsonString();
+        else
+            return "BaseWord{" +
+                    "wordId='" + wordId + '\'' +
+                    ", wordSpelling='" + wordSpelling + '\'' +
+                    ", otherSpellings=" + otherSpellings +
+                    ", timesSearched=" + timesSearched +
+                    ", linkToPronunciation='" + linkToPronunciation + '\'' +
+                    ", extraMetaMap=" + extraMetaMap +
+                    '}';
     }
 
     public String toJsonString() {
 
-        String jsonString = null;
-
-        try {
-
-            jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-
-        } catch (JsonProcessingException exception) {
-
-            LogPrint log = new LogPrint(BaseWord.class);
-            log.info("BW001: Json Processing Exception Message: " + exception.getMessage());
-        }
-
-        return jsonString;
-    }
-
-    public String customToStringBaseWord() {
-
-        return "Base Word {" +
-                //"\n\n\t\t\t Word Id = '" + wordId + "'" +
-                "\n\n\t\t\t Word Spelling = '" + wordSpelling + "'" +
-                //"\n\n\t\t\t Times Searched = " + timesSearched +
-                //"\n\n\t\t\t Link To Pronunciation = '" + linkToPronunciation + "'" +
-                //"\n\n\t\t\t Extra Meta Map = " + metaMapString() + "\n" +
-                "\n\n\t\t}";
+        return JsonUtil.toJsonString(this);
     }
 
 }
