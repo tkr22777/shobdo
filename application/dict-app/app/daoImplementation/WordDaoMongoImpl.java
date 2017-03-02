@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.result.DeleteResult;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
@@ -145,4 +146,9 @@ public class WordDaoMongoImpl implements WordDao {
         return collection.count();
     }
 
+    public void deleteAllWords() {
+
+        DeleteResult result = collection.deleteMany(new BasicDBObject());
+        log.info("Result : " + result);
+    }
 }
