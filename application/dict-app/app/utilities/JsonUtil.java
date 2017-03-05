@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import objects.DictionaryWord;
+import play.api.libs.json.Json;
 
 /**
  * Created by tahsink on 1/6/17.
@@ -64,6 +65,24 @@ public class JsonUtil {
         }
     }
 
+    public static JsonNode toJsonNodeFromObject(Object object) {
+
+        if (object == null)
+            return null;
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+
+            return mapper.convertValue(object, JsonNode.class);
+
+        } catch (Exception ex) {
+
+            log.info("@JU004: Error converting Object to JsonNode. Exception:" + ex.getStackTrace().toString());
+            return null;
+        }
+    }
+
     public static Object jsonNodeToObject( JsonNode jsonNode, Class<?> class_type ) {
 
         if(jsonNode == null || class_type == null)
@@ -77,7 +96,7 @@ public class JsonUtil {
 
         } catch (JsonProcessingException ex) {
 
-            log.info("@JU004: Error converting jsonNode to Object. Exception:" + ex.getStackTrace().toString());
+            log.info("@JU005: Error converting jsonNode to Object. Exception:" + ex.getStackTrace().toString());
             return null;
         }
 
