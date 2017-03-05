@@ -124,6 +124,10 @@ public class WordLogic {
         wordDao.deleteAllWords();
     }
 
+    public void flushCache(){
+        wordCache.flushCache();
+    }
+
     protected void verifyDictionaryWord(DictionaryWord dictionaryWord) {
 
         if( dictionaryWord == null)

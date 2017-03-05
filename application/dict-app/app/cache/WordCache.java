@@ -152,4 +152,9 @@ public class WordCache {
     public String getKeyForSearch(String spelling) {
         return RedisUtil.buildRedisKey( Arrays.asList( SERACH_WORD_BY_SPELLING_PFX, spelling));
     }
+
+    public void flushCache(){
+        jedis.flushAll();
+    }
+
 }

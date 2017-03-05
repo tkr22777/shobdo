@@ -2,53 +2,41 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-
-
 # 0. SPLASH DICTIONARY MESSAGE:
-# These are the main application routes for the Dictionary application
+GET     /api/v1/                      controllers.WordController.index()
 
-GET     /dict                       controllers.WordController.index()
+# 2. CREATE WORD: (body contains the word in json)
+POST    /api/v1/word                  controllers.WordController.createWord()
 
+# 3. GET WORD:
+GET     /api/v1/word/:wordId          controllers.WordController.getWordByWordId(wordId: String)
+GET     /api/v1/word/:wordSpelling    controllers.WordController.getWordBySpelling(wordSpelling: String)
 
+# 4. UPDATE WORD:
+#body contains word in json
+PUT     /api/v1/word/:wordId          controllers.WordController.updateWord(wordId: String)
+
+# 5. DELETE WORD:
+DELETE  /api/v1/word/:wordId          controllers.WordController.deleteWord(wordId: String)
 
 # 1. SEARCH WORD BY SPELLING:
-# The request body contains spelling
+#body contains "searchString"
+POST    /api/v1/search                controllers.WordController.searchWordsBySpelling()
 
-POST    /dict/search           controllers.WordController.searchWordsBySpelling()
+# 6. GENERATE RANDOM DICTIONARY: (body contains wordCount)
+POST    /api/v1/generate              controllers.WordController.createRandomDictionary()
 
-
-
-# 2. GET WORD BY SPELLING:
-# The request body contains spelling
-
-POST    /dict/word                 controllers.WordController.getWordBySpelling()
-
-
-
-# 3. GENERATE RANDOM DICTIONARY:
-# The request body contains wordCount
-
-POST    /dict/generate             controllers.WordController.createRandomDictionary()
-
-
-
-# 4. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
-# The request body contains name
-
-POST    /posttest                  controllers.AdminController.testPost()
-
-GET     /gettest                   controllers.AdminController.testGet()
-
-POST    /dict/word/create          controllers.WordController.createWord()
-
+# 7. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
+GET     /api/v1/gettest               controllers.AdminController.testGet()
+POST    /api/v1/posttest              controllers.AdminController.testPost()
 
 ##THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+GET     /                             controllers.HomeController.index
 # An example controller showing how to use dependency injection
-GET     /count                      controllers.CountController.count
+GET     /count                        controllers.CountController.count
 # An example controller showing how to write asynchronous code
-GET     /message                    controllers.AsyncController.message
+GET     /message                      controllers.AsyncController.message
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
