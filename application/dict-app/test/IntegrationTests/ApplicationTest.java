@@ -51,24 +51,6 @@ public class ApplicationTest extends WithServer {
         //assertTrue(html.body().contains("Your new application is ready."));
     }
 
-    @Test @Ignore //Didnt work
-    public void createRandomDictionary_RoutePOSTTest() {
-
-        running( fakeApplication(), () -> {
-
-                Map<String, String> body = new HashMap<>();
-                body.put("keyT", "valueT");
-
-                RequestBuilder request = new RequestBuilder()
-                        .method(POST)
-                        .bodyForm(body)
-                        .uri("/dict/generate");
-
-                Result result = route(request);
-                assertEquals(OK, result.status());
-        });
-    }
-
     @Test
     public void rootRouteTest() {
 
@@ -84,7 +66,7 @@ public class ApplicationTest extends WithServer {
     public void getRequestTest() {
 
         running( fakeApplication(), () -> {
-            Result result = route(fakeRequest(GET, "/gettest"));
+            Result result = route(fakeRequest(GET, "/api/v1/gettest"));
             assertEquals(OK, result.status());
             JsonNode jsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
             assertEquals("Dictionary", jsonNode.get("Application").asText());
@@ -98,7 +80,7 @@ public class ApplicationTest extends WithServer {
         running( fakeApplication(), () -> {
 
             JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString("{\"name\":\"SIN\"}");
-            Result result = route( fakeRequest(POST,"/posttest").bodyJson(bodyJson) );
+            Result result = route( fakeRequest(POST,"/api/v1/posttest").bodyJson(bodyJson) );
 
             assertEquals(OK, result.status());
 
