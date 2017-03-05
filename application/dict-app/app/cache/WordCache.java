@@ -1,5 +1,6 @@
 package cache;
 
+import com.typesafe.config.ConfigFactory;
 import objects.DictionaryWord;
 import redis.clients.jedis.Jedis;
 import utilities.BenchmarkLogger;
@@ -13,7 +14,7 @@ import java.util.Set;
 public class WordCache {
 
     private static boolean USE_REDIS = true;
-    private static String DEFAULT_REDIS_HOSTNAME = "redis";
+    public final String REDIS_HOSTNAME_CONFIG_STRING = "shobdo.redishostname";
 
     private Jedis jedis;
 
@@ -35,8 +36,7 @@ public class WordCache {
 
     public String getHostname() {
 
-        //DEFAULT_REDIS_HOSTNAME = "172.17.0.1";
-        //DEFAULT_REDIS_HOSTNAME = "localhost";
+        String DEFAULT_REDIS_HOSTNAME = ConfigFactory.load().getString(REDIS_HOSTNAME_CONFIG_STRING);
         log.info("@WC001 Connect to redis [host:" +  DEFAULT_REDIS_HOSTNAME + "][port:6379]." );
         return DEFAULT_REDIS_HOSTNAME;
     }

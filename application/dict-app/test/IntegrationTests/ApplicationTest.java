@@ -96,7 +96,10 @@ public class ApplicationTest extends WithServer {
 
         String configString = "shobdo.config";
         String config = ConfigFactory.load().getString(configString);
+        String mongodbhostnameConfigString = "shobdo.mongodbhostname";
+        String mongodbhostname = ConfigFactory.load().getString(mongodbhostnameConfigString);
         log.info("Config for \"" + configString + "\":" + config);
+        log.info("Config for mongodbhostname\"" + mongodbhostnameConfigString + "\":" + mongodbhostname);
     }
 
     @Test @Ignore //Ignore because it is not a functionality test
