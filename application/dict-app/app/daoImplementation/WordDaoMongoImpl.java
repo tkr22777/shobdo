@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
+import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
+    public final String MONGO_DB_HOSTNAME_CONFIG_STRING = "shobdo.mongodbhostname";
     public final String DICTIONARY_DATABASE_NAME = "Dictionary";
     public final String WORD_COLLECTION_NAME = "Words";
 
@@ -39,11 +41,9 @@ public class WordDaoMongoImpl implements WordDao {
 
     public WordDaoMongoImpl() {
 
-        String MONGODB_HOSTNAME = "mongo";
+        String MONGODB_HOSTNAME = ConfigFactory.load().getString(MONGO_DB_HOSTNAME_CONFIG_STRING);
         int MONGODB_PORT = 27017;
 
-        //MONGODB_HOSTNAME = "localhost";
-        //MONGODB_HOSTNAME = "172.17.0.1";
         log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
 
         mongoClient = new MongoClient( MONGODB_HOSTNAME, MONGODB_PORT );
