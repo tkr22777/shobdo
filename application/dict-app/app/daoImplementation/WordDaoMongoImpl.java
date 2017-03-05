@@ -86,7 +86,7 @@ public class WordDaoMongoImpl implements WordDao {
 
         } else  {
 
-            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            DictionaryWord word = (DictionaryWord) DictUtil.getDictionaryWordFromDocument( wordDocument, DictionaryWord.class);
             bmLog.end("@WDMI002 getDictionaryWordByWordId word [spelling:" + word.getWordSpelling()
                     + "] found from database for wordId: " + wordId);
             return word;
@@ -109,7 +109,7 @@ public class WordDaoMongoImpl implements WordDao {
         } else {
 
             bmLog.end("@WDMI005 getDictionaryWordByWordId word found in database for spelling: " + spelling);
-            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            DictionaryWord word = (DictionaryWord) DictUtil.getDictionaryWordFromDocument( wordDocument, DictionaryWord.class);
             return word;
         }
     }
