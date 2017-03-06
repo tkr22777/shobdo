@@ -13,6 +13,7 @@ import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
 import utilities.BenchmarkLogger;
+import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
@@ -25,9 +26,6 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    public final String MONGO_DB_HOSTNAME_CONFIG_STRING = "shobdo.mongodbhostname";
-    public final String DICTIONARY_DATABASE_NAME = "Dictionary";
-    public final String WORD_COLLECTION_NAME = "Words";
 
     private final String WORD_ID = "wordId";
     private final String WORD_SPELLING = "wordSpelling";
@@ -39,16 +37,19 @@ public class WordDaoMongoImpl implements WordDao {
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordDaoMongoImpl.class);
     private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
+    private final String MONGODB_HOSTNAME;
+    private final int MONGODB_PORT;
+
     public WordDaoMongoImpl() {
 
-        String MONGODB_HOSTNAME = ConfigFactory.load().getString(MONGO_DB_HOSTNAME_CONFIG_STRING);
-        int MONGODB_PORT = 27017;
+        MONGODB_HOSTNAME = ConfigFactory.load().getString(Constants.MONGO_DB_HOSTNAME_CONFIG_STRING);
+        MONGODB_PORT = Integer.parseInt( ConfigFactory.load().getString(Constants.MONGO_DB_PORT_CONFIG_STRING));
 
         log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
 
         mongoClient = new MongoClient( MONGODB_HOSTNAME, MONGODB_PORT );
-        mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
-        collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
+        mongoDatabase = mongoClient.getDatabase(Constants.DICTIONARY_DATABASE_NAME);
+        collection = mongoDatabase.getCollection(Constants.WORD_COLLECTION_NAME);
     }
 
     @Override
