@@ -1,5 +1,7 @@
 package cache;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
 import objects.DictionaryWord;
 import redis.clients.jedis.Jedis;
@@ -52,6 +54,11 @@ public class WordCache {
 
         if( !USE_REDIS || jedis == null || spelling == null )
             return null;
+
+        return getWordFromRedis(spelling);
+    }
+
+    private DictionaryWord getWordFromRedis(String spelling) {
 
         bmLog.start();
         String key = getKeyForSpelling(spelling);
