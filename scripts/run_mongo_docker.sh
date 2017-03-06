@@ -4,5 +4,5 @@
 docker rm -f mongo-instance
 
 #Deploying the container
-docker run -p 27017:27017 --name mongo-instance -i -t mongo
+docker run -p 27017:27017 -v $PWD/../data/mongodump:/mongoshobdodump --name mongo-instance -i -t mongo
 
