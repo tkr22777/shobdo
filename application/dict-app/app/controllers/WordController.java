@@ -45,7 +45,7 @@ public class WordController extends Controller {
 
         } catch (Exception ex) {
 
-            log.info("WC001 Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC001 Property 'searchString' not found in the json body. Body found:" + json.textValue());
             log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
             return badRequest();
         }
@@ -106,7 +106,7 @@ public class WordController extends Controller {
 
         } catch (Exception ex) {
 
-            log.info("WC003 Property 'spelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC003 Property 'wordSpelling' not found in the json body. Body found:" + json.textValue());
             log.info("WC004 Exception Stacktrace:" + ex.getStackTrace().toString());
             return badRequest();
         }
