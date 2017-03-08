@@ -1,4 +1,5 @@
 import exporter.SamsadExporter;
+import logics.WordLogic;
 import objects.DictionaryWord;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,9 +15,10 @@ import java.util.Collection;
  */
 public class ExporterTest extends WithServer {
 
-    LogPrint log;
+    LogPrint log = new LogPrint(ExporterTest.class);
+    WordLogic wordLogic = WordLogic.factory();
 
-    @Test @Ignore
+    @Test
     public void createDictionaryFromSamsad() throws Exception {
 
         Collection<DictionaryWord> words = new SamsadExporter().getDictiionary();
@@ -33,10 +35,10 @@ public class ExporterTest extends WithServer {
 
                 log.info("Next word: \n" + word.toString());
 
-                wordLogic.saveDictionaryWord(word);
                 total++;
             }
             */
+            //wordLogic.saveDictionaryWord(word);
             total++;
         }
 
