@@ -7,10 +7,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.result.DeleteResult;
+import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
 import objects.DictionaryWord;
 import org.bson.Document;
 import utilities.BenchmarkLogger;
+import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
@@ -23,8 +26,6 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    public final String DICTIONARY_DATABASE_NAME = "Dictionary";
-    public final String WORD_COLLECTION_NAME = "Words";
 
     private final String WORD_ID = "wordId";
     private final String WORD_SPELLING = "wordSpelling";
@@ -36,18 +37,19 @@ public class WordDaoMongoImpl implements WordDao {
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordDaoMongoImpl.class);
     private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
+    private final String MONGODB_HOSTNAME;
+    private final int MONGODB_PORT;
+
     public WordDaoMongoImpl() {
 
-        String MONGODB_HOSTNAME = "mongo";
-        int MONGODB_PORT = 27017;
+        MONGODB_HOSTNAME = ConfigFactory.load().getString(Constants.MONGO_DB_HOSTNAME_CONFIG_STRING);
+        MONGODB_PORT = Integer.parseInt( ConfigFactory.load().getString(Constants.MONGO_DB_PORT_CONFIG_STRING));
 
-        //MONGODB_HOSTNAME = "localhost";
-        //MONGODB_HOSTNAME = "172.17.0.1";
         log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
 
         mongoClient = new MongoClient( MONGODB_HOSTNAME, MONGODB_PORT );
-        mongoDatabase = mongoClient.getDatabase(DICTIONARY_DATABASE_NAME);
-        collection = mongoDatabase.getCollection(WORD_COLLECTION_NAME);
+        mongoDatabase = mongoClient.getDatabase(Constants.DICTIONARY_DATABASE_NAME);
+        collection = mongoDatabase.getCollection(Constants.WORD_COLLECTION_NAME);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class WordDaoMongoImpl implements WordDao {
 
         } else  {
 
-            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            DictionaryWord word = (DictionaryWord) DictUtil.getDictionaryWordFromDocument( wordDocument, DictionaryWord.class);
             bmLog.end("@WDMI002 getDictionaryWordByWordId word [spelling:" + word.getWordSpelling()
                     + "] found from database for wordId: " + wordId);
             return word;
@@ -108,7 +110,7 @@ public class WordDaoMongoImpl implements WordDao {
         } else {
 
             bmLog.end("@WDMI005 getDictionaryWordByWordId word found in database for spelling: " + spelling);
-            DictionaryWord word = (DictionaryWord) DictUtil.getObjectFromDocument( wordDocument, DictionaryWord.class);
+            DictionaryWord word = (DictionaryWord) DictUtil.getDictionaryWordFromDocument( wordDocument, DictionaryWord.class);
             return word;
         }
     }
@@ -145,4 +147,9 @@ public class WordDaoMongoImpl implements WordDao {
         return collection.count();
     }
 
+    public void deleteAllWords() {
+
+        DeleteResult result = collection.deleteMany(new BasicDBObject());
+        log.info("Result : " + result);
+    }
 }

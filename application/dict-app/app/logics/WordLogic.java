@@ -8,6 +8,7 @@ import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.LogPrint;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -26,24 +27,27 @@ public class WordLogic {
     public static WordLogic factory() { //to select which database to use
 
         WordDao wordDao = new WordDaoMongoImpl();
-
         return new WordLogic( wordDao, new WordCache() );
     }
 
     public WordLogic( WordDao wordDao, WordCache wordCache) {
 
         this.wordDao = wordDao;
-
         this.wordCache = wordCache;
     }
 
     public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
 
-        //verifyDictionaryWord(dictionaryWord);
-
         wordDao.setDictionaryWord(dictionaryWord);
-
         wordCache.cacheDictionaryWord(dictionaryWord);
+    }
+
+    public void saveDictionaryWords(Collection<DictionaryWord> dictionaryWords ) {
+
+        for(DictionaryWord word: dictionaryWords) {
+            wordDao.setDictionaryWord(word);
+            wordCache.cacheDictionaryWord(word);
+        }
     }
 
     public DictionaryWord getDictionaryWordBySpelling( String spelling ){
@@ -116,7 +120,15 @@ public class WordLogic {
         return wordDao.totalWordCount();
     }
 
-    protected void verifyDictionaryWord(DictionaryWord dictionaryWord){
+    public void deleteAllWords(){
+        wordDao.deleteAllWords();
+    }
+
+    public void flushCache(){
+        wordCache.flushCache();
+    }
+
+    protected void verifyDictionaryWord(DictionaryWord dictionaryWord) {
 
         if( dictionaryWord == null)
 
@@ -197,4 +209,5 @@ public class WordLogic {
 
         return false;
     }
+
 }
