@@ -3,14 +3,10 @@ package utilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import objects.DictionaryWord;
 import objects.Meaning;
-import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
 import org.bson.Document;
-import org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet;
-import play.api.libs.iteratee.Enumeratee;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -73,40 +69,33 @@ public class DictUtil {
 
         DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
 
-        ArrayList<MeaningForPartsOfSpeech> meaningsForPartsOfSpeech = new ArrayList<>();
+        ArrayList<Meaning> meanings = new ArrayList<>();
 
         for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
-
-            MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
-            meanings.setPartsOfSpeech(pos);
 
             int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
 
             for(int j = 0; j < numberOfMeaningForPOS ; j++) {
 
-                String meaning;
                 wordLength = DictUtil.randomInRange(2, 9);
-                meaning = Bangla.getWord(start, end, wordLength);
 
-                String example;
+                String meaningString = Bangla.getWord(start, end, wordLength);
                 int preSentenceLen = DictUtil.randomInRange(2, 6);
                 int postSentenceLen = DictUtil.randomInRange(2, 4);
-                example = Bangla.getSentence(start, end, preSentenceLen, 12);
-                example += " " + meaning + " ";
+                String example = Bangla.getSentence(start, end, preSentenceLen, 12);
+                example += " " + meaningString + " ";
                 example += Bangla.getSentence(start, end, postSentenceLen, 12);
 
                 String meaningId = "MN_" + UUID.randomUUID();
 
-                int strength = DictUtil.randomInRange( 0 , 10);
-                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strength);
+                int strength = DictUtil.randomInRange(0 , 10);
+                Meaning meaning = new Meaning(meaningId, pos, meaningString, example, strength);
 
-                meanings.addMeaning(meaningForPOS);
+                meanings.add(meaning);
             }
-
-            meaningsForPartsOfSpeech.add(meanings);
         }
 
-        dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
+        dictionaryWord.setMeanings(meanings);
 
         return dictionaryWord;
     }

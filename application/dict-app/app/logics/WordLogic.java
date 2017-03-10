@@ -134,11 +134,11 @@ public class WordLogic {
 
             log.info("Dictionary Word is null.");
 
-        else if(dictionaryWord.getMeaningForPartsOfSpeeches() == null)
+        else if(dictionaryWord.getMeanings() == null)
 
             log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings array is null.");
 
-        else if( dictionaryWord.getMeaningForPartsOfSpeeches().size() == 0 )
+        else if( dictionaryWord.getMeanings().size() == 0 )
 
             log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings size is zero(0).");
 
@@ -151,9 +151,6 @@ public class WordLogic {
         toReturnWord.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
 
         if(providedWord != null) {
-
-            if(providedWord.getArrangementType() != null)
-                toReturnWord.setArrangementType( new String(providedWord.getArrangementType()) );
 
             toReturnWord.setVersion( providedWord.getVersion() + 1 );
 
