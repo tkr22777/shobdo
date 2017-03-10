@@ -2,7 +2,7 @@ package IntegrationTests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import logics.WordLogic;
-import objects.DictionaryWord;
+import objects.Word;
 import objects.PartsOfSpeechSet;
 import org.junit.*;
 import play.mvc.Result;
@@ -28,7 +28,7 @@ public class WordControllerTests extends WithApplication {
 
     LogPrint log;
     WordLogic wordLogic;
-    ArrayList<DictionaryWord> dictionary;
+    ArrayList<Word> dictionary;
 
     @Before
     public void setup() {
@@ -40,7 +40,7 @@ public class WordControllerTests extends WithApplication {
     private void createWordsInDb(int NUMBER_OF_WORDS) {
 
         dictionary = new ArrayList<>( DictUtil.generateDictionaryWithRandomWords(NUMBER_OF_WORDS) );
-        wordLogic.saveDictionaryWords(dictionary); //storing for tests
+        wordLogic.saveWords(dictionary); //storing for tests
     }
 
     @After
@@ -55,12 +55,12 @@ public class WordControllerTests extends WithApplication {
 
         running( fakeApplication(), () -> {
 
-            DictionaryWord wordToBeStored = DictUtil.generateARandomWord(new PartsOfSpeechSet());
+            Word wordToBeStored = DictUtil.generateARandomWord(new PartsOfSpeechSet());
             JsonNode bodyJson = JsonUtil.toJsonNodeFromObject(wordToBeStored);
             Result result = route( fakeRequest(POST,"/api/v1/word").bodyJson(bodyJson) );
 
             assertEquals(OK, result.status());
-            DictionaryWord retrievedWord = wordLogic.getDictionaryWordBySpelling(wordToBeStored.getWordSpelling());
+            Word retrievedWord = wordLogic.getWordBySpelling(wordToBeStored.getWordSpelling());
             Assert.assertEquals(wordToBeStored.toJsonString(), retrievedWord.toJsonString());
         });
     }
@@ -72,7 +72,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             String wordSpelling = dictionary.get(0).getWordSpelling();
-            DictionaryWord word = wordLogic.getDictionaryWordBySpelling(wordSpelling);
+            Word word = wordLogic.getWordBySpelling(wordSpelling);
 
             Assert.assertNotNull(word);
             Assert.assertNotNull(word.getWordId());

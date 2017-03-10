@@ -1,21 +1,18 @@
 package objects;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import play.api.libs.json.Json;
 import utilities.Constants;
 import utilities.JsonUtil;
-import utilities.LogPrint;
 
 import java.util.*;
 
 /**
  * Created by tahsinkabir on 8/21/16.
  */
-public class DictionaryWord {
+public class Word {
 
     //arrangementType is the way the meanings of this word are arranged now
-    //e.g. by parts of speech or by strength of the meaning (are not arranged by parts of speech, such as V, N , N , P, V)
-    //The following array list can be represented as (arranged by meaning strength):
+    //e.g. by parts of speech or by strength of the meanings (are not arranged by parts of speech, such as V, N , N , P, V)
+    //The following array list can be represented as (arranged by meanings strength):
     //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
     //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
@@ -30,51 +27,47 @@ public class DictionaryWord {
 
     private String wordId;
     private String wordSpelling;
-    ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches;
+    ArrayList<Meaning> meanings;
 
-    String arrangementType = null; //Arrangement partsOfSpeech will be used in V2
+    public Word() { }
 
-    public DictionaryWord() { }
-
-    public DictionaryWord(String wordId,
-                          String wordSpelling)
+    public Word(String wordId,
+                String wordSpelling)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
     }
 
-    public DictionaryWord(String wordId,
-                          String wordSpelling,
-                          String arrangementType,
-                          ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches)
+    public Word(String wordId,
+                String wordSpelling,
+                String arrangementType,
+                ArrayList<Meaning> meanings)
     {
 
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
-        this.arrangementType = arrangementType;
-        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
+        this.meanings = meanings;
     }
 
-    public DictionaryWord(String wordId,
-                          String wordSpelling,
-                          int timesSearched,
-                          String linkToPronunciation,
-                          String arrangementType,
-                          Collection<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches,
-                          Map<String,List<String>> extraMeta)
+    public Word(String wordId,
+                String wordSpelling,
+                int timesSearched,
+                String linkToPronunciation,
+                String arrangementType,
+                Collection<Meaning> meanings,
+                Map<String,List<String>> extraMeta)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
         this.timesSearched = timesSearched;
         this.linkToPronunciation = linkToPronunciation;
         this.extraMetaMap = extraMeta;
-        this.arrangementType = arrangementType;
-        this.meaningForPartsOfSpeeches = new ArrayList<>(meaningForPartsOfSpeeches);
+        this.meanings = new ArrayList<>(meanings);
     }
 
-    public static DictionaryWord wordFromJsonString(String wordInJsonString) {
+    public static Word wordFromJsonString(String wordInJsonString) {
 
-        return (DictionaryWord) JsonUtil.toObjectFromJsonString(wordInJsonString,DictionaryWord.class);
+        return (Word) JsonUtil.toObjectFromJsonString(wordInJsonString, Word.class);
     }
 
     public int getVersion() {
@@ -101,28 +94,20 @@ public class DictionaryWord {
         this.diplayToPublic = diplayToPublic;
     }
 
-    public String getArrangementType() {
-        return arrangementType;
+    public ArrayList<Meaning> getMeanings() {
+        return meanings;
     }
 
-    public void setArrangementType(String arrangementType) {
-        this.arrangementType = arrangementType;
+    public void setMeanings(ArrayList<Meaning> meanings) {
+        this.meanings = meanings;
     }
 
-    public ArrayList<MeaningForPartsOfSpeech> getMeaningForPartsOfSpeeches() {
-        return meaningForPartsOfSpeeches;
-    }
+    public void addMeaningForPartsOfSpeech(Meaning meaning) {
 
-    public void setMeaningForPartsOfSpeeches(ArrayList<MeaningForPartsOfSpeech> meaningForPartsOfSpeeches) {
-        this.meaningForPartsOfSpeeches = meaningForPartsOfSpeeches;
-    }
+        if(meanings == null)
+            meanings = new ArrayList<>();
 
-    public void addMeaningForPartsOfSpeech(MeaningForPartsOfSpeech aMeaningForPartsOfSpeech) {
-
-        if(meaningForPartsOfSpeeches == null)
-            meaningForPartsOfSpeeches = new ArrayList<>();
-
-        meaningForPartsOfSpeeches.add(aMeaningForPartsOfSpeech);
+        meanings.add(meaning);
     }
      public ArrayList<String> getOtherSpellings() {
         return otherSpellings;
@@ -220,12 +205,11 @@ public class DictionaryWord {
         if(Constants.JSON_STRING)
             return toJsonString();
         else
-            return "DictionaryWord{" +
+            return "Word{" +
                     "version=" + version +
                     ", reviewed=" + reviewed +
                     ", diplayToPublic=" + diplayToPublic +
-                    ", arrangementType='" + arrangementType + '\'' +
-                    ", meaningForPartsOfSpeeches=" + meaningForPartsOfSpeeches +
+                    ", meanings=" + meanings +
                     '}';
     }
 
