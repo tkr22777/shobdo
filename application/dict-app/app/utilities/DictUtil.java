@@ -71,7 +71,7 @@ public class DictUtil {
 
         ArrayList<Meaning> meanings = new ArrayList<>();
 
-        for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
+        for (String partOfSpeech : partsOfSpeech.getPartsOfSpeeches()) {
 
             int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
 
@@ -82,14 +82,11 @@ public class DictUtil {
                 String meaningString = Bangla.getWord(start, end, wordLength);
                 int preSentenceLen = DictUtil.randomInRange(2, 6);
                 int postSentenceLen = DictUtil.randomInRange(2, 4);
-                String example = Bangla.getSentence(start, end, preSentenceLen, 12);
-                example += " " + meaningString + " ";
-                example += Bangla.getSentence(start, end, postSentenceLen, 12);
-
-                String meaningId = "MN_" + UUID.randomUUID();
+                String example = Bangla.getSentence(start, end, preSentenceLen, 12) + " " + meaningString
+                        + " " + Bangla.getSentence(start, end, postSentenceLen, 12);
 
                 int strength = DictUtil.randomInRange(0 , 10);
-                Meaning meaning = new Meaning(meaningId, pos, meaningString, example, strength);
+                Meaning meaning = new Meaning(partOfSpeech, meaningString, example, strength);
 
                 meanings.add(meaning);
             }

@@ -1,40 +1,27 @@
 package objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import utilities.Constants;
 import utilities.JsonUtil;
-import utilities.LogPrint;
 
 /**
  * Created by tahsinkabir on 6/16/16.
  */
 public class Meaning {
 
-    String id;
+    int strength; //how strongly does this meanings apply to the word, -1 means unset
     String partOfSpeech; //The partOfSpeech of the meanings (redundant?)
     String meaning; //The meanings
     String example; //Example of the word used with the context of this meanings
-    int strength; //how strongly does this meanings apply to the word, -1 means unset
 
     public Meaning(){
 
     }
 
-    public Meaning(String id, String partOfSpeech, String meaning, String example, int strength) {
-        this.id = id;
+    public Meaning(String partOfSpeech, String meaning, String example, int strength) {
         this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
         this.example = example;
         this.strength = strength;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getPartOfSpeech() {
@@ -76,8 +63,7 @@ public class Meaning {
             return toJsonString();
         else
             return "Meaning{" +
-                    "id='" + id + '\'' +
-                    ", partOfSpeech='" + partOfSpeech + '\'' +
+                    "partOfSpeech='" + partOfSpeech + '\'' +
                     ", meanings='" + meaning + '\'' +
                     ", example='" + example + '\'' +
                     ", strength=" + strength +
