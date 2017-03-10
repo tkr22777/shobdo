@@ -1,7 +1,7 @@
 package exporter;
 
 import logics.WordLogic;
-import objects.DictionaryWord;
+import objects.Word;
 import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
@@ -50,7 +50,7 @@ public class SamsadExporter {
         SET_OF_TYPES = new HashSet<>( MAP_OF_TYPES.values() );
     }
 
-    public Collection<DictionaryWord> getDictiionary() {
+    public Collection<Word> getDictiionary() {
 
         setup();
 
@@ -60,7 +60,7 @@ public class SamsadExporter {
 
         int lines_to_read = 240000;
 
-        ArrayList<DictionaryWord> words = new ArrayList<DictionaryWord>(lines_to_read);
+        ArrayList<Word> words = new ArrayList<Word>(lines_to_read);
 
         for ( int i = 0; i < lines_to_read ; i++ ) {
 
@@ -69,7 +69,7 @@ public class SamsadExporter {
             if (line == null)
                 break;
 
-            DictionaryWord word = createCrudeWord(line);
+            Word word = createCrudeWord(line);
 
             if(word != null)
                 words.add( word );
@@ -79,9 +79,9 @@ public class SamsadExporter {
     }
 
 
-    public DictionaryWord createCrudeWord(String line) {
+    public Word createCrudeWord(String line) {
 
-        DictionaryWord word = new DictionaryWord();
+        Word word = new Word();
 
         word.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
         word.setExtraMetaValue(Constants.ORIGINAL_STRING, line);
@@ -103,7 +103,7 @@ public class SamsadExporter {
         return word;
     }
 
-    public Collection<DictionaryWord> fixSpellingAndMeanings(ArrayList<DictionaryWord> words) {
+    public Collection<Word> fixSpellingAndMeanings(ArrayList<Word> words) {
 
         //What should we do about these unfixed ones?!
         FixSpellingReturn fixSpellingReturn =  fixSpelling(words);
@@ -114,17 +114,17 @@ public class SamsadExporter {
 
     class FixMeaningReturn {
 
-        Collection<DictionaryWord> fixed;
-        Collection<DictionaryWord> unfixed;
+        Collection<Word> fixed;
+        Collection<Word> unfixed;
     }
 
-    private Map<String, DictionaryWord> findSpellingsWithSimpleMeanings(Collection<DictionaryWord> words) {
+    private Map<String, Word> findSpellingsWithSimpleMeanings(Collection<Word> words) {
 
-        Map<String, DictionaryWord> simpleMeaningWords = new HashMap<>();
+        Map<String, Word> simpleMeaningWords = new HashMap<>();
 
         List<String> allMeaning = new ArrayList<>();
 
-        for(DictionaryWord word: words) {
+        for(Word word: words) {
 
             List<String> meanings = word.retrieveExtraMetaValueForKey(Constants.MEANING_STRING);
 
@@ -152,11 +152,11 @@ public class SamsadExporter {
         return simpleMeaningWords;
     }
 
-    private LinkedHashMap<String, Set<String>> getAllMeanings(Collection<DictionaryWord> words){
+    private LinkedHashMap<String, Set<String>> getAllMeanings(Collection<Word> words){
 
         LinkedHashMap<String,Set<String>> allMeaning = new LinkedHashMap<>();
 
-        for(DictionaryWord word: words) {
+        for(Word word: words) {
 
             for(String meaning: word.retrieveExtraMetaValueForKey(Constants.MEANING_STRING)){
 
@@ -175,7 +175,7 @@ public class SamsadExporter {
     }
 
 
-    public FixMeaningReturn fixMeaning(Collection<DictionaryWord> words) {
+    public FixMeaningReturn fixMeaning(Collection<Word> words) {
 
         FixMeaningReturn fixMeaningReturn = new FixMeaningReturn();
 
@@ -188,9 +188,9 @@ public class SamsadExporter {
 
         //DictUtil.printStringsByTag("All Meangins:", meanings, 1000 , 1000, false);
 
-        Map<String, DictionaryWord> wordMap = createWordMapFromListDiplicateSpellingFix(words);
-        Map<String, DictionaryWord> simpleMeaningWordMap = findSpellingsWithSimpleMeanings(words);
-        Map<String, DictionaryWord> wordMapFirstGen = DictUtil.removeKeyValuesForKeys(wordMap, simpleMeaningWordMap.keySet());
+        Map<String, Word> wordMap = createWordMapFromListDiplicateSpellingFix(words);
+        Map<String, Word> simpleMeaningWordMap = findSpellingsWithSimpleMeanings(words);
+        Map<String, Word> wordMapFirstGen = DictUtil.removeKeyValuesForKeys(wordMap, simpleMeaningWordMap.keySet());
 
 
         /*
@@ -269,21 +269,21 @@ public class SamsadExporter {
     }
 
 
-    private Map<String,DictionaryWord> createWordMapFromListDiplicateSpellingFix(Collection<DictionaryWord> words) {
+    private Map<String,Word> createWordMapFromListDiplicateSpellingFix(Collection<Word> words) {
 
         //Has duplicate key
-        Map<String,DictionaryWord> wordMap =  new HashMap<>();
+        Map<String,Word> wordMap =  new HashMap<>();
 
         Set<String> duplicates = new HashSet<>();
 
-        for(DictionaryWord word: words) {
+        for(Word word: words) {
 
             String spelling = word.getWordSpelling();
 
             if(wordMap.containsKey(spelling)) {
                 // ^^ means duplicate found, we are adding them to the same words meta map without updating
 
-                DictionaryWord firstOne = wordMap.get(spelling);
+                Word firstOne = wordMap.get(spelling);
                 firstOne.setExtraMetaValue(Constants.MEANING_STRING, word.getExtraMetaMap().get(Constants.MEANING_STRING));
                 firstOne.setExtraMetaValue(Constants.ORIGINAL_STRING, word.getExtraMetaMap().get(Constants.ORIGINAL_STRING));
                 firstOne.setExtraMetaValue(Constants.ENG_PRONUN_STRING, word.getExtraMetaMap().get(Constants.ENG_PRONUN_STRING));
@@ -299,18 +299,18 @@ public class SamsadExporter {
     }
 
     //Mostly duplicate spelling fix
-    private Map<String, DictionaryWord> fixSupSpellingWords(Map<String,DictionaryWord> allWordMap, List<String> supSpellings) {
+    private Map<String, Word> fixSupSpellingWords(Map<String,Word> allWordMap, List<String> supSpellings) {
 
-        Map<String,DictionaryWord> filteredSupWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(supSpellings));
+        Map<String,Word> filteredSupWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(supSpellings));
 
         //DictUtil.printStringsByTag("Sup Words", new ArrayList<>( filteredSupWordMap.values()) , 0, 10, true);
 
-        List<DictionaryWord> words = new ArrayList<>();
+        List<Word> words = new ArrayList<>();
 
         List<String> allSpellingList = new ArrayList<>();
         int print = 0;
 
-        for(DictionaryWord word: filteredSupWordMap.values()){
+        for(Word word: filteredSupWordMap.values()){
 
             String spelling = word.getWordSpelling();
 
@@ -341,26 +341,26 @@ public class SamsadExporter {
         HashSet<String> allspellingSet = new HashSet<>(allSpellingList);
         log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meanings are merged
 
-        Map<String, DictionaryWord> finishedSupWord = createWordMapFromListDiplicateSpellingFix(words);
+        Map<String, Word> finishedSupWord = createWordMapFromListDiplicateSpellingFix(words);
 
         //DictUtil.printStringsByTag("Sup Words After:", new ArrayList<>( finishedSupWord.values()) , 0, 100, true);
         return finishedSupWord;
     }
 
     //Comma spelling fix
-    private Map<String, DictionaryWord> fixCommaSpellingWords(Map<String,DictionaryWord> allWordMap, List<String> commaSpellings) {
+    private Map<String, Word> fixCommaSpellingWords(Map<String,Word> allWordMap, List<String> commaSpellings) {
 
-        Map<String, DictionaryWord> filteredCommaWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(commaSpellings));
+        Map<String, Word> filteredCommaWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(commaSpellings));
         //DictUtil.printStringsByTag("Comma Words", new ArrayList<>(filteredCommaWordMap.values()), 0, 10, true);
-        List<DictionaryWord> words = new ArrayList<>();
+        List<Word> words = new ArrayList<>();
 
         int print = 0;
 
-        for (DictionaryWord word : filteredCommaWordMap.values()) {
+        for (Word word : filteredCommaWordMap.values()) {
 
             String wordSpelling = word.getWordSpelling();
 
-            ArrayList<DictionaryWord> newWords = new ArrayList<>();
+            ArrayList<Word> newWords = new ArrayList<>();
 
             if (wordSpelling.contains(",")) {
 
@@ -374,7 +374,7 @@ public class SamsadExporter {
 
                 for(String spelling: spellings) {
 
-                    DictionaryWord newWord = WordLogic.copyToNewDictWordObject(word);
+                    Word newWord = WordLogic.copyToNewDictWordObject(word);
 
                     newWord.setWordSpelling(spelling.trim());
 
@@ -394,21 +394,21 @@ public class SamsadExporter {
             words.addAll(newWords);
         }
 
-        Map<String, DictionaryWord> finishedCommaWords = createWordMapFromListDiplicateSpellingFix(words);
+        Map<String, Word> finishedCommaWords = createWordMapFromListDiplicateSpellingFix(words);
         //DictUtil.printStringsByTag("Comma Words After:", new ArrayList<>(finishedCommaWords.values()), 0, 10, false);
 
         return finishedCommaWords;
     }
 
     //Simple dash spelling fix
-    private Map<String, DictionaryWord> fixSimpelDashSpellingWords(Map<String,DictionaryWord> dashWordMap) {
+    private Map<String, Word> fixSimpelDashSpellingWords(Map<String,Word> dashWordMap) {
 
         //DictUtil.printStringsByTag("Dash Words", new ArrayList<>(dashWordMap.values()), 0, 10, true);
-        List<DictionaryWord> words = new ArrayList<>();
+        List<Word> words = new ArrayList<>();
 
         int print = 0;
 
-        for (DictionaryWord word : dashWordMap.values()) {
+        for (Word word : dashWordMap.values()) {
 
             String wordSpelling = word.getWordSpelling();
 
@@ -425,7 +425,7 @@ public class SamsadExporter {
                     print++;
                 }
 
-                DictionaryWord newWord = WordLogic.copyToNewDictWordObject(word);
+                Word newWord = WordLogic.copyToNewDictWordObject(word);
                 newWord.setWordSpelling(newSpelling);
 
                 words.add(word);
@@ -436,7 +436,7 @@ public class SamsadExporter {
             }
         }
 
-        Map<String, DictionaryWord> finishedDashWords = createWordMapFromListDiplicateSpellingFix(words);
+        Map<String, Word> finishedDashWords = createWordMapFromListDiplicateSpellingFix(words);
         //DictUtil.printStringsByTag("Dash Words After:", new ArrayList<>(finishedDashWords.values()), 0, 10, false);
 
         return finishedDashWords;
@@ -444,15 +444,15 @@ public class SamsadExporter {
 
     class FixSpellingReturn {
 
-        Collection<DictionaryWord> fixed;
-        Collection<DictionaryWord> unfixed;
+        Collection<Word> fixed;
+        Collection<Word> unfixed;
     }
 
-    private FixSpellingReturn fixSpelling(ArrayList<DictionaryWord> words) {
+    private FixSpellingReturn fixSpelling(ArrayList<Word> words) {
 
         //Has duplicate key
-        Map<String,DictionaryWord> wordMapClean = new HashMap<>();
-        Map<String,DictionaryWord> wordMapFirstGen = createWordMapFromListDiplicateSpellingFix(words);
+        Map<String,Word> wordMapClean = new HashMap<>();
+        Map<String,Word> wordMapFirstGen = createWordMapFromListDiplicateSpellingFix(words);
 
         //Getting all the available spelling string, might contain multiple actual string
         List<String> allSpellings = new ArrayList<>(wordMapFirstGen.keySet());
@@ -478,12 +478,12 @@ public class SamsadExporter {
         log.info("Simpleton size: " + simpletons.size());
 
         //DictUtil.printStringsByTag("Simpletons spelling:", simpletons, 0, 10, true);
-        Map<String, DictionaryWord> simpleWords = DictUtil.filterForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
+        Map<String, Word> simpleWords = DictUtil.filterForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
         wordMapClean.putAll(simpleWords);
         /*END OF SIMPLE*/
 
 
-        Map<String,DictionaryWord> wordMapSecondGenSimpleRemoved = DictUtil.removeKeyValuesForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
+        Map<String,Word> wordMapSecondGenSimpleRemoved = DictUtil.removeKeyValuesForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
         log.info("Word map after simple removal size: " + wordMapSecondGenSimpleRemoved.size());
 
         /* Start of SUP */
@@ -506,12 +506,12 @@ public class SamsadExporter {
 
         log.info("Simple Sup Size: " + simpleSups.size());
         //DictUtil.printStringsByTag("Simple sup:", simpleSups, 0, 10, true);
-        Map<String,DictionaryWord> supWords = fixSupSpellingWords(wordMapSecondGenSimpleRemoved, simpleSups);
+        Map<String,Word> supWords = fixSupSpellingWords(wordMapSecondGenSimpleRemoved, simpleSups);
         wordMapClean.putAll(supWords);
         log.info("Total after simple and sup: " + wordMapClean.size());
         /* End of SUP */
 
-        Map<String,DictionaryWord> wordMapThirdGenSimpleAndSupRemoved = DictUtil.removeKeyValuesForKeys(wordMapSecondGenSimpleRemoved, new HashSet<>(simpleSups) );
+        Map<String,Word> wordMapThirdGenSimpleAndSupRemoved = DictUtil.removeKeyValuesForKeys(wordMapSecondGenSimpleRemoved, new HashSet<>(simpleSups) );
         log.info("Word map after simple and sup removal size: " + wordMapThirdGenSimpleAndSupRemoved.size());
         complexSpellings.removeAll(simpleSups);
 
@@ -534,11 +534,11 @@ public class SamsadExporter {
         log.info("Simple Comma Size: " + simpleComma.size());
         //DictUtil.printStringsByTag("Simple Comma(,):", simpleComma, 0, 10, true);
 
-        Map<String,DictionaryWord> commaWords = fixCommaSpellingWords(wordMapThirdGenSimpleAndSupRemoved, simpleComma);
+        Map<String,Word> commaWords = fixCommaSpellingWords(wordMapThirdGenSimpleAndSupRemoved, simpleComma);
         wordMapClean.putAll(commaWords);
         log.info("Wordmap clean size:" + wordMapClean.size());
 
-        Map<String,DictionaryWord> wordMapFourthGenSimpleSupCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapThirdGenSimpleAndSupRemoved, new HashSet<>(simpleComma) );
+        Map<String,Word> wordMapFourthGenSimpleSupCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapThirdGenSimpleAndSupRemoved, new HashSet<>(simpleComma) );
         log.info("Word map after simple, sup & comma removal size: " + wordMapFourthGenSimpleSupCommaRemoved.size());
 
         complexSpellings.removeAll(simpleComma);
@@ -561,12 +561,12 @@ public class SamsadExporter {
         log.info("Simple Dash Size: " + simpleDash.size());
         //DictUtil.printStringsByTag("Simple Dash(-):", simpleDash, 0, 10, true);
 
-        Map<String, DictionaryWord> dashWordMap = DictUtil.filterForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash));
-        Map<String,DictionaryWord> fixedDashWords = fixSimpelDashSpellingWords(dashWordMap);
+        Map<String, Word> dashWordMap = DictUtil.filterForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash));
+        Map<String,Word> fixedDashWords = fixSimpelDashSpellingWords(dashWordMap);
         wordMapClean.putAll(fixedDashWords);
         log.info("Wordmap clean size after dash:" + wordMapClean.size());
 
-        Map<String,DictionaryWord> wordMapFifthGenSimpleSupCommaDashRemoved = DictUtil.removeKeyValuesForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash) );
+        Map<String,Word> wordMapFifthGenSimpleSupCommaDashRemoved = DictUtil.removeKeyValuesForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash) );
         log.info("Word map after simple, sup, comma and dash removal size: " + wordMapFifthGenSimpleSupCommaDashRemoved.size());
 
         complexSpellings.removeAll(simpleDash);
@@ -589,11 +589,11 @@ public class SamsadExporter {
         log.info("Simple simpleCommaDash Size: " + simpleCommaDash.size());
         //DictUtil.printStringsByTag("Simple Comma Dash(, -):", simpleCommaDash, 0, 10, true);
 
-        Map<String,DictionaryWord> commaRemovedDashedMap = fixCommaSpellingWords(wordMapFifthGenSimpleSupCommaDashRemoved, simpleCommaDash);
-        Map<String,DictionaryWord> commaDashRemovedCommaDashedMap = fixSimpelDashSpellingWords(commaRemovedDashedMap);
+        Map<String,Word> commaRemovedDashedMap = fixCommaSpellingWords(wordMapFifthGenSimpleSupCommaDashRemoved, simpleCommaDash);
+        Map<String,Word> commaDashRemovedCommaDashedMap = fixSimpelDashSpellingWords(commaRemovedDashedMap);
         wordMapClean.putAll(commaDashRemovedCommaDashedMap);
 
-        Map<String,DictionaryWord> wordMapSixthGenSimpleSupCommaDashDashCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapFifthGenSimpleSupCommaDashRemoved, new HashSet<>(simpleCommaDash) );
+        Map<String,Word> wordMapSixthGenSimpleSupCommaDashDashCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapFifthGenSimpleSupCommaDashRemoved, new HashSet<>(simpleCommaDash) );
         //DictUtil.printStringsByTag("Comma Removed Dashed: ", new ArrayList<>(commaDashRemovedCommaDashedMap.values()) , 0, 10, true);
 
         complexSpellings.removeAll(simpleCommaDash);

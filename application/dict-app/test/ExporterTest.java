@@ -1,6 +1,6 @@
 import exporter.SamsadExporter;
 import logics.WordLogic;
-import objects.DictionaryWord;
+import objects.Word;
 import org.junit.Ignore;
 import org.junit.Test;
 import play.test.WithServer;
@@ -21,10 +21,10 @@ public class ExporterTest extends WithServer {
     @Test
     public void createDictionaryFromSamsad() throws Exception {
 
-        Collection<DictionaryWord> words = new SamsadExporter().getDictiionary();
+        Collection<Word> words = new SamsadExporter().getDictiionary();
 
         int total = 0;
-        for(DictionaryWord word: words) {
+        for(Word word: words) {
 
             /*
             if(total == 0) break;
@@ -38,7 +38,7 @@ public class ExporterTest extends WithServer {
                 total++;
             }
             */
-            //wordLogic.saveDictionaryWord(word);
+            wordLogic.saveWord(word);
             total++;
         }
 
