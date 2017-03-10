@@ -2,7 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import logics.WordLogic;
-import objects.DictionaryWord;
+import objects.Word;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -58,8 +58,8 @@ public class WordController extends Controller {
     public Result createWord() {
 
         JsonNode json = request().body().asJson();
-        DictionaryWord word = (DictionaryWord) JsonUtil.jsonNodeToObject(json, DictionaryWord.class);
-        wordLogic.saveDictionaryWord(word);
+        Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
+        wordLogic.saveWord(word);
         return ok();
     }
 
@@ -86,7 +86,7 @@ public class WordController extends Controller {
 
     public Result getWordByWordId(String wordId) {
 
-        DictionaryWord word = wordLogic.getDictionaryWordByWordId(wordId);
+        Word word = wordLogic.getWordByWordId(wordId);
 
         if (word == null)
             return ok("No word found for wordId:\"" + wordId + "\"");
@@ -116,7 +116,7 @@ public class WordController extends Controller {
 
     public Result getWordBySpelling(String wordSpelling) {
 
-        DictionaryWord word = wordLogic.getDictionaryWordBySpelling(wordSpelling);
+        Word word = wordLogic.getWordBySpelling(wordSpelling);
 
         if (word == null)
             return ok("No word found for spelling:\"" + wordSpelling + "\"");
@@ -129,7 +129,7 @@ public class WordController extends Controller {
     public Result updateWord(String wordId) {
 
         JsonNode json = request().body().asJson();
-        DictionaryWord word = (DictionaryWord) JsonUtil.jsonNodeToObject(json, DictionaryWord.class);
+        Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
         log.info(word.toString());
         return ok();
     }
@@ -162,10 +162,10 @@ public class WordController extends Controller {
             return badRequest();
         }
 
-        Set<DictionaryWord> words = DictUtil.generateDictionaryWithRandomWords(wordCount);
+        Set<Word> words = DictUtil.generateDictionaryWithRandomWords(wordCount);
 
-        for (DictionaryWord word : words)
-            wordLogic.saveDictionaryWord(word);
+        for (Word word : words)
+            wordLogic.saveWord(word);
 
         return ok("Generated and added " + wordCount + " random words on the dictionary!");
     }

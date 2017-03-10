@@ -1,9 +1,7 @@
 package daos;
 
-import objects.DictionaryWord;
-import sun.security.util.DisabledAlgorithmConstraints;
+import objects.Word;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -11,11 +9,11 @@ import java.util.Set;
  */
 public interface WordDao {
 
-    public String setDictionaryWord(DictionaryWord dictionaryWord);
+    public String setWord(Word word);
 
-    public DictionaryWord getDictionaryWordByWordId(String wordId);
+    public Word getWordByWordId(String wordId);
 
-    public DictionaryWord getDictionaryWordBySpelling(String spelling);
+    public Word getWordBySpelling(String spelling);
 
     public Set<String> getWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
 

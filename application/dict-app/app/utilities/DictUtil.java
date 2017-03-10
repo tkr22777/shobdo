@@ -1,16 +1,12 @@
 package utilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import objects.DictionaryWord;
+import objects.Word;
 import objects.Meaning;
-import objects.MeaningForPartsOfSpeech;
 import objects.PartsOfSpeechSet;
 import org.bson.Document;
-import org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet;
-import play.api.libs.iteratee.Enumeratee;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -24,10 +20,10 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
-    public static DictionaryWord getDictionaryWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
+    public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
-        return (DictionaryWord) getObjectFromDocument(dictionaryDocument, class_type);
+        return (Word) getObjectFromDocument(dictionaryDocument, class_type);
     }
 
     public static Object getObjectFromDocument(Document doc, Class<?> class_type) {
@@ -46,20 +42,20 @@ public class DictUtil {
         return object;
     }
 
-    public static Set<DictionaryWord> generateDictionaryWithRandomWords(int numberOfWords){
+    public static Set<Word> generateDictionaryWithRandomWords(int numberOfWords){
 
-        Set<DictionaryWord> words = new HashSet<>();
+        Set<Word> words = new HashSet<>();
 
         for(int i = 0 ; i < numberOfWords ; i++) {
 
-            DictionaryWord word = generateARandomWord( new PartsOfSpeechSet() );
+            Word word = generateARandomWord( new PartsOfSpeechSet() );
             words.add(word);
         }
 
         return words;
     }
 
-    public static DictionaryWord generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
+    public static Word generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
 
         String start = "995"; //ক
         String end = "9A8";   //ন
@@ -71,44 +67,34 @@ public class DictUtil {
         wordSpelling = Bangla.getWord(start, end, wordLength);
         wordId = "WD_" + UUID.randomUUID();
 
-        DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
+        Word word = new Word(wordId, wordSpelling);
 
-        ArrayList<MeaningForPartsOfSpeech> meaningsForPartsOfSpeech = new ArrayList<>();
+        ArrayList<Meaning> meanings = new ArrayList<>();
 
-        for (String pos : partsOfSpeech.getPartsOfSpeeches()) {
-
-            MeaningForPartsOfSpeech meanings = new MeaningForPartsOfSpeech();
-            meanings.setPartsOfSpeech(pos);
+        for (String partOfSpeech : partsOfSpeech.getPartsOfSpeeches()) {
 
             int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
 
             for(int j = 0; j < numberOfMeaningForPOS ; j++) {
 
-                String meaning;
                 wordLength = DictUtil.randomInRange(2, 9);
-                meaning = Bangla.getWord(start, end, wordLength);
 
-                String example;
+                String meaningString = Bangla.getWord(start, end, wordLength);
                 int preSentenceLen = DictUtil.randomInRange(2, 6);
                 int postSentenceLen = DictUtil.randomInRange(2, 4);
-                example = Bangla.getSentence(start, end, preSentenceLen, 12);
-                example += " " + meaning + " ";
-                example += Bangla.getSentence(start, end, postSentenceLen, 12);
+                String example = Bangla.getSentence(start, end, preSentenceLen, 12) + " " + meaningString
+                        + " " + Bangla.getSentence(start, end, postSentenceLen, 12);
 
-                String meaningId = "MN_" + UUID.randomUUID();
+                int strength = DictUtil.randomInRange(0 , 10);
+                Meaning meaning = new Meaning(partOfSpeech, meaningString, example, strength);
 
-                int strength = DictUtil.randomInRange( 0 , 10);
-                Meaning meaningForPOS = new Meaning(meaningId, pos, meaning, example, strength);
-
-                meanings.addMeaning(meaningForPOS);
+                meanings.add(meaning);
             }
-
-            meaningsForPartsOfSpeech.add(meanings);
         }
 
-        dictionaryWord.setMeaningForPartsOfSpeeches(meaningsForPartsOfSpeech);
+        word.setMeanings(meanings);
 
-        return dictionaryWord;
+        return word;
     }
 
     public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {
@@ -129,7 +115,7 @@ public class DictUtil {
         }
     }
 
-    public static Map<String, DictionaryWord> removeKeyValuesForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+    public static Map<String, Word> removeKeyValuesForKeys(Map<String, Word> map, Set<String> keys) {
 
         return map.entrySet().stream()
                 .filter( e-> !keys.contains( e.getKey() ) )
@@ -141,7 +127,7 @@ public class DictUtil {
                 );
     }
 
-    public static Map<String,DictionaryWord> filterForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+    public static Map<String, Word> filterForKeys(Map<String, Word> map, Set<String> keys) {
 
         return map.entrySet().stream()
                 .filter( e -> keys.contains(e.getKey()))
