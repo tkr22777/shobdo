@@ -3,14 +3,10 @@ package unitTests;
 import cache.WordCache;
 import daos.WordDao;
 import logics.WordLogic;
-import objects.DictionaryWord;
+import objects.Word;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import utilities.LogPrint;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,7 +27,7 @@ public class WordLogicTest {
     private WordLogic wordLogic;
 
     private String wordSpelling = "পিটন";
-    private DictionaryWord theWord;
+    private Word theWord;
 
     @Before
     public void setup() {
@@ -51,7 +47,7 @@ public class WordLogicTest {
 
     public void setupObjects() {
 
-        theWord = new DictionaryWord();
+        theWord = new Word();
         theWord.setWordSpelling(wordSpelling);
     }
 
@@ -62,31 +58,31 @@ public class WordLogicTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void getDictionaryWordBySpelling_spellingIsNull_throwsException() {
+    public void getWordBySpelling_spellingIsNull_throwsException() {
 
-        wordLogic.getDictionaryWordBySpelling(null);
+        wordLogic.getWordBySpelling(null);
     }
 
     @Test
-    public void getDictionaryWordBySpelling_foundCached_doNotCallDB() {
+    public void getWordBySpelling_foundCached_doNotCallDB() {
 
-        when(mockWordCache.getDictionaryWordBySpellingFromCache(wordSpelling)).thenReturn(theWord);
+        when(mockWordCache.getWordBySpellingFromCache(wordSpelling)).thenReturn(theWord);
 
-        wordLogic.getDictionaryWordBySpelling(wordSpelling);
+        wordLogic.getWordBySpelling(wordSpelling);
 
-        verify(mockWordDao, never()).getDictionaryWordBySpelling(anyString());
-        verify(mockWordCache, never()).cacheDictionaryWord(any(DictionaryWord.class));
+        verify(mockWordDao, never()).getWordBySpelling(anyString());
+        verify(mockWordCache, never()).cacheWord(any(Word.class));
     }
 
     @Test
-    public void getDictionaryWordBySpelling_notCached_callDatabaseAndCache() {
+    public void getWordBySpelling_notCached_callDatabaseAndCache() {
 
-        when(mockWordCache.getDictionaryWordBySpellingFromCache(wordSpelling)).thenReturn(null);
-        when(mockWordDao.getDictionaryWordBySpelling(wordSpelling)).thenReturn(theWord);
+        when(mockWordCache.getWordBySpellingFromCache(wordSpelling)).thenReturn(null);
+        when(mockWordDao.getWordBySpelling(wordSpelling)).thenReturn(theWord);
 
-        wordLogic.getDictionaryWordBySpelling(wordSpelling);
+        wordLogic.getWordBySpelling(wordSpelling);
 
-        verify(mockWordDao, times(1) ).getDictionaryWordBySpelling(wordSpelling);
-        verify(mockWordCache, times(1) ).cacheDictionaryWord(theWord);
+        verify(mockWordDao, times(1) ).getWordBySpelling(wordSpelling);
+        verify(mockWordCache, times(1) ).cacheWord(theWord);
     }
 }

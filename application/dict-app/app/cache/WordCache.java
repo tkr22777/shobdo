@@ -1,9 +1,7 @@
 package cache;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
-import objects.DictionaryWord;
+import objects.Word;
 import redis.clients.jedis.Jedis;
 import utilities.*;
 
@@ -50,7 +48,7 @@ public class WordCache {
         return jedis;
     }
 
-    public DictionaryWord getDictionaryWordBySpellingFromCache(String spelling) {
+    public Word getWordBySpellingFromCache(String spelling) {
 
         if( !USE_REDIS || jedis == null || spelling == null )
             return null;
@@ -58,7 +56,7 @@ public class WordCache {
         return getWordFromRedis(spelling);
     }
 
-    private DictionaryWord getWordFromRedis(String spelling) {
+    private Word getWordFromRedis(String spelling) {
 
         bmLog.start();
         String key = getKeyForSpelling(spelling);
@@ -66,7 +64,7 @@ public class WordCache {
 
         if (wordJsonString != null) {
 
-            DictionaryWord wordFound = (DictionaryWord) JsonUtil.toObjectFromJsonString(wordJsonString, DictionaryWord.class);
+            Word wordFound = (Word) JsonUtil.toObjectFromJsonString(wordJsonString, Word.class);
             bmLog.end("@WC003 Word [" + spelling + "] found in cache and returning");
             return wordFound;
 
@@ -77,7 +75,7 @@ public class WordCache {
         }
     }
 
-    public void cacheDictionaryWord(DictionaryWord word) {
+    public void cacheWord(Word word) {
 
         if(!USE_REDIS || jedis == null || word == null)
             return;

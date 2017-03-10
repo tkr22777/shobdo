@@ -3,7 +3,7 @@ package logics;
 import cache.WordCache;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
-import objects.DictionaryWord;
+import objects.Word;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.LogPrint;
@@ -36,45 +36,45 @@ public class WordLogic {
         this.wordCache = wordCache;
     }
 
-    public void saveDictionaryWord( DictionaryWord dictionaryWord ) {
+    public void saveWord(Word word) {
 
-        wordDao.setDictionaryWord(dictionaryWord);
-        wordCache.cacheDictionaryWord(dictionaryWord);
+        wordDao.setWord(word);
+        wordCache.cacheWord(word);
     }
 
-    public void saveDictionaryWords(Collection<DictionaryWord> dictionaryWords ) {
+    public void saveWords(Collection<Word> words) {
 
-        for(DictionaryWord word: dictionaryWords) {
-            wordDao.setDictionaryWord(word);
-            wordCache.cacheDictionaryWord(word);
+        for(Word word: words) {
+            wordDao.setWord(word);
+            wordCache.cacheWord(word);
         }
     }
 
-    public DictionaryWord getDictionaryWordBySpelling( String spelling ){
+    public Word getWordBySpelling(String spelling ){
 
         if(spelling == null || spelling == "")
-            throw new IllegalArgumentException("WLEX: getDictionaryWordBySpelling word spelling is null or empty");
+            throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
 
-        DictionaryWord cachedWord = wordCache.getDictionaryWordBySpellingFromCache(spelling);
+        Word cachedWord = wordCache.getWordBySpellingFromCache(spelling);
 
         if(cachedWord != null)
             return cachedWord;
 
-        DictionaryWord wordFromDB = wordDao.getDictionaryWordBySpelling(spelling);
+        Word wordFromDB = wordDao.getWordBySpelling(spelling);
 
-        wordCache.cacheDictionaryWord(wordFromDB);
+        wordCache.cacheWord(wordFromDB);
 
         return wordFromDB;
 
     }
 
-    public DictionaryWord getDictionaryWordByWordId( String wordId) {
+    public Word getWordByWordId(String wordId) {
 
         if(wordId == null)
-            throw new IllegalArgumentException("WLEX: getDictionaryWordByWordId wordId is null or empty");
+            throw new IllegalArgumentException("WLEX: getWordByWordId wordId is null or empty");
 
         bmLog.start();
-        DictionaryWord word = wordDao.getDictionaryWordByWordId(wordId);
+        Word word = wordDao.getWordByWordId(wordId);
         bmLog.end("@WL001 Word [ID:" + wordId + "][Spelling"+ word.getWordSpelling() +"] found in database and returning");
 
         return word;
@@ -128,25 +128,25 @@ public class WordLogic {
         wordCache.flushCache();
     }
 
-    protected void verifyDictionaryWord(DictionaryWord dictionaryWord) {
+    protected void verifyWord(Word word) {
 
-        if( dictionaryWord == null)
+        if( word == null)
 
             log.info("Dictionary Word is null.");
 
-        else if(dictionaryWord.getMeanings() == null)
+        else if(word.getMeanings() == null)
 
-            log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings array is null.");
+            log.info("Dictionary Word Id:" + word.getWordId() + " meanings array is null.");
 
-        else if( dictionaryWord.getMeanings().size() == 0 )
+        else if( word.getMeanings().size() == 0 )
 
-            log.info("Dictionary Word Id:" + dictionaryWord.getWordId() + " meanings size is zero(0).");
+            log.info("Dictionary Word Id:" + word.getWordId() + " meanings size is zero(0).");
 
     }
 
-    public static DictionaryWord copyToNewDictWordObject(DictionaryWord providedWord) {
+    public static Word copyToNewDictWordObject(Word providedWord) {
 
-        DictionaryWord toReturnWord = new DictionaryWord();
+        Word toReturnWord = new Word();
 
         toReturnWord.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
 
@@ -174,22 +174,22 @@ public class WordLogic {
 
     //Word arrangement is a future feature
 
-    public void reArrangeBy(DictionaryWord dictionaryWord, String arrangement){
+    public void reArrangeBy(Word word, String arrangement){
 
-        if(isFoundOnCache( dictionaryWord.getWordId(), arrangement)) {
+        if(isFoundOnCache( word.getWordId(), arrangement)) {
 
-            getFromCache(dictionaryWord.getWordId(), arrangement);
+            getFromCache(word.getWordId(), arrangement);
             return; //from cache
 
         } else {
 
             _reArrange(arrangement);
-            storeOnCache( dictionaryWord, arrangement);
+            storeOnCache(word, arrangement);
             return;
         }
     }
 
-    private DictionaryWord getFromCache(String wordId, String arrangement){
+    private Word getFromCache(String wordId, String arrangement){
 
         return null;
     }
@@ -198,7 +198,7 @@ public class WordLogic {
 
     }
 
-    private void storeOnCache(DictionaryWord dictionaryWord, String arrangement){
+    private void storeOnCache(Word word, String arrangement){
 
     }
 

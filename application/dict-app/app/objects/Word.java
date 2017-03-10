@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by tahsinkabir on 8/21/16.
  */
-public class DictionaryWord {
+public class Word {
 
     //arrangementType is the way the meanings of this word are arranged now
     //e.g. by parts of speech or by strength of the meanings (are not arranged by parts of speech, such as V, N , N , P, V)
@@ -29,19 +29,19 @@ public class DictionaryWord {
     private String wordSpelling;
     ArrayList<Meaning> meanings;
 
-    public DictionaryWord() { }
+    public Word() { }
 
-    public DictionaryWord(String wordId,
-                          String wordSpelling)
+    public Word(String wordId,
+                String wordSpelling)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
     }
 
-    public DictionaryWord(String wordId,
-                          String wordSpelling,
-                          String arrangementType,
-                          ArrayList<Meaning> meanings)
+    public Word(String wordId,
+                String wordSpelling,
+                String arrangementType,
+                ArrayList<Meaning> meanings)
     {
 
         this.wordId = wordId;
@@ -49,13 +49,13 @@ public class DictionaryWord {
         this.meanings = meanings;
     }
 
-    public DictionaryWord(String wordId,
-                          String wordSpelling,
-                          int timesSearched,
-                          String linkToPronunciation,
-                          String arrangementType,
-                          Collection<Meaning> meanings,
-                          Map<String,List<String>> extraMeta)
+    public Word(String wordId,
+                String wordSpelling,
+                int timesSearched,
+                String linkToPronunciation,
+                String arrangementType,
+                Collection<Meaning> meanings,
+                Map<String,List<String>> extraMeta)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
@@ -65,9 +65,9 @@ public class DictionaryWord {
         this.meanings = new ArrayList<>(meanings);
     }
 
-    public static DictionaryWord wordFromJsonString(String wordInJsonString) {
+    public static Word wordFromJsonString(String wordInJsonString) {
 
-        return (DictionaryWord) JsonUtil.toObjectFromJsonString(wordInJsonString,DictionaryWord.class);
+        return (Word) JsonUtil.toObjectFromJsonString(wordInJsonString, Word.class);
     }
 
     public int getVersion() {
@@ -205,7 +205,7 @@ public class DictionaryWord {
         if(Constants.JSON_STRING)
             return toJsonString();
         else
-            return "DictionaryWord{" +
+            return "Word{" +
                     "version=" + version +
                     ", reviewed=" + reviewed +
                     ", diplayToPublic=" + diplayToPublic +

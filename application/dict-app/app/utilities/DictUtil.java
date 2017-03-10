@@ -1,7 +1,7 @@
 package utilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import objects.DictionaryWord;
+import objects.Word;
 import objects.Meaning;
 import objects.PartsOfSpeechSet;
 import org.bson.Document;
@@ -20,10 +20,10 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
-    public static DictionaryWord getDictionaryWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
+    public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
-        return (DictionaryWord) getObjectFromDocument(dictionaryDocument, class_type);
+        return (Word) getObjectFromDocument(dictionaryDocument, class_type);
     }
 
     public static Object getObjectFromDocument(Document doc, Class<?> class_type) {
@@ -42,20 +42,20 @@ public class DictUtil {
         return object;
     }
 
-    public static Set<DictionaryWord> generateDictionaryWithRandomWords(int numberOfWords){
+    public static Set<Word> generateDictionaryWithRandomWords(int numberOfWords){
 
-        Set<DictionaryWord> words = new HashSet<>();
+        Set<Word> words = new HashSet<>();
 
         for(int i = 0 ; i < numberOfWords ; i++) {
 
-            DictionaryWord word = generateARandomWord( new PartsOfSpeechSet() );
+            Word word = generateARandomWord( new PartsOfSpeechSet() );
             words.add(word);
         }
 
         return words;
     }
 
-    public static DictionaryWord generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
+    public static Word generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
 
         String start = "995"; //ক
         String end = "9A8";   //ন
@@ -67,7 +67,7 @@ public class DictUtil {
         wordSpelling = Bangla.getWord(start, end, wordLength);
         wordId = "WD_" + UUID.randomUUID();
 
-        DictionaryWord dictionaryWord = new DictionaryWord(wordId, wordSpelling);
+        Word word = new Word(wordId, wordSpelling);
 
         ArrayList<Meaning> meanings = new ArrayList<>();
 
@@ -95,9 +95,9 @@ public class DictUtil {
             }
         }
 
-        dictionaryWord.setMeanings(meanings);
+        word.setMeanings(meanings);
 
-        return dictionaryWord;
+        return word;
     }
 
     public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {
@@ -118,7 +118,7 @@ public class DictUtil {
         }
     }
 
-    public static Map<String, DictionaryWord> removeKeyValuesForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+    public static Map<String, Word> removeKeyValuesForKeys(Map<String, Word> map, Set<String> keys) {
 
         return map.entrySet().stream()
                 .filter( e-> !keys.contains( e.getKey() ) )
@@ -130,7 +130,7 @@ public class DictUtil {
                 );
     }
 
-    public static Map<String,DictionaryWord> filterForKeys(Map<String,DictionaryWord> map, Set<String> keys) {
+    public static Map<String, Word> filterForKeys(Map<String, Word> map, Set<String> keys) {
 
         return map.entrySet().stream()
                 .filter( e -> keys.contains(e.getKey()))
