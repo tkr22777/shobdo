@@ -48,7 +48,7 @@ public class WordCache {
         return jedis;
     }
 
-    public Word getWordBySpellingFromCache(String spelling) {
+    public Word getWordBySpelling(String spelling) {
 
         if( !USE_REDIS || jedis == null || spelling == null )
             return null;
@@ -97,13 +97,13 @@ public class WordCache {
         }
     }
 
-    public Set<String> getSearchWordsBySpellingFromCache(String spelling){
+    public Set<String> getWordsForSearchString(String searchString){
 
-        if ( !USE_REDIS || jedis == null || spelling == null)
+        if ( !USE_REDIS || jedis == null || searchString == null)
             return null;
 
         bmLog.start();
-        String key = getKeyForSearch(spelling);
+        String key = getKeyForSearchString(searchString);
         Set<String> words = jedis.smembers(key);
 
         if( words != null && words.size() > 0) {
@@ -113,18 +113,18 @@ public class WordCache {
 
         } else {
 
-            bmLog.end("@WC005 Search result not found on cache for spelling: \'" + spelling + "\'");
+            bmLog.end("@WC005 Search result not found on cache for spelling: \'" + searchString + "\'");
             return null;
         }
     }
 
-    public void cacheSearchWordsBySpelling(String spelling, Set<String> words){
+    public void cacheWordsForSearchString(String searchString, Set<String> words){
 
-        if( !USE_REDIS || jedis == null || spelling == null)
+        if( !USE_REDIS || jedis == null || searchString == null)
             return;
 
         bmLog.start();
-        String key = getKeyForSearch(spelling);
+        String key = getKeyForSearchString(searchString);
 
         if(words == null) { //invalidate existing value
             jedis.del(key);
@@ -145,8 +145,8 @@ public class WordCache {
         return RedisUtil.buildRedisKey( Arrays.asList( GET_WORD_BY_SPELLING_PFX, spelling) );
     }
 
-    public String getKeyForSearch(String spelling) {
-        return RedisUtil.buildRedisKey( Arrays.asList( SERACH_WORD_BY_SPELLING_PFX, spelling));
+    public String getKeyForSearchString(String searchString) {
+        return RedisUtil.buildRedisKey( Arrays.asList( SERACH_WORD_BY_SPELLING_PFX, searchString));
     }
 
     public void flushCache(){

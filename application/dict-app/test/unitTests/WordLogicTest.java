@@ -66,7 +66,7 @@ public class WordLogicTest {
     @Test
     public void getWordBySpelling_foundCached_doNotCallDB() {
 
-        when(mockWordCache.getWordBySpellingFromCache(wordSpelling)).thenReturn(theWord);
+        when(mockWordCache.getWordBySpelling(wordSpelling)).thenReturn(theWord);
 
         wordLogic.getWordBySpelling(wordSpelling);
 
@@ -77,7 +77,7 @@ public class WordLogicTest {
     @Test
     public void getWordBySpelling_notCached_callDatabaseAndCache() {
 
-        when(mockWordCache.getWordBySpellingFromCache(wordSpelling)).thenReturn(null);
+        when(mockWordCache.getWordBySpelling(wordSpelling)).thenReturn(null);
         when(mockWordDao.getWordBySpelling(wordSpelling)).thenReturn(theWord);
 
         wordLogic.getWordBySpelling(wordSpelling);
