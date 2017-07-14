@@ -1,7 +1,7 @@
 Tech Specification:
 	- Front End (The last thing to do)
 	    - Language: TBD
-	    - Emphasis: Keep it simple and highly responsive
+	    - Emphasis: Keep it simple and highly responsive single page webapp
 
 	- Backend Service:
 	    - Language
@@ -23,14 +23,4 @@ User Specification:
 	- User login and history with Facebook
 
 Tips:
-	- match a word from cache as users are typing and suggest them
-
-Resources:
-
-- Dictionary files and definitions, csv?
-    - DB source one Ankur:
-        - https://sourceforge.net/projects/anubadok/files/anubadok/0.2.1/
-        - space and line separated values
-
-Check:
-https://github.com/danielnaber/openthesaurus
+	- match a word from cache as users are typing and suggest them:w
