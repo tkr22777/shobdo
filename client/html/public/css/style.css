@@ -1,0 +1,11 @@
+.jumbotron {
+    background-color: rgb(0, 0, 0);
+    color: #FFFFFF;
+}
+
+input[type="text"], textarea {
+  background-color : #d1d1d1;
+}
+
+nav ul{height:298px; width:100%;}
+nav ul{overflow:hidden; overflow-y:scroll; overflow-x:scroll;}
