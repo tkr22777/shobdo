@@ -11,6 +11,8 @@ POST    /api/v1/word                  controllers.WordController.createWord()
 # 3. GET WORD:
 GET     /api/v1/word/:wordId          controllers.WordController.getWordByWordId(wordId: String)
 GET     /api/v1/word/:wordSpelling    controllers.WordController.getWordBySpelling(wordSpelling: String)
+#body contains "wordSpelling"
+POST    /api/v1/word/postget          controllers.WordController.getWordBySpellingPost()
 
 # 4. UPDATE WORD:
 #body contains word in json
