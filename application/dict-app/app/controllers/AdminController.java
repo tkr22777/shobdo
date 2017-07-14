@@ -1,7 +1,9 @@
 package controllers;
 
+import cache.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import logics.WordLogic;
 import play.data.DynamicForm;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -15,6 +17,7 @@ import utilities.LogPrint;
  */
 public class AdminController extends Controller {
 
+    private final WordLogic wordLogic = WordLogic.factory();
     private static LogPrint log = new LogPrint(AdminController.class);
 
     public Result testLength(String word, int length) {
@@ -61,5 +64,11 @@ public class AdminController extends Controller {
         result.put("StartsWith", name.charAt(0) + "");
 
         return ok(result);
+    }
+
+    public Result flushCache() {
+
+        wordLogic.flushCache();
+        return ok();
     }
 }

@@ -24,7 +24,7 @@ public class WordLogic {
     private BenchmarkLogger bmLog = new BenchmarkLogger(WordLogic.class);
     private LogPrint log = new LogPrint(WordLogic.class);
 
-    public static WordLogic factory() { //to select which database to use
+    public static WordLogic factory() {
 
         WordDao wordDao = new WordDaoMongoImpl();
         return new WordLogic( wordDao, new WordCache() );
@@ -55,7 +55,7 @@ public class WordLogic {
         if(spelling == null || spelling == "")
             throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
 
-        Word cachedWord = wordCache.getWordBySpellingFromCache(spelling);
+        Word cachedWord = wordCache.getWordBySpelling(spelling);
 
         if(cachedWord != null)
             return cachedWord;
@@ -95,7 +95,7 @@ public class WordLogic {
         if(spelling == null || spelling.equals(""))
             throw new IllegalArgumentException("WLEX: searchWordsBySpelling spelling is null or empty");
 
-        Set<String> words = wordCache.getSearchWordsBySpellingFromCache(spelling);
+        Set<String> words = wordCache.getWordsForSearchString(spelling);
 
         if(words != null && words.size() > 0)
             return words;
@@ -106,7 +106,7 @@ public class WordLogic {
         if ( words != null && words.size() > 0 ) {
 
             bmLog.end("@WL003 search result [size:" + words.size() + "] for spelling:\"" + spelling + "\" found in database and returning");
-            wordCache.cacheSearchWordsBySpelling(spelling, words);
+            wordCache.cacheWordsForSearchString(spelling, words);
             return words;
 
         } else {

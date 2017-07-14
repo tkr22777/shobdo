@@ -19,7 +19,7 @@ PUT     /api/v1/word/:wordId          controllers.WordController.updateWord(word
 # 5. DELETE WORD:
 DELETE  /api/v1/word/:wordId          controllers.WordController.deleteWord(wordId: String)
 
-# 1. SEARCH WORD BY SPELLING:
+# 1. SEARCH WORDS BY SPELLING:
 #body contains "searchString"
 POST    /api/v1/search                controllers.WordController.searchWordsBySpelling()
 
@@ -29,6 +29,9 @@ POST    /api/v1/generate              controllers.WordController.createRandomDic
 # 7. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
 GET     /api/v1/gettest               controllers.AdminController.testGet()
 POST    /api/v1/posttest              controllers.AdminController.testPost()
+
+# 8. TO CLEAR/FLUSH REDIS CACHE:
+GET     /api/v1/admineflushcache      controllers.AdminController.flushCache()
 
 ##THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES
 # An example controller showing a sample home page
