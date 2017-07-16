@@ -162,9 +162,6 @@ public class WordLogic {
 
             toReturnWord.setTimesSearched(providedWord.getTimesSearched());
 
-            if(providedWord.getLinkToPronunciation() != null)
-                toReturnWord.setLinkToPronunciation(providedWord.getLinkToPronunciation());
-
             if(providedWord.getExtraMetaMap() != null)
                 toReturnWord.setExtraMetaMap( providedWord.getExtraMetaMap() );
         }

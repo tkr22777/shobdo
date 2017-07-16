@@ -19,7 +19,6 @@ public class Word {
 
     private int version;
     private int timesSearched;
-    private String linkToPronunciation;
     private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
 
@@ -56,7 +55,6 @@ public class Word {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
         this.timesSearched = timesSearched;
-        this.linkToPronunciation = linkToPronunciation;
         this.extraMetaMap = extraMeta;
         this.meanings = new ArrayList<>(meanings);
     }
@@ -169,14 +167,6 @@ public class Word {
     public Set<String> retriveExtraMetaKeys(){
 
         return this.extraMetaMap.keySet();
-    }
-
-    public String getLinkToPronunciation() {
-        return linkToPronunciation;
-    }
-
-    public void setLinkToPronunciation(String linkToPronunciation) {
-        this.linkToPronunciation = linkToPronunciation;
     }
 
     @Override
