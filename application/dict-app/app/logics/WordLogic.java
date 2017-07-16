@@ -141,8 +141,6 @@ public class WordLogic {
             if(providedWord.getWordSpelling() != null)
                 toReturnWord.setWordSpelling(providedWord.getWordSpelling());
 
-            toReturnWord.setTimesSearched(providedWord.getTimesSearched());
-
             if(providedWord.getExtraMetaMap() != null)
                 toReturnWord.setExtraMetaMap( providedWord.getExtraMetaMap() );
         }

@@ -18,7 +18,6 @@ public class Word {
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
 
     private int version;
-    private int timesSearched;
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
 
     private String wordId;
@@ -46,14 +45,12 @@ public class Word {
 
     public Word(String wordId,
                 String wordSpelling,
-                int timesSearched,
                 String linkToPronunciation,
                 Collection<Meaning> meanings,
                 Map<String,List<String>> extraMeta)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
-        this.timesSearched = timesSearched;
         this.extraMetaMap = extraMeta;
         this.meanings = new ArrayList<>(meanings);
     }
@@ -101,14 +98,6 @@ public class Word {
 
     public void setWordSpelling(String wordSpelling) {
         this.wordSpelling = wordSpelling;
-    }
-
-    public int getTimesSearched() {
-        return timesSearched;
-    }
-
-    public void setTimesSearched(int timesSearched) {
-        this.timesSearched = timesSearched;
     }
 
     public Map<String,List<String>> getExtraMetaMap() {
