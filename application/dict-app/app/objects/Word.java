@@ -18,9 +18,7 @@ public class Word {
     //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
 
     private int version;
-    private boolean reviewed;
     private int timesSearched;
-    private boolean diplayToPublic;
     private String linkToPronunciation;
     private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
@@ -40,7 +38,6 @@ public class Word {
 
     public Word(String wordId,
                 String wordSpelling,
-                String arrangementType,
                 ArrayList<Meaning> meanings)
     {
 
@@ -53,7 +50,6 @@ public class Word {
                 String wordSpelling,
                 int timesSearched,
                 String linkToPronunciation,
-                String arrangementType,
                 Collection<Meaning> meanings,
                 Map<String,List<String>> extraMeta)
     {
@@ -76,22 +72,6 @@ public class Word {
 
     public void setVersion(int version) {
         this.version = version;
-    }
-
-    public boolean isReviewed() {
-        return reviewed;
-    }
-
-    public void setReviewed(boolean reviewed) {
-        this.reviewed = reviewed;
-    }
-
-    public boolean isDiplayToPublic() {
-        return diplayToPublic;
-    }
-
-    public void setDiplayToPublic(boolean diplayToPublic) {
-        this.diplayToPublic = diplayToPublic;
     }
 
     public ArrayList<Meaning> getMeanings() {
@@ -202,15 +182,7 @@ public class Word {
     @Override
     public String toString() {
 
-        if(Constants.JSON_STRING)
-            return toJsonString();
-        else
-            return "Word{" +
-                    "version=" + version +
-                    ", reviewed=" + reviewed +
-                    ", diplayToPublic=" + diplayToPublic +
-                    ", meanings=" + meanings +
-                    '}';
+        return toJsonString();
     }
 
     public String toJsonString() {
