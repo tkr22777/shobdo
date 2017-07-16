@@ -3,9 +3,9 @@ package utilities;
 import java.lang.Integer;
 import java.lang.String;
 
-public class Bangla {
+public class BanglaUtil {
 
-    public static String getSentence(String startHex, String endHex, int numberOfWords, int maxWordLength) {
+    public static String getBanglaRandomSentence(String startHex, String endHex, int numberOfWords, int maxWordLength) {
 
         if(startHex == null)
             startHex = "995"; //ক
@@ -27,14 +27,14 @@ public class Bangla {
                 sentence += " ";
 
             int number = DictUtil.randomInRange(1, maxWordLength);
-            String word = getWord(startHex, endHex, number);
+            String word = getBanglaRandomString(startHex, endHex, number);
             sentence += word;
         }
 
         return sentence;
     }
 
-    public static String getWord(String startHex, String endHex, int wordLength) {
+    public static String getBanglaRandomString(String startHex, String endHex, int wordLength) {
 
         int start = Integer.parseInt(startHex, 16);
         int end = Integer.parseInt(endHex, 16);
@@ -54,5 +54,4 @@ public class Bangla {
 
         return retString;
     }
-
 }

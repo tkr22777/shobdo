@@ -6,13 +6,13 @@ import java.io.FileReader;
 /**
  * Created by tahsinkabir on 9/1/16.
  */
-public class ReadFile {
+public class FileReadUtil {
 
-    private LogPrint log = new LogPrint(ReadFile.class);
+    private LogPrint log = new LogPrint(FileReadUtil.class);
 
     BufferedReader reader;
 
-    public ReadFile(String fileLocation) {
+    public FileReadUtil(String fileLocation) {
 
         reader = getReader(fileLocation);
     }

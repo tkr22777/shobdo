@@ -38,14 +38,14 @@ public class WordLogic {
 
     public void saveWord(Word word) {
 
-        wordDao.setWord(word);
+        wordDao.saveWord(word);
         wordCache.cacheWord(word);
     }
 
     public void saveWords(Collection<Word> words) {
 
         for(Word word: words) {
-            wordDao.setWord(word);
+            wordDao.saveWord(word);
             wordCache.cacheWord(word);
         }
     }
@@ -84,7 +84,7 @@ public class WordLogic {
      Cache all the spellings together for search!!
      Check if there is are ways to search by string on the indexed string, it should be very basic!
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
-     How to find closest neighbour of a Bangla word? you may be able to do that locally?
+     How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
      **/
     public Set<String> searchWords(String searchSting) {
         return searchWords(searchSting, Constants.SEARCH_SPELLING_LIMIT);

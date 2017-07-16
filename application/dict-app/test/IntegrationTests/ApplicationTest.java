@@ -55,7 +55,7 @@ public class ApplicationTest extends WithServer {
         running( fakeApplication(), () -> {
                 Result result = route(fakeRequest(GET, "/"));
                 assertEquals(OK, result.status());
-                assertEquals("The Bangla Dictionary!",contentAsString(result));
+                assertEquals("The BanglaUtil Dictionary!",contentAsString(result));
             }
         );
     }

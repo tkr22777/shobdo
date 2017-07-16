@@ -5,7 +5,7 @@ import objects.Word;
 import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
-import utilities.ReadFile;
+import utilities.FileReadUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +54,7 @@ public class SamsadExporter {
 
         setup();
 
-        ReadFile readFileB2B = new ReadFile(BANGLA_TO_BANGLA_FILE_LOCATION);
+        FileReadUtil fileReadUtilB2B = new FileReadUtil(BANGLA_TO_BANGLA_FILE_LOCATION);
 
         String line = "";
 
@@ -64,7 +64,7 @@ public class SamsadExporter {
 
         for ( int i = 0; i < lines_to_read ; i++ ) {
 
-            line = readFileB2B.getLine();
+            line = fileReadUtilB2B.getLine();
 
             if (line == null)
                 break;
@@ -74,6 +74,8 @@ public class SamsadExporter {
             if(word != null)
                 words.add( word );
         }
+
+        fileReadUtilB2B.closeReader();
 
         return fixSpellingAndMeanings(words);
     }

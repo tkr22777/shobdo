@@ -64,7 +64,7 @@ public class DictUtil {
         String wordId;
 
         int wordLength = DictUtil.randomInRange(2, 9);
-        wordSpelling = Bangla.getWord(start, end, wordLength);
+        wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
         wordId = "WD_" + UUID.randomUUID();
 
         Word word = new Word(wordId, wordSpelling);
@@ -79,11 +79,11 @@ public class DictUtil {
 
                 wordLength = DictUtil.randomInRange(2, 9);
 
-                String meaningString = Bangla.getWord(start, end, wordLength);
+                String meaningString = BanglaUtil.getBanglaRandomString(start, end, wordLength);
                 int preSentenceLen = DictUtil.randomInRange(2, 6);
                 int postSentenceLen = DictUtil.randomInRange(2, 4);
-                String example = Bangla.getSentence(start, end, preSentenceLen, 12) + " " + meaningString
-                        + " " + Bangla.getSentence(start, end, postSentenceLen, 12);
+                String example = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
+                        + " " + BanglaUtil.getBanglaRandomSentence(start, end, postSentenceLen, 12);
 
                 int strength = DictUtil.randomInRange(0 , 10);
                 Meaning meaning = new Meaning(partOfSpeech, meaningString, example, strength);
@@ -110,7 +110,6 @@ public class DictUtil {
         }
 
         for(int i = start ; i < toPrint.size() && i <  start + limit ; i++) {
-
             log.info( "#" + i + " " + tag + ": '"+ toPrint.get(i).toString() + "'");
         }
     }
@@ -137,6 +136,5 @@ public class DictUtil {
                                 e->e.getValue()
                         )
                 );
-
     }
 }
