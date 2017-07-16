@@ -1,0 +1,43 @@
+Tech Specification:
+	- Front End (The last thing to do)
+	    - Language: TBD
+	    - Emphasis: Keep it simple and highly responsive single page webapp
+
+	- Backend Service:
+	    - Language
+		- Java
+	    - Persitance/Datastore:
+		- Redis
+		- MongoDb
+	- Others:
+	    - Languages/Text repository?
+	Schema:
+		Mongo Schema from Play Java Code
+
+User Specification:
+
+	- Bangla to Bangla dictionary P0
+	- English to Bangla dictionary
+	- Bangla to English dictionary
+	- Bangla synonyms
+	- User login and history with Facebook
+
+Tips:
+	- match a word from cache as users are typing and suggest them:w
+
+
+V2:
+    All V2s should be implemented later, First phase is word clean up phase
+    //arrangementType is the way the meanings of this word are arranged now
+    //e.g. by parts of speech or by strength of the meanings (are not arranged by parts of speech, such as V, N , N , P, V)
+    //The following array list can be represented as (arranged by meanings strength):
+    //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
+    //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
+    //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
+
+    //Link to pronunciation
+    //Times searched 
+
+Help:
+    For schema changes you will need to migrate and the migrated db should be used by new code
+
