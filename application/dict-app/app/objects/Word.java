@@ -19,7 +19,6 @@ public class Word {
 
     private int version;
     private int timesSearched;
-    private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
 
     private String wordId;
@@ -86,13 +85,6 @@ public class Word {
             meanings = new ArrayList<>();
 
         meanings.add(meaning);
-    }
-     public ArrayList<String> getOtherSpellings() {
-        return otherSpellings;
-    }
-
-    public void setOtherSpellings(ArrayList<String> otherSpellings) {
-        this.otherSpellings = otherSpellings;
     }
 
     public String getWordId() {

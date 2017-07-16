@@ -18,7 +18,7 @@ public class ExporterTest extends WithServer {
     LogPrint log = new LogPrint(ExporterTest.class);
     WordLogic wordLogic = WordLogic.factory();
 
-    @Test
+    @Test @Ignore
     public void createDictionaryFromSamsad() throws Exception {
 
         Collection<Word> words = new SamsadExporter().getDictiionary();

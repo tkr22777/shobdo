@@ -41,7 +41,7 @@ public class WordController extends Controller {
             searchString = json.get("searchString").asText();
 
             if (searchString.length() > 0)
-                wordSpellings = wordLogic.searchWordsBySpelling(searchString);
+                wordSpellings = wordLogic.searchWords(searchString);
 
         } catch (Exception ex) {
 
