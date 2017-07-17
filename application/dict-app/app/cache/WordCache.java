@@ -85,7 +85,7 @@ public class WordCache {
 
         try {
 
-            jedis.set(key, word.toJsonString());
+            jedis.set(key, word.toString());
             bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] stored in cache.");
 
             if (USE_REDIS_EXPIRATION_TIME)

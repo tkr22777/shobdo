@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public interface WordDao {
 
-    public String setWord(Word word);
+    public boolean saveWord(Word word);
 
     public Word getWordByWordId(String wordId);
 

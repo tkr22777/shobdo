@@ -38,14 +38,14 @@ public class WordLogic {
 
     public void saveWord(Word word) {
 
-        wordDao.setWord(word);
+        wordDao.saveWord(word);
         wordCache.cacheWord(word);
     }
 
     public void saveWords(Collection<Word> words) {
 
         for(Word word: words) {
-            wordDao.setWord(word);
+            wordDao.saveWord(word);
             wordCache.cacheWord(word);
         }
     }
@@ -84,34 +84,34 @@ public class WordLogic {
      Cache all the spellings together for search!!
      Check if there is are ways to search by string on the indexed string, it should be very basic!
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
-     How to find closest neighbour of a Bangla word? you may be able to do that locally?
+     How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
      **/
-    public Set<String> searchWordsBySpelling(String spelling) {
-        return searchWordsBySpelling(spelling, Constants.SEARCH_SPELLING_LIMIT);
+    public Set<String> searchWords(String searchSting) {
+        return searchWords(searchSting, Constants.SEARCH_SPELLING_LIMIT);
     }
 
-    public Set<String> searchWordsBySpelling(String spelling, int limit){
+    public Set<String> searchWords(String searchString, int limit){
 
-        if(spelling == null || spelling.equals(""))
-            throw new IllegalArgumentException("WLEX: searchWordsBySpelling spelling is null or empty");
+        if(searchString == null || searchString.equals(""))
+            throw new IllegalArgumentException("WLEX: searchWords spelling is null or empty");
 
-        Set<String> words = wordCache.getWordsForSearchString(spelling);
+        Set<String> words = wordCache.getWordsForSearchString(searchString);
 
         if(words != null && words.size() > 0)
             return words;
 
         bmLog.start();
-        words = wordDao.getWordSpellingsWithPrefixMatch(spelling, limit);
+        words = wordDao.getWordSpellingsWithPrefixMatch(searchString, limit);
 
         if ( words != null && words.size() > 0 ) {
 
-            bmLog.end("@WL003 search result [size:" + words.size() + "] for spelling:\"" + spelling + "\" found in database and returning");
-            wordCache.cacheWordsForSearchString(spelling, words);
+            bmLog.end("@WL003 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
+            wordCache.cacheWordsForSearchString(searchString, words);
             return words;
 
         } else {
 
-            bmLog.end("@WL003 search result for spelling:\"" + spelling + "\" not found in database");
+            bmLog.end("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
             return new HashSet<>();
         }
     }
@@ -128,22 +128,6 @@ public class WordLogic {
         wordCache.flushCache();
     }
 
-    protected void verifyWord(Word word) {
-
-        if( word == null)
-
-            log.info("Dictionary Word is null.");
-
-        else if(word.getMeanings() == null)
-
-            log.info("Dictionary Word Id:" + word.getWordId() + " meanings array is null.");
-
-        else if( word.getMeanings().size() == 0 )
-
-            log.info("Dictionary Word Id:" + word.getWordId() + " meanings size is zero(0).");
-
-    }
-
     public static Word copyToNewDictWordObject(Word providedWord) {
 
         Word toReturnWord = new Word();
@@ -157,54 +141,11 @@ public class WordLogic {
             if(providedWord.getWordSpelling() != null)
                 toReturnWord.setWordSpelling(providedWord.getWordSpelling());
 
-            if(providedWord.getOtherSpellings() != null)
-                toReturnWord.setOtherSpellings(providedWord.getOtherSpellings());
-
-            toReturnWord.setTimesSearched(providedWord.getTimesSearched());
-
-            if(providedWord.getLinkToPronunciation() != null)
-                toReturnWord.setLinkToPronunciation(providedWord.getLinkToPronunciation());
-
             if(providedWord.getExtraMetaMap() != null)
                 toReturnWord.setExtraMetaMap( providedWord.getExtraMetaMap() );
         }
 
         return toReturnWord;
-    }
-
-    //Word arrangement is a future feature
-
-    public void reArrangeBy(Word word, String arrangement){
-
-        if(isFoundOnCache( word.getWordId(), arrangement)) {
-
-            getFromCache(word.getWordId(), arrangement);
-            return; //from cache
-
-        } else {
-
-            _reArrange(arrangement);
-            storeOnCache(word, arrangement);
-            return;
-        }
-    }
-
-    private Word getFromCache(String wordId, String arrangement){
-
-        return null;
-    }
-
-    private void _reArrange(String arrangement){
-
-    }
-
-    private void storeOnCache(Word word, String arrangement){
-
-    }
-
-    public boolean isFoundOnCache(String wordId, String arrangement){
-
-        return false;
     }
 
 }

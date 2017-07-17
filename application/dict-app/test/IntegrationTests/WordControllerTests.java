@@ -61,7 +61,7 @@ public class WordControllerTests extends WithApplication {
 
             assertEquals(OK, result.status());
             Word retrievedWord = wordLogic.getWordBySpelling(wordToBeStored.getWordSpelling());
-            Assert.assertEquals(wordToBeStored.toJsonString(), retrievedWord.toJsonString());
+            Assert.assertEquals(wordToBeStored.toString(), retrievedWord.toString());
         });
     }
 
@@ -82,7 +82,7 @@ public class WordControllerTests extends WithApplication {
             assertEquals(OK, result.status());
 
             JsonNode resultsJson = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
-            Assert.assertEquals(word.toJsonString(), JsonUtil.toJsonString(resultsJson));
+            Assert.assertEquals(word.toString(), JsonUtil.toJsonString(resultsJson));
         });
     }
 

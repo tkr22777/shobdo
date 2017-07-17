@@ -1,5 +1,6 @@
 package objects;
 
+import lombok.Data;
 import utilities.Constants;
 import utilities.JsonUtil;
 
@@ -8,98 +9,34 @@ import java.util.*;
 /**
  * Created by tahsinkabir on 8/21/16.
  */
+@Data
 public class Word {
-
-    //arrangementType is the way the meanings of this word are arranged now
-    //e.g. by parts of speech or by strength of the meanings (are not arranged by parts of speech, such as V, N , N , P, V)
-    //The following array list can be represented as (arranged by meanings strength):
-    //{ { V { A1, A2 } } , { N { A3 } }, { N { A4, A5} } , { V { A6 } } }
-    //or as (arranged by combined strength for each of the parts of speeches and words ordered within them):
-    //{ { V { A1, A2, A6 } } , { N { A3, A4, A5 } } } //<-- lets only support this
-
-    private int version;
-    private boolean reviewed;
-    private int timesSearched;
-    private boolean diplayToPublic;
-    private String linkToPronunciation;
-    private ArrayList<String> otherSpellings; //list of other correct or incorrect very similar spellings for the word
-    private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata
 
     private String wordId;
     private String wordSpelling;
     ArrayList<Meaning> meanings;
+    private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
+    private Date deletedDate;
+
+    int version; //remove it?
 
     public Word() { }
 
-    public Word(String wordId,
-                String wordSpelling)
-    {
+    public Word( String wordId, String wordSpelling) {
+
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
     }
 
     public Word(String wordId,
                 String wordSpelling,
-                String arrangementType,
-                ArrayList<Meaning> meanings)
-    {
-
-        this.wordId = wordId;
-        this.wordSpelling = wordSpelling;
-        this.meanings = meanings;
-    }
-
-    public Word(String wordId,
-                String wordSpelling,
-                int timesSearched,
-                String linkToPronunciation,
-                String arrangementType,
                 Collection<Meaning> meanings,
                 Map<String,List<String>> extraMeta)
     {
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
-        this.timesSearched = timesSearched;
-        this.linkToPronunciation = linkToPronunciation;
         this.extraMetaMap = extraMeta;
         this.meanings = new ArrayList<>(meanings);
-    }
-
-    public static Word wordFromJsonString(String wordInJsonString) {
-
-        return (Word) JsonUtil.toObjectFromJsonString(wordInJsonString, Word.class);
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public boolean isReviewed() {
-        return reviewed;
-    }
-
-    public void setReviewed(boolean reviewed) {
-        this.reviewed = reviewed;
-    }
-
-    public boolean isDiplayToPublic() {
-        return diplayToPublic;
-    }
-
-    public void setDiplayToPublic(boolean diplayToPublic) {
-        this.diplayToPublic = diplayToPublic;
-    }
-
-    public ArrayList<Meaning> getMeanings() {
-        return meanings;
-    }
-
-    public void setMeanings(ArrayList<Meaning> meanings) {
-        this.meanings = meanings;
     }
 
     public void addMeaningForPartsOfSpeech(Meaning meaning) {
@@ -108,45 +45,6 @@ public class Word {
             meanings = new ArrayList<>();
 
         meanings.add(meaning);
-    }
-     public ArrayList<String> getOtherSpellings() {
-        return otherSpellings;
-    }
-
-    public void setOtherSpellings(ArrayList<String> otherSpellings) {
-        this.otherSpellings = otherSpellings;
-    }
-
-    public String getWordId() {
-        return wordId;
-    }
-
-    public void setWordId(String wordId) {
-        this.wordId = wordId;
-    }
-
-    public String getWordSpelling() {
-        return wordSpelling;
-    }
-
-    public void setWordSpelling(String wordSpelling) {
-        this.wordSpelling = wordSpelling;
-    }
-
-    public int getTimesSearched() {
-        return timesSearched;
-    }
-
-    public void setTimesSearched(int timesSearched) {
-        this.timesSearched = timesSearched;
-    }
-
-    public Map<String,List<String>> getExtraMetaMap() {
-        return extraMetaMap;
-    }
-
-    public void setExtraMetaMap( Map<String,List<String>>  map) {
-        this.extraMetaMap = map;
     }
 
     public void setExtraMetaValue(String key, String value){
@@ -186,35 +84,13 @@ public class Word {
         }
     }
 
-    public Set<String> retriveExtraMetaKeys(){
+    public Set<String> retrieveExtraMetaKeys(){
 
         return this.extraMetaMap.keySet();
     }
 
-    public String getLinkToPronunciation() {
-        return linkToPronunciation;
-    }
-
-    public void setLinkToPronunciation(String linkToPronunciation) {
-        this.linkToPronunciation = linkToPronunciation;
-    }
-
     @Override
     public String toString() {
-
-        if(Constants.JSON_STRING)
-            return toJsonString();
-        else
-            return "Word{" +
-                    "version=" + version +
-                    ", reviewed=" + reviewed +
-                    ", diplayToPublic=" + diplayToPublic +
-                    ", meanings=" + meanings +
-                    '}';
-    }
-
-    public String toJsonString() {
-
         return JsonUtil.toJsonString(this);
     }
 }
