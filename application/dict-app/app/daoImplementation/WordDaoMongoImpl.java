@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-
     private final String WORD_ID = "wordId";
     private final String WORD_SPELLING = "wordSpelling";
 

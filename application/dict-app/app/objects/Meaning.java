@@ -4,16 +4,24 @@ import lombok.Data;
 import utilities.Constants;
 import utilities.JsonUtil;
 
+import java.util.Date;
+
 /**
  * Created by tahsinkabir on 6/16/16.
  */
 @Data
 public class Meaning {
 
-    int strength; //how strongly does this meanings apply to the word, -1 means unset
-    String partOfSpeech; //The partOfSpeech of the meanings (redundant?)
-    String meaning; //The meanings
-    String example; //Example of the word used with the context of this meanings
+    String meaningId;       //meaningId would be helpful for deleting/updating a specific meaning
+    String meaning;         //the meanings
+    String partOfSpeech;    //The part of speech of the meaning
+    String example;         //example of the word in a sentence with the context of this meaning
+    int strength = -1;      //how strongly does this meanings apply to the word, -1 means unset
+
+    //For updates, we will set a deleted date on deletee meaning and
+    //create a new meaning with the parentId = deletee.meaniningId
+    Date deletedDate;
+    String parentId;
 
     public Meaning() { }
 

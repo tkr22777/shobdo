@@ -16,6 +16,7 @@ public class Word {
     private String wordSpelling;
     ArrayList<Meaning> meanings;
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
+    private Date deletedDate;
 
     int version; //remove it?
 
