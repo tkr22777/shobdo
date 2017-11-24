@@ -1,5 +1,6 @@
 package controllers;
 
+import ch.qos.logback.core.pattern.util.RestrictedEscapeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import logics.WordLogic;
 import objects.Word;
@@ -140,6 +141,35 @@ public class WordController extends Controller {
 
         JsonNode json = request().body().asJson();
         log.info("Delete word with wordId:" + wordId);
+        return ok();
+    }
+
+    /* Meaning related API */
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createMeaning(String wordId) {
+        JsonNode json = request().body().asJson();
+        log.info("Create meaning: " + json + " on word with wordId:" + wordId);
+        return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getMeaning(String wordId, String meaningId) {
+        JsonNode json = request().body().asJson();
+        log.info("Create meaning: " + json + " on word with wordId:" + wordId);
+        return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result updateMeaning(String wordId, String meaningId) {
+        JsonNode json = request().body().asJson();
+        log.info("Update meaning: " + json + " on word with wordId:" + wordId);
+        return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result deleteMeaning(String wordId, String meaningId) {
+        log.info("Delete meaning: " + meaningId + " on word with wordId:" + wordId);
         return ok();
     }
 

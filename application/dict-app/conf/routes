@@ -2,40 +2,72 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# 0. SPLASH DICTIONARY MESSAGE:
+###############################################
+# 0. Splash dictionary message and test routes:
+###############################################
 GET     /api/v1/                      controllers.WordController.index()
-
-# 1. CREATE WORD: (body contains the word in json)
-POST    /api/v1/word                  controllers.WordController.createWord()
-
-# 2. GET WORD:
-GET     /api/v1/word/:wordId          controllers.WordController.getWordByWordId(wordId: String)
-GET     /api/v1/word/:wordSpelling    controllers.WordController.getWordBySpelling(wordSpelling: String)
-#body contains "wordSpelling"
-POST    /api/v1/word/postget          controllers.WordController.getWordBySpellingPost()
-
-# 3. UPDATE WORD:
-#body contains word in json
-PUT     /api/v1/word/:wordId          controllers.WordController.updateWord(wordId: String)
-
-# 4. DELETE WORD:
-DELETE  /api/v1/word/:wordId          controllers.WordController.deleteWord(wordId: String)
-
-# 5. SEARCH WORDS BY SPELLING:
-#body contains "searchString"
-POST    /api/v1/search                controllers.WordController.searchWordsBySpelling()
-
-# 6. GENERATE RANDOM DICTIONARY: (body contains wordCount)
-POST    /api/v1/generate              controllers.WordController.createRandomDictionary()
-
-# 7. A TEST ROUTE TO TEST THE RUNNING APPLICATION:
 GET     /api/v1/gettest               controllers.AdminController.testGet()
 POST    /api/v1/posttest              controllers.AdminController.testPost()
 
-# 8. TO CLEAR/FLUSH REDIS CACHE:
-GET     /api/v1/admineflushcache      controllers.AdminController.flushCache()
+#####################################
+# CRUD, list and search API for word:
+#####################################
 
-##THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES
+# 1. Create word: (body contains the word in json)
+POST    /api/v1/word                  controllers.WordController.createWord()
+
+# 2. Get word:
+GET     /api/v1/word/:wordId          controllers.WordController.getWordByWordId(wordId: String)
+
+# 3. Get word by spelling :
+GET     /api/v1/word/:wordSpelling    controllers.WordController.getWordBySpelling(wordSpelling: String)
+
+# 4. Get word by spelling in POST body request (Since Bengali characters do not play well in route):
+POST    /api/v1/word/postget          controllers.WordController.getWordBySpellingPost()
+
+# 5. Update word, request body contains json word:
+PUT     /api/v1/word/:wordId          controllers.WordController.updateWord(wordId: String)
+
+# 6. Delete word:
+DELETE  /api/v1/word/:wordId          controllers.WordController.deleteWord(wordId: String)
+
+# 7. List words:
+# GET     /api/v1/word/list should have some skip token
+
+# 8. Search words by spelling, body contains "searchString":
+POST    /api/v1/search                controllers.WordController.searchWordsBySpelling()
+
+##############################################
+# CRUD, list and search API for word meanings:
+##############################################
+
+# 1. Create a new meaning of a word
+# POST /api/v1/word/:wordId/meaning
+
+# 2. Get a specific meaning
+# GET /api/v1/word/:wordId/meaning/:meaningId
+
+# 3. Update a specific meaning
+# PUT /api/v1/word/:wordId/meaning/:meaningId
+
+# 4. Delete a specific meaning
+# DELETE /api/v1/word/:wordId/meaning/:meaningId
+
+##############
+# Admin stuff:
+##############
+# CRUDL for users, GENERAL, REVIEWER, ADMIN
+
+# 8. Generate random dictionary, body contains wordCount:
+POST    /api/v1/generate              controllers.WordController.createRandomDictionary()
+
+# 9. To clear/flush redis cache:
+GET     /api/v1/admin/flushcache      controllers.AdminController.flushCache()
+
+####################################################
+# THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES:
+####################################################
+
 # An example controller showing a sample home page
 GET     /                             controllers.HomeController.index
 # An example controller showing how to use dependency injection

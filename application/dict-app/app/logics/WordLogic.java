@@ -36,6 +36,28 @@ public class WordLogic {
         this.wordCache = wordCache;
     }
 
+    /* We will version each updates/deletes:
+
+        For an update:
+            We will copy the current object, copyMeaning
+            On copyMeaning,
+                set a new meaningId, //since we do not want to destruct the existingId
+                set a deletedDate,
+                set an event note, //Update
+            On the actual object,
+                update data,
+                set the parentMeaningId to the meaningId for the copyMeaning
+
+        For a delete:
+            Set the deletedDate
+            Set an event note, //Delete
+    */
+
+    //todo
+    public void updateWord(Word word) {
+
+    }
+
     public void saveWord(Word word) {
 
         wordDao.saveWord(word);
@@ -105,7 +127,7 @@ public class WordLogic {
 
         if ( words != null && words.size() > 0 ) {
 
-            bmLog.end("@WL003 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
+            bmLog.end("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
             wordCache.cacheWordsForSearchString(searchString, words);
             return words;
 
@@ -146,6 +168,16 @@ public class WordLogic {
         }
 
         return toReturnWord;
+    }
+
+    //WIP verification function
+    private void verfifyWordForUpsert(Word word) {
+
+        if(word.getWordId() == null)
+            log.info("@WL004 wordId is null");
+
+        if(word.getWordSpelling() == null || word.getWordSpelling().trim().length() == 0)
+            log.info("@WL004 wordSpelling is null or empty");
     }
 
 }

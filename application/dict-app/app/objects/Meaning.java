@@ -1,6 +1,8 @@
 package objects;
 
 import lombok.Data;
+import org.joda.time.DateTime;
+import sun.jvm.hotspot.debugger.win32.coff.COFFLineNumber;
 import utilities.Constants;
 import utilities.JsonUtil;
 
@@ -12,23 +14,32 @@ import java.util.Date;
 @Data
 public class Meaning {
 
-    String meaningId;       //meaningId would be helpful for deleting/updating a specific meaning
-    String meaning;         //the meanings
-    String partOfSpeech;    //The part of speech of the meaning
-    String example;         //example of the word in a sentence with the context of this meaning
-    int strength = -1;      //how strongly does this meanings apply to the word, -1 means unset
+    private String meaningId;
+    private String meaning;
+    private String partOfSpeech;
+    private String exampleSentence;
 
-    //For updates, we will set a deleted date on deletee meaning and
-    //create a new meaning with the parentId = deletee.meaniningId
-    Date deletedDate;
-    String parentId;
+    private String creatorId;
+    private Date creationDate;
+
+    //For versioning of the meanings
+    private String status = Constants.ENTITIY_ACTIVE;
+    private String parentMeaningId; //null for pioneer meaning
+    private Date deletedDate;
+
+    //V1.5 validation of updates
+    private String validatorId; //if validatorId is present, then the meaning is validated
+
+    //V2 attributes
+    private int strength = -1; //how strongly does this meanings apply to the word, -1 means unset
+    private int version = 0; //V2 version of the meaning as the object gets updated, can be back populated using parentId chain
 
     public Meaning() { }
 
-    public Meaning(String partOfSpeech, String meaning, String example, int strength) {
+    public Meaning(String partOfSpeech, String meaning, String exampleSentence, int strength) {
         this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
-        this.example = example;
+        this.exampleSentence = exampleSentence;
         this.strength = strength;
     }
 
