@@ -10,6 +10,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
+import objects.Meaning;
 import objects.Word;
 import org.bson.Document;
 import utilities.BenchmarkLogger;
@@ -17,6 +18,7 @@ import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -52,7 +54,7 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public boolean saveWord(Word word) {
+    public boolean createWord(Word word) {
 
         bmLog.start();
 
@@ -61,7 +63,7 @@ public class WordDaoMongoImpl implements WordDao {
             ObjectMapper mapper = new ObjectMapper();
             Document wordDocument = Document.parse( mapper.writeValueAsString(word) );
             collection.insertOne(wordDocument);
-            bmLog.end("@WDMI001 saveWord Saving word to database: " + word.getWordSpelling());
+            bmLog.end("@WDMI001 createWord Saving word to database: " + word.getWordSpelling());
 
         } catch ( Exception ex ){
 
@@ -83,14 +85,12 @@ public class WordDaoMongoImpl implements WordDao {
 
             bmLog.end("@WDMI002 getWordByWordId word not found in database for wordId: " + wordId);
             return null;
-
-        } else  {
-
-            Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
-            bmLog.end("@WDMI002 getWordByWordId word [spelling:" + word.getWordSpelling()
-                    + "] found from database for wordId: " + wordId);
-            return word;
         }
+
+        Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
+        bmLog.end("@WDMI002 getWordByWordId word [spelling:" + word.getWordSpelling()
+                + "] found from database for wordId: " + wordId);
+        return word;
     }
 
     @Override
@@ -105,17 +105,21 @@ public class WordDaoMongoImpl implements WordDao {
 
             bmLog.end("@WDMI004 getWordByWordId word not found in database for spelling: " + spelling);
             return null;
-
-        } else {
-
-            bmLog.end("@WDMI005 getWordByWordId word found in database for spelling: " + spelling);
-            Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
-            return word;
         }
+
+        bmLog.end("@WDMI005 getWordByWordId word found in database for spelling: " + spelling);
+        Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
+        return word;
     }
 
     @Override
     public boolean updateWord(Word word) {
+
+        return false;
+    }
+
+    @Override
+    public boolean deleteWord(String wordId) {
 
         return false;
     }
@@ -157,4 +161,10 @@ public class WordDaoMongoImpl implements WordDao {
         DeleteResult result = collection.deleteMany(new BasicDBObject());
         log.info("Result : " + result);
     }
+
+    @Override
+    public ArrayList<Word> listWords(String startWordId, int limit) {
+        return new ArrayList<>();
+    }
+
 }

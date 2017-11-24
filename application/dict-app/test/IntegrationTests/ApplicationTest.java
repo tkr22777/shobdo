@@ -111,7 +111,7 @@ public class ApplicationTest extends WithServer {
 
         WordLogic logic = WordLogic.factory();
 
-        logic.saveWord(theWord);
+        logic.createWord(theWord);
 
         LoadingCache<String, Word> wordLoadingCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(20, TimeUnit.MILLISECONDS)

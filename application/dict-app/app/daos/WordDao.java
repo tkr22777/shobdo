@@ -1,7 +1,9 @@
 package daos;
 
+import objects.Meaning;
 import objects.Word;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -9,7 +11,7 @@ import java.util.Set;
  */
 public interface WordDao {
 
-    public boolean saveWord(Word word);
+    public boolean createWord(Word word);
 
     public Word getWordByWordId(String wordId);
 
@@ -17,10 +19,13 @@ public interface WordDao {
 
     public boolean updateWord(Word word);
 
+    public boolean deleteWord(String wordId);
+
     public Set<String> getWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
 
     public long totalWordCount();
 
     public void deleteAllWords();
 
+    public ArrayList<Word> listWords(String startWordId, int limit);
 }

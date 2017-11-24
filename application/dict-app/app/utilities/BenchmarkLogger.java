@@ -1,7 +1,5 @@
 package utilities;
 
-import sun.rmi.runtime.Log;
-
 /**
  * Created by tahsinkabir on 1/7/17.
  */

@@ -1,6 +1,5 @@
 package controllers;
 
-import ch.qos.logback.core.pattern.util.RestrictedEscapeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import logics.WordLogic;
 import objects.Word;
@@ -60,7 +59,7 @@ public class WordController extends Controller {
 
         JsonNode json = request().body().asJson();
         Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
-        wordLogic.saveWord(word);
+        wordLogic.createWord(word);
         return ok();
     }
 
@@ -144,32 +143,49 @@ public class WordController extends Controller {
         return ok();
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result listWords(String startWordId, Integer limit) {
+        log.info("List words starting from wordId:" + startWordId + ", limit:" + limit);
+        return ok();
+    }
+
     /* Meaning related API */
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(String wordId) {
         JsonNode json = request().body().asJson();
         log.info("Create meaning: " + json + " on word with wordId:" + wordId);
+        wordLogic.createMeaning(wordId, null);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
-        JsonNode json = request().body().asJson();
-        log.info("Create meaning: " + json + " on word with wordId:" + wordId);
+        log.info("Get meaning with meaningId:" + meaningId  + " of word with wordId:" + wordId);
+        wordLogic.getMeaning(wordId, meaningId);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateMeaning(String wordId, String meaningId) {
         JsonNode json = request().body().asJson();
-        log.info("Update meaning: " + json + " on word with wordId:" + wordId);
+        log.info("Update meaning with meaningId: " + meaningId + " with json:" + json
+                + " on word with wordId:" + wordId);
+        wordLogic.updateMeaning(wordId, null);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteMeaning(String wordId, String meaningId) {
         log.info("Delete meaning: " + meaningId + " on word with wordId:" + wordId);
+        wordLogic.deleteMeaning(wordId, meaningId);
+        return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result listMeanings(String wordId) {
+        log.info("List meanings on word with wordId:" + wordId);
+        wordLogic.listMeanings(wordId);
         return ok();
     }
 
@@ -195,7 +211,7 @@ public class WordController extends Controller {
         Set<Word> words = DictUtil.generateDictionaryWithRandomWords(wordCount);
 
         for (Word word : words)
-            wordLogic.saveWord(word);
+            wordLogic.createWord(word);
 
         return ok("Generated and added " + wordCount + " random words on the dictionary!");
     }
