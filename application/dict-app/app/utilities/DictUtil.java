@@ -36,7 +36,7 @@ public class DictUtil {
             object = mapper.readValue( doc.toJson(), class_type );
 
         } catch(Exception ex) {
-            log.info( "Failed to map document " + doc + " to " + class_type + " object. Ex: " + ex.getMessage() );
+            log.info( "@DU001 Failed to map document " + doc + " to " + class_type + " object. [Exception Message: " + ex.getMessage() +"]" );
         }
 
         return object;
@@ -82,11 +82,11 @@ public class DictUtil {
                 String meaningString = BanglaUtil.getBanglaRandomString(start, end, wordLength);
                 int preSentenceLen = DictUtil.randomInRange(2, 6);
                 int postSentenceLen = DictUtil.randomInRange(2, 4);
-                String example = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
+                String exampleSentence = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
                         + " " + BanglaUtil.getBanglaRandomSentence(start, end, postSentenceLen, 12);
 
                 int strength = DictUtil.randomInRange(0 , 10);
-                Meaning meaning = new Meaning(partOfSpeech, meaningString, example, strength);
+                Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
 
                 meanings.add(meaning);
             }

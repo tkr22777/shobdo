@@ -14,11 +14,22 @@ public class Word {
 
     private String wordId;
     private String wordSpelling;
-    ArrayList<Meaning> meanings;
+    private ArrayList<Meaning> meanings;
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
+
+    private String creatorId;
+    private Date creationDate;
+
+    //For versioning of the meanings
+    private String status = Constants.ENTITIY_ACTIVE;
+    private String parentMeaningId; //null for pioneer word
     private Date deletedDate;
 
-    int version; //remove it?
+    //V1.5 validation of updates
+    private String validatorId; //if validatorId is present, then the meaning is validated
+
+    //V2 attributes
+    private int version;
 
     public Word() { }
 
@@ -31,8 +42,8 @@ public class Word {
     public Word(String wordId,
                 String wordSpelling,
                 Collection<Meaning> meanings,
-                Map<String,List<String>> extraMeta)
-    {
+                Map<String,List<String>> extraMeta) {
+
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
         this.extraMetaMap = extraMeta;

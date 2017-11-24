@@ -20,4 +20,10 @@ public class Constants {
     public static final String MEANING_STRING = "MEANING STRING";
     public static final String ORIGINAL_STRING = "ORIGINAL STRING";
     public static final String ENG_PRONUN_STRING = "ENG PRONUNCIATION";
+
+    //Versioning
+    public static final String ENTITIY_ACTIVE = "ACTIVE";
+    public static final String ENTITIY_UPDATED = "UPDATED";
+    public static final String ENTITIY_DELETED = "DELETED";
+
 }
