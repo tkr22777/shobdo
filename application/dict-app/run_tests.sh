@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Running All Tests:"
-activator test
+activator clean test
 echo ""
 
 

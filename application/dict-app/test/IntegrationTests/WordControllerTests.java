@@ -89,7 +89,7 @@ public class WordControllerTests extends WithApplication {
     @Test
     public void searchWordsByPrefix() throws Exception {
 
-        createWordsInDb(300);
+        createWordsInDb(50);
 
         String spelling = dictionary.get(0).getWordSpelling();
         String prefix = spelling.substring(0,1);

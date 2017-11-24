@@ -4,5 +4,5 @@
 rm -rf target/universal/*
 
 #Building the app binaries for distribution
-activator dist
+activator clean dist
 
