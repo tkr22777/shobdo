@@ -115,6 +115,12 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
+    public boolean updateWord(Word word) {
+
+        return false;
+    }
+
+    @Override
     public Set<String> getWordSpellingsWithPrefixMatch(String spelling, int limit) {
 
         bmLog.start();

@@ -20,6 +20,11 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
+    public static String generateNewWordId() {
+        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
+    }
+
+
     public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
@@ -65,7 +70,7 @@ public class DictUtil {
 
         int wordLength = DictUtil.randomInRange(2, 9);
         wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
-        wordId = "WD_" + UUID.randomUUID();
+        wordId = generateNewWordId();
 
         Word word = new Word(wordId, wordSpelling);
 
