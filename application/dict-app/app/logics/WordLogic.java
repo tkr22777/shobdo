@@ -54,11 +54,6 @@ public class WordLogic {
             Set an event note, //Delete
     */
 
-    //todo
-    public void updateWord(Word word) {
-
-    }
-
     public void saveWord(Word word) {
 
         wordDao.saveWord(word);
