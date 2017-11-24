@@ -85,7 +85,7 @@ public class SamsadExporter {
 
         Word word = new Word();
 
-        word.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
+        word.setWordId( DictUtil.generateNewWordId() );
         word.setExtraMetaValue(Constants.ORIGINAL_STRING, line);
 
         //Spelling
@@ -376,7 +376,7 @@ public class SamsadExporter {
 
                 for(String spelling: spellings) {
 
-                    Word newWord = WordLogic.copyToNewDictWordObject(word);
+                    Word newWord = WordLogic.copyToNewWordObject(word);
 
                     newWord.setWordSpelling(spelling.trim());
 
@@ -427,7 +427,7 @@ public class SamsadExporter {
                     print++;
                 }
 
-                Word newWord = WordLogic.copyToNewDictWordObject(word);
+                Word newWord = WordLogic.copyToNewWordObject(word);
                 newWord.setWordSpelling(newSpelling);
 
                 words.add(word);

@@ -131,7 +131,7 @@ public class WordController extends Controller {
 
         JsonNode json = request().body().asJson();
         Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
-        log.info(word.toString());
+        wordLogic.updateWord(wordId, word);
         return ok();
     }
 

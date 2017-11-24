@@ -5,6 +5,7 @@ import daos.WordDao;
 import logics.WordLogic;
 import objects.Word;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import utilities.LogPrint;
 
@@ -84,5 +85,25 @@ public class WordLogicTest {
 
         verify(mockWordDao, times(1) ).getWordBySpelling(wordSpelling);
         verify(mockWordCache, times(1) ).cacheWord(theWord);
+    }
+
+    @Test (expected = IllegalArgumentException.class) @Ignore
+    public void updateWord_nullWordId_throwsIllegalArgumentException() {
+
+    }
+
+    @Test (expected = IllegalArgumentException.class) @Ignore
+    public void updateWord_illegalWordId_throwsIllegalArgumentException() {
+
+    }
+
+    @Test (expected = IllegalArgumentException.class) @Ignore
+    public void updateWord_wordIdsDoNotMatch_throwsIllegalArgumentException() {
+
+    }
+
+    @Test @Ignore
+    public void updateWord_wordIdSetWordsIdNotSet_addsWordCurrently() {
+
     }
 }

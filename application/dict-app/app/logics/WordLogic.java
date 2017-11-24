@@ -6,6 +6,7 @@ import daos.WordDao;
 import objects.Word;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
+import utilities.DictUtil;
 import utilities.LogPrint;
 
 import java.util.Collection;
@@ -102,6 +103,26 @@ public class WordLogic {
         return word;
     }
 
+    public void updateWord(String wordId, Word word) {
+
+        if(wordId == null)
+            throw new IllegalArgumentException("wordId is null, cannot update");
+
+        if(word.getWordId() == null)
+            word.setWordId(wordId);
+
+        if(word.getWordId().equals(wordId))
+            throw new IllegalArgumentException("wordId on route do not match");
+
+        updateWord(word);
+    }
+
+    public void updateWord(Word word) {
+
+        verifyWordForUpsert(word);
+
+    }
+
     /**
      Cache all the spellings together for search!!
      Check if there is are ways to search by string on the indexed string, it should be very basic!
@@ -150,11 +171,11 @@ public class WordLogic {
         wordCache.flushCache();
     }
 
-    public static Word copyToNewDictWordObject(Word providedWord) {
+    public static Word copyToNewWordObject(Word providedWord) {
 
         Word toReturnWord = new Word();
 
-        toReturnWord.setWordId( Constants.WORD_ID_PREFIX + UUID.randomUUID() );
+        toReturnWord.setWordId(DictUtil.generateNewWordId());
 
         if(providedWord != null) {
 
@@ -170,14 +191,22 @@ public class WordLogic {
         return toReturnWord;
     }
 
-    //WIP verification function
-    private void verfifyWordForUpsert(Word word) {
+    private void verifyWordForUpsert(Word word) {
 
-        if(word.getWordId() == null)
+        if(word.getWordId() == null) {
             log.info("@WL004 wordId is null");
+            throw new IllegalArgumentException("wordId is null");
+        }
 
-        if(word.getWordSpelling() == null || word.getWordSpelling().trim().length() == 0)
-            log.info("@WL004 wordSpelling is null or empty");
+        if(word.getWordSpelling() == null || word.getWordSpelling().trim().length() == 0) {
+            log.info("@WL005 wordSpelling is null or empty");
+            throw new IllegalArgumentException("word spelling cannot be null or empty");
+        }
+
+        if(word.getMeanings() == null || word.getMeanings().size() == 0) {
+            log.info("@WL006 meanings array is null or empty");
+            throw new IllegalArgumentException("word meaning cannot be null or empty");
+        }
     }
 
 }
