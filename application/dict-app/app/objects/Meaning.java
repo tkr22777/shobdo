@@ -6,6 +6,7 @@ import utilities.Constants;
 import utilities.JsonUtil;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by tahsinkabir on 6/16/16.
@@ -25,6 +26,7 @@ public class Meaning {
     private String status = Constants.ENTITIY_ACTIVE;
     private String parentMeaningId; //null for pioneer meaning
     private Date deletedDate;
+    private List<Meaning> previousVersions; //only the latest version should have previous versions
 
     //V1.5 validation of updates
     private String validatorId; //if validatorId is present, then the meaning is validated
