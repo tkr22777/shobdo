@@ -41,8 +41,8 @@ public class WordDaoMongoImpl implements WordDao {
 
     public WordDaoMongoImpl() {
 
-        MONGODB_HOSTNAME = ConfigFactory.load().getString(Constants.MONGO_DB_HOSTNAME_CONFIG_STRING);
-        MONGODB_PORT = Integer.parseInt( ConfigFactory.load().getString(Constants.MONGO_DB_PORT_CONFIG_STRING));
+        MONGODB_HOSTNAME = ConfigFactory.load().getString(Constants.MONGODB_HOSTNAME_CONFIG_STRING);
+        MONGODB_PORT = Integer.parseInt( ConfigFactory.load().getString(Constants.MONGODB_PORT_CONFIG_STRING));
 
         log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
 
