@@ -5,12 +5,12 @@ package utilities;
  */
 public class Constants {
 
-    public static final String MONGO_DB_HOSTNAME_CONFIG_STRING = "shobdo.mongodbhostname";
-    public static final String MONGO_DB_PORT_CONFIG_STRING = "shobdo.mongodbport";
-    public static final String REDIS_HOSTNAME_CONFIG_STRING = "shobdo.redishostname";
-
+    public static final String MONGODB_HOSTNAME_CONFIG_STRING = "shobdo.mongodbhostname";
+    public static final String MONGODB_PORT_CONFIG_STRING = "shobdo.mongodbport";
     public static final String DICTIONARY_DATABASE_NAME = "Dictionary";
     public static final String WORD_COLLECTION_NAME = "Words";
+
+    public static final String REDIS_HOSTNAME_CONFIG_STRING = "shobdo.redishostname";
 
     public static final int SEARCH_SPELLING_LIMIT = 40;
 
