@@ -142,7 +142,7 @@ public class WordLogic {
         return wordDao.totalWordCount();
     }
 
-    publict  void deleteAllWords(){
+    public void deleteAllWords(){
         wordDao.deleteAllWords();
     }
 
