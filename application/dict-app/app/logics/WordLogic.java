@@ -3,16 +3,15 @@ package logics;
 import cache.WordCache;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
+import objects.Meaning;
 import objects.Word;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collector;
 
 /**
  * Created by tahsinkabir on 8/14/16.
@@ -37,38 +36,37 @@ public class WordLogic {
         this.wordCache = wordCache;
     }
 
-    /* We will version each updates/deletes:
+    /* Start of CRUDLS of WORD objects in the logic class */
 
-        For an update:
-            We will copy the current object, copyMeaning
-            On copyMeaning,
-                set a new meaningId, //since we do not want to destruct the existingId
-                set a deletedDate,
-                set an event note, //Update
-            On the actual object,
-                update data,
-                set the parentMeaningId to the meaningId for the copyMeaning
+    /* CREATE word(s) */
+    public void createWord(Word word) {
 
-        For a delete:
-            Set the deletedDate
-            Set an event note, //Delete
-    */
-
-    public void saveWord(Word word) {
-
-        wordDao.saveWord(word);
-        wordCache.cacheWord(word);
+        createWordsBatch(Arrays.asList(word));
     }
 
-    public void saveWords(Collection<Word> words) {
+    public void createWordsBatch(Collection<Word> words) {
 
         for(Word word: words) {
-            wordDao.saveWord(word);
+            wordDao.createWord(word);
             wordCache.cacheWord(word);
         }
     }
 
-    public Word getWordBySpelling(String spelling ){
+    /* GET word by wordId */
+    public Word getWordByWordId(String wordId) {
+
+        if(wordId == null)
+            throw new IllegalArgumentException("WLEX: getWordByWordId wordId is null or empty");
+
+        bmLog.start();
+        Word word = wordDao.getWordByWordId(wordId);
+        bmLog.end("@WL001 Word [ID:" + wordId + "][Spelling"+ word.getWordSpelling() +"] found in database and returning");
+
+        return word;
+    }
+
+    /* GET word by (exact) spelling */
+    public Word getWordBySpelling(String spelling) {
 
         if(spelling == null || spelling == "")
             throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
@@ -83,20 +81,26 @@ public class WordLogic {
         wordCache.cacheWord(wordFromDB);
 
         return wordFromDB;
-
     }
 
-    public Word getWordByWordId(String wordId) {
+    /* UPDATE word by wordId todo
 
-        if(wordId == null)
-            throw new IllegalArgumentException("WLEX: getWordByWordId wordId is null or empty");
+       We will version each updates:
 
-        bmLog.start();
-        Word word = wordDao.getWordByWordId(wordId);
-        bmLog.end("@WL001 Word [ID:" + wordId + "][Spelling"+ word.getWordSpelling() +"] found in database and returning");
-
-        return word;
-    }
+       Versioned update pseudo-code:
+           We will copy the current object, copyWord
+           On copyWord,
+               set a new wordId, //since we do not want to destruct the existing wordId for the client
+               set a deletedDate,
+               set status as UPDATED
+               set the meanings to null //we will keep the meanings on the word being updated
+               set the previousVersions to null //we will keep the previousVersions on the word being updated
+               set the extraMetaMap to null //we will keep the extraMetaMap on the word being updated
+           On the actual object,
+               update data,
+               set the parentWordId to the wordId of the copyWord
+               add the copyWord to previousVersions
+    */
 
     public void updateWord(String wordId, Word word) {
 
@@ -115,15 +119,29 @@ public class WordLogic {
     public void updateWord(Word word) {
 
         verifyWordForUpsert(word);
-
     }
 
-    /**
+    /* DELETE word by wordId todo
+       For a delete:
+           Set the deletedDate
+           Set status as DELETED
+    */
+
+    public boolean deleteWord(String wordId) {
+        return wordDao.deleteWord(wordId);
+    }
+
+    /* LIST words todo */
+    public ArrayList<Word> listWords(String startWordId, Integer limit) {
+        return new ArrayList<>();
+    }
+
+    /* SEARCH words by a search string
      Cache all the spellings together for search!!
      Check if there is are ways to search by string on the indexed string, it should be very basic!
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
      How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
-     **/
+     */
     public Set<String> searchWords(String searchSting) {
         return searchWords(searchSting, Constants.SEARCH_SPELLING_LIMIT);
     }
@@ -131,7 +149,7 @@ public class WordLogic {
     public Set<String> searchWords(String searchString, int limit){
 
         if(searchString == null || searchString.equals(""))
-            throw new IllegalArgumentException("WLEX: searchWords spelling is null or empty");
+            return new HashSet<>();
 
         Set<String> words = wordCache.getWordsForSearchString(searchString);
 
@@ -146,12 +164,10 @@ public class WordLogic {
             bmLog.end("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
             wordCache.cacheWordsForSearchString(searchString, words);
             return words;
-
-        } else {
-
-            bmLog.end("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
-            return new HashSet<>();
         }
+
+        bmLog.end("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
+        return new HashSet<>();
     }
 
     public long totalWordCount(){
@@ -204,4 +220,57 @@ public class WordLogic {
         }
     }
 
+    /** CRUDL for meaning of a word:
+     * most of the operations will deal with getting the word
+     * and modifying the word to incorporate the create, update
+     * and delete changes of a meaning and updating the word back
+     * to  DB. The update should take into account of caching, i.e.
+     * invalidating and re-caching the changes.
+     */
+
+    /* CREATE meaning todo implement using WORD's interfaces */
+    public String createMeaning(String wordId, Meaning meaning) {
+        Word word = getWordByWordId(wordId);
+        //add the meaning to the word and save
+        return "newMeaningId";
+    }
+
+    /* GET meaning todo implement using WORD's interfaces */
+    public Meaning getMeaning(String wordId, String meaningId) {
+
+        Word word = getWordByWordId(wordId);
+        if(word == null || word.getMeanings() == null)
+            return null;
+
+        return word.getMeanings().stream()
+                .filter( m -> m.getMeaningId().equals(meaningId) && m.getDeletedDate() == null)
+                .findFirst().get();
+    }
+
+    /* UPDATE meaning todo implement using WORD's interfaces */
+    public boolean updateMeaning(String wordId, Meaning meaning) {
+
+        return false;
+    }
+
+    /* DELETE meaning todo implement using WORD's interfaces */
+    public boolean deleteMeaning(String wordId, String meaningId) {
+
+        Word word = getWordByWordId(wordId);
+
+        if(word == null)
+            throw new IllegalArgumentException("No word exists for wordId:" + wordId);
+
+        if( word.getMeanings() == null || word.getMeanings().size() == 0)
+            throw new IllegalArgumentException("Word does not have any meaning with meaningId:" + meaningId);
+
+        return false;
+
+    }
+
+    /* LIST meaning todo implement using WORD's interfaces */
+    public ArrayList<Meaning> listMeanings(String wordId) {
+
+        return new ArrayList<>();
+    }
 }

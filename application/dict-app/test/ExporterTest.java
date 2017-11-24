@@ -38,7 +38,7 @@ public class ExporterTest extends WithServer {
                 total++;
             }
             */
-            wordLogic.saveWord(word);
+            wordLogic.createWord(word);
             total++;
         }
 

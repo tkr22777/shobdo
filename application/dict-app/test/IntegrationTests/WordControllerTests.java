@@ -40,7 +40,7 @@ public class WordControllerTests extends WithApplication {
     private void createWordsInDb(int NUMBER_OF_WORDS) {
 
         dictionary = new ArrayList<>( DictUtil.generateDictionaryWithRandomWords(NUMBER_OF_WORDS) );
-        wordLogic.saveWords(dictionary); //storing for tests
+        wordLogic.createWordsBatch(dictionary); //storing for tests
     }
 
     @After

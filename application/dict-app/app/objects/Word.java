@@ -24,6 +24,7 @@ public class Word {
     private String status = Constants.ENTITIY_ACTIVE;
     private String parentMeaningId; //null for pioneer word
     private Date deletedDate;
+    private List<Word> previousVersions; //only the latest version should have previous versions
 
     //V1.5 validation of updates
     private String validatorId; //if validatorId is present, then the meaning is validated
