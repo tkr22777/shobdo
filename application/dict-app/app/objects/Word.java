@@ -14,8 +14,8 @@ public class Word {
 
     private String wordId;
     private String wordSpelling;
-    private Map<String,Meaning> meaningsMap;
-    private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
+    private HashMap<String,Meaning> meaningsMap = new HashMap<>();
+    private HashMap<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
 
     private String creatorId;
     private Date creationDate;
@@ -24,7 +24,7 @@ public class Word {
     private String status = Constants.ENTITIY_ACTIVE;
     private String parentMeaningId; //null for pioneer word
     private Date deletedDate;
-    private List<Word> previousVersions; //only the latest version should have previous versions
+    private List<Word> previousVersions = new ArrayList<>(); //only the latest version should have previous versions
 
     //V1.5 validation of updates
     private String validatorId; //if validatorId is present, then the meaning is validated
@@ -42,8 +42,8 @@ public class Word {
 
     public Word(String wordId,
                 String wordSpelling,
-                Map<String,Meaning> meaningsMap,
-                Map<String,List<String>> extraMeta) {
+                HashMap<String,Meaning> meaningsMap,
+                HashMap<String,List<String>> extraMeta) {
 
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;

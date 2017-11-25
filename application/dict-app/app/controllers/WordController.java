@@ -1,12 +1,14 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import logics.WordLogic;
 import objects.Word;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import utilities.Constants;
 import utilities.DictUtil;
 import utilities.JsonUtil;
 import utilities.LogPrint;
@@ -29,61 +31,20 @@ public class WordController extends Controller {
         return ok(welcome);
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result searchWordsBySpelling() {
-
-        String searchString = "";
-        JsonNode json = request().body().asJson();
-        Set<String> wordSpellings = new HashSet<>();
-
-        try {
-
-            searchString = json.get("searchString").asText();
-
-            if (searchString.length() > 0)
-                wordSpellings = wordLogic.searchWords(searchString);
-
-        } catch (Exception ex) {
-
-            log.info("WC001 Property 'searchString' not found in the json body. Body found:" + json.textValue());
-            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
-        }
-
-        return ok(Json.toJson(wordSpellings));
-    }
-
     //CREATE
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result createWord() {
+    @BodyParser.Of(BodyParser.Json.class) public Result createWord() {
 
         JsonNode json = request().body().asJson();
         Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
-        wordLogic.createWord(word);
-        return ok();
+
+        String wordId = wordLogic.createWord(word);
+
+        ObjectNode result = Json.newObject().put("wordId", wordId);
+
+        return ok(result);
     }
 
     //READ
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result getWordByWordIdPost() {
-
-        JsonNode json = request().body().asJson();
-        String wordId;
-
-        try {
-
-            wordId = json.get("wordId").asText();
-
-        } catch (Exception ex) {
-
-            log.info("WC005 Property 'wordId' not found in the json body. Body found:" + json.textValue());
-            log.info("WC006 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
-        }
-
-        return getWordByWordId(wordId);
-    }
-
     public Result getWordByWordId(String wordId) {
 
         Word word = wordLogic.getWordByWordId(wordId);
@@ -92,26 +53,6 @@ public class WordController extends Controller {
             return ok("No word found for wordId:\"" + wordId + "\"");
         else
             return ok(Json.toJson(word));
-    }
-
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result getWordBySpellingPost() {
-
-        String wordSpelling;
-        JsonNode json = request().body().asJson();
-
-        try {
-
-            wordSpelling = json.get("wordSpelling").asText();
-
-        } catch (Exception ex) {
-
-            log.info("WC003 Property 'wordSpelling' not found in the json body. Body found:" + json.textValue());
-            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
-        }
-
-        return getWordBySpelling(wordSpelling);
     }
 
     public Result getWordBySpelling(String wordSpelling) {
@@ -124,9 +65,27 @@ public class WordController extends Controller {
             return ok(Json.toJson(word));
     }
 
+    @BodyParser.Of(BodyParser.Json.class) public Result getWordBySpellingPost() {
+
+        String wordSpelling;
+        JsonNode json = request().body().asJson();
+
+        try {
+
+            wordSpelling = json.get(Constants.WORD_SPELLING_KEY).asText();
+
+        } catch (Exception ex) {
+
+            log.info("WC003 Property 'wordSpelling' not found in the json body. Body found:" + json.textValue());
+            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace().toString());
+            return badRequest();
+        }
+
+        return getWordBySpelling(wordSpelling);
+    }
+
     //UPDATE TODO
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result updateWord(String wordId) {
+    @BodyParser.Of(BodyParser.Json.class) public Result updateWord(String wordId) {
 
         JsonNode json = request().body().asJson();
         Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
@@ -138,9 +97,35 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteWord(String wordId) {
 
-        JsonNode json = request().body().asJson();
         log.info("Delete word with wordId:" + wordId);
+
+        wordLogic.deleteWord(wordId);
+
         return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result searchWordsBySpelling() {
+
+        String searchString = "";
+        JsonNode json = request().body().asJson();
+        Set<String> wordSpellings = new HashSet<>();
+
+        try {
+
+            searchString = json.get(Constants.SEARCH_STRING_KEY).asText();
+
+            if (searchString.length() > 0)
+                wordSpellings = wordLogic.searchWords(searchString);
+
+        } catch (Exception ex) {
+
+            log.info("WC001 Property 'searchString' not found in the json body. Body found:" + json.textValue());
+            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
+            return badRequest();
+        }
+
+        return ok(Json.toJson(wordSpellings));
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -198,7 +183,7 @@ public class WordController extends Controller {
 
         try {
 
-            wordCount = Integer.parseInt(json.get("wordCount").asText());
+            wordCount = Integer.parseInt(json.get(Constants.WORD_COUNT_KEY).asText());
 
         } catch (Exception ex) {
 
