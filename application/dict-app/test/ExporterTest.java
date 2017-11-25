@@ -29,9 +29,9 @@ public class ExporterTest extends WithServer {
             /*
             if(total == 0) break;
 
-            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_SPELLING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("SIMPLE_MEANING"))
-             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValueForKey("UNDERSTANDABLE_TYPE")) ) {
+            if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValuesForKey("SIMPLE_SPELLING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValuesForKey("SIMPLE_MEANING"))
+             && "YES".equalsIgnoreCase(word.retrieveExtraMetaValuesForKey("UNDERSTANDABLE_TYPE")) ) {
 
                 log.info("Next word: \n" + word.toString());
 

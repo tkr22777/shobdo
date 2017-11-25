@@ -22,7 +22,7 @@ public class Meaning {
     private String creatorId;
     private Date creationDate;
 
-    //For versioning of the meanings
+    //For versioning of the meaningsMap
     private String status = Constants.ENTITIY_ACTIVE;
     private String parentMeaningId; //null for pioneer meaning
     private Date deletedDate;
@@ -32,12 +32,13 @@ public class Meaning {
     private String validatorId; //if validatorId is present, then the meaning is validated
 
     //V2 attributes
-    private int strength = -1; //how strongly does this meanings apply to the word, -1 means unset
+    private int strength = -1; //how strongly does this meaningsMap apply to the word, -1 means unset
     private int version = 0; //V2 version of the meaning as the object gets updated, can be back populated using parentId chain
 
     public Meaning() { }
 
-    public Meaning(String partOfSpeech, String meaning, String exampleSentence, int strength) {
+    public Meaning(String meaningId, String partOfSpeech, String meaning, String exampleSentence, int strength) {
+        this.meaningId = meaningId;
         this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
         this.exampleSentence = exampleSentence;

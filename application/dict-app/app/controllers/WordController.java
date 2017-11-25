@@ -184,7 +184,7 @@ public class WordController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result listMeanings(String wordId) {
-        log.info("List meanings on word with wordId:" + wordId);
+        log.info("List meaningsMap on word with wordId:" + wordId);
         wordLogic.listMeanings(wordId);
         return ok();
     }

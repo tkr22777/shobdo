@@ -128,7 +128,7 @@ public class SamsadExporter {
 
         for(Word word: words) {
 
-            List<String> meanings = word.retrieveExtraMetaValueForKey(Constants.MEANING_STRING);
+            List<String> meanings = word.retrieveExtraMetaValuesForKey(Constants.MEANING_STRING);
 
             allMeaning.addAll(meanings);
 
@@ -145,7 +145,7 @@ public class SamsadExporter {
 
             if(filtered.size() == meanings.size() ) {
 
-                //DictUtil.printStringsByTag( word.getWordSpelling() + " Meaning(s): ", meanings, 0, 100, false);
+                //DictUtil.printStringsByTag( word.getWordSpelling() + " Meaning(s): ", meaningsMap, 0, 100, false);
 
                 simpleMeaningWords.put(word.getWordSpelling(), word);
             }
@@ -160,7 +160,7 @@ public class SamsadExporter {
 
         for(Word word: words) {
 
-            for(String meaning: word.retrieveExtraMetaValueForKey(Constants.MEANING_STRING)){
+            for(String meaning: word.retrieveExtraMetaValuesForKey(Constants.MEANING_STRING)){
 
                 Set<String> spellings = allMeaning.get(meaning);
 
@@ -188,7 +188,7 @@ public class SamsadExporter {
                 .filter( entry -> entry.getValue().size() < 5 && entry.getValue().size() > 2)
                 .forEach(entry -> log.info(entry.getValue() + " : " + entry.getKey() ) );
 
-        //DictUtil.printStringsByTag("All Meangins:", meanings, 1000 , 1000, false);
+        //DictUtil.printStringsByTag("All Meangins:", meaningsMap, 1000 , 1000, false);
 
         Map<String, Word> wordMap = createWordMapFromListDiplicateSpellingFix(words);
         Map<String, Word> simpleMeaningWordMap = findSpellingsWithSimpleMeanings(words);
@@ -341,7 +341,7 @@ public class SamsadExporter {
 
         log.info("All spelling list size:"  + allSpellingList.size());
         HashSet<String> allspellingSet = new HashSet<>(allSpellingList);
-        log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meanings are merged
+        log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meaningsMap are merged
 
         Map<String, Word> finishedSupWord = createWordMapFromListDiplicateSpellingFix(words);
 

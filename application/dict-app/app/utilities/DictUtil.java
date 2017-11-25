@@ -16,7 +16,7 @@ public class DictUtil {
 
     private static LogPrint log = new LogPrint(DictUtil.class);
 
-    public static int randomInRange(int lowest, int highest) {
+    public static int randomIntInRange(int lowest, int highest) {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
@@ -24,6 +24,9 @@ public class DictUtil {
         return Constants.WORD_ID_PREFIX + UUID.randomUUID();
     }
 
+    public static String generateNewMeaningId() {
+        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
+    }
 
     public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
@@ -68,36 +71,36 @@ public class DictUtil {
         String wordSpelling;
         String wordId;
 
-        int wordLength = DictUtil.randomInRange(2, 9);
+        int wordLength = randomIntInRange(2, 9);
         wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
         wordId = generateNewWordId();
 
         Word word = new Word(wordId, wordSpelling);
 
-        ArrayList<Meaning> meanings = new ArrayList<>();
+        HashMap<String,Meaning> meaningsMap = new HashMap<>();
 
         for (String partOfSpeech : partsOfSpeech.getPartsOfSpeeches()) {
 
-            int numberOfMeaningForPOS = DictUtil.randomInRange(1,3);
+            int numberOfMeaningForPOS = randomIntInRange(1,3);
 
             for(int j = 0; j < numberOfMeaningForPOS ; j++) {
 
-                wordLength = DictUtil.randomInRange(2, 9);
+                wordLength = randomIntInRange(2, 9);
 
                 String meaningString = BanglaUtil.getBanglaRandomString(start, end, wordLength);
-                int preSentenceLen = DictUtil.randomInRange(2, 6);
-                int postSentenceLen = DictUtil.randomInRange(2, 4);
+                int preSentenceLen = randomIntInRange(2, 6);
+                int postSentenceLen = randomIntInRange(2, 4);
                 String exampleSentence = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
                         + " " + BanglaUtil.getBanglaRandomSentence(start, end, postSentenceLen, 12);
 
-                int strength = DictUtil.randomInRange(0 , 10);
-                Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
+                int strength = randomIntInRange(0 , 10);
+                Meaning meaning = new Meaning(generateNewMeaningId(), partOfSpeech, meaningString, exampleSentence, strength);
 
-                meanings.add(meaning);
+                meaningsMap.put(meaning.getMeaningId(), meaning);
             }
         }
 
-        word.setMeanings(meanings);
+        word.setMeaningsMap(meaningsMap);
 
         return word;
     }
@@ -122,7 +125,7 @@ public class DictUtil {
     public static Map<String, Word> removeKeyValuesForKeys(Map<String, Word> map, Set<String> keys) {
 
         return map.entrySet().stream()
-                .filter( e-> !keys.contains( e.getKey() ) )
+                .filter( e -> !keys.contains( e.getKey() ) )
                 .collect(
                         Collectors.toMap(
                                 e -> e.getKey(),

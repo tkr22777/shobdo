@@ -14,10 +14,10 @@ public class BanglaUtil {
             endHex = "9A8"; //ন
 
         if(numberOfWords == -1)
-            numberOfWords = DictUtil.randomInRange(1, 10);
+            numberOfWords = DictUtil.randomIntInRange(1, 10);
 
         if(maxWordLength < 1)
-            maxWordLength = DictUtil.randomInRange(1, 7);
+            maxWordLength = DictUtil.randomIntInRange(1, 7);
 
         String sentence = "";
 
@@ -26,7 +26,7 @@ public class BanglaUtil {
             if( i != 0)
                 sentence += " ";
 
-            int number = DictUtil.randomInRange(1, maxWordLength);
+            int number = DictUtil.randomIntInRange(1, maxWordLength);
             String word = getBanglaRandomString(startHex, endHex, number);
             sentence += word;
         }
@@ -42,11 +42,11 @@ public class BanglaUtil {
         String retString = "";
 
         if(wordLength < 1)
-            wordLength = DictUtil.randomInRange(1, 10);
+            wordLength = DictUtil.randomIntInRange(1, 10);
 
         for(int i = 0 ; i < wordLength ; i++) {
 
-            int number = DictUtil.randomInRange(start, end);
+            int number = DictUtil.randomIntInRange(start, end);
             char c = (char) number;
             String single_char = "" + c;
             retString += single_char;

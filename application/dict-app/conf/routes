@@ -38,28 +38,28 @@ GET     /api/v1/word/list             controllers.WordController.listWords(start
 POST    /api/v1/search                controllers.WordController.searchWordsBySpelling()
 
 ##############################
-# CRUDL API for word meanings:
+# CRUDL API for word meaningsMap:
 ##############################
 
 # 1. Create a new meaning of a word
-POST    /api/v1/word/:wordId/meanings                   controllers.WordController.createMeaning(wordId: String)
+POST    /api/v1/word/:wordId/meaningsMap                   controllers.WordController.createMeaning(wordId: String)
 
 # 2. Get a specific meaning of a word
-GET     /api/v1/word/:wordId/meanings/:meaningId        controllers.WordController.getMeaning(wordId: String, meaningId: String)
+GET     /api/v1/word/:wordId/meaningsMap/:meaningId        controllers.WordController.getMeaning(wordId: String, meaningId: String)
 
 # 3. Update a specific meaning of a word
-PUT     /api/v1/word/:wordId/meanings/:meaningId        controllers.WordController.updateMeaning(wordId: String, meaningId: String)
+PUT     /api/v1/word/:wordId/meaningsMap/:meaningId        controllers.WordController.updateMeaning(wordId: String, meaningId: String)
 
 # 4. Delete a specific meaning of a word
-DELETE  /api/v1/word/:wordId/meanings/:meaningId        controllers.WordController.deleteMeaning(wordId: String, meaningId: String)
+DELETE  /api/v1/word/:wordId/meaningsMap/:meaningId        controllers.WordController.deleteMeaning(wordId: String, meaningId: String)
 
-# 5. List meanings of a word
-GET     /api/v1/word/:wordId/meanings/list              controllers.WordController.listMeanings(wordId: String)
+# 5. List meaningsMap of a word
+GET     /api/v1/word/:wordId/meaningsMap/list              controllers.WordController.listMeanings(wordId: String)
 
 ##############
 # Admin stuff:
 ##############
-# CRUDL for users, GENERAL, REVIEWER, ADMIN
+# CRUDL for users GENERAL, REVIEWER, ADMIN
 
 # 8. Generate random dictionary, body contains wordCount:
 POST    /api/v1/generate              controllers.WordController.createRandomDictionary()
