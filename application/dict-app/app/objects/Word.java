@@ -14,13 +14,13 @@ public class Word {
 
     private String wordId;
     private String wordSpelling;
-    private ArrayList<Meaning> meanings;
+    private Map<String,Meaning> meaningsMap;
     private Map<String,List<String>> extraMetaMap; //used for any extra keyed metadata of freaking Strings! What the hack were you thinkin'?
 
     private String creatorId;
     private Date creationDate;
 
-    //For versioning of the meanings
+    //For versioning of the meaningsMap
     private String status = Constants.ENTITIY_ACTIVE;
     private String parentMeaningId; //null for pioneer word
     private Date deletedDate;
@@ -42,21 +42,13 @@ public class Word {
 
     public Word(String wordId,
                 String wordSpelling,
-                Collection<Meaning> meanings,
+                Map<String,Meaning> meaningsMap,
                 Map<String,List<String>> extraMeta) {
 
         this.wordId = wordId;
         this.wordSpelling = wordSpelling;
         this.extraMetaMap = extraMeta;
-        this.meanings = new ArrayList<>(meanings);
-    }
-
-    public void addMeaningForPartsOfSpeech(Meaning meaning) {
-
-        if(meanings == null)
-            meanings = new ArrayList<>();
-
-        meanings.add(meaning);
+        this.meaningsMap = meaningsMap;
     }
 
     public void setExtraMetaValue(String key, String value){
@@ -79,26 +71,21 @@ public class Word {
         extraMetaMap.put(key, values);
     }
 
-    public List<String> retrieveExtraMetaValueForKey(String key){
+    public List<String> retrieveExtraMetaValuesForKey(String key) {
 
         return extraMetaMap.get(key);
     }
 
-    public void removeExtraMetaValueForKey(String key){
+    public void removeExtraMetaValueForKey(String key) {
 
         removeExtraMetaValueForKeys(Arrays.asList(key));
     }
 
-    public void removeExtraMetaValueForKeys(Collection<String> keys){
+    public void removeExtraMetaValueForKeys(Collection<String> keys) {
 
         for(String key: keys) {
             extraMetaMap.remove(key);
         }
-    }
-
-    public Set<String> retrieveExtraMetaKeys(){
-
-        return this.extraMetaMap.keySet();
     }
 
     @Override

@@ -11,7 +11,6 @@ import utilities.DictUtil;
 import utilities.LogPrint;
 
 import java.util.*;
-import java.util.stream.Collector;
 
 /**
  * Created by tahsinkabir on 8/14/16.
@@ -93,7 +92,7 @@ public class WordLogic {
                set a new wordId, //since we do not want to destruct the existing wordId for the client
                set a deletedDate,
                set status as UPDATED
-               set the meanings to null //we will keep the meanings on the word being updated
+               set the meaningsMap to null //we will keep the meaningsMap on the word being updated
                set the previousVersions to null //we will keep the previousVersions on the word being updated
                set the extraMetaMap to null //we will keep the extraMetaMap on the word being updated
            On the actual object,
@@ -214,8 +213,8 @@ public class WordLogic {
             throw new IllegalArgumentException("word spelling cannot be null or empty");
         }
 
-        if(word.getMeanings() == null || word.getMeanings().size() == 0) {
-            log.info("@WL006 meanings array is null or empty");
+        if(word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0) {
+            log.info("@WL006 meaningsMap array is null or empty");
             throw new IllegalArgumentException("word meaning cannot be null or empty");
         }
     }
@@ -239,12 +238,10 @@ public class WordLogic {
     public Meaning getMeaning(String wordId, String meaningId) {
 
         Word word = getWordByWordId(wordId);
-        if(word == null || word.getMeanings() == null)
+        if(word == null || word.getMeaningsMap() == null)
             return null;
 
-        return word.getMeanings().stream()
-                .filter( m -> m.getMeaningId().equals(meaningId) && m.getDeletedDate() == null)
-                .findFirst().get();
+        return word.getMeaningsMap().get(meaningId);
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
@@ -261,11 +258,10 @@ public class WordLogic {
         if(word == null)
             throw new IllegalArgumentException("No word exists for wordId:" + wordId);
 
-        if( word.getMeanings() == null || word.getMeanings().size() == 0)
+        if( word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0)
             throw new IllegalArgumentException("Word does not have any meaning with meaningId:" + meaningId);
 
         return false;
-
     }
 
     /* LIST meaning todo implement using WORD's interfaces */
