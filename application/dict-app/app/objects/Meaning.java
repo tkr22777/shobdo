@@ -37,8 +37,7 @@ public class Meaning {
 
     public Meaning() { }
 
-    public Meaning(String meaningId, String partOfSpeech, String meaning, String exampleSentence, int strength) {
-        this.meaningId = meaningId;
+    public Meaning(String partOfSpeech, String meaning, String exampleSentence, int strength) {
         this.partOfSpeech = partOfSpeech;
         this.meaning = meaning;
         this.exampleSentence = exampleSentence;

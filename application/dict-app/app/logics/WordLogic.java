@@ -37,18 +37,35 @@ public class WordLogic {
 
     /* Start of CRUDLS of WORD objects in the logic class */
 
-    /* CREATE word(s) */
-    public void createWord(Word word) {
+    /* CREATE word(s)
+        * wordId should always be generated here (createWord of wordLogic)
+        * no meaning creation is allowed with the create word endpoint for now
+    */
+    public String createWord(Word word) {
 
-        createWordsBatch(Arrays.asList(word));
+        String wordId = generateNewWordId();
+
+        if(word.getWordId() != null)
+            throw new IllegalArgumentException("Creating word with providedId is not allowed");
+
+        word.setWordId(wordId);
+        word.setMeaningsMap(new HashMap<>());//clearing meaningMap if any
+
+        wordDao.createWord(word);
+        wordCache.cacheWord(word);
+
+        return wordId;
     }
+
+    public static String generateNewWordId() {
+        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
+    }
+
 
     public void createWordsBatch(Collection<Word> words) {
 
-        for(Word word: words) {
-            wordDao.createWord(word);
-            wordCache.cacheWord(word);
-        }
+        for(Word word: words)
+            createWord(word);
     }
 
     /* GET word by wordId */
@@ -126,8 +143,8 @@ public class WordLogic {
            Set status as DELETED
     */
 
-    public boolean deleteWord(String wordId) {
-        return wordDao.deleteWord(wordId);
+    public void deleteWord(String wordId) {
+        wordDao.deleteWord(wordId);
     }
 
     /* LIST words todo */
@@ -185,7 +202,7 @@ public class WordLogic {
 
         Word toReturnWord = new Word();
 
-        toReturnWord.setWordId(DictUtil.generateNewWordId());
+        toReturnWord.setWordId(null);
 
         if(providedWord != null) {
 
@@ -232,6 +249,10 @@ public class WordLogic {
         Word word = getWordByWordId(wordId);
         //add the meaning to the word and save
         return "newMeaningId";
+    }
+
+    public static String generateNewMeaningId() {
+        return Constants.MEANING_ID_PREFIX + UUID.randomUUID();
     }
 
     /* GET meaning todo implement using WORD's interfaces */

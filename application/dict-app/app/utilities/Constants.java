@@ -15,6 +15,7 @@ public class Constants {
     public static final int SEARCH_SPELLING_LIMIT = 40;
 
     public static final String WORD_ID_PREFIX = "WD";
+    public static final String MEANING_ID_PREFIX = "MNG";
 
     //Meta constant keys
     public static final String MEANING_STRING = "MEANING STRING";
@@ -26,4 +27,8 @@ public class Constants {
     public static final String ENTITIY_UPDATED = "UPDATED";
     public static final String ENTITIY_DELETED = "DELETED";
 
+    //REST REQUEST CONSTANTS
+    public static final String WORD_SPELLING_KEY = "wordSpelling";
+    public static final String SEARCH_STRING_KEY = "searchString";
+    public static final String WORD_COUNT_KEY = "wordCount";
 }

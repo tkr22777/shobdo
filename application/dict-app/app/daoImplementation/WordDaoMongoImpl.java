@@ -119,9 +119,8 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public boolean deleteWord(String wordId) {
+    public void deleteWord(String wordId) {
 
-        return false;
     }
 
     @Override

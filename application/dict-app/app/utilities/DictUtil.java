@@ -20,12 +20,8 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
-    public static String generateNewWordId() {
-        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
-    }
-
-    public static String generateNewMeaningId() {
-        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
+    public static String generateIdWithPrefix(String prefix) {
+        return prefix + UUID.randomUUID();
     }
 
     public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
@@ -56,11 +52,24 @@ public class DictUtil {
 
         for(int i = 0 ; i < numberOfWords ; i++) {
 
-            Word word = generateARandomWord( new PartsOfSpeechSet() );
+            Word word = generateARandomWord();
             words.add(word);
         }
 
         return words;
+    }
+
+    public static Word generateARandomWord() {
+
+        String start = "995"; //ক
+        String end = "9A8";   //ন
+
+        int wordLength = randomIntInRange(2, 9);
+
+        Word word = new Word();
+        word.setWordSpelling(BanglaUtil.getBanglaRandomString(start, end, wordLength));
+
+        return word;
     }
 
     public static Word generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
@@ -68,14 +77,11 @@ public class DictUtil {
         String start = "995"; //ক
         String end = "9A8";   //ন
 
-        String wordSpelling;
-        String wordId;
-
         int wordLength = randomIntInRange(2, 9);
-        wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
-        wordId = generateNewWordId();
+        String wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
 
-        Word word = new Word(wordId, wordSpelling);
+        Word word = new Word();
+        word.setWordSpelling(wordSpelling);
 
         HashMap<String,Meaning> meaningsMap = new HashMap<>();
 
@@ -94,7 +100,7 @@ public class DictUtil {
                         + " " + BanglaUtil.getBanglaRandomSentence(start, end, postSentenceLen, 12);
 
                 int strength = randomIntInRange(0 , 10);
-                Meaning meaning = new Meaning(generateNewMeaningId(), partOfSpeech, meaningString, exampleSentence, strength);
+                Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
 
                 meaningsMap.put(meaning.getMeaningId(), meaning);
             }
