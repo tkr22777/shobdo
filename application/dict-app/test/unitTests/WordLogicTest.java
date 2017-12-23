@@ -52,10 +52,20 @@ public class WordLogicTest {
         theWord.setWordSpelling(wordSpelling);
     }
 
+    //Create word
     @Test
-    public void simpleCheck() {
-        int a = 1 + 1;
-        assertEquals(2, a);
+    public void createWord_wordIdIsNotSet_createWordDaoCalled() {
+        when(mockWordDao.createWord(any())).thenReturn(true);
+        wordLogic.createWord(theWord);
+        verify(mockWordDao, times(1)).createWord(any(Word.class));
+        verify(mockWordCache, times(1)).cacheWord(any(Word.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createWord_wordIdIsSet_throwsIAE() {
+
+        theWord.setWordId("WD_ID_SET_By_USER");
+        wordLogic.createWord(theWord);
     }
 
     @Test(expected = IllegalArgumentException.class)

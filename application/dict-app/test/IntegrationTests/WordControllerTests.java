@@ -1,10 +1,12 @@
 package IntegrationTests;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import logics.WordLogic;
 import objects.Word;
 import org.junit.*;
+import play.libs.Json;
 import play.mvc.Result;
 import play.test.WithApplication;
 import utilities.Constants;
@@ -29,7 +31,7 @@ public class WordControllerTests extends WithApplication {
 
     LogPrint log;
     WordLogic wordLogic;
-    ArrayList<Word> dictionary;
+    ArrayList<Word> createdWords;
 
     @Before
     public void setup() {
@@ -40,8 +42,8 @@ public class WordControllerTests extends WithApplication {
 
     private void createWordsInDb(int numberOfWords) {
 
-        dictionary = new ArrayList<>( DictUtil.generateDictionaryWithRandomWords(numberOfWords) );
-        wordLogic.createWordsBatch(dictionary); //storing for tests
+        createdWords = new ArrayList<>( DictUtil.generateRandomWordSet(numberOfWords) );
+        wordLogic.createWordsBatch(createdWords); //storing for tests
     }
 
     @After
@@ -50,21 +52,77 @@ public class WordControllerTests extends WithApplication {
         wordLogic.flushCache();
     }
 
+    @Test
+    public void simpleTest() {
+
+        running( fakeApplication(), () -> {
+
+            createWordsInDb(2);
+
+            log.info("Created words: " + createdWords);
+
+            Word word = createdWords.get(0);
+
+            Word wordFromDb = wordLogic.getWordByWordId(word.getWordId());
+
+            log.info("Created word retrieved from DB:" + wordFromDb);
+
+        });
+
+    }
+
     //WORD CRUD TESTS
+    /*
+        These API's should not know and care about the internals/logic of the system
+
+        CREATE Test Cases:
+        1. Valid object, word spelling provided, spelling do not exist, create correctly
+        2. Valid object, word spelling provided, spelling exists, throw error
+        3. WordId provided, throw error
+        4. Meaning provided, throw error
+        5. Any other attribute provided, throws error, returns reasons in the body
+
+        GET Test Cases:
+        1. Invalid wordId, throws error
+        2. Valid wordId, returns correct word, word should not have meaning attribute afterJson conversion
+
+        Update Word Test:
+        1.
+        2.
+
+        Delete Word Test:
+        1.
+        2.
+
+    */
+
     @Test
     public void createWordTest() {
 
         running( fakeApplication(), () -> {
 
-            Word word = DictUtil.generateARandomWord();
-            JsonNode bodyJson = JsonUtil.toJsonNodeFromObject(word);
-            Result result = route( fakeRequest(POST,"/api/v1/word").bodyJson(bodyJson) );
+            String jsonWordString = "{\n" +
+                    "  \"wordId\" : null,\n" +
+                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
+                    "  \"meaningsMap\" : { },\n" +
+                    "  \"antonyms\" : [ ],\n" +
+                    "  \"synonyms\" : [ ]\n" +
+                    "}";
 
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
             assertEquals(OK, result.status());
 
-            Word createdWord = wordLogic.getWordBySpelling(word.getWordSpelling());
-            createdWord.setWordId(null); //since the word to be stored did not have an wordId
-            Assert.assertEquals(word.toString(), createdWord.toString());
+            Word createdWord = wordLogic.getWordBySpelling("ঞতটতথঙ");
+
+            //since request did not have an wordId and versionMeta
+            createdWord.setWordId(null);
+            createdWord.setVersionMeta(null);
+            ObjectNode objectNode = Json.toJson(createdWord).deepCopy();
+            objectNode.remove("extraMetaMap");
+            objectNode.remove("versionMeta");
+            Assert.assertEquals(bodyJson, JsonUtil.toJsonNodeFromJsonString(objectNode.toString()));
         });
     }
 
@@ -74,13 +132,15 @@ public class WordControllerTests extends WithApplication {
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordSpelling = dictionary.get(0).getWordSpelling();
+            String wordSpelling = createdWords.get(0).getWordSpelling();
             Word word = wordLogic.getWordBySpelling(wordSpelling);
+
+            log.info("Word:" + Json.toJson(word) );
 
             Assert.assertNotNull(word);
             Assert.assertNotNull(word.getWordId());
 
-            Result result = route( fakeRequest(GET,"/api/v1/word/" + word.getWordId()) );
+            Result result = route( fakeRequest(GET,"/api/v1/words/" + word.getWordId()) );
 
             assertEquals(OK, result.status());
 
@@ -95,7 +155,7 @@ public class WordControllerTests extends WithApplication {
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordSpelling = dictionary.get(0).getWordSpelling();
+            String wordSpelling = createdWords.get(0).getWordSpelling();
             Word word = wordLogic.getWordBySpelling(wordSpelling);
 
             Assert.assertNotNull(word);
@@ -105,7 +165,7 @@ public class WordControllerTests extends WithApplication {
             jsonObject.addProperty(Constants.WORD_SPELLING_KEY, word.getWordSpelling());
             JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonObject.toString());
 
-            Result result = route( fakeRequest(POST,"/api/v1/word/postget").bodyJson(bodyJson) );
+            Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
 
             assertEquals(OK, result.status());
 
@@ -123,12 +183,12 @@ public class WordControllerTests extends WithApplication {
     public void deleteWord() {
 
         createWordsInDb(1);
-        String wordSpelling = dictionary.get(0).getWordSpelling();
+        String wordSpelling = createdWords.get(0).getWordSpelling();
         Word word = wordLogic.getWordBySpelling(wordSpelling);
         Assert.assertNotNull(word);
         Assert.assertNotNull(word.getWordId());
 
-        Result result = route( fakeRequest(DELETE,"/api/v1/word/" + word.getWordId()) );
+        Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getWordId()) );
         assertEquals(OK, result.status());
 
         Assert.assertNull(wordLogic.getWordByWordId(word.getWordId()));
@@ -139,26 +199,29 @@ public class WordControllerTests extends WithApplication {
 
         createWordsInDb(50);
 
-        String spelling = dictionary.get(0).getWordSpelling();
+        String spelling = createdWords.get(0).getWordSpelling();
         String prefix = spelling.substring(0,1);
 
         log.info("Test searchWordsByPrefix, prefix: " + prefix);
 
-        Set<String> spellingsWithPrefixes = dictionary.stream()
+        Set<String> spellingsWithPrefixes = createdWords.stream()
                 .filter( word -> word.getWordSpelling().startsWith(prefix) )
                 .map( word-> word.getWordSpelling() )
                 .collect( Collectors.toSet() );
+
+        log.info("Spelling with prefixes:" + spellingsWithPrefixes );
 
         running( fakeApplication(), () -> {
 
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty(Constants.SEARCH_STRING_KEY, prefix);
             JsonNode requestBodyJson = JsonUtil.toJsonNodeFromJsonString(jsonObject.toString());
-            Result result = route( fakeRequest(POST,"/api/v1/search").bodyJson(requestBodyJson) );
+            Result result = route( fakeRequest(POST,"/api/v1/words/search").bodyJson(requestBodyJson) );
 
             assertEquals(OK, result.status());
             JsonNode resultsJson = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
             JsonNode expectedResult = JsonUtil.toJsonNodeFromObject(spellingsWithPrefixes);
+            log.info("results json:" + resultsJson);
             Assert.assertEquals( expectedResult, resultsJson);
         });
     }

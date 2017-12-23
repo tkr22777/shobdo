@@ -1,13 +1,17 @@
 package logics;
 
 import cache.WordCache;
+import com.fasterxml.jackson.databind.JsonNode;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.Meaning;
+import objects.VersionMeta;
 import objects.Word;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
-import utilities.DictUtil;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.*;
@@ -39,28 +43,31 @@ public class WordLogic {
 
     /* CREATE word(s)
         * wordId should always be generated here (createWord of wordLogic)
-        * no meaning creation is allowed with the create word endpoint for now
-    */
-    public String createWord(Word word) {
+        * no meaning creation is allowed with the create word endpoint for now */
+    public String createWord(JsonNode wordJsonNode) {
 
-        String wordId = generateNewWordId();
+        Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
+        return createWord(word);
+
+    }
+
+    public String createWord(Word word) {
 
         if(word.getWordId() != null)
             throw new IllegalArgumentException("Creating word with providedId is not allowed");
 
-        word.setWordId(wordId);
-        word.setMeaningsMap(new HashMap<>());//clearing meaningMap if any
+        word.setWordId(generateNewWordId());
+        word = prepareWordForCreate(word);
 
         wordDao.createWord(word);
         wordCache.cacheWord(word);
 
-        return wordId;
+        return word.getWordId();
     }
 
     public static String generateNewWordId() {
-        return Constants.WORD_ID_PREFIX + UUID.randomUUID();
+        return Constants.WORD_ID_PREFIX + "-" + UUID.randomUUID();
     }
-
 
     public void createWordsBatch(Collection<Word> words) {
 
@@ -88,6 +95,8 @@ public class WordLogic {
             throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
 
         Word cachedWord = wordCache.getWordBySpelling(spelling);
+
+        log.info("WL001 Spelling : " + spelling + " Word:" + cachedWord);
 
         if(cachedWord != null)
             return cachedWord;
@@ -206,8 +215,6 @@ public class WordLogic {
 
         if(providedWord != null) {
 
-            toReturnWord.setVersion( providedWord.getVersion() + 1 );
-
             if(providedWord.getWordSpelling() != null)
                 toReturnWord.setWordSpelling(providedWord.getWordSpelling());
 
@@ -289,5 +296,29 @@ public class WordLogic {
     public ArrayList<Meaning> listMeanings(String wordId) {
 
         return new ArrayList<>();
+    }
+
+    public static Word prepareWordForCreate( Word word ){
+
+        if(word == null)
+            return word;
+
+        Word retWord = new Word();
+
+        retWord.setWordId(word.getWordId());
+        retWord.setWordSpelling(word.getWordSpelling());
+
+        //todo get creatorId from context
+        String creatorId =  "sin";
+        VersionMeta versionMeta = new VersionMeta();
+
+        versionMeta.setCreatorId(creatorId);
+        versionMeta.setStatus(Constants.ENTITIY_ACTIVE);
+        String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
+        versionMeta.setCreationDate( creationDateString );
+
+        retWord.setVersionMeta(versionMeta);
+
+        return retWord;
     }
 }
