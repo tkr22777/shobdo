@@ -103,7 +103,7 @@ public class ApplicationTest extends WithServer {
     @Test @Ignore //Ignore because it is not a functionality test
     public void testGuava() {
 
-        List<Word> words = new ArrayList<>( DictUtil.generateDictionaryWithRandomWords(2) );
+        List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
 
         Word theWord = words.get(0);
 

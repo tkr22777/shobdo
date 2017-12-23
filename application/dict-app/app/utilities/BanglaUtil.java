@@ -27,14 +27,14 @@ public class BanglaUtil {
                 sentence += " ";
 
             int number = DictUtil.randomIntInRange(1, maxWordLength);
-            String word = getBanglaRandomString(startHex, endHex, number);
+            String word = getRandomBanglaString(startHex, endHex, number);
             sentence += word;
         }
 
         return sentence;
     }
 
-    public static String getBanglaRandomString(String startHex, String endHex, int wordLength) {
+    public static String getRandomBanglaString(String startHex, String endHex, int wordLength) {
 
         int start = Integer.parseInt(startHex, 16);
         int end = Integer.parseInt(endHex, 16);

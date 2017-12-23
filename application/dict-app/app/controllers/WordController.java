@@ -27,17 +27,15 @@ public class WordController extends Controller {
     public Result index() {
 
         String welcome = "বাংলা অভিধান এ স্বাগতম!";
-        log.info(welcome);
         return ok(welcome);
     }
 
     //CREATE
     @BodyParser.Of(BodyParser.Json.class) public Result createWord() {
 
-        JsonNode json = request().body().asJson();
-        Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
+        JsonNode wordJson = request().body().asJson();
 
-        String wordId = wordLogic.createWord(word);
+        String wordId = wordLogic.createWord(wordJson);
 
         ObjectNode result = Json.newObject().put("wordId", wordId);
 
@@ -193,7 +191,7 @@ public class WordController extends Controller {
             return badRequest();
         }
 
-        Set<Word> words = DictUtil.generateDictionaryWithRandomWords(wordCount);
+        Set<Word> words = DictUtil.generateRandomWordSet(wordCount);
 
         for (Word word : words)
             wordLogic.createWord(word);

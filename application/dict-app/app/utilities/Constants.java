@@ -16,6 +16,7 @@ public class Constants {
 
     public static final String WORD_ID_PREFIX = "WD";
     public static final String MEANING_ID_PREFIX = "MNG";
+    public static final String REQ_ID_PREFIX = "REQ";
 
     //Meta constant keys
     public static final String MEANING_STRING = "MEANING STRING";
@@ -26,6 +27,10 @@ public class Constants {
     public static final String ENTITIY_ACTIVE = "ACTIVE";
     public static final String ENTITIY_UPDATED = "UPDATED";
     public static final String ENTITIY_DELETED = "DELETED";
+    //REQUESTED
+    public static final String ENTITIY_CREATE_REQUESTED = "CREATE_REQUESTED";
+    public static final String ENTITIY_UPDATE_REQUESTED = "UPDATE_REQUESTED";
+    public static final String ENTITIY_DELETE_REQUESTED = "DELETED_REQUESTED";
 
     //REST REQUEST CONSTANTS
     public static final String WORD_SPELLING_KEY = "wordSpelling";

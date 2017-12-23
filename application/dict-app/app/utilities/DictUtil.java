@@ -32,21 +32,10 @@ public class DictUtil {
 
     public static Object getObjectFromDocument(Document doc, Class<?> class_type) {
 
-        ObjectMapper mapper = new ObjectMapper();
-        Object object = null;
-
-        try {
-
-            object = mapper.readValue( doc.toJson(), class_type );
-
-        } catch(Exception ex) {
-            log.info( "@DU001 Failed to map document " + doc + " to " + class_type + " object. [Exception Message: " + ex.getMessage() +"]" );
-        }
-
-        return object;
+        return JsonUtil.toObjectFromJsonString(doc.toJson(), class_type);
     }
 
-    public static Set<Word> generateDictionaryWithRandomWords(int numberOfWords){
+    public static Set<Word> generateRandomWordSet(int numberOfWords){
 
         Set<Word> words = new HashSet<>();
 
@@ -67,7 +56,7 @@ public class DictUtil {
         int wordLength = randomIntInRange(2, 9);
 
         Word word = new Word();
-        word.setWordSpelling(BanglaUtil.getBanglaRandomString(start, end, wordLength));
+        word.setWordSpelling(BanglaUtil.getRandomBanglaString(start, end, wordLength));
 
         return word;
     }
@@ -78,7 +67,7 @@ public class DictUtil {
         String end = "9A8";   //ন
 
         int wordLength = randomIntInRange(2, 9);
-        String wordSpelling = BanglaUtil.getBanglaRandomString(start, end, wordLength);
+        String wordSpelling = BanglaUtil.getRandomBanglaString(start, end, wordLength);
 
         Word word = new Word();
         word.setWordSpelling(wordSpelling);
@@ -93,7 +82,7 @@ public class DictUtil {
 
                 wordLength = randomIntInRange(2, 9);
 
-                String meaningString = BanglaUtil.getBanglaRandomString(start, end, wordLength);
+                String meaningString = BanglaUtil.getRandomBanglaString(start, end, wordLength);
                 int preSentenceLen = randomIntInRange(2, 6);
                 int postSentenceLen = randomIntInRange(2, 4);
                 String exampleSentence = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
