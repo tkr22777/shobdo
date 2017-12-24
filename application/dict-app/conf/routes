@@ -19,24 +19,21 @@ POST    /api/v1/words                            controllers.WordController.crea
 # 2. Get word:
 GET     /api/v1/words/:wordId                    controllers.WordController.getWordByWordId(wordId: String)
 
-# 3. Get word by spelling:
-GET     /api/v1/words/:wordSpelling              controllers.WordController.getWordBySpelling(wordSpelling: String)
-
-# 4. POST Get word by spelling:
+# 3. POST Get word by spelling:
 #     body contains "wordSpelling" since Bengali
 #     chars do not play well in route):
 POST    /api/v1/words/postget                    controllers.WordController.getWordBySpellingPost()
 
-# 5. Update word:
+# 4. Update word:
 PUT     /api/v1/words/:wordId                    controllers.WordController.updateWord(wordId: String)
 
-# 6. Delete word:
+# 5. Delete word:
 DELETE  /api/v1/words/:wordId                    controllers.WordController.deleteWord(wordId: String)
 
-# 7. List words
+# 6. List words
 GET     /api/v1/words/list                       controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
-# 8. Search words by spelling:
+# 7. Search words by spelling:
 #     body contains "searchString"
 POST    /api/v1/words/search                     controllers.WordController.searchWordsBySpelling()
 

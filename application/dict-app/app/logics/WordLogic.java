@@ -10,7 +10,6 @@ import objects.Word;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import play.libs.Json;
-import sun.jvm.hotspot.debugger.win32.coff.COFFLineNumber;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.JsonUtil;
@@ -50,10 +49,10 @@ public class WordLogic {
 
         Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
         Word createdWord = createWord(word) ;
-        return convertWordObjectToResponseJsonNode(createdWord);
+        return convertWordToResponseJNode(createdWord);
     }
 
-    private JsonNode convertWordObjectToResponseJsonNode(Word word) {
+    public static JsonNode convertWordToResponseJNode(Word word) {
 
         JsonNode jsonNode = Json.toJson(word);
         List attributesToRemove = Arrays.asList("extraMetaMap", "versionMeta");
@@ -103,19 +102,27 @@ public class WordLogic {
     }
 
     /* GET word by wordId */
+    public JsonNode getWordJNodeByWordId(String wordId) {
+
+        Word word = getWordByWordId(wordId);
+        return word == null? null: convertWordToResponseJNode(word);
+    }
+
     public Word getWordByWordId(String wordId) {
 
-        if(wordId == null)
-            throw new IllegalArgumentException("WLEX: getWordByWordId wordId is null or empty");
+        if( wordId == null || "".equalsIgnoreCase(wordId) )
+            throw new IllegalArgumentException(Constants.GET_WORDID_NULLEMPTY + wordId);
 
-        bmLog.start();
-        Word word = wordDao.getWordByWordId(wordId);
-        bmLog.end("@WL001 Word [ID:" + wordId + "][Spelling"+ word.getWordSpelling() +"] found in database and returning");
-
-        return word;
+        return wordDao.getWordByWordId(wordId);
     }
 
     /* GET word by (exact) spelling */
+    public JsonNode getWordJNodeBySpelling(String spelling) {
+
+        Word word = getWordBySpelling(spelling);
+        return word == null? null: convertWordToResponseJNode(word);
+    }
+
     public Word getWordBySpelling(String spelling) {
 
         if(spelling == null || spelling == "")

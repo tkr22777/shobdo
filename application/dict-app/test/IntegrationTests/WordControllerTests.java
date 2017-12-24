@@ -3,11 +3,9 @@ package IntegrationTests;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import logics.WordLogic;
-import objects.Meaning;
-import objects.PartsOfSpeechSet;
 import objects.Word;
 import org.junit.*;
-import play.libs.Json;
+import org.junit.experimental.categories.Categories;
 import play.mvc.Result;
 import play.test.WithApplication;
 import utilities.Constants;
@@ -17,7 +15,6 @@ import utilities.LogPrint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -142,63 +139,96 @@ public class WordControllerTests extends WithApplication {
         });
     }
 
-   //WORD CRUD TESTS
-    /*
-        GET Test Cases:
-        1. Invalid wordId, throws error
-        2. Valid wordId, returns correct word, word should not have meaning attribute afterJson conversion
-        Update Word Test:
-        Delete Word Test:
-    */
 
     /* Get tests */
     @Test
-    public void getWordByWordId() {
+    public void getWordByWordId_validWordIdForWordInDb_wordReturned() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordSpelling = createdWords.get(0).getWordSpelling();
-            Word word = wordLogic.getWordBySpelling(wordSpelling);
+            Word createdWord = createdWords.get(0);
 
-            log.info("Word:" + Json.toJson(word) );
-
-            Assert.assertNotNull(word);
-            Assert.assertNotNull(word.getWordId());
-
-            Result result = route( fakeRequest(GET,"/api/v1/words/" + word.getWordId()) );
-
+            Result result = route( fakeRequest(GET,"/api/v1/words/" + createdWord.getWordId()) );
             assertEquals(OK, result.status());
-
-            JsonNode wordJsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
-            Assert.assertEquals(word.toString(), JsonUtil.toJsonString(wordJsonNode));
+            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
         });
     }
 
     @Test
-    public void getWordBySpellingPost() {
+    public void getWordByWordId_invalidWordId_returnedNotFound() {
+
+        running( fakeApplication(), () -> {
+
+            Result result = route( fakeRequest(GET,"/api/v1/words/invalid_wid" ) );
+            assertEquals(NOT_FOUND, result.status());
+            assertEquals(Constants.GET_WORD_NOT_FOUND + "invalid_wid" , contentAsString(result));
+        });
+    }
+
+    @Test @Ignore //Bengali characters don't play well on API routes, route has not been implemented due to technical difficulties
+    public void getWordBySpelling() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordSpelling = createdWords.get(0).getWordSpelling();
-            Word word = wordLogic.getWordBySpelling(wordSpelling);
-
-            Assert.assertNotNull(word);
-            Assert.assertNotNull(word.getWordId());
-
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty(Constants.WORD_SPELLING_KEY, word.getWordSpelling());
-            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonObject.toString());
-
-            Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
-
+            Word createdWord = createdWords.get(0);
+            Result result = route( fakeRequest(GET,"/api/v1/words/spelling" + createdWord.getWordSpelling() ) );
             assertEquals(OK, result.status());
-
-            JsonNode wordJsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
-            Assert.assertEquals(word.toString(), JsonUtil.toJsonString(wordJsonNode));
+            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
         });
     }
+
+    @Test
+    public void getWordBySpellingPost_existingWordSpellingForWordsInDb_wordReturned() {
+
+        running( fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            Word createdWord = createdWords.get(0);
+            String jsonWordString = "{" + "\"" + Constants.WORD_SPELLING_KEY + "\":\"" + createdWord.getWordSpelling() + "\"}";
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
+            assertEquals(OK, result.status());
+            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
+        });
+    }
+
+    @Test
+    public void getWordBySpellingPost_nonexistingWordSpellingForWordsInDb_returnedNotFound() {
+
+        running( fakeApplication(), () -> {
+
+            String jsonWordString = "{\"" + Constants.WORD_SPELLING_KEY + "\":\"NonExistentSpelling\"}";
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
+            assertEquals(NOT_FOUND, result.status());
+            assertEquals(Constants.GET_WORD_NOT_FOUND + "NonExistentSpelling" , contentAsString(result));
+        });
+    }
+
+    @Test
+    public void getWordBySpellingPost_invalidSpellingKey_returnedBadRequest() {
+
+        running( fakeApplication(), () -> {
+
+            String jsonWordString = "{\"InvalidSearchKeyField\":\"NonExistentSpelling\"}";
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
+            assertEquals(BAD_REQUEST, result.status());
+        });
+    }
+
+    /* WORD CRUD TESTS
+       GET Test Cases:
+       1. Invalid wordId, throws error
+       2. Valid wordId, returns correct word, word should not have meaning attribute afterJson conversion
+       Update Word Test:
+       Delete Word Test:
+    */
 
     @Test @Ignore
     public void updateWord() {
