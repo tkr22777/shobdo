@@ -54,7 +54,7 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public boolean createWord(Word word) {
+    public Word createWord(Word word) {
 
         bmLog.start();
 
@@ -64,13 +64,13 @@ public class WordDaoMongoImpl implements WordDao {
             Document wordDocument = Document.parse( mapper.writeValueAsString(word) );
             collection.insertOne(wordDocument);
             bmLog.end("@WDMI001 createWord Saving word to database: " + word.getWordSpelling());
+            return word;
 
         } catch ( Exception ex ){
 
             log.info( "Failed to map dictionary word object to jsonString. Ex: " + ex.getMessage() );
+            throw new RuntimeException("@WDMI002 Failed to create word");
         }
-
-        return true;
     }
 
     @Override

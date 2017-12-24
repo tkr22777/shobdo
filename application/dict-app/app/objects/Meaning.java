@@ -18,13 +18,6 @@ public class Meaning {
 
     private VersionMeta versionMeta;
 
-    public Meaning(String partOfSpeech, String meaning, String exampleSentence, int strength) {
-        this.partOfSpeech = partOfSpeech;
-        this.meaning = meaning;
-        this.exampleSentence = exampleSentence;
-        this.strength = strength;
-    }
-
     @Override
     public String toString() {
         return JsonUtil.toJsonString(this);

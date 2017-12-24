@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 public class PartsOfSpeechSet {
 
-    private Set<String> partsOfSpeeches = new HashSet<String>(
+    public Set<String> partsOfSpeeches = new HashSet<String>(
             Arrays.asList(
                     "বিশেষ্য",
                     "বিশেষণ",

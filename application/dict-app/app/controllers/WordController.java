@@ -35,11 +35,14 @@ public class WordController extends Controller {
 
         JsonNode wordJson = request().body().asJson();
 
-        String wordId = wordLogic.createWord(wordJson);
+        try {
 
-        ObjectNode result = Json.newObject().put("wordId", wordId);
+            return created(wordLogic.createWord(wordJson));
 
-        return ok(result);
+        } catch (Exception ex) {
+
+            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
+        }
     }
 
     //READ
@@ -48,7 +51,7 @@ public class WordController extends Controller {
         Word word = wordLogic.getWordByWordId(wordId);
 
         if (word == null)
-            return ok("No word found for wordId:\"" + wordId + "\"");
+            return notFound("No word found for wordId:\"" + wordId + "\"");
         else
             return ok(Json.toJson(word));
     }

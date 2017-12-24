@@ -36,4 +36,11 @@ public class Constants {
     public static final String WORD_SPELLING_KEY = "wordSpelling";
     public static final String SEARCH_STRING_KEY = "searchString";
     public static final String WORD_COUNT_KEY = "wordCount";
+
+    //Error Messages
+    public static final String CREATE_WORDID_EXISTS = "WordID exists:";
+    public static final String CREATE_SPELLING_NOT_PROVIDED = "WordSpelling was not provided.";
+    public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:";
+    public static final String CREATE_MEANING_PROVIDED = "Word creation along with meaning is not supported";
+
 }
