@@ -1,7 +1,6 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import logics.WordLogic;
 import objects.Word;
 import play.libs.Json;
@@ -31,7 +30,8 @@ public class WordController extends Controller {
     }
 
     //CREATE
-    @BodyParser.Of(BodyParser.Json.class) public Result createWord() {
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createWord() {
 
         JsonNode wordJson = request().body().asJson();
 
@@ -48,41 +48,36 @@ public class WordController extends Controller {
     //READ
     public Result getWordByWordId(String wordId) {
 
-        Word word = wordLogic.getWordByWordId(wordId);
-
-        if (word == null)
-            return notFound("No word found for wordId:\"" + wordId + "\"");
-        else
-            return ok(Json.toJson(word));
-    }
-
-    public Result getWordBySpelling(String wordSpelling) {
-
-        Word word = wordLogic.getWordBySpelling(wordSpelling);
-
-        if (word == null)
-            return ok("No word found for spelling:\"" + wordSpelling + "\"");
-        else
-            return ok(Json.toJson(word));
-    }
-
-    @BodyParser.Of(BodyParser.Json.class) public Result getWordBySpellingPost() {
-
-        String wordSpelling;
-        JsonNode json = request().body().asJson();
-
         try {
 
-            wordSpelling = json.get(Constants.WORD_SPELLING_KEY).asText();
+            log.info("001 getWordById, wordId:" + wordId);
+            JsonNode wordJson = wordLogic.getWordJNodeByWordId(wordId);
+            return wordJson == null? notFound(Constants.GET_WORD_NOT_FOUND + wordId): ok(wordJson);
 
         } catch (Exception ex) {
 
-            log.info("WC003 Property 'wordSpelling' not found in the json body. Body found:" + json.textValue());
-            log.info("WC004 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
+            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
         }
+    }
 
-        return getWordBySpelling(wordSpelling);
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getWordBySpellingPost() {
+
+        try {
+
+            JsonNode body =  request().body().asJson();
+
+            if(!body.has(Constants.WORD_SPELLING_KEY))
+                throw new IllegalArgumentException("");
+
+            String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
+            JsonNode wordNode = wordLogic.getWordJNodeBySpelling(wordSpelling);
+            return wordNode == null? notFound(Constants.GET_WORD_NOT_FOUND + wordSpelling): ok(wordNode);
+
+        } catch (Exception ex) {
+
+            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
+        }
     }
 
     //UPDATE TODO
