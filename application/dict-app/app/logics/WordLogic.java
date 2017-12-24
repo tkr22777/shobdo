@@ -9,6 +9,8 @@ import objects.VersionMeta;
 import objects.Word;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import play.libs.Json;
+import sun.jvm.hotspot.debugger.win32.coff.COFFLineNumber;
 import utilities.BenchmarkLogger;
 import utilities.Constants;
 import utilities.JsonUtil;
@@ -44,25 +46,50 @@ public class WordLogic {
     /* CREATE word(s)
         * wordId should always be generated here (createWord of wordLogic)
         * no meaning creation is allowed with the create word endpoint for now */
-    public String createWord(JsonNode wordJsonNode) {
+    public JsonNode createWord(JsonNode wordJsonNode) {
 
         Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
-        return createWord(word);
-
+        Word createdWord = createWord(word) ;
+        return convertWordObjectToResponseJsonNode(createdWord);
     }
 
-    public String createWord(Word word) {
+    private JsonNode convertWordObjectToResponseJsonNode(Word word) {
+
+        JsonNode jsonNode = Json.toJson(word);
+        List attributesToRemove = Arrays.asList("extraMetaMap", "versionMeta");
+        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
+    }
+
+    public Word createWord(Word word) {
 
         if(word.getWordId() != null)
-            throw new IllegalArgumentException("Creating word with providedId is not allowed");
+            throw new IllegalArgumentException(Constants.CREATE_WORDID_EXISTS + word.getWordId());
 
-        word.setWordId(generateNewWordId());
-        word = prepareWordForCreate(word);
+        if(word.getWordSpelling() == null || "".equalsIgnoreCase(word.getWordSpelling()))
+            throw new IllegalArgumentException(Constants.CREATE_SPELLING_NOT_PROVIDED);
+
+        if(getWordBySpelling( word.getWordSpelling() ) != null)
+            throw new IllegalArgumentException(Constants.CREATE_SPELLING_EXISTS + word.getWordSpelling());
+
+        if(word.getMeaningsMap() != null && word.getMeaningsMap().size() > 0)
+            throw new IllegalArgumentException(Constants.CREATE_MEANING_PROVIDED);
+
+        word.setWordId( generateNewWordId() );
+
+        //todo get creatorId from context
+        String creatorId =  "sin";
+        VersionMeta versionMeta = new VersionMeta();
+        versionMeta.setCreatorId( creatorId );
+        versionMeta.setStatus(Constants.ENTITIY_ACTIVE);
+        String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
+        versionMeta.setCreationDate( creationDateString );
+
+        word.setVersionMeta(versionMeta);
 
         wordDao.createWord(word);
         wordCache.cacheWord(word);
 
-        return word.getWordId();
+        return word;
     }
 
     public static String generateNewWordId() {
@@ -95,8 +122,6 @@ public class WordLogic {
             throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
 
         Word cachedWord = wordCache.getWordBySpelling(spelling);
-
-        log.info("WL001 Spelling : " + spelling + " Word:" + cachedWord);
 
         if(cachedWord != null)
             return cachedWord;
@@ -298,27 +323,5 @@ public class WordLogic {
         return new ArrayList<>();
     }
 
-    public static Word prepareWordForCreate( Word word ){
 
-        if(word == null)
-            return word;
-
-        Word retWord = new Word();
-
-        retWord.setWordId(word.getWordId());
-        retWord.setWordSpelling(word.getWordSpelling());
-
-        //todo get creatorId from context
-        String creatorId =  "sin";
-        VersionMeta versionMeta = new VersionMeta();
-
-        versionMeta.setCreatorId(creatorId);
-        versionMeta.setStatus(Constants.ENTITIY_ACTIVE);
-        String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        versionMeta.setCreationDate( creationDateString );
-
-        retWord.setVersionMeta(versionMeta);
-
-        return retWord;
-    }
 }

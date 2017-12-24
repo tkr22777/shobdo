@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface WordDao {
 
-    public boolean createWord(Word word);
+    public Word createWord(Word word);
 
     public Word getWordByWordId(String wordId);
 

@@ -2,7 +2,10 @@ package utilities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.nio.ByteBuffer;
+import java.util.Collection;
 
 /**
  * Created by tahsink on 1/6/17.
@@ -88,5 +91,23 @@ public class JsonUtil {
             log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to [ClassType:" + class_type + "]");
             throw new IllegalArgumentException("Invalid JsonNode:" + jsonNode + " for ClassType:" + class_type);
         }
+    }
+
+    public static JsonNode removeFieldsFromJsonNode(JsonNode node, Collection<String> attributes) {
+
+        ObjectNode objectNode = node.deepCopy();
+        for(String attribute: attributes) {
+            objectNode.remove(attribute);
+        }
+        return toJsonNodeFromJsonString(objectNode.toString());
+    }
+
+    public static JsonNode nullFieldsFromJsonNode(JsonNode node, Collection<String> attributes) {
+
+        ObjectNode objectNode = node.deepCopy();
+        for(String attribute: attributes) {
+            objectNode.putNull(attribute);
+        }
+        return toJsonNodeFromJsonString(objectNode.toString());
     }
 }

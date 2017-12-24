@@ -1,9 +1,10 @@
 package IntegrationTests;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import logics.WordLogic;
+import objects.Meaning;
+import objects.PartsOfSpeechSet;
 import objects.Word;
 import org.junit.*;
 import play.libs.Json;
@@ -15,6 +16,8 @@ import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,52 +55,9 @@ public class WordControllerTests extends WithApplication {
         wordLogic.flushCache();
     }
 
+    /* Create tests */
     @Test
-    public void simpleTest() {
-
-        running( fakeApplication(), () -> {
-
-            createWordsInDb(2);
-
-            log.info("Created words: " + createdWords);
-
-            Word word = createdWords.get(0);
-
-            Word wordFromDb = wordLogic.getWordByWordId(word.getWordId());
-
-            log.info("Created word retrieved from DB:" + wordFromDb);
-
-        });
-
-    }
-
-    //WORD CRUD TESTS
-    /*
-        These API's should not know and care about the internals/logic of the system
-
-        CREATE Test Cases:
-        1. Valid object, word spelling provided, spelling do not exist, create correctly
-        2. Valid object, word spelling provided, spelling exists, throw error
-        3. WordId provided, throw error
-        4. Meaning provided, throw error
-        5. Any other attribute provided, throws error, returns reasons in the body
-
-        GET Test Cases:
-        1. Invalid wordId, throws error
-        2. Valid wordId, returns correct word, word should not have meaning attribute afterJson conversion
-
-        Update Word Test:
-        1.
-        2.
-
-        Delete Word Test:
-        1.
-        2.
-
-    */
-
-    @Test
-    public void createWordTest() {
+    public void createWord_validObjectSpellingDoNotExitsWordIdNotProvided_wordCreatedCorrectly() {
 
         running( fakeApplication(), () -> {
 
@@ -110,22 +70,88 @@ public class WordControllerTests extends WithApplication {
                     "}";
 
             JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
-
             Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
-            assertEquals(OK, result.status());
-
-            Word createdWord = wordLogic.getWordBySpelling("ঞতটতথঙ");
-
-            //since request did not have an wordId and versionMeta
-            createdWord.setWordId(null);
-            createdWord.setVersionMeta(null);
-            ObjectNode objectNode = Json.toJson(createdWord).deepCopy();
-            objectNode.remove("extraMetaMap");
-            objectNode.remove("versionMeta");
-            Assert.assertEquals(bodyJson, JsonUtil.toJsonNodeFromJsonString(objectNode.toString()));
+            assertEquals(CREATED, result.status());
+            JsonNode createdJNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
+            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(createdJNode, Arrays.asList("wordId")));
         });
     }
 
+    @Test
+    public void createWord_spellingAlreadyExits_throwsError() {
+
+        running( fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            String existingWordSpelling = createdWords.get(0).getWordSpelling();
+            String jsonWordString = "{\n" +
+                    "  \"wordId\" : null,\n" +
+                    "  \"wordSpelling\" : \"" + existingWordSpelling +"\",\n" +
+                    "  \"meaningsMap\" : { },\n" +
+                    "  \"antonyms\" : [ ],\n" +
+                    "  \"synonyms\" : [ ]\n" +
+                    "}";
+
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
+            assertEquals(BAD_REQUEST, result.status());
+            assertEquals(Constants.CREATE_SPELLING_EXISTS + existingWordSpelling, contentAsString(result));
+        });
+    }
+
+    @Test
+    public void createWord_wordIdProvided_throwsError() {
+
+        running( fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            String existingWordId = createdWords.get(0).getWordId();
+
+            String jsonWordString = "{\n" +
+                    "  \"wordId\" : \"" + existingWordId + "\",\n" +
+                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
+                    "  \"meaningsMap\" : { },\n" +
+                    "  \"antonyms\" : [ ],\n" +
+                    "  \"synonyms\" : [ ]\n" +
+                    "}";
+
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
+            assertEquals(BAD_REQUEST, result.status());
+            assertEquals(Constants.CREATE_WORDID_EXISTS + existingWordId, contentAsString(result));
+        });
+    }
+
+    @Test
+    public void createWord_meaningProvided_throwsError() {
+
+        running( fakeApplication(), () -> {
+
+            String jsonWordString = "{\n" +
+                    "  \"wordId\" : null,\n" +
+                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
+                    "  \"meaningsMap\" : { \"aMeaningId\":  { \"meaningId\": \"aMeaningId\"}  },\n" +
+                    "  \"antonyms\" : [ ],\n" +
+                    "  \"synonyms\" : [ ]\n" +
+                    "}";
+
+            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString(jsonWordString);
+            Result result = route(fakeRequest(POST, "/api/v1/words").bodyJson(bodyJson));
+            assertEquals(BAD_REQUEST, result.status());
+            assertEquals(Constants.CREATE_MEANING_PROVIDED, contentAsString(result));
+        });
+    }
+
+   //WORD CRUD TESTS
+    /*
+        GET Test Cases:
+        1. Invalid wordId, throws error
+        2. Valid wordId, returns correct word, word should not have meaning attribute afterJson conversion
+        Update Word Test:
+        Delete Word Test:
+    */
+
+    /* Get tests */
     @Test
     public void getWordByWordId() {
 

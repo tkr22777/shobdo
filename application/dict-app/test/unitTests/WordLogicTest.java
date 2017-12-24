@@ -55,7 +55,7 @@ public class WordLogicTest {
     //Create word
     @Test
     public void createWord_wordIdIsNotSet_createWordDaoCalled() {
-        when(mockWordDao.createWord(any())).thenReturn(true);
+        when(mockWordDao.createWord(any())).thenReturn(theWord);
         wordLogic.createWord(theWord);
         verify(mockWordDao, times(1)).createWord(any(Word.class));
         verify(mockWordCache, times(1)).cacheWord(any(Word.class));
