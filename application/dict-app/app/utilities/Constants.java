@@ -23,27 +23,19 @@ public class Constants {
     public static final String ORIGINAL_STRING = "ORIGINAL STRING";
     public static final String ENG_PRONUN_STRING = "ENG PRONUNCIATION";
 
-    //Versioning
-    public static final String ENTITIY_ACTIVE = "ACTIVE";
-    public static final String ENTITIY_UPDATED = "UPDATED";
-    public static final String ENTITIY_DELETED = "DELETED";
-    //REQUESTED
-    public static final String ENTITIY_CREATE_REQUESTED = "CREATE_REQUESTED";
-    public static final String ENTITIY_UPDATE_REQUESTED = "UPDATE_REQUESTED";
-    public static final String ENTITIY_DELETE_REQUESTED = "DELETED_REQUESTED";
-
-    //REST REQUEST CONSTANTS
+    //REST REQUEST FIELD NAMES
     public static final String WORD_SPELLING_KEY = "wordSpelling";
     public static final String SEARCH_STRING_KEY = "searchString";
     public static final String WORD_COUNT_KEY = "wordCount";
 
     //Messages
-    public static final String GET_WORD_NOT_FOUND = "No word found for wordId/spelling:";
-    //Error Messages
-    public static final String CREATE_WORDID_EXISTS = "WordID exists:";
-    public static final String CREATE_SPELLING_NOT_PROVIDED = "WordSpelling was not provided.";
+    public static final String ENTITY_NOT_FOUND = "Entity not found for:";
+    public static final String ENTITY_IS_DEACTIVE = "Entity deactive:";
+    public static final String ENTITY_LOCKED = "Entity is currently locked:";
+    public static final String ID_NULLOREMPTY = "Id is null/empty:";
+    public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
+    public static final String CREATE_ID_NOT_PERMITTED = "User provided id is not permissible:";
     public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:";
-    public static final String CREATE_MEANING_PROVIDED = "Word creation along with meaning is not supported";
-    public static final String GET_WORDID_NULLEMPTY = "Provided wordId is null/empty:";
+    public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
 
 }
