@@ -14,7 +14,7 @@ public class Word {
     @JsonIgnore
     private String _id;
 
-    private String wordId;
+    private String id;
     private String wordSpelling;
 
     private HashMap<String, Meaning> meaningsMap = new HashMap<>(); //Think of this as the document store for meanings
@@ -22,14 +22,13 @@ public class Word {
     private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds
 
     private HashMap<String,List<String>> extraMetaMap;
-
     private VersionMeta versionMeta;
 
-    public Word() { }
+    public Word() {};
 
-    public Word( String wordId, String wordSpelling) {
+    public Word( String id, String wordSpelling) {
 
-        this.wordId = wordId;
+        this.id = id;
         this.wordSpelling = wordSpelling;
     }
 
@@ -72,6 +71,6 @@ public class Word {
 
     @Override
     public String toString() {
-        return JsonUtil.toJsonString(this);
+        return JsonUtil.objectToJsonString(this);
     }
 }

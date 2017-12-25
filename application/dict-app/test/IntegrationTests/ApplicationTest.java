@@ -66,7 +66,7 @@ public class ApplicationTest extends WithServer {
         running( fakeApplication(), () -> {
             Result result = route(fakeRequest(GET, "/api/v1/gettest"));
             assertEquals(OK, result.status());
-            JsonNode jsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
+            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
             assertEquals("Dictionary", jsonNode.get("Application").asText());
             assertEquals("Bengali", jsonNode.get("Language").asText());
         });
@@ -77,12 +77,12 @@ public class ApplicationTest extends WithServer {
 
         running( fakeApplication(), () -> {
 
-            JsonNode bodyJson = JsonUtil.toJsonNodeFromJsonString("{\"name\":\"SIN\"}");
+            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode("{\"name\":\"SIN\"}");
             Result result = route( fakeRequest(POST,"/api/v1/posttest").bodyJson(bodyJson) );
 
             assertEquals(OK, result.status());
 
-            JsonNode jsonNode = JsonUtil.toJsonNodeFromJsonString(contentAsString(result));
+            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
             assertEquals("SIN", jsonNode.get("Name").asText());
             assertEquals("3", jsonNode.get("Length").asText());
             assertEquals("S", jsonNode.get("StartsWith").asText());

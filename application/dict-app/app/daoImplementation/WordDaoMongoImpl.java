@@ -1,6 +1,5 @@
 package daoImplementation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -10,13 +9,10 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
-import objects.Meaning;
+import objects.SRequest;
 import objects.Word;
 import org.bson.Document;
-import utilities.BenchmarkLogger;
-import utilities.Constants;
-import utilities.DictUtil;
-import utilities.LogPrint;
+import utilities.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,7 +24,8 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    private final String WORD_ID = "wordId";
+    private final String WORD_ID = "id";
+    private final String REQUEST_ID = "requestId";
     private final String WORD_SPELLING = "wordSpelling";
 
     MongoClient mongoClient;
@@ -57,70 +54,48 @@ public class WordDaoMongoImpl implements WordDao {
     public Word createWord(Word word) {
 
         bmLog.start();
-
-        try {
-
-            ObjectMapper mapper = new ObjectMapper();
-            Document wordDocument = Document.parse( mapper.writeValueAsString(word) );
-            collection.insertOne(wordDocument);
-            bmLog.end("@WDMI001 createWord Saving word to database: " + word.getWordSpelling());
-            return word;
-
-        } catch ( Exception ex ){
-
-            log.info( "Failed to map dictionary word object to jsonString. Ex: " + ex.getMessage() );
-            throw new RuntimeException("@WDMI002 Failed to create word");
-        }
+        Document wordDoc = JsonUtil.objectToDocument(word);
+        collection.insertOne(wordDoc);
+        bmLog.end("@WDMI002 createWord Saving word to database: " + word.getWordSpelling());
+        return word;
     }
 
     @Override
     public Word getWordByWordId(String wordId) {
 
         bmLog.start();
-
         BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
-        Document wordDocument = collection.find(query).first();
-
-        if(wordDocument == null) {
-
-            bmLog.end("@WDMI002 getWordByWordId word not found in database for wordId: " + wordId);
-            return null;
-        }
-
-        Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
-        bmLog.end("@WDMI002 getWordByWordId word [spelling:" + word.getWordSpelling()
-                + "] found from database for wordId: " + wordId);
-        return word;
+        log.info("Query: " + query);
+        Document wordDoc = collection.find(query).first();
+        bmLog.end("@WDMI003 getWordByWordId id: " + wordId + " mongoDoc:" + wordDoc);
+        return wordDoc == null ?  null: DictUtil.getWordFromDocument( wordDoc, Word.class);
     }
 
     @Override
     public Word getWordBySpelling(String spelling) {
 
         bmLog.start();
-
         BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
-        Document wordDocument = collection.find(query).first();
+        Document wordDoc = collection.find(query).first();
+        bmLog.end("@WDMI004 getWordBySpelling   spelling: " + spelling + " mongoDoc:" + wordDoc);
+        return wordDoc == null ?  null: DictUtil.getWordFromDocument( wordDoc, Word.class);
+    }
 
-        if(wordDocument == null) {
+    @Override
+    public Word updateWord(Word word) {
 
-            bmLog.end("@WDMI004 getWordByWordId word not found in database for spelling: " + spelling);
-            return null;
-        }
+        if(word.getId() == null || word.getId().trim().equals(""))
+            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
-        bmLog.end("@WDMI005 getWordByWordId word found in database for spelling: " + spelling);
-        Word word = (Word) DictUtil.getWordFromDocument( wordDocument, Word.class);
+        BasicDBObject searchQuery = new BasicDBObject(WORD_ID, word.getId());
+        Document wordDocument = JsonUtil.objectToDocument(word);
+        collection.replaceOne(searchQuery, wordDocument);
         return word;
     }
 
     @Override
-    public boolean updateWord(Word word) {
-
-        return false;
-    }
-
-    @Override
     public void deleteWord(String wordId) {
-
+        //so delete via update/setting the deleted timestamp or flag
     }
 
     @Override
@@ -164,6 +139,45 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public ArrayList<Word> listWords(String startWordId, int limit) {
         return new ArrayList<>();
+    }
+
+    /* Consider moving them to request */
+    @Override
+    public SRequest createRequest(SRequest request) {
+        bmLog.start();
+        Document requestDoc = JsonUtil.objectToDocument(request);
+        collection.insertOne(requestDoc);
+        bmLog.end("@WDMI002 createRequest Saving request to database: " + request.getRequestId());
+        return request;
+    }
+
+    @Override
+    public SRequest getRequestById(String requestId) {
+
+        bmLog.start();
+        BasicDBObject query = new BasicDBObject(REQUEST_ID, requestId);
+        Document requestDoc = collection.find(query).first();
+        bmLog.end("@WDMI003 getWordByWordId id: " + requestId + " mongoDoc:" + requestDoc);
+        return requestDoc == null ?  null: DictUtil.getRequestFromDocument( requestDoc, SRequest.class);
+    }
+
+    @Override
+    public SRequest updateRequest(SRequest request) {
+
+        String requestId = request.getRequestId();
+
+        if( requestId == null || requestId.trim().length() == 0)
+            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
+
+        BasicDBObject searchQuery = new BasicDBObject(REQUEST_ID, requestId);
+        Document requestDocument = JsonUtil.objectToDocument(request);
+        collection.replaceOne(searchQuery, requestDocument);
+        return request;
+    }
+
+    @Override
+    public void deleteRequest(String requestId) {
+        //so delete via update/setting the deleted timestamp, status deleted
     }
 
 }

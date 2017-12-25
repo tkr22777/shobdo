@@ -1,6 +1,7 @@
 package daos;
 
 import objects.Meaning;
+import objects.SRequest;
 import objects.Word;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public interface WordDao {
 
     public Word getWordBySpelling(String spelling);
 
-    public boolean updateWord(Word word);
+    public Word updateWord(Word word);
 
     public void deleteWord(String wordId);
 
@@ -28,4 +29,13 @@ public interface WordDao {
     public void deleteAllWords();
 
     public ArrayList<Word> listWords(String startWordId, int limit);
+
+    //todo create separate request dao
+    public SRequest createRequest(SRequest request);
+
+    public SRequest getRequestById(String requestId);
+
+    public SRequest updateRequest(SRequest request);
+
+    public void deleteRequest(String requestId);
 }

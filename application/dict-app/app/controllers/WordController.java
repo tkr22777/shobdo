@@ -9,7 +9,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.Constants;
 import utilities.DictUtil;
-import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.util.HashSet;
@@ -50,9 +49,9 @@ public class WordController extends Controller {
 
         try {
 
-            log.info("001 getWordById, wordId:" + wordId);
+            log.info("001 getWordById, id:" + wordId);
             JsonNode wordJson = wordLogic.getWordJNodeByWordId(wordId);
-            return wordJson == null? notFound(Constants.GET_WORD_NOT_FOUND + wordId): ok(wordJson);
+            return wordJson == null? notFound(Constants.ENTITY_NOT_FOUND + wordId): ok(wordJson);
 
         } catch (Exception ex) {
 
@@ -72,7 +71,7 @@ public class WordController extends Controller {
 
             String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
             JsonNode wordNode = wordLogic.getWordJNodeBySpelling(wordSpelling);
-            return wordNode == null? notFound(Constants.GET_WORD_NOT_FOUND + wordSpelling): ok(wordNode);
+            return wordNode == null? notFound(Constants.ENTITY_NOT_FOUND + wordSpelling): ok(wordNode);
 
         } catch (Exception ex) {
 
@@ -83,17 +82,23 @@ public class WordController extends Controller {
     //UPDATE TODO
     @BodyParser.Of(BodyParser.Json.class) public Result updateWord(String wordId) {
 
-        JsonNode json = request().body().asJson();
-        Word word = (Word) JsonUtil.jsonNodeToObject(json, Word.class);
-        wordLogic.updateWord(wordId, word);
-        return ok();
+        JsonNode wordJson = request().body().asJson();
+
+        try {
+
+            return ok(wordLogic.updateWordJNode(wordId, wordJson));
+
+        } catch (Exception ex) {
+
+            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
+        }
     }
 
     //DELETE TODO
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteWord(String wordId) {
 
-        log.info("Delete word with wordId:" + wordId);
+        log.info("Delete word with id:" + wordId);
 
         wordLogic.deleteWord(wordId);
 
@@ -126,7 +131,7 @@ public class WordController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result listWords(String startWordId, Integer limit) {
-        log.info("List words starting from wordId:" + startWordId + ", limit:" + limit);
+        log.info("List words starting from id:" + startWordId + ", limit:" + limit);
         return ok();
     }
 
@@ -135,14 +140,14 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(String wordId) {
         JsonNode json = request().body().asJson();
-        log.info("Create meaning: " + json + " on word with wordId:" + wordId);
+        log.info("Create meaning: " + json + " on word with id:" + wordId);
         wordLogic.createMeaning(wordId, null);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
-        log.info("Get meaning with meaningId:" + meaningId  + " of word with wordId:" + wordId);
+        log.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
         wordLogic.getMeaning(wordId, meaningId);
         return ok();
     }
@@ -151,21 +156,21 @@ public class WordController extends Controller {
     public Result updateMeaning(String wordId, String meaningId) {
         JsonNode json = request().body().asJson();
         log.info("Update meaning with meaningId: " + meaningId + " with json:" + json
-                + " on word with wordId:" + wordId);
+                + " on word with id:" + wordId);
         wordLogic.updateMeaning(wordId, null);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteMeaning(String wordId, String meaningId) {
-        log.info("Delete meaning: " + meaningId + " on word with wordId:" + wordId);
+        log.info("Delete meaning: " + meaningId + " on word with id:" + wordId);
         wordLogic.deleteMeaning(wordId, meaningId);
         return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result listMeanings(String wordId) {
-        log.info("List meaningsMap on word with wordId:" + wordId);
+        log.info("List meaningsMap on word with id:" + wordId);
         wordLogic.listMeanings(wordId);
         return ok();
     }

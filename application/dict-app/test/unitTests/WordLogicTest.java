@@ -64,7 +64,7 @@ public class WordLogicTest {
     @Test(expected = IllegalArgumentException.class)
     public void createWord_wordIdIsSet_throwsIAE() {
 
-        theWord.setWordId("WD_ID_SET_By_USER");
+        theWord.setId("WD_ID_SET_By_USER");
         wordLogic.createWord(theWord);
     }
 

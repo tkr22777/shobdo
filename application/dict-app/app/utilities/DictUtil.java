@@ -1,6 +1,6 @@
 package utilities;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import objects.SRequest;
 import objects.Word;
 import objects.Meaning;
 import objects.PartsOfSpeechSet;
@@ -24,15 +24,16 @@ public class DictUtil {
         return prefix + UUID.randomUUID();
     }
 
+    public static SRequest getRequestFromDocument(Document dictionaryDocument, Class<?> class_type) {
+
+        dictionaryDocument.remove("_id");
+        return (SRequest) JsonUtil.documentToObject(dictionaryDocument, class_type);
+    }
+
     public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
-        return (Word) getObjectFromDocument(dictionaryDocument, class_type);
-    }
-
-    public static Object getObjectFromDocument(Document doc, Class<?> class_type) {
-
-        return JsonUtil.toObjectFromJsonString(doc.toJson(), class_type);
+        return (Word) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }
 
     public static Set<Word> generateRandomWordSet(int numberOfWords){
