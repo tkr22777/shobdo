@@ -7,7 +7,7 @@ import utilities.JsonUtil;
  * Created by tahsinkabir on 6/16/16.
  */
 @Data
-public class Meaning {
+public class Meaning extends VersionMeta {
 
     private String meaningId;
     private String meaning;
@@ -20,6 +20,6 @@ public class Meaning {
 
     @Override
     public String toString() {
-        return JsonUtil.toJsonString(this);
+        return JsonUtil.objectToJsonString(this);
     }
 }

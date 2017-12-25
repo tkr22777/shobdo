@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.bson.Document;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
@@ -15,7 +16,7 @@ public class JsonUtil {
     private static LogPrint log = new LogPrint(JsonUtil.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
 
-    public static Object toObjectFromJsonString(String jsonString, Class<?> class_type ) {
+    public static Object jsonStringToObject(String jsonString, Class<?> class_type ) {
 
         try {
 
@@ -28,20 +29,7 @@ public class JsonUtil {
         }
     }
 
-    public static String toJsonString(Object object) {
-
-        try {
-
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
-
-        } catch (Exception ex) {
-
-            log.info("@JU002: Error converting object to json string. Exception: " + ex.getStackTrace().toString());
-            throw new IllegalArgumentException("Object to JsonString conversion failed:" + object );
-        }
-    }
-
-    public static JsonNode toJsonNodeFromJsonString(String jsonString) {
+    public static JsonNode jsonStringToJsonNode(String jsonString) {
 
         try {
 
@@ -54,7 +42,20 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode toJsonNodeFromObject(Object object) {
+    public static String objectToJsonString(Object object) {
+
+        try {
+
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+
+        } catch (Exception ex) {
+
+            log.info("@JU002: Error converting object to json string. Exception: " + ex.getStackTrace().toString());
+            throw new IllegalArgumentException("Object to JsonString conversion failed:" + object );
+        }
+    }
+
+    public static JsonNode objectToJsonNode(Object object) {
 
         try {
 
@@ -99,7 +100,7 @@ public class JsonUtil {
         for(String attribute: attributes) {
             objectNode.remove(attribute);
         }
-        return toJsonNodeFromJsonString(objectNode.toString());
+        return jsonStringToJsonNode(objectNode.toString());
     }
 
     public static JsonNode nullFieldsFromJsonNode(JsonNode node, Collection<String> attributes) {
@@ -108,6 +109,24 @@ public class JsonUtil {
         for(String attribute: attributes) {
             objectNode.putNull(attribute);
         }
-        return toJsonNodeFromJsonString(objectNode.toString());
+        return jsonStringToJsonNode(objectNode.toString());
+    }
+
+    public static Object documentToObject(Document doc, Class<?> class_type) {
+
+        return jsonStringToObject(doc.toJson(), class_type);
+    }
+
+    public static Document objectToDocument(Object object) {
+
+        try {
+
+            return Document.parse( objectMapper.writeValueAsString(object) );
+
+        } catch (Exception ex) {
+
+            throw new IllegalArgumentException("objectToDocument error. Object["
+                    + object.toString() + "][Ex:" + ex.getStackTrace().toString());
+        }
     }
 }

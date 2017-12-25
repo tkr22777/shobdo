@@ -85,7 +85,7 @@ public class SamsadExporter {
 
         Word word = new Word();
 
-        //word.setWordId( DictUtil.generateNewWordId() );
+        //word.setId( DictUtil.generateNewWordId() );
         word.setExtraMetaValue(Constants.ORIGINAL_STRING, line);
 
         //Spelling

@@ -5,56 +5,56 @@
 ###############################################
 # 0. Splash dictionary message and test routes:
 ###############################################
-GET     /api/v1/                                controllers.WordController.index()
-GET     /api/v1/gettest                         controllers.AdminController.testGet()
-POST    /api/v1/posttest                        controllers.AdminController.testPost()
+GET     /api/v1/                                     controllers.WordController.index()
+GET     /api/v1/gettest                              controllers.AdminController.testGet()
+POST    /api/v1/posttest                             controllers.AdminController.testPost()
 
 ################################
 # CRUDL and search API for word:
 ################################
 
 # 1. Create word:
-POST    /api/v1/words                            controllers.WordController.createWord()
+POST    /api/v1/words                                controllers.WordController.createWord()
 
 # 2. Get word:
-GET     /api/v1/words/:wordId                    controllers.WordController.getWordByWordId(wordId: String)
+GET     /api/v1/words/:id                            controllers.WordController.getWordByWordId(id: String)
 
 # 3. POST Get word by spelling:
-#     body contains "wordSpelling" since Bengali
-#     chars do not play well in route):
-POST    /api/v1/words/postget                    controllers.WordController.getWordBySpellingPost()
+# body contains "wordSpelling" key and query value
+# since Bengali chars do not play well in route):
+POST    /api/v1/words/postget                        controllers.WordController.getWordBySpellingPost()
 
 # 4. Update word:
-PUT     /api/v1/words/:wordId                    controllers.WordController.updateWord(wordId: String)
+PUT     /api/v1/words/:id                            controllers.WordController.updateWord(id: String)
 
 # 5. Delete word:
-DELETE  /api/v1/words/:wordId                    controllers.WordController.deleteWord(wordId: String)
+DELETE  /api/v1/words/:id                            controllers.WordController.deleteWord(id: String)
 
 # 6. List words
-GET     /api/v1/words/list                       controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
+GET     /api/v1/words/list                           controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
 # 7. Search words by spelling:
-#     body contains "searchString"
-POST    /api/v1/words/search                     controllers.WordController.searchWordsBySpelling()
+#    body contains "searchString"
+POST    /api/v1/words/search                         controllers.WordController.searchWordsBySpelling()
 
 ##############################
 # CRUDL API for word meanings:
 ##############################
 
 # 1. Create a new meaning of a word
-POST    /api/v1/words/:wordId/meanings                   controllers.WordController.createMeaning(wordId: String)
+POST    /api/v1/words/:id/meanings                   controllers.WordController.createMeaning(id: String)
 
 # 2. Get a specific meaning of a word
-GET     /api/v1/words/:wordId/meanings/:meaningId        controllers.WordController.getMeaning(wordId: String, meaningId: String)
+GET     /api/v1/words/:id/meanings/:meaningId        controllers.WordController.getMeaning(id: String, meaningId: String)
 
 # 3. Update a specific meaning of a word
-PUT     /api/v1/words/:wordId/meanings/:meaningId        controllers.WordController.updateMeaning(wordId: String, meaningId: String)
+PUT     /api/v1/words/:id/meanings/:meaningId        controllers.WordController.updateMeaning(id: String, meaningId: String)
 
 # 4. Delete a specific meaning of a word
-DELETE  /api/v1/words/:wordId/meanings/:meaningId        controllers.WordController.deleteMeaning(wordId: String, meaningId: String)
+DELETE  /api/v1/words/:id/meanings/:meaningId        controllers.WordController.deleteMeaning(id: String, meaningId: String)
 
 # 5. List meaningsMap of a word
-GET     /api/v1/words/:wordId/meanings/list              controllers.WordController.listMeanings(wordId: String)
+GET     /api/v1/words/:id/meanings/list              controllers.WordController.listMeanings(id: String)
 
 ##############
 # Admin stuff:

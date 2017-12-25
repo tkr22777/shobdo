@@ -20,5 +20,4 @@ public class PartsOfSpeechSet {
                     "অব্যয়",
                     "ক্রিয়া")
     );
-
 }

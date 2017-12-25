@@ -64,7 +64,7 @@ public class WordCache {
 
         if (wordJsonString != null) {
 
-            Word wordFound = (Word) JsonUtil.toObjectFromJsonString(wordJsonString, Word.class);
+            Word wordFound = (Word) JsonUtil.jsonStringToObject(wordJsonString, Word.class);
             bmLog.end("@WC003 Word [" + spelling + "] found in cache and returning");
             return wordFound;
 
