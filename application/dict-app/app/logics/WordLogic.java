@@ -176,28 +176,20 @@ public class WordLogic {
         if(currentWord == null)
             throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + updateWord.getId());
 
-        EntityMeta currentVersion = currentWord.getEntityMeta();
+        EntityMeta currentMeta = currentWord.getEntityMeta();
 
-        if(currentVersion.getStatus().equals(EntityStatus.LOCKED))
+        if(currentMeta.getStatus().equals(EntityStatus.LOCKED))
             throw new IllegalArgumentException(Constants.ENTITY_LOCKED + updateWord.getId());
 
         //Create a UserRequest object for the word
         String requestId = generateNewWordUpdateReqID();
-
-        UserRequest updateRequest = new UserRequest();
-        updateRequest.setRequestId(requestId);
-        updateRequest.setTargetId(currentWordId);
-        updateRequest.setTargetType(EntityType.WORD);
-        updateRequest.setOperation(RequestOperation.UPDATE);
-        updateRequest.setBody(JsonUtil.objectToJsonNode(updateWord));
-
         String creatorId =  "sin";
         String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        EntityMeta requestVersion = new EntityMeta( EntityStatus.ACTIVE, EntityType.REQUEST, null, creatorId,
+        EntityMeta requestMeta = new EntityMeta( EntityStatus.ACTIVE, EntityType.REQUEST, null, creatorId,
                 creationDateString, null, null, 0 );
-
-        updateRequest.setEntityMeta(requestVersion);
-
+        JsonNode body = JsonUtil.objectToJsonNode(updateWord);
+        UserRequest updateRequest = new UserRequest(null, requestId, currentWordId, EntityType.WORD, RequestOperation.UPDATE,
+                body, requestMeta);
         wordDao.createRequest(updateRequest);
 
         return requestId;
@@ -238,41 +230,57 @@ public class WordLogic {
 
     private Word approveUpdateWordRequest(UserRequest request){
 
-        String validatorId = "validatorId";
         String currentWordId = request.getTargetId();
-
         Word currentWord = wordDao.getWordByWordId(currentWordId);
-        Word currentWordCopy = deepCopyWord(currentWord);
 
-        //updated the word with the updates
+        //Keeping backup of current word
+        Word currentWordCopy = deepCopyWord(currentWord);
+        currentWordCopy = createUpdatedWordEntry(currentWordCopy);
+        currentWord.setExtraMetaValue(request.getRequestId(), currentWordCopy.toString() );
+
+        //Updated the word with the updates
         JsonNode updateWordBody = request.getBody();
         Word updateRequestWord = (Word) JsonUtil.jsonNodeToObject( updateWordBody, Word.class);
         currentWord.setWordSpelling( updateRequestWord.getWordSpelling() );
         currentWord.setSynonyms( updateRequestWord.getSynonyms());
         currentWord.setAntonyms( updateRequestWord.getAntonyms());
         currentWord.setExtraMetaValue(REQUEST_MERGED, request.getRequestId());
+        //update the entry in DB
+        wordDao.updateWord(currentWord);
+
+        //Update the request as merged
+        saveRequestAsMerged(request);
+
+        return currentWord;
+    }
+
+    private Word createUpdatedWordEntry(Word currentWordCopy) {
 
         //keeping the old word in the current words extra meta map with requestId
         currentWordCopy.setId( generateNewWordId() );
-        EntityMeta currentCopyVersion = currentWordCopy.getEntityMeta();
-        currentCopyVersion.setParentId(currentWordId);
-        currentCopyVersion.setStatus(EntityStatus.UPDATED);
+        EntityMeta currentCopyMeta = currentWordCopy.getEntityMeta();
+
+        String validatorId = "validatorId";
+        currentCopyMeta.setValidatorId(validatorId);
+
+        String currentWordId = currentWordCopy.getId();
+        currentCopyMeta.setParentId(currentWordId);
+        currentCopyMeta.setStatus(EntityStatus.UPDATED);
         String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        currentCopyVersion.setDeactivationDate(deactivationDateString); //marked it as de-active
-        currentCopyVersion.setValidatorId(validatorId);
-        currentWord.setExtraMetaValue(request.getRequestId(), currentWordCopy.toString() );
+        currentCopyMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
 
-        wordDao.updateWord(currentWord);
+        return currentWordCopy;
+    }
 
-        //updated the request as merged
-        EntityMeta requestVersion = request.getEntityMeta();
-        requestVersion.setStatus(EntityStatus.MERGED);
-        requestVersion.setDeactivationDate(deactivationDateString); //marked it as de-active
-        requestVersion.setValidatorId(validatorId);
-        log.info("Updated entry of request:" + request);
+    private void saveRequestAsMerged(UserRequest request) {
+
+        String validatorId = "validatorId";
+        EntityMeta requestMeta = request.getEntityMeta();
+        requestMeta.setValidatorId(validatorId);
+        requestMeta.setStatus(EntityStatus.MERGED);
+        String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
+        requestMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
         wordDao.updateRequest(request);
-
-        return currentWord;
     }
 
     private Word approveDeleteWordRequest(UserRequest request){
