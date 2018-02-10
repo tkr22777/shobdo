@@ -104,25 +104,24 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        String searchString = "";
-        JsonNode json = request().body().asJson();
-        Set<String> wordSpellings = new HashSet<>();
+        String endpoint = "searchWordsBySpelling";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
-        try {
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
 
-            searchString = json.get(Constants.SEARCH_STRING_KEY).asText();
+            JsonNode json = request().body().asJson();
+            if(!json.has(Constants.SEARCH_STRING_KEY))
+                badRequest();
+
+            String searchString = json.get(Constants.SEARCH_STRING_KEY).asText();;
+            Set<String> wordSpellings = new HashSet<>();
 
             if (searchString.length() > 0)
                 wordSpellings = wordLogic.searchWords(searchString);
 
-        } catch (Exception ex) {
-
-            log.info("WC001 Property 'searchString' not found in the json body. Body found:" + json.textValue());
-            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
-        }
-
-        return ok(Json.toJson(wordSpellings));
+            return ok(Json.toJson(wordSpellings));
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
