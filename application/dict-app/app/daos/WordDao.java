@@ -1,7 +1,6 @@
 package daos;
 
-import objects.Meaning;
-import objects.SRequest;
+import objects.MutationRequest;
 import objects.Word;
 
 import java.util.ArrayList;
@@ -31,11 +30,11 @@ public interface WordDao {
     public ArrayList<Word> listWords(String startWordId, int limit);
 
     //todo create separate request dao
-    public SRequest createRequest(SRequest request);
+    public MutationRequest createRequest(MutationRequest request);
 
-    public SRequest getRequestById(String requestId);
+    public MutationRequest getRequestById(String requestId);
 
-    public SRequest updateRequest(SRequest request);
+    public MutationRequest updateRequest(MutationRequest request);
 
     public void deleteRequest(String requestId);
 }

@@ -6,6 +6,7 @@ import logics.WordLogic;
 import objects.Meaning;
 import objects.Word;
 import org.junit.*;
+import play.libs.Json;
 import play.mvc.Result;
 import play.test.WithApplication;
 import utilities.Constants;
@@ -39,10 +40,17 @@ public class WordControllerTests extends WithApplication {
         wordLogic = WordLogic.factory();
     }
 
+    private JsonNode convertWordToJsonResponse(Word word) {
+
+        JsonNode jsonNode = Json.toJson(word);
+        List attributesToRemove = Arrays.asList("extraMetaMap", "entityMeta");
+        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
+    }
+
     private void createWordsInDb(int numberOfWords) {
 
         createdWords = new ArrayList<>( DictUtil.generateRandomWordSet(numberOfWords) );
-        wordLogic.createWordsBatch(createdWords); //storing for tests
+        wordLogic.createWords(createdWords); //storing for tests
     }
 
     private void createMeaningsInDbForWord(String wordId, int numberOfMeanings) {
@@ -82,7 +90,7 @@ public class WordControllerTests extends WithApplication {
 
             //Making sure the data persisted
             String wordId = createdJNode.get("id").toString().replaceAll("\"","");
-            JsonNode wordFromDB = WordLogic.convertWordToResponseJNode( wordLogic.getWordByWordId(wordId) );
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(wordId) );
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(wordFromDB, Arrays.asList("id")));
         });
     }
@@ -164,7 +172,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = route( fakeRequest(GET,"/api/v1/words/" + createdWord.getId()) );
             assertEquals(OK, result.status());
-            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
+            Assert.assertEquals( convertWordToJsonResponse(createdWord).toString(), contentAsString(result));
         });
     }
 
@@ -188,7 +196,7 @@ public class WordControllerTests extends WithApplication {
             Word createdWord = createdWords.get(0);
             Result result = route( fakeRequest(GET,"/api/v1/words/spelling" + createdWord.getWordSpelling() ) );
             assertEquals(OK, result.status());
-            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
+            Assert.assertEquals( convertWordToJsonResponse(createdWord).toString(), contentAsString(result));
         });
     }
 
@@ -204,7 +212,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = route( fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson) );
             assertEquals(OK, result.status());
-            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
+            Assert.assertEquals( convertWordToJsonResponse(createdWord).toString(), contentAsString(result));
         });
     }
 
@@ -246,7 +254,7 @@ public class WordControllerTests extends WithApplication {
 
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(OK, result.status());
@@ -255,7 +263,7 @@ public class WordControllerTests extends WithApplication {
             Assert.assertEquals(updateRequestWordJNode, updatedJNode);
 
             //Making sure the data persisted
-            JsonNode wordFromDB = WordLogic.convertWordToResponseJNode( wordLogic.getWordByWordId(createdWord.getId()));
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(createdWord.getId()));
             Assert.assertEquals(updateRequestWordJNode, wordFromDB);
         });
     }
@@ -291,7 +299,7 @@ public class WordControllerTests extends WithApplication {
 
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling("");
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(BAD_REQUEST, result.status());
@@ -314,7 +322,7 @@ public class WordControllerTests extends WithApplication {
             HashMap<String,Meaning> meaningHashMap = new HashMap<>();
             meaningHashMap.put(meaning.getMeaningId(), meaning);
             updateRequestWord.setMeaningsMap(meaningHashMap);
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(BAD_REQUEST, result.status());
@@ -366,7 +374,7 @@ public class WordControllerTests extends WithApplication {
 
             //Making sure the data persisted
             String wordId = createdJNode.get("id").toString().replaceAll("\"","");
-            JsonNode wordFromDB = WordLogic.convertWordToResponseJNode( wordLogic.getWordByWordId(wordId) );
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(wordId) );
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(wordFromDB, Arrays.asList("id")));
             */
         });
@@ -433,7 +441,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = route( fakeRequest(GET,"/api/v1/words/" + createdWord.getId()) );
             assertEquals(OK, result.status());
-            Assert.assertEquals( WordLogic.convertWordToResponseJNode(createdWord).toString(), contentAsString(result));
+            Assert.assertEquals( convertWordToJsonResponse(createdWord).toString(), contentAsString(result));
         });
     }
 
@@ -460,7 +468,7 @@ public class WordControllerTests extends WithApplication {
 
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(OK, result.status());
@@ -469,7 +477,7 @@ public class WordControllerTests extends WithApplication {
             Assert.assertEquals(updateRequestWordJNode, updatedJNode);
 
             //Making sure the data persisted
-            JsonNode wordFromDB = WordLogic.convertWordToResponseJNode( wordLogic.getWordByWordId(createdWord.getId()));
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(createdWord.getId()));
             Assert.assertEquals(updateRequestWordJNode, wordFromDB);
         });
     }
@@ -505,7 +513,7 @@ public class WordControllerTests extends WithApplication {
 
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling("");
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(BAD_REQUEST, result.status());
@@ -528,7 +536,7 @@ public class WordControllerTests extends WithApplication {
             HashMap<String,Meaning> meaningHashMap = new HashMap<>();
             meaningHashMap.put(meaning.getMeaningId(), meaning);
             updateRequestWord.setMeaningsMap(meaningHashMap);
-            JsonNode updateRequestWordJNode = WordLogic.convertWordToResponseJNode(updateRequestWord);
+            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             assertEquals(BAD_REQUEST, result.status());
