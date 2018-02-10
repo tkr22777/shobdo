@@ -1,7 +1,7 @@
 package objects;
 
 //Shobdo Object/Entity Status
-public class SOStatus {
+public class EntityStatus {
 
     public static final String ACTIVE = "ACTIVE";
     public static final String LOCKED = "LOCKED";

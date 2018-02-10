@@ -22,7 +22,7 @@ public class Word {
     private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds
 
     private HashMap<String,List<String>> extraMetaMap;
-    private VersionMeta versionMeta;
+    private EntityMeta entityMeta;
 
     public Word() {};
 
