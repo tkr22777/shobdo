@@ -14,6 +14,10 @@ import utilities.LogPrint;
 import java.util.HashSet;
 import java.util.Set;
 
+import static utilities.ControllerUtils.executeEndpoint;
+import static utilities.Headers.X_REQUEST_ID;
+import static utilities.Headers.X_TRANSACTION_ID;
+
 /**
  * Created by tahsinkabir on 5/28/16.
  */
@@ -23,75 +27,65 @@ public class WordController extends Controller {
     private static LogPrint log = new LogPrint(WordController.class);
 
     public Result index() {
-
-        String welcome = "বাংলা অভিধান এ স্বাগতম!";
-        return ok(welcome);
+        return ok( "বাংলা অভিধান এ স্বাগতম!");
     }
 
     //CREATE
     @BodyParser.Of(BodyParser.Json.class)
     public Result createWord() {
 
+        String endpoint = "createWord";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
+
         JsonNode wordJson = request().body().asJson();
-
-        try {
-
-            return created(wordLogic.createWord(wordJson));
-
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
-        }
+        return executeEndpoint(transactionId, requestId, endpoint, () ->
+                created(wordLogic.createWord(wordJson))
+        );
     }
 
     //READ
     public Result getWordByWordId(String wordId) {
 
-        try {
+        String endpoint = "getWordByWordId";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
-            log.info("001 getWordById, id:" + wordId);
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
             JsonNode wordJson = wordLogic.getWordJNodeByWordId(wordId);
-            return wordJson == null? notFound(Constants.ENTITY_NOT_FOUND + wordId): ok(wordJson);
-
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
-        }
+            return wordJson == null ? notFound(Constants.ENTITY_NOT_FOUND + wordId): ok(wordJson);
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getWordBySpellingPost() {
 
-        try {
+        String endpoint = "getWordBySpellingPost";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
             JsonNode body =  request().body().asJson();
-
             if(!body.has(Constants.WORD_SPELLING_KEY))
                 throw new IllegalArgumentException("");
 
             String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
             JsonNode wordNode = wordLogic.getWordJNodeBySpelling(wordSpelling);
             return wordNode == null? notFound(Constants.ENTITY_NOT_FOUND + wordSpelling): ok(wordNode);
-
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
-        }
+        });
     }
 
-    //UPDATE TODO
-    @BodyParser.Of(BodyParser.Json.class) public Result updateWord(String wordId) {
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result updateWord(String wordId) {
 
-        JsonNode wordJson = request().body().asJson();
+        String endpoint = "updateWord";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
-        try {
-
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+            JsonNode wordJson = request().body().asJson();
             return ok(wordLogic.updateWordJNode(wordId, wordJson));
-
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
-        }
+        });
     }
 
     //DELETE TODO
@@ -139,26 +133,47 @@ public class WordController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(String wordId) {
-        JsonNode json = request().body().asJson();
-        log.info("Create meaning: " + json + " on word with id:" + wordId);
-        wordLogic.createMeaning(wordId, null);
-        return ok();
+
+        try {
+
+            JsonNode json = request().body().asJson();
+            log.info("Create meaning: " + json + " on word with id:" + wordId);
+            return created(wordLogic.createMeaningJNode(wordId, json));
+
+        } catch (Exception ex) {
+
+            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
+        }
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
-        log.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
-        wordLogic.getMeaning(wordId, meaningId);
-        return ok();
+
+        try {
+
+            log.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
+            JsonNode meaningJson = wordLogic.getMeaningJsonNodeByMeaningId(wordId, meaningId);
+            return meaningJson == null ? notFound(Constants.ENTITY_NOT_FOUND + meaningId): ok(meaningJson);
+
+        } catch (Exception ex ) {
+
+            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
+        }
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateMeaning(String wordId, String meaningId) {
-        JsonNode json = request().body().asJson();
-        log.info("Update meaning with meaningId: " + meaningId + " with json:" + json
-                + " on word with id:" + wordId);
-        wordLogic.updateMeaning(wordId, null);
-        return ok();
+
+        try{
+            JsonNode meaningJsonNode = request().body().asJson();
+            log.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
+                    + " on word with id:" + wordId);
+            JsonNode updateMeaningJsonNode = wordLogic.updateMeaningJsonNode(wordId, meaningJsonNode);
+            return ok();
+        } catch (Exception ex) {
+
+            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
+        }
     }
 
     @BodyParser.Of(BodyParser.Json.class)
