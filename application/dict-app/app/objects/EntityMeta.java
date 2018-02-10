@@ -8,8 +8,8 @@ import lombok.NonNull;
 public class EntityMeta {
 
     //private String id;
-    @NonNull private String status = EntityStatus.ACTIVE;
-    @NonNull private String type = SOTypes.UNKNOWN;
+    @NonNull private EntityStatus status = EntityStatus.ACTIVE;
+    @NonNull private EntityType type = EntityType.UNKNOWN;
 
     private String parentId; //null for pioneer object
     @NonNull private String creatorId; //creator is the deleter of the parent if parentId is present

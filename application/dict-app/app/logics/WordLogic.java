@@ -74,7 +74,7 @@ public class WordLogic {
         //todo get creatorId from context
         String creatorId =  "sin";
         String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        EntityMeta entityMeta = new EntityMeta(EntityStatus.ACTIVE,SOTypes.WORD, null, creatorId,
+        EntityMeta entityMeta = new EntityMeta(EntityStatus.ACTIVE, EntityType.WORD, null, creatorId,
                 creationDateString, null, null, 0 );
         word.setEntityMeta(entityMeta);
 
@@ -181,19 +181,19 @@ public class WordLogic {
         if(currentVersion.getStatus().equals(EntityStatus.LOCKED))
             throw new IllegalArgumentException(Constants.ENTITY_LOCKED + updateWord.getId());
 
-        //Create a MutationRequest object for the word
+        //Create a UserRequest object for the word
         String requestId = generateNewWordUpdateReqID();
 
-        MutationRequest updateRequest = new MutationRequest();
+        UserRequest updateRequest = new UserRequest();
         updateRequest.setRequestId(requestId);
         updateRequest.setTargetId(currentWordId);
-        updateRequest.setTargetType(SOTypes.WORD);
-        updateRequest.setOperation(SROperation.UPDATE);
+        updateRequest.setTargetType(EntityType.WORD);
+        updateRequest.setOperation(RequestOperation.UPDATE);
         updateRequest.setBody(JsonUtil.objectToJsonNode(updateWord));
 
         String creatorId =  "sin";
         String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        EntityMeta requestVersion = new EntityMeta( EntityStatus.ACTIVE, SOTypes.REQUEST, null, creatorId,
+        EntityMeta requestVersion = new EntityMeta( EntityStatus.ACTIVE, EntityType.REQUEST, null, creatorId,
                 creationDateString, null, null, 0 );
 
         updateRequest.setEntityMeta(requestVersion);
@@ -210,7 +210,7 @@ public class WordLogic {
         if(requestId == null || requestId.trim().length() == 0)
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
-        MutationRequest storedRequest = wordDao.getRequestById(requestId);
+        UserRequest storedRequest = wordDao.getRequestById(requestId);
 
         if( storedRequest == null )
             throw new IllegalArgumentException( Constants.ENTITY_NOT_FOUND + requestId );
@@ -220,23 +220,23 @@ public class WordLogic {
 
         switch (storedRequest.getOperation()) {
 
-            case SROperation.CREATE:
+            case CREATE:
                 return approveCreateWordRequest(storedRequest);
-            case SROperation.UPDATE:
+            case UPDATE:
                 return approveUpdateWordRequest(storedRequest);
-            case SROperation.DELETE:
+            case DELETE:
                 return approveDeleteWordRequest(storedRequest);
             default:
                 return null;
         }
     }
 
-    private Word approveCreateWordRequest(MutationRequest request){
+    private Word approveCreateWordRequest(UserRequest request){
 
         return null;
     }
 
-    private Word approveUpdateWordRequest(MutationRequest request){
+    private Word approveUpdateWordRequest(UserRequest request){
 
         String validatorId = "validatorId";
         String currentWordId = request.getTargetId();
@@ -275,7 +275,7 @@ public class WordLogic {
         return currentWord;
     }
 
-    private Word approveDeleteWordRequest(MutationRequest request){
+    private Word approveDeleteWordRequest(UserRequest request){
 
         return null;
     }
