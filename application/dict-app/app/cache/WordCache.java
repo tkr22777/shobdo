@@ -62,16 +62,13 @@ public class WordCache {
         String key = getKeyForSpelling(spelling);
         String wordJsonString = jedis.get(key);
 
-        if (wordJsonString != null) {
-
+        if (wordJsonString == null) {
+            bmLog.end("@WC003 Word [" + spelling + "] not found in cache.");
+            return null;
+        } else {
             Word wordFound = (Word) JsonUtil.jsonStringToObject(wordJsonString, Word.class);
             bmLog.end("@WC003 Word [" + spelling + "] found in cache and returning");
             return wordFound;
-
-        } else {
-
-            bmLog.end("@WC003 Word [" + spelling + "] not found in cache.");
-            return null;
         }
     }
 
@@ -90,6 +87,25 @@ public class WordCache {
 
             if (USE_REDIS_EXPIRATION_TIME)
                 jedis.expire(key, REDIS_EXPIRE_TIME);
+
+        } catch (Exception ex) {
+
+            log.info("@WC007 Error while storing JSON string of word");
+        }
+    }
+
+    public void uncacheWord(Word word) {
+
+        if(!USE_REDIS || jedis == null || word == null)
+            return;
+
+        bmLog.start();
+        String key = getKeyForSpelling(word.getWordSpelling());
+
+        try {
+
+            jedis.del(key);
+            bmLog.end("@WC004 Word [" + word.getWordSpelling() + "] cleared from cache.");
 
         } catch (Exception ex) {
 

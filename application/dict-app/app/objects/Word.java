@@ -11,15 +11,12 @@ import java.util.*;
 @Data
 public class Word {
 
-    @JsonIgnore
-    private String _id;
-
     private String id;
     private String wordSpelling;
 
     private HashMap<String, Meaning> meaningsMap = new HashMap<>(); //Think of this as the document store for meanings
-    private ArrayList<String> antonyms = new ArrayList<>(); //antonym wordIds
-    private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds
+    private ArrayList<String> antonyms = new ArrayList<>(); //antonym wordIds, should it be id mapped to word spellings
+    private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds, should it be id mapped to word spellings
 
     private HashMap<String,List<String>> extraMetaMap;
     private EntityMeta entityMeta;

@@ -21,7 +21,7 @@ public interface WordDao {
 
     public void deleteWord(String wordId);
 
-    public Set<String> getWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
+    public Set<String> searchWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
 
     public long totalWordCount();
 

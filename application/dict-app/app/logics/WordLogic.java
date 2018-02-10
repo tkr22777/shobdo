@@ -178,9 +178,6 @@ public class WordLogic {
 
         EntityMeta currentMeta = currentWord.getEntityMeta();
 
-        if(currentMeta.getStatus().equals(EntityStatus.LOCKED))
-            throw new IllegalArgumentException(Constants.ENTITY_LOCKED + updateWord.getId());
-
         //Create a UserRequest object for the word
         String requestId = generateNewWordUpdateReqID();
         String creatorId =  "sin";
@@ -188,7 +185,7 @@ public class WordLogic {
         EntityMeta requestMeta = new EntityMeta( EntityStatus.ACTIVE, EntityType.REQUEST, null, creatorId,
                 creationDateString, null, null, 0 );
         JsonNode body = JsonUtil.objectToJsonNode(updateWord);
-        UserRequest updateRequest = new UserRequest(null, requestId, currentWordId, EntityType.WORD, RequestOperation.UPDATE,
+        UserRequest updateRequest = new UserRequest(requestId, currentWordId, EntityType.WORD, RequestOperation.UPDATE,
                 body, requestMeta);
         wordDao.createRequest(updateRequest);
 
@@ -250,7 +247,7 @@ public class WordLogic {
 
         //Update the request as merged
         saveRequestAsMerged(request);
-
+        wordCache.cacheWord(currentWord);
         return currentWord;
     }
 
@@ -265,7 +262,7 @@ public class WordLogic {
 
         String currentWordId = currentWordCopy.getId();
         currentCopyMeta.setParentId(currentWordId);
-        currentCopyMeta.setStatus(EntityStatus.UPDATED);
+        currentCopyMeta.setStatus(EntityStatus.DEACTIVE);
         String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
         currentCopyMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
 
@@ -277,7 +274,7 @@ public class WordLogic {
         String validatorId = "validatorId";
         EntityMeta requestMeta = request.getEntityMeta();
         requestMeta.setValidatorId(validatorId);
-        requestMeta.setStatus(EntityStatus.MERGED);
+        requestMeta.setStatus(EntityStatus.DEACTIVE);
         String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
         requestMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
         wordDao.updateRequest(request);
@@ -299,7 +296,10 @@ public class WordLogic {
     /* Delete to do */
 
     public void deleteWord(String wordId) {
-        wordDao.deleteWord(wordId);
+        Word word = getWordByWordId(wordId);
+        word.getEntityMeta().setStatus(EntityStatus.DEACTIVE);
+        wordDao.updateWord(word);
+        wordCache.uncacheWord(word);
     }
 
     /* LIST words todo */
@@ -328,7 +328,7 @@ public class WordLogic {
             return words;
 
         bmLog.start();
-        words = wordDao.getWordSpellingsWithPrefixMatch(searchString, limit);
+        words = wordDao.searchWordSpellingsWithPrefixMatch(searchString, limit);
 
         if ( words != null && words.size() > 0 ) {
 

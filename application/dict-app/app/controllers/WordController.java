@@ -88,15 +88,17 @@ public class WordController extends Controller {
         });
     }
 
-    //DELETE TODO
-    @BodyParser.Of(BodyParser.Json.class)
     public Result deleteWord(String wordId) {
 
-        log.info("Delete word with id:" + wordId);
+        String endpoint = "deleteWord";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
-        wordLogic.deleteWord(wordId);
-
-        return ok();
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+            log.info("Delete word with id:" + wordId);
+            wordLogic.deleteWord(wordId);
+            return ok();
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
