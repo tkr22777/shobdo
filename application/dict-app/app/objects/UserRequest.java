@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 @Data
-public class MutationRequest {
+public class UserRequest {
 
     @JsonIgnore
     private String _id;
 
     private String requestId;
     private String targetId;
-    private String targetType;
-    private String operation;
+    private EntityType targetType;
+    private RequestOperation operation;
     private JsonNode body;
     private EntityMeta entityMeta;
 }

@@ -9,7 +9,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
-import objects.MutationRequest;
+import objects.UserRequest;
 import objects.Word;
 import org.bson.Document;
 import utilities.*;
@@ -143,7 +143,7 @@ public class WordDaoMongoImpl implements WordDao {
 
     /* Consider moving them to request */
     @Override
-    public MutationRequest createRequest(MutationRequest request) {
+    public UserRequest createRequest(UserRequest request) {
         bmLog.start();
         Document requestDoc = JsonUtil.objectToDocument(request);
         collection.insertOne(requestDoc);
@@ -152,17 +152,17 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public MutationRequest getRequestById(String requestId) {
+    public UserRequest getRequestById(String requestId) {
 
         bmLog.start();
         BasicDBObject query = new BasicDBObject(REQUEST_ID, requestId);
         Document requestDoc = collection.find(query).first();
         bmLog.end("@WDMI003 getWordByWordId id: " + requestId + " mongoDoc:" + requestDoc);
-        return requestDoc == null ?  null: DictUtil.getRequestFromDocument( requestDoc, MutationRequest.class);
+        return requestDoc == null ?  null: DictUtil.getRequestFromDocument( requestDoc, UserRequest.class);
     }
 
     @Override
-    public MutationRequest updateRequest(MutationRequest request) {
+    public UserRequest updateRequest(UserRequest request) {
 
         String requestId = request.getRequestId();
 

@@ -1,6 +1,6 @@
 package utilities;
 
-import objects.MutationRequest;
+import objects.UserRequest;
 import objects.Word;
 import objects.Meaning;
 import objects.PartsOfSpeechSet;
@@ -20,10 +20,10 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
-    public static MutationRequest getRequestFromDocument(Document dictionaryDocument, Class<?> class_type) {
+    public static UserRequest getRequestFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
-        return (MutationRequest) JsonUtil.documentToObject(dictionaryDocument, class_type);
+        return (UserRequest) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }
 
     public static Word getWordFromDocument(Document dictionaryDocument, Class<?> class_type) {

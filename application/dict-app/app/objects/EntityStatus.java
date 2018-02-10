@@ -1,11 +1,17 @@
 package objects;
 
 //Shobdo Object/Entity Status
-public class EntityStatus {
+public enum  EntityStatus {
 
-    public static final String ACTIVE = "ACTIVE";
-    public static final String LOCKED = "LOCKED";
-    public static final String UPDATED = "UPDATED";
-    public static final String MERGED = "MERGED";
+    ACTIVE("ACTIVE"),
+    LOCKED("LOCKED"),
+    UPDATED("UPDATED"),
+    MERGED("MERGED");
+
+    private final String status;
+
+    EntityStatus(final String status)  {
+        this.status = status;
+    }
 
 }
