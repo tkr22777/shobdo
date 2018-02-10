@@ -2,7 +2,6 @@ package logics;
 
 import cache.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.*;
@@ -392,7 +391,6 @@ public class WordLogic {
         return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
     }
 
-<<<<<<< HEAD
     public void createMeaningsBatch(String wordId, Collection<Meaning> meanings) {
 
         for (Meaning meaning: meanings) {
@@ -400,8 +398,6 @@ public class WordLogic {
         }
     }
 
-=======
->>>>>>> task/wip_current
     public Meaning createMeaning(String wordId, Meaning meaning) {
 
         if(meaning.getMeaningId() != null)
