@@ -34,7 +34,8 @@ public class Constants {
     public static final String ENTITY_LOCKED = "Entity is currently locked:";
     public static final String ID_NULLOREMPTY = "Id is null/empty:";
     public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
-    public static final String CREATE_ID_NOT_PERMITTED = "User provided id is not permissible:";
+    public static final String MEANING_NULLOREMPTY = "Meaning string is null/empty.";
+    public static final String CREATE_ID_NOT_PERMITTED = "User provided id is not permissible for create:";
     public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:";
     public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
 

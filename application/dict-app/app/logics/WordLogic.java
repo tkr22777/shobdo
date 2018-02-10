@@ -2,6 +2,7 @@ package logics;
 
 import cache.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.*;
@@ -176,7 +177,7 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
 
         String currentWordId = updateWord.getId();
-        Word currentWord = wordDao.getWordByWordId(currentWordId);
+        Word currentWord = getWordByWordId(currentWordId);
 
         if(currentWord == null)
             throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + updateWord.getId());
@@ -378,21 +379,78 @@ public class WordLogic {
      * invalidating and re-caching the changes.
      */
 
-    /* CREATE meaning todo implement using WORD's interfaces */
-    public String createMeaning(String wordId, Meaning meaning) {
-        Word word = getWordByWordId(wordId);
-        //add the meaning to the word and save
-        return "newMeaningId";
+    /* CREATE meaning */
+    public JsonNode createMeaningJNode(String wordId, JsonNode meaningJsonNode) {
+        Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
+        return convertMeaningToResponseJNode( createMeaning(wordId, meaning) );
+    }
+
+    public static JsonNode convertMeaningToResponseJNode(Meaning meaning) {
+
+        JsonNode jsonNode = Json.toJson(meaning);
+        List attributesToRemove = Arrays.asList("strength", "versionMeta");
+        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
+    }
+
+<<<<<<< HEAD
+    public void createMeaningsBatch(String wordId, Collection<Meaning> meanings) {
+
+        for (Meaning meaning: meanings) {
+            createMeaning(wordId,meaning);
+        }
+    }
+
+=======
+>>>>>>> task/wip_current
+    public Meaning createMeaning(String wordId, Meaning meaning) {
+
+        if(meaning.getMeaningId() != null)
+            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getMeaningId());
+
+        if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
+            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+
+        Word currentWord = getWordByWordId(wordId);
+
+        if(currentWord == null)
+            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
+
+        String meaningId = generateNewMeaningId();
+        meaning.setMeaningId( meaningId );
+        addMeaningToWord(currentWord, meaning);
+
+        wordDao.updateWord(currentWord);
+        return meaning;
+    }
+
+    private Word addMeaningToWord(Word word, Meaning meaning) {
+
+        if(word == null || meaning == null || meaning.getMeaningId() == null)
+            throw new RuntimeException("Temp");
+
+        HashMap<String, Meaning> meaningHashMap = word.getMeaningsMap();
+        if(meaningHashMap == null)
+            meaningHashMap = new HashMap<>();
+        meaningHashMap.put(meaning.getMeaningId(), meaning);
+        word.setMeaningsMap(meaningHashMap);
+        return  word;
     }
 
     public static String generateNewMeaningId() {
         return Constants.MEANING_ID_PREFIX + UUID.randomUUID();
     }
 
-    /* GET meaning todo implement using WORD's interfaces */
+    /* GET meaning */
+    public JsonNode getMeaningJsonNodeByMeaningId(String wordId, String meaningId) {
+
+        Meaning meaning = getMeaning(wordId, meaningId);
+        return meaning == null? null: convertMeaningToResponseJNode(meaning);
+    }
+
     public Meaning getMeaning(String wordId, String meaningId) {
 
         Word word = getWordByWordId(wordId);
+
         if(word == null || word.getMeaningsMap() == null)
             return null;
 
@@ -400,9 +458,33 @@ public class WordLogic {
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
-    public boolean updateMeaning(String wordId, Meaning meaning) {
+    public JsonNode updateMeaningJsonNode(String wordId, JsonNode meaningJsonNode) {
 
-        return false;
+        Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
+        return convertMeaningToResponseJNode(updateMeaning(wordId, meaning));
+    }
+
+    public Meaning updateMeaning(String wordId, Meaning meaning) {
+
+        if(meaning.getMeaningId() != null)
+            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getMeaningId());
+
+        if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
+            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+
+        Word currentWord = getWordByWordId(wordId);
+
+        if(currentWord == null)
+            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
+
+        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getMeaningId());
+
+        if(currentMeaning == null)
+            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + meaning.getMeaningId());
+
+        addMeaningToWord(currentWord, meaning);
+
+        return meaning;
     }
 
     /* DELETE meaning todo implement using WORD's interfaces */

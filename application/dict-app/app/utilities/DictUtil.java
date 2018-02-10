@@ -20,10 +20,6 @@ public class DictUtil {
         return new Random().nextInt( highest - lowest + 1) + lowest;
     }
 
-    public static String generateIdWithPrefix(String prefix) {
-        return prefix + UUID.randomUUID();
-    }
-
     public static SRequest getRequestFromDocument(Document dictionaryDocument, Class<?> class_type) {
 
         dictionaryDocument.remove("_id");
@@ -34,6 +30,36 @@ public class DictUtil {
 
         dictionaryDocument.remove("_id");
         return (Word) JsonUtil.documentToObject(dictionaryDocument, class_type);
+    }
+
+    public static Set<Meaning> generateRandomMeaning(int numberOfMeanings){
+
+        Set<Meaning> meanings = new HashSet<>();
+
+        for(int i = 0 ; i < numberOfMeanings ; i++) {
+            Meaning meaning = generateARandomMeaning();
+            meanings.add(meaning);
+        }
+
+        return meanings;
+    }
+
+    private static Meaning generateARandomMeaning() {
+
+        String start = "995"; //ক
+        String end = "9A8";   //ন
+
+        int stringsOnMeaning = randomIntInRange(2, 9);
+        String meaningString = "";
+        for(int i = 0 ; i < stringsOnMeaning; i++) {
+            int aMeaningWordSize = randomIntInRange(2, 9);
+            String aMeaningWordString = BanglaUtil.getRandomBanglaString(start, end, aMeaningWordSize);
+            meaningString = meaningString + aMeaningWordString + " ";
+        }
+
+        Meaning meaning = new Meaning();
+        meaning.setMeaning(meaningString);
+        return meaning;
     }
 
     public static Set<Word> generateRandomWordSet(int numberOfWords){
@@ -49,7 +75,7 @@ public class DictUtil {
         return words;
     }
 
-    public static Word generateARandomWord() {
+    private static Word generateARandomWord() {
 
         String start = "995"; //ক
         String end = "9A8";   //ন
