@@ -9,6 +9,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.typesafe.config.ConfigFactory;
 import daos.WordDao;
+import objects.EntityStatus;
 import objects.UserRequest;
 import objects.Word;
 import org.bson.Document;
@@ -27,6 +28,7 @@ public class WordDaoMongoImpl implements WordDao {
     private final String WORD_ID = "id";
     private final String REQUEST_ID = "requestId";
     private final String WORD_SPELLING = "wordSpelling";
+    private final String ENTITYMETA_STATUS = "entityMeta.status";
 
     MongoClient mongoClient;
     MongoDatabase mongoDatabase;
@@ -64,7 +66,10 @@ public class WordDaoMongoImpl implements WordDao {
     public Word getWordByWordId(String wordId) {
 
         bmLog.start();
-        BasicDBObject query = new BasicDBObject(WORD_ID, wordId);
+        BasicDBObject query = new BasicDBObject();
+        query.put(WORD_ID, wordId);
+        query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
+
         log.info("Query: " + query);
         Document wordDoc = collection.find(query).first();
         bmLog.end("@WDMI003 getWordByWordId id: " + wordId + " mongoDoc:" + wordDoc);
@@ -75,9 +80,13 @@ public class WordDaoMongoImpl implements WordDao {
     public Word getWordBySpelling(String spelling) {
 
         bmLog.start();
-        BasicDBObject query = new BasicDBObject(WORD_SPELLING, spelling);
+
+        BasicDBObject query = new BasicDBObject();
+        query.put(WORD_SPELLING, spelling);
+        query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
+
         Document wordDoc = collection.find(query).first();
-        bmLog.end("@WDMI004 getWordBySpelling   spelling: " + spelling + " mongoDoc:" + wordDoc);
+        bmLog.end("@WDMI004 getWordBySpelling spelling: " + spelling + " mongoDoc:" + wordDoc);
         return wordDoc == null ?  null: DictUtil.getWordFromDocument( wordDoc, Word.class);
     }
 
@@ -87,9 +96,12 @@ public class WordDaoMongoImpl implements WordDao {
         if(word.getId() == null || word.getId().trim().equals(""))
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
-        BasicDBObject searchQuery = new BasicDBObject(WORD_ID, word.getId());
+        BasicDBObject query = new BasicDBObject();
+        query.put(WORD_ID, word.getId());
+        query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
+
         Document wordDocument = JsonUtil.objectToDocument(word);
-        collection.replaceOne(searchQuery, wordDocument);
+        collection.replaceOne(query, wordDocument);
         return word;
     }
 
@@ -99,12 +111,14 @@ public class WordDaoMongoImpl implements WordDao {
     }
 
     @Override
-    public Set<String> getWordSpellingsWithPrefixMatch(String spelling, int limit) {
+    public Set<String> searchWordSpellingsWithPrefixMatch(String spelling, int limit) {
 
         bmLog.start();
 
         Pattern prefixForSpellPattern = Pattern.compile("^" + spelling + ".*");
-        BasicDBObject query = new BasicDBObject(WORD_SPELLING, prefixForSpellPattern);
+        BasicDBObject query = new BasicDBObject();
+        query.put(WORD_SPELLING, prefixForSpellPattern);
+        query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
         MongoCursor<Document> words = collection
                 .find(query)
@@ -121,7 +135,7 @@ public class WordDaoMongoImpl implements WordDao {
             result.add( document.get(WORD_SPELLING).toString() );
         }
 
-        bmLog.end("@WDMI006 getWordSpellingsWithPrefixMatch getting similar spelling from database for spelling: " + spelling);
+        bmLog.end("@WDMI006 searchWordSpellingsWithPrefixMatch getting similar spelling from database for spelling: " + spelling);
         return result;
     }
 
@@ -155,7 +169,11 @@ public class WordDaoMongoImpl implements WordDao {
     public UserRequest getRequestById(String requestId) {
 
         bmLog.start();
-        BasicDBObject query = new BasicDBObject(REQUEST_ID, requestId);
+
+        BasicDBObject query = new BasicDBObject();
+        query.put(REQUEST_ID, requestId);
+        query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
+
         Document requestDoc = collection.find(query).first();
         bmLog.end("@WDMI003 getWordByWordId id: " + requestId + " mongoDoc:" + requestDoc);
         return requestDoc == null ?  null: DictUtil.getRequestFromDocument( requestDoc, UserRequest.class);
@@ -169,9 +187,12 @@ public class WordDaoMongoImpl implements WordDao {
         if( requestId == null || requestId.trim().length() == 0)
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
-        BasicDBObject searchQuery = new BasicDBObject(REQUEST_ID, requestId);
-        Document requestDocument = JsonUtil.objectToDocument(request);
-        collection.replaceOne(searchQuery, requestDocument);
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.put(REQUEST_ID, requestId);
+        searchQuery.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
+
+        Document requestDoc = JsonUtil.objectToDocument(request);
+        collection.replaceOne(searchQuery, requestDoc);
         return request;
     }
 
