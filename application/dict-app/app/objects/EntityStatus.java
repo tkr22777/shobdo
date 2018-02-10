@@ -4,9 +4,7 @@ package objects;
 public enum  EntityStatus {
 
     ACTIVE("ACTIVE"),
-    LOCKED("LOCKED"),
-    UPDATED("UPDATED"),
-    MERGED("MERGED");
+    DEACTIVE("DEACTIVE");
 
     private final String status;
 

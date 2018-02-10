@@ -8,9 +8,6 @@ import lombok.Data;
 @Data @AllArgsConstructor
 public class UserRequest {
 
-    @JsonIgnore
-    private String _id;
-
     private String requestId;
     private String targetId;
     private EntityType targetType;
