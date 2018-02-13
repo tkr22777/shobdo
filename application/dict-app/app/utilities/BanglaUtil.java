@@ -5,15 +5,12 @@ import java.lang.String;
 
 public class BanglaUtil {
 
-    public static String getBanglaRandomSentence(String startHex, String endHex, int numberOfWords, int maxWordLength) {
+    public static String getBanglaRandomSentence(int numberOfWords, int maxWordLength) {
 
-        if(startHex == null)
-            startHex = "995"; //ক
+        String startHex = "995"; //ক
+        String endHex = "9A8";   //ন
 
-        if(endHex == null)
-            endHex = "9A8"; //ন
-
-        if(numberOfWords == -1)
+        if(numberOfWords < 1)
             numberOfWords = DictUtil.randomIntInRange(1, 10);
 
         if(maxWordLength < 1)
@@ -27,14 +24,17 @@ public class BanglaUtil {
                 sentence += " ";
 
             int number = DictUtil.randomIntInRange(1, maxWordLength);
-            String word = getRandomBanglaString(startHex, endHex, number);
+            String word = getRandomBanglaString(number);
             sentence += word;
         }
 
         return sentence;
     }
 
-    public static String getRandomBanglaString(String startHex, String endHex, int wordLength) {
+    public static String getRandomBanglaString(int wordLength) {
+
+        String startHex = "995"; //ক
+        String endHex = "9A8";   //ন
 
         int start = Integer.parseInt(startHex, 16);
         int end = Integer.parseInt(endHex, 16);
@@ -53,5 +53,12 @@ public class BanglaUtil {
         }
 
         return retString;
+    }
+
+    public static String getRandomBanglaExampleString(String wordStringInSentence ) {
+        int preSentenceLen = DictUtil.randomIntInRange(2, 6);
+        int postSentenceLen = DictUtil.randomIntInRange(2, 4);
+        return getBanglaRandomSentence(preSentenceLen, 12) + " " + wordStringInSentence + " "
+                + getBanglaRandomSentence(postSentenceLen, 12);
     }
 }

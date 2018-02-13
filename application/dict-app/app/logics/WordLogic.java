@@ -1,9 +1,11 @@
 package logics;
 
+import Exceptions.EntityDoesNotExist;
 import cache.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import daoImplementation.WordDaoMongoImpl;
 import daos.WordDao;
+import helpers.WordHelper;
 import objects.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -64,7 +66,7 @@ public class WordLogic {
         if(word.getWordSpelling() == null || word.getWordSpelling().trim().length() == 0)
             throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
 
-        Word existingWord = getWordBySpelling( word.getWordSpelling() );
+        Word existingWord = wordDao.getWordBySpelling( word.getWordSpelling() );
         if( existingWord != null)
             throw new IllegalArgumentException(Constants.CREATE_SPELLING_EXISTS + word.getWordSpelling());
 
@@ -98,7 +100,7 @@ public class WordLogic {
     public JsonNode getWordJNodeByWordId(String wordId) {
 
         Word word = getWordByWordId(wordId);
-        return word == null? null: convertWordToJsonResponse(word);
+        return convertWordToJsonResponse(word);
     }
 
     public Word getWordByWordId(String wordId) {
@@ -106,7 +108,12 @@ public class WordLogic {
         if( wordId == null || wordId.trim().length() == 0 )
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + wordId);
 
-        return wordDao.getWordByWordId(wordId);
+        Word word = wordDao.getWordByWordId(wordId);
+
+        if( word == null)
+            throw new EntityDoesNotExist( Constants.ENTITY_NOT_FOUND + wordId);
+
+        return word;
     }
 
     /* GET word by (exact) spelling */
@@ -127,6 +134,10 @@ public class WordLogic {
             return cachedWord;
 
         Word wordFromDB = wordDao.getWordBySpelling(spelling);
+
+        if( wordFromDB == null)
+            throw new EntityDoesNotExist( Constants.ENTITY_NOT_FOUND + spelling);
+
         wordCache.cacheWord(wordFromDB);
         return wordFromDB;
     }
@@ -171,12 +182,7 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
 
         String currentWordId = updateWord.getId();
-        Word currentWord = getWordByWordId(currentWordId);
-
-        if(currentWord == null)
-            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + updateWord.getId());
-
-        EntityMeta currentMeta = currentWord.getEntityMeta();
+        getWordByWordId(currentWordId); //validating the update request for the word exists
 
         //Create a UserRequest object for the word
         String requestId = generateNewWordUpdateReqID();
@@ -235,12 +241,11 @@ public class WordLogic {
     private Word approveUpdateWordRequest(UserRequest request){
 
         String currentWordId = request.getTargetId();
-        Word currentWord = wordDao.getWordByWordId(currentWordId);
+        Word currentWord = getWordByWordId(currentWordId);
 
         //Keeping backup of current word
-        Word currentWordCopy = deepCopyWord(currentWord);
-        currentWordCopy = createUpdatedWordEntry(currentWordCopy);
-        currentWord.setExtraMetaValue(request.getRequestId(), currentWordCopy.toString() );
+        Word currentWordBackup = deepCopyWord(currentWord);
+        currentWordBackup = modifyToDeactivatedWordEntry(currentWordBackup);
 
         //Updated the word with the updates
         JsonNode updateWordBody = request.getBody();
@@ -249,16 +254,16 @@ public class WordLogic {
         currentWord.setSynonyms( updateRequestWord.getSynonyms());
         currentWord.setAntonyms( updateRequestWord.getAntonyms());
         currentWord.setExtraMetaValue(REQUEST_MERGED, request.getRequestId());
-        //update the entry in DB
-        wordDao.updateWord(currentWord);
+        currentWord.setExtraMetaValue(request.getRequestId(), currentWordBackup.toString() );
 
-        //Update the request as merged
-        saveRequestAsMerged(request);
+        wordDao.updateWord(currentWord); //update the entry in DB
+
+        saveRequestAsMerged(request); //Update the request as merged
         wordCache.cacheWord(currentWord);
         return currentWord;
     }
 
-    private Word createUpdatedWordEntry(Word currentWordCopy) {
+    private Word modifyToDeactivatedWordEntry(Word currentWordCopy) {
 
         //keeping the old word in the current words extra meta map with requestId
         currentWordCopy.setId( generateNewWordId() );
@@ -420,24 +425,13 @@ public class WordLogic {
 
         String meaningId = generateNewMeaningId();
         meaning.setMeaningId( meaningId );
-        addMeaningToWord(currentWord, meaning);
+        WordHelper.addMeaningToWord(currentWord, meaning);
 
         wordDao.updateWord(currentWord);
         return meaning;
     }
 
-    private Word addMeaningToWord(Word word, Meaning meaning) {
 
-        if(word == null || meaning == null || meaning.getMeaningId() == null)
-            throw new RuntimeException("Temp");
-
-        HashMap<String, Meaning> meaningHashMap = word.getMeaningsMap();
-        if(meaningHashMap == null)
-            meaningHashMap = new HashMap<>();
-        meaningHashMap.put(meaning.getMeaningId(), meaning);
-        word.setMeaningsMap(meaningHashMap);
-        return  word;
-    }
 
     public static String generateNewMeaningId() {
         return Constants.MEANING_ID_PREFIX + UUID.randomUUID();
@@ -485,7 +479,7 @@ public class WordLogic {
         if(currentMeaning == null)
             throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + meaning.getMeaningId());
 
-        addMeaningToWord(currentWord, meaning);
+        currentWord.getMeaningsMap().put(meaning.getMeaningId(), meaning);
 
         return meaning;
     }
