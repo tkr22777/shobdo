@@ -45,6 +45,10 @@ public class WordLogic {
         return convertWordToJsonResponse(createdWord);
     }
 
+    public static String generateNewWordId() {
+        return Constants.WORD_ID_PREFIX + "-" + UUID.randomUUID();
+    }
+
     private JsonNode convertWordToJsonResponse(Word word) {
 
         JsonNode jsonNode = Json.toJson(word);
@@ -82,10 +86,6 @@ public class WordLogic {
         wordCache.cacheWord(word);
 
         return word;
-    }
-
-    public static String generateNewWordId() {
-        return Constants.WORD_ID_PREFIX + "-" + UUID.randomUUID();
     }
 
     public void createWords(Collection<Word> words) {
@@ -192,20 +192,27 @@ public class WordLogic {
         return requestId;
     }
 
-    //todo make transactional
-    //approveWordRequest applies the requested changes to a word
-    public Word approveWordRequest(String requestId) {
+    private UserRequest getRequest(String requestId) {
 
         if(requestId == null || requestId.trim().length() == 0)
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
         UserRequest storedRequest = wordDao.getRequestById(requestId);
 
-        if( storedRequest == null )
+        if(storedRequest == null)
             throw new IllegalArgumentException( Constants.ENTITY_NOT_FOUND + requestId );
 
-        if( !storedRequest.getEntityMeta().getStatus().equals(EntityStatus.ACTIVE) )
+        if(!storedRequest.getEntityMeta().getStatus().equals(EntityStatus.ACTIVE))
             throw new IllegalArgumentException( Constants.ENTITY_IS_DEACTIVE + requestId );
+
+        return storedRequest;
+    }
+
+    //todo make transactional
+    //approveWordRequest applies the requested changes to a word
+    public Word approveWordRequest(String requestId) {
+
+        UserRequest storedRequest  = getRequest(requestId);
 
         switch (storedRequest.getOperation()) {
 
@@ -274,9 +281,9 @@ public class WordLogic {
         String validatorId = "validatorId";
         EntityMeta requestMeta = request.getEntityMeta();
         requestMeta.setValidatorId(validatorId);
-        requestMeta.setStatus(EntityStatus.DEACTIVE);
+        requestMeta.setStatus(EntityStatus.DEACTIVE); //marked it as de-active
         String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        requestMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
+        requestMeta.setDeactivationDate(deactivationDateString);
         wordDao.updateRequest(request);
     }
 
@@ -293,7 +300,7 @@ public class WordLogic {
         return Constants.REQ_ID_PREFIX + "-" + UUID.randomUUID();
     }
 
-    /* Delete to do */
+    /* Delete Word */
 
     public void deleteWord(String wordId) {
         Word word = getWordByWordId(wordId);

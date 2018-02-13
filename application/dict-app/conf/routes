@@ -19,9 +19,7 @@ POST    /api/v1/words                                    controllers.WordControl
 # 2. Get word:
 GET     /api/v1/words/:id                                controllers.WordController.getWordByWordId(id: String)
 
-# 3. POST Get word by spelling:
-# body contains "wordSpelling" key and query value
-# since Bengali chars do not play well in route):
+# 3. POST Get word by spelling: (body contains "wordSpelling" key and query value since Bengali chars do not play well in route :( )
 POST    /api/v1/words/postget                            controllers.WordController.getWordBySpellingPost()
 
 # 4. Update word:
