@@ -32,33 +32,30 @@ public class DictUtil {
         return (Word) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }
 
-    public static Set<Meaning> generateRandomMeaning(int numberOfMeanings){
+    public static Set<Meaning> generateRandomMeaning(String wordSpelling, int numberOfMeanings){
 
         Set<Meaning> meanings = new HashSet<>();
 
         for(int i = 0 ; i < numberOfMeanings ; i++) {
-            Meaning meaning = generateARandomMeaning();
+            Meaning meaning = generateARandomMeaning(wordSpelling);
             meanings.add(meaning);
         }
 
         return meanings;
     }
 
-    private static Meaning generateARandomMeaning() {
-
-        String start = "995"; //ক
-        String end = "9A8";   //ন
-
-        int stringsOnMeaning = randomIntInRange(2, 9);
-        String meaningString = "";
-        for(int i = 0 ; i < stringsOnMeaning; i++) {
-            int aMeaningWordSize = randomIntInRange(2, 9);
-            String aMeaningWordString = BanglaUtil.getRandomBanglaString(start, end, aMeaningWordSize);
-            meaningString = meaningString + aMeaningWordString + " ";
-        }
+    private static Meaning generateARandomMeaning(String wordSpelling) {
 
         Meaning meaning = new Meaning();
+
+        String meaningString =  BanglaUtil.getBanglaRandomSentence(3, 5);
         meaning.setMeaning(meaningString);
+
+        String exampleSentence =  BanglaUtil.getRandomBanglaExampleString(wordSpelling);
+        meaning.setExampleSentence(exampleSentence);
+
+        meaning.setPartOfSpeech(new PartsOfSpeechSet().getPartsOfSpeeches().iterator().next());
+
         return meaning;
     }
 
@@ -77,24 +74,18 @@ public class DictUtil {
 
     private static Word generateARandomWord() {
 
-        String start = "995"; //ক
-        String end = "9A8";   //ন
-
         int wordLength = randomIntInRange(2, 9);
 
         Word word = new Word();
-        word.setWordSpelling(BanglaUtil.getRandomBanglaString(start, end, wordLength));
+        word.setWordSpelling(BanglaUtil.getRandomBanglaString(wordLength));
 
         return word;
     }
 
     public static Word generateARandomWord(PartsOfSpeechSet partsOfSpeech ) {
 
-        String start = "995"; //ক
-        String end = "9A8";   //ন
-
         int wordLength = randomIntInRange(2, 9);
-        String wordSpelling = BanglaUtil.getRandomBanglaString(start, end, wordLength);
+        String wordSpelling = BanglaUtil.getRandomBanglaString(wordLength);
 
         Word word = new Word();
         word.setWordSpelling(wordSpelling);
@@ -109,12 +100,8 @@ public class DictUtil {
 
                 wordLength = randomIntInRange(2, 9);
 
-                String meaningString = BanglaUtil.getRandomBanglaString(start, end, wordLength);
-                int preSentenceLen = randomIntInRange(2, 6);
-                int postSentenceLen = randomIntInRange(2, 4);
-                String exampleSentence = BanglaUtil.getBanglaRandomSentence(start, end, preSentenceLen, 12) + " " + meaningString
-                        + " " + BanglaUtil.getBanglaRandomSentence(start, end, postSentenceLen, 12);
-
+                String meaningString = BanglaUtil.getRandomBanglaString(wordLength);
+                String exampleSentence = BanglaUtil.getRandomBanglaExampleString(meaningString);
                 int strength = randomIntInRange(0 , 10);
                 //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
 

@@ -54,10 +54,10 @@ public class WordControllerTests extends WithApplication {
         wordLogic.createWords(createdWords); //storing for tests
     }
 
-    private void createMeaningsInDbForWord(String wordId, int numberOfMeanings) {
+    private void createMeaningsInDbForWord(String wordId, String wordSpelling, int numberOfMeanings) {
 
         createdMeaningForWord = new HashMap<>();
-        ArrayList<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(numberOfMeanings));
+        ArrayList<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(wordSpelling, numberOfMeanings));
         wordLogic.createMeaningsBatch(wordId, meaningList);
         createdMeaningForWord.put(wordId, meaningList);
     }
@@ -347,32 +347,29 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Create tests */
-    @Test @Ignore
+    @Test
     public void createMeaning_validObject_meaningCreatedCorrectly() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordId = createdWords.get(0).getId();
-            Meaning meaning = DictUtil.generateRandomMeaning(1).iterator().next();
-            log.info("Meaning: " + meaning);
+            Word word = createdWords.get(0);
+            log.info("The word:" + word);
 
-            /*
-            String jsonWordString = "{\n" +
-                    "  \"id\" : null,\n" +
-                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                    "  \"meaningsMap\" : { },\n" +
-                    "  \"antonyms\" : [ ],\n" +
-                    "  \"synonyms\" : [ ]\n" +
+            String jsonMeaningString = "{\n" +
+                    "  \"meaningId\" : null,\n" +
+                    "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
+                    "  \"partOfSpeech\" : \"অব্যয়\",\n" +
+                    "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ " + word.getWordSpelling() + " ঙঞজতঢণটজঠধ \"\n" +
                     "}";
 
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
-            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
-            assertEquals(CREATED, result.status());
+            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonMeaningString);
 
+            Result result = route( fakeRequest(POST,"/api/v1/words/" + word.getId() + "/meanings").bodyJson(bodyJson) );
+            assertEquals(CREATED, result.status());
             JsonNode createdJNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(createdJNode, Arrays.asList("id")));
-
+            /*
             //Making sure the data persisted
             String wordId = createdJNode.get("id").toString().replaceAll("\"","");
             JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(wordId) );
@@ -387,8 +384,9 @@ public class WordControllerTests extends WithApplication {
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String wordId = createdWords.get(0).getId();
-            createMeaningsInDbForWord(wordId, 2);
+            Word word = createdWords.get(0);
+            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 2);
+
             /*
             createWordsInDb(1);
             String existingWordSpelling = createdWords.get(0).getWordSpelling();

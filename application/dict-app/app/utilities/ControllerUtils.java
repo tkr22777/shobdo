@@ -23,6 +23,9 @@ public class ControllerUtils {
                                          Supplier<Result> supplier) {
 
         try {
+            String message = String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+                    transactionId, parentRequestId, endpoint, parameters);
+            log.info(message);
             return supplier.get();
         } catch (Exception ex) {
             return handleException(transactionId, parentRequestId, endpoint, parameters, ex);

@@ -144,12 +144,12 @@ public class WordController extends Controller {
         String requestId = request().getHeader(X_REQUEST_ID);
         Map<String,String> parameters = new HashMap<>();
         JsonNode body = request().body().asJson();
+        parameters.put("wordId", wordId);
         parameters.put("body", body.toString());
 
-        return executeEndpoint(transactionId, requestId, "createMeaning" , parameters, () -> {
-            log.info("Create meaning: " + body + " on word with id:" + wordId);
-            return created(wordLogic.createMeaningJNode(wordId, body));
-        });
+        return executeEndpoint(transactionId, requestId, "createMeaning" , parameters, () ->
+            created(wordLogic.createMeaningJNode(wordId, body))
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
