@@ -104,25 +104,24 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        String searchString = "";
-        JsonNode json = request().body().asJson();
-        Set<String> wordSpellings = new HashSet<>();
+        String endpoint = "searchWordsBySpelling";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
-        try {
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
 
-            searchString = json.get(Constants.SEARCH_STRING_KEY).asText();
+            JsonNode json = request().body().asJson();
+            if(!json.has(Constants.SEARCH_STRING_KEY))
+                badRequest();
+
+            String searchString = json.get(Constants.SEARCH_STRING_KEY).asText();;
+            Set<String> wordSpellings = new HashSet<>();
 
             if (searchString.length() > 0)
                 wordSpellings = wordLogic.searchWords(searchString);
 
-        } catch (Exception ex) {
-
-            log.info("WC001 Property 'searchString' not found in the json body. Body found:" + json.textValue());
-            log.info("WC002 Exception Stacktrace:" + ex.getStackTrace().toString());
-            return badRequest();
-        }
-
-        return ok(Json.toJson(wordSpellings));
+            return ok(Json.toJson(wordSpellings));
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -136,60 +135,73 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(String wordId) {
 
-        try {
+        String endpoint = "createMeaning";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
             JsonNode json = request().body().asJson();
             log.info("Create meaning: " + json + " on word with id:" + wordId);
             return created(wordLogic.createMeaningJNode(wordId, json));
-
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
-        }
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
 
-        try {
+        String endpoint = "getMeaning";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
 
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
             log.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
             JsonNode meaningJson = wordLogic.getMeaningJsonNodeByMeaningId(wordId, meaningId);
             return meaningJson == null ? notFound(Constants.ENTITY_NOT_FOUND + meaningId): ok(meaningJson);
-
-        } catch (Exception ex ) {
-
-            return ex instanceof IllegalArgumentException ? badRequest(ex.getMessage()) : internalServerError(ex.getMessage());
-        }
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateMeaning(String wordId, String meaningId) {
 
-        try{
+        String endpoint = "updateMeaning";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
+
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
             JsonNode meaningJsonNode = request().body().asJson();
             log.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
                     + " on word with id:" + wordId);
             JsonNode updateMeaningJsonNode = wordLogic.updateMeaningJsonNode(wordId, meaningJsonNode);
-            return ok();
-        } catch (Exception ex) {
-
-            return ex instanceof IllegalArgumentException? badRequest(ex.getMessage()): internalServerError(ex.getMessage());
-        }
+            return ok(updateMeaningJsonNode);
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteMeaning(String wordId, String meaningId) {
-        log.info("Delete meaning: " + meaningId + " on word with id:" + wordId);
-        wordLogic.deleteMeaning(wordId, meaningId);
-        return ok();
+
+        String endpoint = "deleteMeaning";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
+
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+            log.info("Delete meaning: " + meaningId + " on word with id:" + wordId);
+            wordLogic.deleteMeaning(wordId, meaningId);
+            return ok();
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result listMeanings(String wordId) {
-        log.info("List meaningsMap on word with id:" + wordId);
-        wordLogic.listMeanings(wordId);
-        return ok();
+
+        String endpoint = "listMeanings";
+        String transactionId = request().getHeader(X_TRANSACTION_ID);
+        String requestId = request().getHeader(X_REQUEST_ID);
+
+        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+            log.info("List meaningsMap on word with id:" + wordId);
+            wordLogic.listMeanings(wordId);
+            return ok();
+        });
     }
 
     @BodyParser.Of(BodyParser.Json.class)

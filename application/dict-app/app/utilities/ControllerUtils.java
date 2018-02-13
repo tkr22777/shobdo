@@ -39,6 +39,7 @@ public class ControllerUtils {
             return badRequest(throwable.getMessage());
 
         } else {
+
             log.error(message, throwable);
             return internalServerError(throwable.getMessage());
         }
