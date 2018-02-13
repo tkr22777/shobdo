@@ -347,7 +347,7 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Create tests */
-    @Test
+    @Test @Ignore
     public void createMeaning_validObject_meaningCreatedCorrectly() {
 
         running( fakeApplication(), () -> {
