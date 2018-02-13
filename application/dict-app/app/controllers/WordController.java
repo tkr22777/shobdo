@@ -11,7 +11,9 @@ import utilities.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static utilities.ControllerUtils.executeEndpoint;
@@ -34,67 +36,69 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createWord() {
 
-        String endpoint = "createWord";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
-
+        Map<String,String> parameters = new HashMap<>();
         JsonNode wordJson = request().body().asJson();
-        return executeEndpoint(transactionId, requestId, endpoint, () ->
-                created(wordLogic.createWord(wordJson))
+        parameters.put("body", wordJson.toString());
+
+        return executeEndpoint(transactionId, requestId, "createWord", parameters, () ->
+            created(wordLogic.createWord(wordJson))
         );
     }
 
     //READ
     public Result getWordByWordId(String wordId) {
 
-        String endpoint = "getWordByWordId";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
-            JsonNode wordJson = wordLogic.getWordJNodeByWordId(wordId);
-            return wordJson == null ? notFound(Constants.ENTITY_NOT_FOUND + wordId): ok(wordJson);
-        });
+        return executeEndpoint(transactionId, requestId, "getWordByWordId", parameters, () ->
+            ok(wordLogic.getWordJNodeByWordId(wordId))
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getWordBySpellingPost() {
 
-        String endpoint = "getWordBySpellingPost";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
+        JsonNode body =  request().body().asJson();
+        parameters.put("body", body.toString());
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
-            JsonNode body =  request().body().asJson();
+        return executeEndpoint(transactionId, requestId, "getWordBySpellingPost", parameters, () -> {
             if(!body.has(Constants.WORD_SPELLING_KEY))
                 throw new IllegalArgumentException("");
 
             String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
-            JsonNode wordNode = wordLogic.getWordJNodeBySpelling(wordSpelling);
-            return wordNode == null? notFound(Constants.ENTITY_NOT_FOUND + wordSpelling): ok(wordNode);
+            return ok(wordLogic.getWordJNodeBySpelling(wordSpelling));
         });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateWord(String wordId) {
 
-        String endpoint = "updateWord";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
+        JsonNode body = request().body().asJson();
+        parameters.put("body", body.toString());
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
-            JsonNode wordJson = request().body().asJson();
-            return ok(wordLogic.updateWordJNode(wordId, wordJson));
-        });
+        return executeEndpoint(transactionId, requestId, "updateWord", parameters, () ->
+            ok(wordLogic.updateWordJNode(wordId, body))
+        );
     }
 
     public Result deleteWord(String wordId) {
 
-        String endpoint = "deleteWord";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
+        parameters.put("wordId", wordId);
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "deleteWord", parameters, () -> {
             log.info("Delete word with id:" + wordId);
             wordLogic.deleteWord(wordId);
             return ok();
@@ -104,17 +108,18 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        String endpoint = "searchWordsBySpelling";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
+        JsonNode body = request().body().asJson();
+        parameters.put("body", body.toString());
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "searchWordsBySpelling", parameters, () -> {
 
-            JsonNode json = request().body().asJson();
-            if(!json.has(Constants.SEARCH_STRING_KEY))
+            if(!body.has(Constants.SEARCH_STRING_KEY))
                 badRequest();
 
-            String searchString = json.get(Constants.SEARCH_STRING_KEY).asText();;
+            String searchString = body.get(Constants.SEARCH_STRING_KEY).asText();;
             Set<String> wordSpellings = new HashSet<>();
 
             if (searchString.length() > 0)
@@ -135,25 +140,26 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(String wordId) {
 
-        String endpoint = "createMeaning";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
+        JsonNode body = request().body().asJson();
+        parameters.put("body", body.toString());
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
-            JsonNode json = request().body().asJson();
-            log.info("Create meaning: " + json + " on word with id:" + wordId);
-            return created(wordLogic.createMeaningJNode(wordId, json));
+        return executeEndpoint(transactionId, requestId, "createMeaning" , parameters, () -> {
+            log.info("Create meaning: " + body + " on word with id:" + wordId);
+            return created(wordLogic.createMeaningJNode(wordId, body));
         });
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
 
-        String endpoint = "getMeaning";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "getMeaning" , parameters, () -> {
             log.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
             JsonNode meaningJson = wordLogic.getMeaningJsonNodeByMeaningId(wordId, meaningId);
             return meaningJson == null ? notFound(Constants.ENTITY_NOT_FOUND + meaningId): ok(meaningJson);
@@ -163,11 +169,11 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateMeaning(String wordId, String meaningId) {
 
-        String endpoint = "updateMeaning";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "updateMeaning", parameters, () -> {
             JsonNode meaningJsonNode = request().body().asJson();
             log.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
                     + " on word with id:" + wordId);
@@ -179,11 +185,11 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result deleteMeaning(String wordId, String meaningId) {
 
-        String endpoint = "deleteMeaning";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "deleteMeaning", parameters, () -> {
             log.info("Delete meaning: " + meaningId + " on word with id:" + wordId);
             wordLogic.deleteMeaning(wordId, meaningId);
             return ok();
@@ -193,11 +199,11 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result listMeanings(String wordId) {
 
-        String endpoint = "listMeanings";
         String transactionId = request().getHeader(X_TRANSACTION_ID);
         String requestId = request().getHeader(X_REQUEST_ID);
+        Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, endpoint, () -> {
+        return executeEndpoint(transactionId, requestId, "listMeanings", parameters, () -> {
             log.info("List meaningsMap on word with id:" + wordId);
             wordLogic.listMeanings(wordId);
             return ok();
@@ -230,5 +236,4 @@ public class WordController extends Controller {
 
         return ok("Generated and added " + wordCount + " random words on the dictionary!");
     }
-
 }

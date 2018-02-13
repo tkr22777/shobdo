@@ -1,5 +1,6 @@
 package IntegrationTests;
 
+import Exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import logics.WordLogic;
@@ -284,7 +285,7 @@ public class WordControllerTests extends WithApplication {
 
             JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
             Result result = route( fakeRequest(PUT,"/api/v1/words/" + wordId).bodyJson(bodyJson));
-            assertEquals(BAD_REQUEST, result.status());
+            assertEquals(NOT_FOUND, result.status());
             assertEquals(Constants.ENTITY_NOT_FOUND + wordId, contentAsString(result));
         });
     }
@@ -331,7 +332,7 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Delete Word Test: */
-    @Test
+    @Test(expected = EntityDoesNotExist.class)
     public void deleteWord_existingWord_deletesSuccessfully() {
 
         createWordsInDb(1);
@@ -342,7 +343,7 @@ public class WordControllerTests extends WithApplication {
 
         Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getId()) );
         assertEquals(OK, result.status());
-        Assert.assertNull(wordLogic.getWordByWordId(word.getId()));
+        wordLogic.getWordByWordId(word.getId()); //Should throw EntityDoesNotExist exception
     }
 
     /* Create tests */
