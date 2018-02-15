@@ -403,11 +403,13 @@ public class WordLogic {
         return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
     }
 
-    public void createMeaningsBatch(String wordId, Collection<Meaning> meanings) {
+    public List<Meaning> createMeaningsBatch(String wordId, Collection<Meaning> meanings) {
 
+        ArrayList<Meaning> createdMeaning = new ArrayList<>();
         for (Meaning meaning: meanings) {
-            createMeaning(wordId,meaning);
+            createdMeaning.add( createMeaning(wordId,meaning) );
         }
+        return createdMeaning;
     }
 
     public Meaning createMeaning(String wordId, Meaning meaning) {
@@ -446,10 +448,12 @@ public class WordLogic {
 
         Word word = getWordByWordId(wordId);
 
-        if(word == null || word.getMeaningsMap() == null)
-            return null;
+        Meaning meaning = word.getMeaningsMap().get(meaningId);
 
-        return word.getMeaningsMap().get(meaningId);
+        if(meaning == null)
+            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + meaningId);
+
+        return meaning;
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
