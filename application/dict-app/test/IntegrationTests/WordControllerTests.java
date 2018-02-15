@@ -32,7 +32,7 @@ public class WordControllerTests extends WithApplication {
     LogPrint log;
     WordLogic wordLogic;
     ArrayList<Word> createdWords;
-    Map<String, ArrayList<Meaning>> createdMeaningForWord;
+    Map<String, List<Meaning>> createdMeaningForWord;
 
     @Before
     public void setup() {
@@ -64,8 +64,8 @@ public class WordControllerTests extends WithApplication {
     private void createMeaningsInDbForWord(String wordId, String wordSpelling, int numberOfMeanings) {
 
         createdMeaningForWord = new HashMap<>();
-        ArrayList<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(wordSpelling, numberOfMeanings));
-        wordLogic.createMeaningsBatch(wordId, meaningList);
+        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(wordSpelling, numberOfMeanings));
+        meaningList = wordLogic.createMeaningsBatch(wordId, meaningList);
         createdMeaningForWord.put(wordId, meaningList);
     }
 
@@ -426,28 +426,33 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Get tests */
-    @Test @Ignore
-    public void getMeaningByMeaningIdForAWord_validMeaningIdInDb_meaningReturn() {
+    @Test
+    public void getMeaningByMeaningIdForAWord_validMeaningIdInDb_meaningReturnedSuccessfully() {
+
+        running( fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            Word createdWord = createdWords.get(0);
+            createMeaningsInDbForWord(createdWord.getId(), createdWord.getWordSpelling(), 1);
+            Meaning meaning = createdMeaningForWord.get(createdWord.getId()).get(0);
+
+            Result result = route( fakeRequest(GET, "/api/v1/words/" + createdWord.getId() + "/meanings/" + meaning.getId()));
+            assertEquals(OK, result.status());
+            Assert.assertEquals( convertMeaningToResponseJNode(meaning).toString(), contentAsString(result));
+        });
+    }
+
+    @Test
+    public void getMeaningByMeaningIdForAWord_invalidMeaningId_notFoundReturned() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
             Word createdWord = createdWords.get(0);
 
-            Result result = route( fakeRequest(GET,"/api/v1/words/" + createdWord.getId()) );
-            assertEquals(OK, result.status());
-            Assert.assertEquals( convertWordToJsonResponse(createdWord).toString(), contentAsString(result));
-        });
-    }
-
-    @Test @Ignore
-    public void getMeaningByMeaningIdForAWord_invalidMeaning_notFoundReturned() {
-
-        running( fakeApplication(), () -> {
-
-            Result result = route( fakeRequest(GET,"/api/v1/words/invalid_wid" ) );
+            Result result = route( fakeRequest(GET, "/api/v1/words/" + createdWord.getId() + "/meanings/invalidId"));
             assertEquals(NOT_FOUND, result.status());
-            assertEquals(Constants.ENTITY_NOT_FOUND + "invalid_wid" , contentAsString(result));
+            assertEquals(Constants.ENTITY_NOT_FOUND + "invalidId" , contentAsString(result));
         });
     }
 

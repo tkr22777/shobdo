@@ -152,7 +152,6 @@ public class WordController extends Controller {
         );
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
     public Result getMeaning(String wordId, String meaningId) {
 
         String transactionId = request().getHeader(X_TRANSACTION_ID);
@@ -182,7 +181,6 @@ public class WordController extends Controller {
         });
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
     public Result deleteMeaning(String wordId, String meaningId) {
 
         String transactionId = request().getHeader(X_TRANSACTION_ID);
@@ -196,7 +194,6 @@ public class WordController extends Controller {
         });
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
     public Result listMeanings(String wordId) {
 
         String transactionId = request().getHeader(X_TRANSACTION_ID);
