@@ -54,6 +54,13 @@ public class WordControllerTests extends WithApplication {
         wordLogic.createWords(createdWords); //storing for tests
     }
 
+    public static JsonNode convertMeaningToResponseJNode(Meaning meaning) {
+
+        JsonNode jsonNode = Json.toJson(meaning);
+        List attributesToRemove = Arrays.asList("strength", "entityMeta");
+        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
+    }
+
     private void createMeaningsInDbForWord(String wordId, String wordSpelling, int numberOfMeanings) {
 
         createdMeaningForWord = new HashMap<>();
@@ -149,7 +156,7 @@ public class WordControllerTests extends WithApplication {
             String jsonWordString = "{\n" +
                     "  \"id\" : null,\n" +
                     "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                    "  \"meaningsMap\" : { \"aMeaningId\":  { \"meaningId\": \"aMeaningId\"}  },\n" +
+                    "  \"meaningsMap\" : { \"aMeaningId\":  { \"id\": \"aMeaningId\"}  },\n" +
                     "  \"antonyms\" : [ ],\n" +
                     "  \"synonyms\" : [ ]\n" +
                     "}";
@@ -319,9 +326,9 @@ public class WordControllerTests extends WithApplication {
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
             Meaning meaning = new Meaning();
-            meaning.setMeaningId(WordLogic.generateNewMeaningId());
+            meaning.setId(WordLogic.generateNewMeaningId());
             HashMap<String,Meaning> meaningHashMap = new HashMap<>();
-            meaningHashMap.put(meaning.getMeaningId(), meaning);
+            meaningHashMap.put(meaning.getId(), meaning);
             updateRequestWord.setMeaningsMap(meaningHashMap);
             JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
@@ -347,17 +354,16 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Create tests */
-    @Test @Ignore
+    @Test
     public void createMeaning_validObject_meaningCreatedCorrectly() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
             Word word = createdWords.get(0);
-            log.info("The word:" + word);
 
             String jsonMeaningString = "{\n" +
-                    "  \"meaningId\" : null,\n" +
+                    "  \"id\" : null,\n" +
                     "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
                     "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                     "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ " + word.getWordSpelling() + " ঙঞজতঢণটজঠধ \"\n" +
@@ -368,13 +374,14 @@ public class WordControllerTests extends WithApplication {
             Result result = route( fakeRequest(POST,"/api/v1/words/" + word.getId() + "/meanings").bodyJson(bodyJson) );
             assertEquals(CREATED, result.status());
             JsonNode createdJNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(createdJNode, Arrays.asList("id")));
-            /*
+            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(createdJNode, Collections.singletonList("id")));
+
             //Making sure the data persisted
-            String wordId = createdJNode.get("id").toString().replaceAll("\"","");
-            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(wordId) );
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(wordFromDB, Arrays.asList("id")));
-            */
+            String meaningId = createdJNode.get("id").toString().replaceAll("\"","");
+            word =  wordLogic.getWordByWordId(word.getId());
+            Meaning meaning = word.getMeaningsMap().get(meaningId);
+            JsonNode meaningJson = convertMeaningToResponseJNode(meaning);
+            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(meaningJson, Collections.singletonList("id")));
         });
     }
 
@@ -531,9 +538,9 @@ public class WordControllerTests extends WithApplication {
             Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
             updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
             Meaning meaning = new Meaning();
-            meaning.setMeaningId(WordLogic.generateNewMeaningId());
+            meaning.setId(WordLogic.generateNewMeaningId());
             HashMap<String,Meaning> meaningHashMap = new HashMap<>();
-            meaningHashMap.put(meaning.getMeaningId(), meaning);
+            meaningHashMap.put(meaning.getId(), meaning);
             updateRequestWord.setMeaningsMap(meaningHashMap);
             JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
 
