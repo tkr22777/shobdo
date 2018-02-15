@@ -9,7 +9,7 @@ import utilities.JsonUtil;
 @Data
 public class Meaning {
 
-    private String meaningId;
+    private String id;
     private String meaning;
     private String partOfSpeech;
     private String exampleSentence;

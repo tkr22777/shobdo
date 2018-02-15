@@ -7,9 +7,9 @@ public class WordHelper {
 
     public static Word addMeaningToWord(Word word, Meaning meaning) {
 
-        if(word == null || meaning == null || meaning.getMeaningId() == null)
+        if(word == null || meaning == null || meaning.getId() == null)
             throw new RuntimeException("Word or Meaning in null");
-        word.getMeaningsMap().put(meaning.getMeaningId(), meaning);
+        word.getMeaningsMap().put(meaning.getId(), meaning);
         return  word;
     }
 

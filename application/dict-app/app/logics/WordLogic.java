@@ -412,11 +412,11 @@ public class WordLogic {
 
     public Meaning createMeaning(String wordId, Meaning meaning) {
 
-        if(meaning.getMeaningId() != null)
-            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getMeaningId());
+        if(meaning.getId() != null)
+            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getId());
 
         if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
-            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
 
         Word currentWord = getWordByWordId(wordId);
 
@@ -424,14 +424,12 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
 
         String meaningId = generateNewMeaningId();
-        meaning.setMeaningId( meaningId );
+        meaning.setId( meaningId );
         WordHelper.addMeaningToWord(currentWord, meaning);
 
         wordDao.updateWord(currentWord);
         return meaning;
     }
-
-
 
     public static String generateNewMeaningId() {
         return Constants.MEANING_ID_PREFIX + UUID.randomUUID();
@@ -463,8 +461,8 @@ public class WordLogic {
 
     public Meaning updateMeaning(String wordId, Meaning meaning) {
 
-        if(meaning.getMeaningId() != null)
-            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getMeaningId());
+        if(meaning.getId() != null)
+            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getId());
 
         if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
             throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
@@ -474,12 +472,12 @@ public class WordLogic {
         if(currentWord == null)
             throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
 
-        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getMeaningId());
+        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getId());
 
         if(currentMeaning == null)
-            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + meaning.getMeaningId());
+            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + meaning.getId());
 
-        currentWord.getMeaningsMap().put(meaning.getMeaningId(), meaning);
+        currentWord.getMeaningsMap().put(meaning.getId(), meaning);
 
         return meaning;
     }
@@ -493,7 +491,7 @@ public class WordLogic {
             throw new IllegalArgumentException("No word exists for id:" + wordId);
 
         if( word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0)
-            throw new IllegalArgumentException("Word does not have any meaning with meaningId:" + meaningId);
+            throw new IllegalArgumentException("Word does not have any meaning with id:" + meaningId);
 
         return false;
     }

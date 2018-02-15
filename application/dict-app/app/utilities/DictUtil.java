@@ -105,7 +105,7 @@ public class DictUtil {
                 int strength = randomIntInRange(0 , 10);
                 //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
 
-                //meaningsMap.put(meaning.getMeaningId(), meaning);
+                //meaningsMap.put(meaning.getId(), meaning);
             }
         }
 
