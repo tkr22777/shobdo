@@ -385,54 +385,43 @@ public class WordControllerTests extends WithApplication {
         });
     }
 
-    @Test @Ignore
+    @Test
     public void createMeaning_invalidWordId_throwsError() {
 
         running( fakeApplication(), () -> {
 
-            createWordsInDb(1);
-            Word word = createdWords.get(0);
-            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 2);
-
-            /*
-            createWordsInDb(1);
-            String existingWordSpelling = createdWords.get(0).getWordSpelling();
-            String jsonWordString = "{\n" +
+            String jsonMeaningString = "{\n" +
                     "  \"id\" : null,\n" +
-                    "  \"wordSpelling\" : \"" + existingWordSpelling +"\",\n" +
-                    "  \"meaningsMap\" : { },\n" +
-                    "  \"antonyms\" : [ ],\n" +
-                    "  \"synonyms\" : [ ]\n" +
+                    "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
+                    "  \"partOfSpeech\" : \"অব্যয়\",\n" +
+                    "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ ঙঞজতঢণটজঠধ \"\n" +
                     "}";
 
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
-            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
-            assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.CREATE_SPELLING_EXISTS + existingWordSpelling, contentAsString(result));
-            */
+            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonMeaningString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words/" + "invalidId" + "/meanings").bodyJson(bodyJson) );
+            assertEquals(NOT_FOUND, result.status());
+            assertEquals(Constants.ENTITY_NOT_FOUND + "invalidId", contentAsString(result));
         });
     }
 
-    @Test @Ignore
+    @Test
     public void createMeaning_meaningStringIsEmpty_throwsError() {
 
         running( fakeApplication(), () -> {
 
-            createWordsInDb(1);
-            String existingWordId = createdWords.get(0).getId();
-
-            String jsonWordString = "{\n" +
-                    "  \"id\" : \"" + existingWordId + "\",\n" +
-                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                    "  \"meaningsMap\" : { },\n" +
-                    "  \"antonyms\" : [ ],\n" +
-                    "  \"synonyms\" : [ ]\n" +
+            String jsonMeaningString = "{\n" +
+                    "  \"id\" : null,\n" +
+                    "  \"meaning\" : \"\",\n" +
+                    "  \"partOfSpeech\" : \"অব্যয়\",\n" +
+                    "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ ঙঞজতঢণটজঠধ \"\n" +
                     "}";
 
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
-            Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
+            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonMeaningString);
+
+            Result result = route( fakeRequest(POST,"/api/v1/words/" + "someWordId" + "/meanings").bodyJson(bodyJson) );
             assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.CREATE_ID_NOT_PERMITTED + existingWordId, contentAsString(result));
+            assertEquals(Constants.MEANING_NULLOREMPTY, contentAsString(result));
         });
     }
 
