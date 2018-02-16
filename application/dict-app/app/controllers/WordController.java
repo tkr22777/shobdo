@@ -176,7 +176,7 @@ public class WordController extends Controller {
             JsonNode meaningJsonNode = request().body().asJson();
             log.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
                     + " on word with id:" + wordId);
-            JsonNode updateMeaningJsonNode = wordLogic.updateMeaningJsonNode(wordId, meaningJsonNode);
+            JsonNode updateMeaningJsonNode = wordLogic.updateMeaningJsonNode(wordId, meaningId, meaningJsonNode);
             return ok(updateMeaningJsonNode);
         });
     }

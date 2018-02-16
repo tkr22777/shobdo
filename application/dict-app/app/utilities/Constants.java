@@ -32,7 +32,7 @@ public class Constants {
     public static final String ENTITY_NOT_FOUND = "Entity not found for:";
     public static final String ENTITY_IS_DEACTIVE = "Entity deactive:";
     public static final String ENTITY_LOCKED = "Entity is currently locked:";
-    public static final String ID_NULLOREMPTY = "Id is null/empty:";
+    public static final String ID_NULLOREMPTY = "Id is null/empty/mismatch:";
     public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
     public static final String MEANING_NULLOREMPTY = "Meaning string is null/empty.";
     public static final String CREATE_ID_NOT_PERMITTED = "User provided id is not permissible for create:";
