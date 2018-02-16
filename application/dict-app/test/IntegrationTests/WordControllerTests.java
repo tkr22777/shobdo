@@ -456,91 +456,97 @@ public class WordControllerTests extends WithApplication {
         });
     }
 
-
     /* Update tests: Update meaning */
-    @Test @Ignore
+    @Test
     public void updateMeaning_validMeaningRequest_updatedSuccessfully() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            Word createdWord = createdWords.get(0);
+            Word word = createdWords.get(0);
+            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
-            Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
-            updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
-            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
+            Meaning meaningRequest = WordLogic.deepCopyMeaning(meaning);
+            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            JsonNode meaningRequestJNode = convertMeaningToResponseJNode(meaningRequest);
 
-            Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
+            String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
+            Result result = route( fakeRequest(PUT,route).bodyJson(meaningRequestJNode));
             assertEquals(OK, result.status());
 
             JsonNode updatedJNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            Assert.assertEquals(updateRequestWordJNode, updatedJNode);
+            Assert.assertEquals(meaningRequestJNode, updatedJNode);
 
             //Making sure the data persisted
-            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(createdWord.getId()));
-            Assert.assertEquals(updateRequestWordJNode, wordFromDB);
+            String meaningId = updatedJNode.get("id").toString().replaceAll("\"","");
+            word =  wordLogic.getWordByWordId(word.getId());
+            meaning = word.getMeaningsMap().get(meaningId);
+            Assert.assertEquals(updatedJNode, convertMeaningToResponseJNode(meaning));
         });
     }
 
-    @Test @Ignore
+    @Test
     public void updateMeaning_invalidWordIdProvided_throwsError() {
 
         running( fakeApplication(), () -> {
 
-            String wordId = WordLogic.generateNewWordId();
-            String jsonWordString = "{\n" +
-                    "  \"id\" : \"" +  wordId + "\",\n" +
-                    "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                    "  \"meaningsMap\" : { },\n" +
-                    "  \"antonyms\" : [ ],\n" +
-                    "  \"synonyms\" : [ ]\n" +
-                    "}";
+            createWordsInDb(1);
+            Word word = createdWords.get(0);
+            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
-            Result result = route( fakeRequest(PUT,"/api/v1/words/" + wordId).bodyJson(bodyJson));
-            assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.ENTITY_NOT_FOUND + wordId, contentAsString(result));
+            Meaning meaningRequest = WordLogic.deepCopyMeaning(meaning);
+            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            JsonNode meaningRequestJNode = convertMeaningToResponseJNode(meaningRequest);
+
+            String route = "/api/v1/words/invalidWordId/meanings/" + meaningRequest.getId() ;
+            Result result = route( fakeRequest(PUT,route).bodyJson(meaningRequestJNode));
+            assertEquals(NOT_FOUND, result.status());
+            assertEquals(Constants.ENTITY_NOT_FOUND + "invalidWordId", contentAsString(result));
         });
     }
 
-    @Test @Ignore
+    @Test
     public void updateMeaning_invalidMeaningIdProvided_throwsError() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            Word createdWord = createdWords.get(0);
+            Word word = createdWords.get(0);
+            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
-            Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
-            updateRequestWord.setWordSpelling("");
-            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
+            Meaning meaningRequest = WordLogic.deepCopyMeaning(meaning);
+            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            meaningRequest.setId("invalidMeaningId");
+            JsonNode meaningRequestJNode = convertMeaningToResponseJNode(meaningRequest);
 
-            Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
-            assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.WORDSPELLING_NULLOREMPTY, contentAsString(result));
+            String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
+            Result result = route( fakeRequest(PUT,route).bodyJson(meaningRequestJNode));
+            assertEquals(NOT_FOUND, result.status());
+            assertEquals(Constants.ENTITY_NOT_FOUND + "invalidMeaningId", contentAsString(result));
         });
     }
 
-    @Test @Ignore
+    @Test
     public void updateMeaning_emptyMeaningStringProvided_throwsError() {
 
         running( fakeApplication(), () -> {
 
             createWordsInDb(1);
-            Word createdWord = createdWords.get(0);
+            Word word = createdWords.get(0);
+            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
-            Word updateRequestWord = WordLogic.deepCopyWord(createdWord);
-            updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling()  + "বিবর্তিত"); //updating the spelling
-            Meaning meaning = new Meaning();
-            meaning.setId(WordLogic.generateNewMeaningId());
-            HashMap<String,Meaning> meaningHashMap = new HashMap<>();
-            meaningHashMap.put(meaning.getId(), meaning);
-            updateRequestWord.setMeaningsMap(meaningHashMap);
-            JsonNode updateRequestWordJNode = convertWordToJsonResponse(updateRequestWord);
+            Meaning meaningRequest = WordLogic.deepCopyMeaning(meaning);
+            meaningRequest.setMeaning("");
+            JsonNode meaningRequestJNode = convertMeaningToResponseJNode(meaningRequest);
 
-            Result result = route( fakeRequest(PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
+            String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
+            Result result = route( fakeRequest(PUT,route).bodyJson(meaningRequestJNode));
             assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.MEANING_PROVIDED, contentAsString(result));
+            assertEquals(Constants.MEANING_NULLOREMPTY, contentAsString(result));
         });
     }
 
@@ -601,8 +607,6 @@ public class WordControllerTests extends WithApplication {
 
     @Test @Ignore
     public void tempTest() {
-
-
 
     }
 

@@ -256,11 +256,16 @@ public class WordLogic {
         currentWord.setExtraMetaValue(REQUEST_MERGED, request.getRequestId());
         currentWord.setExtraMetaValue(request.getRequestId(), currentWordBackup.toString() );
 
-        wordDao.updateWord(currentWord); //update the entry in DB
+        updateWordWithCache(currentWord);
 
         saveRequestAsMerged(request); //Update the request as merged
-        wordCache.cacheWord(currentWord);
         return currentWord;
+    }
+
+    private void updateWordWithCache(Word currentWord) {
+
+        wordDao.updateWord(currentWord); //update the entry in DB
+        wordCache.cacheWord(currentWord);
     }
 
     private Word modifyToDeactivatedWordEntry(Word currentWordCopy) {
@@ -299,6 +304,10 @@ public class WordLogic {
 
     public static Word deepCopyWord(Word word) {
         return (Word) JsonUtil.jsonNodeToObject(JsonUtil.objectToJsonNode(word), Word.class);
+    }
+
+    public static Meaning deepCopyMeaning(Meaning meaning) {
+        return (Meaning) JsonUtil.jsonNodeToObject(JsonUtil.objectToJsonNode(meaning), Meaning.class);
     }
 
     public static String generateNewWordUpdateReqID() {
@@ -457,31 +466,30 @@ public class WordLogic {
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
-    public JsonNode updateMeaningJsonNode(String wordId, JsonNode meaningJsonNode) {
+    public JsonNode updateMeaningJsonNode(String wordId, String meaningId, JsonNode meaningJsonNode) {
 
         Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
-        return convertMeaningToResponseJNode(updateMeaning(wordId, meaning));
+        return convertMeaningToResponseJNode(updateMeaning(wordId, meaningId, meaning));
     }
 
-    public Meaning updateMeaning(String wordId, Meaning meaning) {
+    public Meaning updateMeaning(String wordId, String meaningId, Meaning meaning) {
 
-        if(meaning.getId() != null)
-            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getId());
+        if(meaningId == null || !meaningId.equalsIgnoreCase(meaning.getId()))
+            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
         if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
-            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
 
         Word currentWord = getWordByWordId(wordId);
 
-        if(currentWord == null)
-            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
-
-        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getId());
+        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaningId);
 
         if(currentMeaning == null)
-            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + meaning.getId());
+            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + meaning.getId());
 
         currentWord.getMeaningsMap().put(meaning.getId(), meaning);
+
+        updateWordWithCache(currentWord);
 
         return meaning;
     }
