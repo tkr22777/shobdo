@@ -494,18 +494,18 @@ public class WordLogic {
         return meaning;
     }
 
-    /* DELETE meaning todo implement using WORD's interfaces */
-    public boolean deleteMeaning(String wordId, String meaningId) {
+    /* DELETE meaning */
+    public void deleteMeaning(String wordId, String meaningId) {
 
         Word word = getWordByWordId(wordId);
 
-        if(word == null)
-            throw new IllegalArgumentException("No word exists for id:" + wordId);
-
         if( word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0)
-            throw new IllegalArgumentException("Word does not have any meaning with id:" + meaningId);
+            return;
 
-        return false;
+        if(word.getMeaningsMap().get(meaningId) != null) {
+            word.getMeaningsMap().remove(meaningId);
+            updateWordWithCache(word);
+        }
     }
 
     /* LIST meaning todo implement using WORD's interfaces */

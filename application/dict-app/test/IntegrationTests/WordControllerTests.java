@@ -551,18 +551,37 @@ public class WordControllerTests extends WithApplication {
     }
 
     /* Delete Word Test: */
-    @Test @Ignore
-    public void deleteMeaning() {
+    @Test
+    public void deleteMeaning_validMeaningId_meaningDeletedCorrectly() {
 
         createWordsInDb(1);
-        String wordSpelling = createdWords.get(0).getWordSpelling();
-        Word word = wordLogic.getWordBySpelling(wordSpelling);
-        Assert.assertNotNull(word);
-        Assert.assertNotNull(word.getId());
+        Word word = createdWords.get(0);
+        createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+        Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
-        Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getId()) );
+        Assert.assertNotNull(meaning);
+        Assert.assertNotNull(meaning.getId());
+
+        Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getId() + "/meanings/" + meaning.getId()) );
         assertEquals(OK, result.status());
-        Assert.assertNull(wordLogic.getWordByWordId(word.getId()));
+        Assert.assertNull(wordLogic.getWordByWordId(word.getId()).getMeaningsMap().get(meaning.getId()));
+    }
+
+    /* Delete Word Test: */
+    @Test
+    public void deleteMeaning_invalidWordId_returnsNotFound() {
+
+        createWordsInDb(1);
+        Word word = createdWords.get(0);
+        createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+        Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
+
+        Assert.assertNotNull(meaning);
+        Assert.assertNotNull(meaning.getId());
+
+        Result result = route( fakeRequest(DELETE,"/api/v1/words/" + "invalidWordId" + "/meanings/" + meaning.getId()) );
+        assertEquals(NOT_FOUND, result.status());
+        assertEquals(Constants.ENTITY_NOT_FOUND + "invalidWordId", contentAsString(result));
     }
 
     @Test
