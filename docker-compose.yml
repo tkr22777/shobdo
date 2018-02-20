@@ -9,7 +9,10 @@ services:
   depends_on:
   - "mongo"
  shobdo:
-  image: "stupefied/shobdo:latest"
+  image: "dict-app"
+  environment:
+  - "SHOBDO_MONGODBHOSTNAME=mongo"
+  - "SHOBDO_REDISHOSTNAME=redis"
   depends_on:
   - "redis"
   - "mongo"
