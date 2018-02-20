@@ -51,16 +51,19 @@ function wordSearch(element) {
 
     if( searchQueryString.length > 0 && !containsEng ) { // event.keyCode == 13 && //keyCode 13 is enter
 
-        var searchRoute = "http://192.168.99.100:32779/api/v1/search";
+        var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
         var searchBody = JSON.stringify( { searchString : searchQueryString } );
-        console.log("Body: "  + searchBody);
         RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
     }
 }
 
+function handleTestGetResult(data, status, jqXHR) {
+    console.log("The data:" + data);
+}
+
 function meaningSearch(textContent) {
 
-    var meaningRoute = "http://192.168.99.100:32779/api/v1/word/postget"
+    var meaningRoute = "http://127.0.0.1:32779/api/v1/words/postget"
     var meaningBody = JSON.stringify( { wordSpelling : textContent } );
     console.log("Meaning route: "  + meaningRoute);
     console.log("Meaning route: "  + meaningBody);

@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class WordCache {
 
-    private static boolean USE_REDIS = true;
+    private static boolean USE_REDIS = false;
 
     private Jedis jedis;
 

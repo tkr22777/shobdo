@@ -10,7 +10,7 @@ FROM stupefied/centos-java8
 MAINTAINER Tahsin Kabir
 
 #The copy the binary from the local target dir! Do not mount because we dont want to mount in production
-ADD ./target/universal /dict-app/bin
+ADD  /target/universal/ /dict-app/bin
 
 RUN unzip /dict-app/bin/dict-app-0.11-SNAPSHOT.zip -d /dict-app/bin/
 
