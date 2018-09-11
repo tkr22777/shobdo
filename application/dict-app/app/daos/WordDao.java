@@ -6,35 +6,32 @@ import objects.Word;
 import java.util.ArrayList;
 import java.util.Set;
 
-/**
- * Created by tahsinkabir on 8/14/16.
- */
 public interface WordDao {
 
-    public Word createWord(Word word);
+     Word createWord(Word word);
 
-    public Word getWordByWordId(String wordId);
+     Word getWordByWordId(String wordId);
 
-    public Word getWordBySpelling(String spelling);
+     Word getWordBySpelling(String spelling);
 
-    public Word updateWord(Word word);
+     Word updateWord(Word word);
 
-    public void deleteWord(String wordId);
+     void deleteWord(String wordId);
 
-    public Set<String> searchWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
+     Set<String> searchWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
 
-    public long totalWordCount();
+     long totalWordCount();
 
-    public void deleteAllWords();
+     void deleteAllWords();
 
-    public ArrayList<Word> listWords(String startWordId, int limit);
+     ArrayList<Word> listWords(String startWordId, int limit);
 
-    //todo create separate request dao
-    public UserRequest createRequest(UserRequest request);
+     //TODO create separate request dao
+     UserRequest createRequest(UserRequest request);
 
-    public UserRequest getRequestById(String requestId);
+     UserRequest getRequestById(String requestId);
 
-    public UserRequest updateRequest(UserRequest request);
+     UserRequest updateRequest(UserRequest request);
 
-    public void deleteRequest(String requestId);
+     void deleteRequest(String requestId);
 }

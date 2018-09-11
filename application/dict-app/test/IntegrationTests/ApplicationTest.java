@@ -32,27 +32,12 @@ public class ApplicationTest extends WithServer {
 
     @Before
     public void setup() {
-
         log = new LogPrint(ApplicationTest.class);
     }
 
     @Test
-    public void simpleCheck() {
-        int a = 1 + 1;
-        assertEquals(2, a);
-    }
-
-    @Test @Ignore
-    public void renderTemplate() {
-        //Content html = views.html.ndex.render("Your new application is ready.");
-        //assertEquals("text/html", html.contentType());
-        //assertTrue(html.body().contains("Your new application is ready."));
-    }
-
-    @Test
     public void rootRouteTest() {
-
-        running( fakeApplication(), () -> {
+        running(fakeApplication(), () -> {
                 Result result = route(fakeRequest(GET, "/"));
                 assertEquals(OK, result.status());
                 assertEquals("The Bangla Dictionary!",contentAsString(result));
@@ -62,8 +47,7 @@ public class ApplicationTest extends WithServer {
 
     @Test
     public void getRequestTest() {
-
-        running( fakeApplication(), () -> {
+        running(fakeApplication(), () -> {
             Result result = route(fakeRequest(GET, "/api/v1/gettest"));
             assertEquals(OK, result.status());
             JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
@@ -74,12 +58,9 @@ public class ApplicationTest extends WithServer {
 
     @Test
     public void postRequestTest() {
-
         running( fakeApplication(), () -> {
-
             JsonNode bodyJson = JsonUtil.jsonStringToJsonNode("{\"name\":\"SIN\"}");
             Result result = route( fakeRequest(POST,"/api/v1/posttest").bodyJson(bodyJson) );
-
             assertEquals(OK, result.status());
 
             JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
