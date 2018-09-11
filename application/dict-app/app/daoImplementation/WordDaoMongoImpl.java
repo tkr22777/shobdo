@@ -25,74 +25,74 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    private final String WORD_ID = "id";
-    private final String REQUEST_ID = "requestId";
-    private final String WORD_SPELLING = "wordSpelling";
-    private final String ENTITYMETA_STATUS = "entityMeta.status";
+    private static final String MONGODB_HOSTNAME_CONFIG_STRING = "shobdo.mongodbhostname";
+    private static final String MONGODB_PORT_CONFIG_STRING = "shobdo.mongodbport";
+    private static final String DB_NAME = "Dictionary";
+    private static final String COLLECTION_NAME = "Words";
 
-    MongoClient mongoClient;
-    MongoDatabase mongoDatabase;
-    MongoCollection<Document> collection;
+    private static final String WORD_ID = "id";
+    private static final String REQUEST_ID = "requestId";
+    private static final String WORD_SPELLING = "wordSpelling";
+    private static final String ENTITYMETA_STATUS = "entityMeta.status";
 
-    private BenchmarkLogger bmLog = new BenchmarkLogger(WordDaoMongoImpl.class);
-    private LogPrint log = new LogPrint(WordDaoMongoImpl.class);
+    private final MongoClient mongoClient;
+    private final MongoDatabase mongoDatabase;
+    private final MongoCollection<Document> mongoCollection;
+
+    private static final BenchmarkLogger bmLog = new BenchmarkLogger(WordDaoMongoImpl.class);
+    private static final LogPrint log = new LogPrint(WordDaoMongoImpl.class);
 
     private final String MONGODB_HOSTNAME;
     private final int MONGODB_PORT;
 
     public WordDaoMongoImpl() {
 
-        MONGODB_HOSTNAME = ConfigFactory.load().getString(Constants.MONGODB_HOSTNAME_CONFIG_STRING);
-        MONGODB_PORT = Integer.parseInt( ConfigFactory.load().getString(Constants.MONGODB_PORT_CONFIG_STRING));
+        MONGODB_HOSTNAME = ConfigFactory.load().getString(MONGODB_HOSTNAME_CONFIG_STRING);
+        MONGODB_PORT = Integer.parseInt(ConfigFactory.load().getString(MONGODB_PORT_CONFIG_STRING));
 
-        log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]" );
+        log.info( "@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]");
 
-        mongoClient = new MongoClient( MONGODB_HOSTNAME, MONGODB_PORT );
-        mongoDatabase = mongoClient.getDatabase(Constants.DICTIONARY_DATABASE_NAME);
-        collection = mongoDatabase.getCollection(Constants.WORD_COLLECTION_NAME);
+        mongoClient = new MongoClient(MONGODB_HOSTNAME, MONGODB_PORT);
+        mongoDatabase = mongoClient.getDatabase(DB_NAME);
+        mongoCollection = mongoDatabase.getCollection(COLLECTION_NAME);
     }
 
     @Override
     public Word createWord(Word word) {
-
         bmLog.start();
         Document wordDoc = JsonUtil.objectToDocument(word);
-        collection.insertOne(wordDoc);
+        mongoCollection.insertOne(wordDoc);
         bmLog.end("@WDMI002 createWord Saving word to database: " + word.getWordSpelling());
         return word;
     }
 
     @Override
     public Word getWordByWordId(String wordId) {
-
         bmLog.start();
         BasicDBObject query = new BasicDBObject();
         query.put(WORD_ID, wordId);
         query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
         log.info("Query: " + query);
-        Document wordDoc = collection.find(query).first();
+        Document wordDoc = mongoCollection.find(query).first();
         bmLog.end("@WDMI003 getWordByWordId id: " + wordId + " mongoDoc:" + wordDoc);
         return wordDoc == null ?  null: DictUtil.getWordFromDocument( wordDoc, Word.class);
     }
 
     @Override
     public Word getWordBySpelling(String spelling) {
-
         bmLog.start();
-
         BasicDBObject query = new BasicDBObject();
         query.put(WORD_SPELLING, spelling);
         query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
-        Document wordDoc = collection.find(query).first();
+        Document wordDoc = mongoCollection.find(query).first();
         bmLog.end("@WDMI004 getWordBySpelling spelling: " + spelling + " mongoDoc:" + wordDoc);
         return wordDoc == null ?  null: DictUtil.getWordFromDocument( wordDoc, Word.class);
     }
 
     @Override
     public Word updateWord(Word word) {
-
         if(word.getId() == null || word.getId().trim().equals(""))
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
 
@@ -101,7 +101,7 @@ public class WordDaoMongoImpl implements WordDao {
         query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
         Document wordDocument = JsonUtil.objectToDocument(word);
-        collection.replaceOne(query, wordDocument);
+        mongoCollection.replaceOne(query, wordDocument);
         return word;
     }
 
@@ -120,7 +120,7 @@ public class WordDaoMongoImpl implements WordDao {
         query.put(WORD_SPELLING, prefixForSpellPattern);
         query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
-        MongoCursor<Document> words = collection
+        MongoCursor<Document> words = mongoCollection
                 .find(query)
                 .projection(Projections.include(WORD_SPELLING))
                 .limit(limit)
@@ -141,12 +141,12 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public long totalWordCount() {
-        return collection.count();
+        return mongoCollection.count();
     }
 
     public void deleteAllWords() {
 
-        DeleteResult result = collection.deleteMany(new BasicDBObject());
+        DeleteResult result = mongoCollection.deleteMany(new BasicDBObject());
         log.info("Result : " + result);
     }
 
@@ -160,7 +160,7 @@ public class WordDaoMongoImpl implements WordDao {
     public UserRequest createRequest(UserRequest request) {
         bmLog.start();
         Document requestDoc = JsonUtil.objectToDocument(request);
-        collection.insertOne(requestDoc);
+        mongoCollection.insertOne(requestDoc);
         bmLog.end("@WDMI002 createRequest Saving request to database: " + request.getRequestId());
         return request;
     }
@@ -174,7 +174,7 @@ public class WordDaoMongoImpl implements WordDao {
         query.put(REQUEST_ID, requestId);
         query.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
-        Document requestDoc = collection.find(query).first();
+        Document requestDoc = mongoCollection.find(query).first();
         bmLog.end("@WDMI003 getWordByWordId id: " + requestId + " mongoDoc:" + requestDoc);
         return requestDoc == null ?  null: DictUtil.getRequestFromDocument( requestDoc, UserRequest.class);
     }
@@ -192,7 +192,7 @@ public class WordDaoMongoImpl implements WordDao {
         searchQuery.put(ENTITYMETA_STATUS, EntityStatus.ACTIVE.toString());
 
         Document requestDoc = JsonUtil.objectToDocument(request);
-        collection.replaceOne(searchQuery, requestDoc);
+        mongoCollection.replaceOne(searchQuery, requestDoc);
         return request;
     }
 

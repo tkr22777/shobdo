@@ -12,4 +12,7 @@ public enum  EntityStatus {
         this.status = status;
     }
 
+    public String getStatus() {
+        return status;
+    }
 }
