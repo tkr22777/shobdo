@@ -14,6 +14,7 @@ import play.mvc.Result;
 import play.test.WithServer;
 import utilities.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +83,7 @@ public class ApplicationTest extends WithServer {
     }
 
     @Test @Ignore //Ignore because it is not a functionality test
-    public void testGuava() {
+    public void testGuava() throws IOException {
 
         List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
 
@@ -90,7 +91,7 @@ public class ApplicationTest extends WithServer {
 
         String spelling = theWord.getWordSpelling();
 
-        WordLogic logic = WordLogic.factory();
+        WordLogic logic = WordLogic.createMongoBackedWordLogic();
 
         logic.createWord(theWord);
 
@@ -100,7 +101,7 @@ public class ApplicationTest extends WithServer {
                 .build(new CacheLoader<String, Word>() {
                     @Override
                     public Word load(String key) throws Exception {
-                        WordLogic logic = WordLogic.factory();
+                        WordLogic logic = WordLogic.createMongoBackedWordLogic();
                         return logic.getWordBySpelling(spelling);
                     }
                 });

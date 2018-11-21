@@ -1,6 +1,6 @@
 package IntegrationTests;
 
-import Exceptions.EntityDoesNotExist;
+import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import logics.WordLogic;
@@ -10,11 +10,12 @@ import org.junit.*;
 import play.libs.Json;
 import play.mvc.Result;
 import play.test.WithApplication;
-import utilities.Constants;
+import objects.Constants;
 import utilities.DictUtil;
 import utilities.JsonUtil;
 import utilities.LogPrint;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ import static play.test.Helpers.POST;
 import static play.test.Helpers.contentAsString;
 
 /**
- * Created by tahsinkabir on 1/7/17.
+ * Created by Tahsin Kabir on 1/7/17.
  */
 public class WordControllerTests extends WithApplication {
 
@@ -38,7 +39,7 @@ public class WordControllerTests extends WithApplication {
     public void setup() {
 
         log = new LogPrint(WordControllerTests.class);
-        wordLogic = WordLogic.factory();
+        wordLogic = WordLogic.createMongoBackedWordLogic();
     }
 
     private JsonNode convertWordToJsonResponse(Word word) {
@@ -144,7 +145,7 @@ public class WordControllerTests extends WithApplication {
             JsonNode bodyJson = JsonUtil.jsonStringToJsonNode(jsonWordString);
             Result result = route( fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson) );
             assertEquals(BAD_REQUEST, result.status());
-            assertEquals(Constants.CREATE_ID_NOT_PERMITTED + existingWordId, contentAsString(result));
+            assertEquals(Constants.Messages.UserProvidedIdForbidden(existingWordId), contentAsString(result));
         });
     }
 
@@ -281,7 +282,7 @@ public class WordControllerTests extends WithApplication {
 
         running( fakeApplication(), () -> {
 
-            String wordId = WordLogic.generateNewWordId();
+            String wordId = "TestWordId";
             String jsonWordString = "{\n" +
                     "  \"id\" : \"" +  wordId + "\",\n" +
                     "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
@@ -340,7 +341,7 @@ public class WordControllerTests extends WithApplication {
 
     /* Delete Word Test: */
     @Test(expected = EntityDoesNotExist.class)
-    public void deleteWord_existingWord_deletesSuccessfully() {
+    public void deleteWord_existingWord_deletesSuccessfully() throws IOException {
 
         createWordsInDb(1);
         String wordSpelling = createdWords.get(0).getWordSpelling();

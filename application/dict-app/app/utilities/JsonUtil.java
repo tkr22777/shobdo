@@ -11,7 +11,7 @@ import java.util.Collection;
 public class JsonUtil {
 
     private final static LogPrint log = new LogPrint(JsonUtil.class);
-    private final static ObjectMapper objectMapper = new ObjectMapper(); //Is object mapper thread safe?
+    private final static ObjectMapper objectMapper = new ObjectMapper();
 
     public static Object jsonStringToObject(String jsonString, Class<?> class_type ) {
         try {

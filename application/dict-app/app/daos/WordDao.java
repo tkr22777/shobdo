@@ -8,28 +8,29 @@ import java.util.Set;
 
 public interface WordDao {
 
-     Word createWord(Word word);
+     Word create(Word word);
 
-     Word getWordByWordId(String wordId);
+     Word getById(String wordId);
 
-     Word getWordBySpelling(String spelling);
+     Word getBySpelling(String spelling);
 
-     Word updateWord(Word word);
+     Word update(Word word);
 
-     void deleteWord(String wordId);
+     void delete(String wordId);
 
-     Set<String> searchWordSpellingsWithPrefixMatch(String wordSpelling, int limit); //returns the spelling of the words that matches
+     //returns the spelling of the words that matches the query
+     Set<String> searchSpellingsBySpelling(String spellingQuery, int limit);
 
-     long totalWordCount();
+     long totalCount();
 
-     void deleteAllWords();
+     void deleteAll();
 
-     ArrayList<Word> listWords(String startWordId, int limit);
+     ArrayList<Word> list(String startWordId, int limit);
 
      //TODO create separate request dao
      UserRequest createRequest(UserRequest request);
 
-     UserRequest getRequestById(String requestId);
+     UserRequest getRequest(String requestId);
 
      UserRequest updateRequest(UserRequest request);
 

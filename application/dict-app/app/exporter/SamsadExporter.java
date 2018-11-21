@@ -2,7 +2,7 @@ package exporter;
 
 import logics.WordLogic;
 import objects.Word;
-import utilities.Constants;
+import objects.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 import utilities.FileReadUtil;
@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by tahsinkabir on 9/1/16.
+ * Created by Tahsin Kabir on 9/1/16.
  */
 
 //This is a helper class to export Samsad database file's entries to dictionary objects

@@ -1,11 +1,14 @@
 package objects;
 
+//REQUEST OPERATION TYPES
 public enum RequestOperation {
-
-    //REQUEST OPERATION TYPES
     CREATE("CREATE"),
     UPDATE("UPDATE"),
     DELETE("DELETE");
+
+    public String getOperation() {
+        return operation;
+    }
 
     private final String operation;
 

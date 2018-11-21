@@ -3,62 +3,43 @@ package utilities;
 import java.lang.Integer;
 import java.lang.String;
 
-public class BanglaUtil {
+public final class BanglaUtil {
 
-    public static String getBanglaRandomSentence(int numberOfWords, int maxWordLength) {
+    private static final String START_HEX = "995"; //ক
+    private static final String END_HEX = "9A8";   //ন
 
-        String startHex = "995"; //ক
-        String endHex = "9A8";   //ন
+    private BanglaUtil() {};
 
-        if(numberOfWords < 1)
-            numberOfWords = DictUtil.randomIntInRange(1, 10);
-
-        if(maxWordLength < 1)
-            maxWordLength = DictUtil.randomIntInRange(1, 7);
-
-        String sentence = "";
-
-        for(int i = 0 ; i < numberOfWords ; i++){
-
-            if( i != 0)
-                sentence += " ";
-
-            int number = DictUtil.randomIntInRange(1, maxWordLength);
-            String word = getRandomBanglaString(number);
-            sentence += word;
+    public static String generateRandomSentence(final int numberOfWords) {
+        final StringBuilder sentenceBuilder = new StringBuilder();
+        for (int i = 0 ; i < numberOfWords ; i++) {
+            final int number = DictUtil.randomIntInRange(1, 12);
+            final String word = generateRandomWord(number);
+            sentenceBuilder.append(word);
+            if (i < numberOfWords - 1) {
+                sentenceBuilder.append(" ");
+            }
         }
-
-        return sentence;
+        return sentenceBuilder.toString();
     }
 
-    public static String getRandomBanglaString(int wordLength) {
+    public static String generateRandomWord(final int length) {
+        final int start = Integer.parseInt(START_HEX, 16);
+        final int end = Integer.parseInt(END_HEX, 16);
+        final StringBuilder banglaString = new StringBuilder();
 
-        String startHex = "995"; //ক
-        String endHex = "9A8";   //ন
-
-        int start = Integer.parseInt(startHex, 16);
-        int end = Integer.parseInt(endHex, 16);
-
-        String retString = "";
-
-        if(wordLength < 1)
-            wordLength = DictUtil.randomIntInRange(1, 10);
-
-        for(int i = 0 ; i < wordLength ; i++) {
-
-            int number = DictUtil.randomIntInRange(start, end);
-            char c = (char) number;
-            String single_char = "" + c;
-            retString += single_char;
+        for (int i = 0 ; i < length ; i++) {
+            final int number = DictUtil.randomIntInRange(start, end);
+            final char c = (char) number;
+            final String single_char = "" + c;
+            banglaString.append(single_char);
         }
-
-        return retString;
+        return banglaString.toString();
     }
 
-    public static String getRandomBanglaExampleString(String wordStringInSentence ) {
-        int preSentenceLen = DictUtil.randomIntInRange(2, 6);
-        int postSentenceLen = DictUtil.randomIntInRange(2, 4);
-        return getBanglaRandomSentence(preSentenceLen, 12) + " " + wordStringInSentence + " "
-                + getBanglaRandomSentence(postSentenceLen, 12);
+    public static String generateSentenceWithWord(final String word) {
+        final String preSentence = generateRandomSentence(DictUtil.randomIntInRange(2, 6));
+        final String postSentence = generateRandomSentence(DictUtil.randomIntInRange(2, 4));
+        return preSentence + " " + word + " " + postSentence;
     }
 }

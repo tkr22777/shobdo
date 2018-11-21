@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 /**
- * Created by tahsinkabir on 9/1/16.
+ * Created by Tahsin Kabir on 9/1/16.
  */
 public class FileReadUtil {
 
@@ -21,7 +21,7 @@ public class FileReadUtil {
 
         String line = null;
 
-        if(reader == null)
+        if (reader == null)
             return line;
 
         try {
@@ -54,7 +54,7 @@ public class FileReadUtil {
 
         try {
 
-            reader = new BufferedReader( new FileReader(fileLocation));
+            reader = new BufferedReader(new FileReader(fileLocation));
 
         } catch (Exception ex){
 

@@ -1,73 +1,68 @@
 package objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
 import lombok.Data;
-import utilities.JsonUtil;
 import java.util.*;
 
 /**
- * Created by tahsinkabir on 8/21/16.
+ * Created by Tahsin Kabir on 8/21/16.
  */
-@Data
-public class Word {
+@Data @Builder
+public class Word extends EntityMeta {
 
     private String id;
     private String wordSpelling;
-
+    private ArrayList<String> antonyms = new ArrayList<>(); //antonym wordIds, should it map to associated spelling?
+    private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds, should it map to associated spelling?
     private HashMap<String, Meaning> meaningsMap = new HashMap<>(); //Think of this as the document store for meanings
-    private ArrayList<String> antonyms = new ArrayList<>(); //antonym wordIds, should it be id mapped to word spellings
-    private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds, should it be id mapped to word spellings
+    private HashMap<String,List<String>> extraMetaMap = new HashMap<>();
 
-    private HashMap<String,List<String>> extraMetaMap;
-    private EntityMeta entityMeta;
+    public Word() {}
 
-    public Word() {};
+    @Override
+    public JsonNode toJson() {
+        return null;
+    }
 
-    public Word( String id, String wordSpelling) {
-
+    public Word(final String id, final String wordSpelling) {
         this.id = id;
         this.wordSpelling = wordSpelling;
     }
 
-    public void setExtraMetaValue(String key, String value) {
-
+    public void setExtraMetaValue (final String key, final String value) {
         setExtraMetaValue(key, Arrays.asList(value));
     }
 
-    public void setExtraMetaValue(String key, List<String> newValues) {
-
-        if(extraMetaMap == null)
-            extraMetaMap = new HashMap<>();
-
+    public void setExtraMetaValue(final String key, final List<String> newValues) {
         List<String> values = extraMetaMap.get(key);
-
-        if( values == null )
+        if (values == null) {
             values = new ArrayList<>();
-
+        }
         values.addAll(newValues);
-
         extraMetaMap.put(key, values);
     }
 
-    public List<String> retrieveExtraMetaValuesForKey(String key) {
-
+    public List<String> retrieveExtraMetaValuesForKey(final String key) {
         return extraMetaMap.get(key);
     }
 
-    public void removeExtraMetaValueForKey(String key) {
-
+    public void removeExtraMetaValueForKey(final String key) {
         removeExtraMetaValueForKeys(Arrays.asList(key));
     }
 
-    public void removeExtraMetaValueForKeys(Collection<String> keys) {
-
-        for(String key: keys) {
-            extraMetaMap.remove(key);
-        }
+    public void removeExtraMetaValueForKeys(final Collection<String> keys) {
+        keys.forEach(k-> extraMetaMap.remove(k));
     }
 
     @Override
     public String toString() {
-        return JsonUtil.objectToJsonString(this);
+        try {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        } catch (JsonProcessingException jpe) {
+            return "ERROR 101";
+        }
     }
 }

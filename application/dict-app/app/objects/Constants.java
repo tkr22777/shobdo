@@ -1,13 +1,11 @@
-package utilities;
+package objects;
 
 /**
- * Created by tahsinkabir on 11/24/16.
+ * Created by Tahsin Kabir on 11/24/16.
  */
-public class Constants {
+public final class Constants {
 
-
-
-    public static final String REDIS_HOSTNAME_CONFIG_STRING = "shobdo.redishostname";
+    private Constants() {}
 
     public static final int SEARCH_SPELLING_LIMIT = 40;
 
@@ -25,6 +23,8 @@ public class Constants {
     public static final String SEARCH_STRING_KEY = "searchString";
     public static final String WORD_COUNT_KEY = "wordCount";
 
+    public static final String REQUEST_MERGED = "Requests Merged";
+
     //Messages
     public static final String ENTITY_NOT_FOUND = "Entity not found for:";
     public static final String ENTITY_IS_DEACTIVE = "Entity deactive:";
@@ -32,8 +32,12 @@ public class Constants {
     public static final String ID_NULLOREMPTY = "Id is null/empty/mismatch:";
     public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
     public static final String MEANING_NULLOREMPTY = "Meaning string is null/empty.";
-    public static final String CREATE_ID_NOT_PERMITTED = "User provided id is not permissible for create:";
-    public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:";
+    public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:%s";
     public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
 
+    public static class Messages {
+        public static String UserProvidedIdForbidden(final String id) {
+            return String.format("User provided id is not permissible for create:%s", id);
+        }
+    }
 }

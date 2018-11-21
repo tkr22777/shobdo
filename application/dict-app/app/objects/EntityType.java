@@ -1,17 +1,18 @@
 package objects;
 
-//Entity Types
+//Entity types on version meta
 public enum EntityType {
-
-    //ENTITY TYPES, For type on version meta
     WORD("WORD"),
     MEANING("MEANING"),
-    REQUEST("REQUEST"),
-    UNKNOWN("UNKNOWN");
+    REQUEST("REQUEST");
 
     private final String type;
 
     EntityType(final String type)  {
         this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

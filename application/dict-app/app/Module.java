@@ -27,5 +27,4 @@ public class Module extends AbstractModule {
         // Set AtomicCounter as the implementation for Counter.
         bind(Counter.class).to(AtomicCounter.class);
     }
-
 }

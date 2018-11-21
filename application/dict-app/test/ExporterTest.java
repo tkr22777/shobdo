@@ -16,7 +16,7 @@ import java.util.Collection;
 public class ExporterTest extends WithServer {
 
     LogPrint log = new LogPrint(ExporterTest.class);
-    WordLogic wordLogic = WordLogic.factory();
+    WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
 
     @Test @Ignore
     public void createDictionaryFromSamsad() throws Exception {

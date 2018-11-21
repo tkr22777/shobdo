@@ -20,7 +20,7 @@ public class MiscTests {
     public void setup() {
 
         log = new LogPrint(MiscTests.class);
-        wordLogic = WordLogic.factory();
+        wordLogic = WordLogic.createMongoBackedWordLogic();
     }
 
     @Test @Ignore

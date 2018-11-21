@@ -1,11 +1,9 @@
 package utilities;
 
-import Exceptions.EntityDoesNotExist;
-import play.Logger;
+import exceptions.EntityDoesNotExist;
 import play.mvc.Result;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import static play.mvc.Results.badRequest;
@@ -14,46 +12,38 @@ import static play.mvc.Results.notFound;
 
 public class ControllerUtils {
 
-    private static Logger.ALogger log = Logger.of(ControllerUtils.class);
+    private static LogPrint log = new LogPrint(ControllerUtils.class);
 
-    public static Result executeEndpoint(String transactionId,
-                                         String parentRequestId,
-                                         String endpoint,
-                                         Map<String, String> parameters,
-                                         Supplier<Result> supplier) {
+    public static Result executeEndpoint(final String transactionId,
+                                         final String parentRequestId,
+                                         final String endpoint,
+                                         final Map<String, String> parameters,
+                                         final Supplier<Result> supplier) {
+
+        log.info(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+            transactionId, parentRequestId, endpoint, parameters));
 
         try {
-            String message = String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
-                    transactionId, parentRequestId, endpoint, parameters);
-            log.info(message);
             return supplier.get();
-        } catch (Exception ex) {
+        } catch (Exception  ex) {
             return handleException(transactionId, parentRequestId, endpoint, parameters, ex);
         }
     }
 
-    private static Result handleException(String transactionId,
-                                         String parentRequestId,
-                                         String endpoint,
-                                         Map<String, String> parameters,
-                                         Throwable throwable) {
+    private static Result handleException(final String transactionId,
+                                          final String parentRequestId,
+                                          final String endpoint,
+                                          final Map<String, String> parameters,
+                                          final Throwable throwable) {
 
-        String message = String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s][Exception Message=%s]", transactionId,
-                parentRequestId, endpoint, parameters, throwable.getMessage());
+        log.info(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
+            + "[Exception Message=%s]", transactionId, parentRequestId, endpoint, parameters, throwable.getMessage()));
 
-        if( throwable instanceof EntityDoesNotExist) {
-
-            log.info(message, throwable);
+        if (throwable instanceof EntityDoesNotExist) {
             return notFound(throwable.getMessage());
-
-        } else if ( throwable instanceof IllegalArgumentException) {
-
-            log.info(message, throwable);
+        } else if (throwable instanceof IllegalArgumentException) {
             return badRequest(throwable.getMessage());
-
         } else {
-
-            log.error(message, throwable);
             return internalServerError(throwable.getMessage());
         }
     }
