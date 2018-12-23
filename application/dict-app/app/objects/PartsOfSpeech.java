@@ -11,8 +11,7 @@ import java.util.Set;
  */
 @Data
 public class PartsOfSpeech {
-
-    public Set<String> partsOfSpeeches = new HashSet<String>(
+    public Set<String> partsOfSpeeches = new HashSet<>(
         Arrays.asList(
             "বিশেষ্য",
             "বিশেষণ",

@@ -5,10 +5,11 @@ import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import daos.WordDaoMongoImpl;
 import daos.WordDao;
-import utilities.WordUtil;
+import jdk.nashorn.internal.runtime.WithObject;
 import objects.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.springframework.stereotype.Service;
 import play.libs.Json;
 import utilities.*;
 
@@ -38,17 +39,11 @@ public class WordLogic {
     /* Create */
     public JsonNode createWord(final JsonNode wordJsonNode) {
         final Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
-        final Word createdWord = createWord(word) ;
-        return convertWordToJsonResponse(createdWord);
+        return Word.toJson(createWord(word));
     }
 
     private String generateNewWordId() {
         return String.format("%s-%s", Constants.WORD_ID_PREFIX, UUID.randomUUID());
-    }
-
-    private JsonNode convertWordToJsonResponse(final Word word) {
-        final JsonNode jsonNode = Json.toJson(word);
-        return JsonUtil.removeFieldsFromJsonNode(jsonNode, Arrays.asList("extraMetaMap", "entityMeta"));
     }
 
     public Word createWord(final Word word) {
@@ -71,7 +66,7 @@ public class WordLogic {
         }
 
         word.setId(generateNewWordId());
-        word.setsetEntityMeta(EntityMeta.builder().type(EntityType.WORD).build());
+        word.setEntityMeta(EntityMeta.builder().type(EntityType.WORD).build());
 
         wordDao.create(word);
         wordCache.cacheWord(word);
@@ -84,8 +79,7 @@ public class WordLogic {
 
     /* GET word by id */
     public JsonNode getWordJNodeByWordId(final String wordId) {
-        final Word word = getWordByWordId(wordId);
-        return convertWordToJsonResponse(word);
+        return Word.toJson(getWordByWordId(wordId));
     }
 
     public Word getWordByWordId(@NotNull final String wordId) {
@@ -97,8 +91,7 @@ public class WordLogic {
 
     /* GET word by (exact) spelling */
     public JsonNode getWordJNodeBySpelling(final String spelling) throws IOException {
-        final Word word = getWordBySpelling(spelling);
-        return word == null? null: convertWordToJsonResponse(word);
+        return Word.toJson(getWordBySpelling(spelling));
     }
 
     public Word getWordBySpelling(final String spelling) throws IOException {
@@ -123,8 +116,7 @@ public class WordLogic {
     public JsonNode updateWordJNode(final String wordId, final JsonNode wordJsonNode) {
         final Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
         word.setId(wordId);
-        final Word updatedWord = updateWordVersioned(word);
-        return convertWordToJsonResponse(updatedWord);
+        return Word.toJson(updateWordVersioned(word));
     }
 
     public Word updateWordVersioned(final Word updateWord) {
@@ -402,7 +394,7 @@ public class WordLogic {
 
         final String meaningId = generateNewMeaningId();
         meaning.setId(meaningId);
-        WordUtil.addMeaningToWord(currentWord, meaning);
+        currentWord.addMeaningToWord(meaning);
 
         wordDao.update(currentWord);
         return meaning;

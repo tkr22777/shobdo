@@ -31,6 +31,4 @@ public abstract class EntityMeta {
     private int version = 0;
 
     EntityMeta() { }
-
-    public abstract JsonNode toJson();
 }

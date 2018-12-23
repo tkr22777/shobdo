@@ -8,7 +8,7 @@ public final class BanglaUtil {
     private static final String START_HEX = "995"; //ক
     private static final String END_HEX = "9A8";   //ন
 
-    private BanglaUtil() {};
+    private BanglaUtil() {}
 
     public static String generateRandomSentence(final int numberOfWords) {
         final StringBuilder sentenceBuilder = new StringBuilder();
