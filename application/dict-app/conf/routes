@@ -6,8 +6,6 @@
 # 0. Splash dictionary message and test routes:
 ###############################################
 GET     /api/v1/                                         controllers.WordController.index()
-GET     /api/v1/gettest                                  controllers.AdminController.testGet()
-POST    /api/v1/posttest                                 controllers.AdminController.testPost()
 
 ################################
 # CRUDL and search API for word:
@@ -25,13 +23,16 @@ POST    /api/v1/words/postget                            controllers.WordControl
 # 4. Update word:
 PUT     /api/v1/words/:id                                controllers.WordController.updateWord(id: String)
 
-# 5. Delete word:
+# 5. Update word user request:
+PUT     /api/v1/words/:id                                controllers.WordController.updateWordUserRequest(id: String)
+
+# 6. Delete word:
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)
 
-# 6. List words
+# 7. List words
 GET     /api/v1/words/list                               controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
-# 7. Search words by spelling:
+# 8. Search words by spelling:
 #    requestBody contains "searchString"
 POST    /api/v1/words/search                             controllers.WordController.searchWordsBySpelling()
 

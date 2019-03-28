@@ -72,29 +72,30 @@ public final class WordCache {
             return null;
         }
         final String key = getKeyForSearchString(searchString);
-        final Set<String> words = jedis.smembers(key);
-        if (words != null && words.size() > 0) {
-            log.info("@WC005 Search result found and returning from cache. Count: " + words.size() + ".");
-            return words;
+        final Set<String> wordSpellings = jedis.smembers(key);
+        if (wordSpellings != null && wordSpellings.size() > 0) {
+            log.info("@WC005 Search result found and returning from cache. Count: " + wordSpellings.size() + ".");
+            return wordSpellings;
         } else {
             log.info("@WC005 Search result not found on cache for spelling: \'" + searchString + "\'");
             return null;
         }
     }
 
-    public void cacheWordsForSearchString(final String searchString, final Set<String> words) {
-        if (searchString == null || words == null || words.size() == 0) {
+    public void cacheWordsForSearchString(final String searchString, final Set<String> wordSpellings) {
+        if (searchString == null || wordSpellings == null || wordSpellings.size() == 0) {
             return;
         }
         final String key = getKeyForSearchString(searchString);
         final String wordsString = String.join("-|-",
-                words.stream().map(w->toString()).collect(Collectors.toList())
+            wordSpellings.stream()
+                .map(w->toString()).collect(Collectors.toList())
         );
         jedis.set(key, wordsString);
         if (USE_REDIS_EXPIRATION_TIME) {
             jedis.expire(key, REDIS_EXPIRE_TIME_SECONDS);
         }
-        log.info("@WC006 Storing search results on cache. Count: " + words.size() + ".");
+        log.info("@WC006 Storing search results on cache. Count: " + wordSpellings.size() + ".");
     }
 
     private String getKeyForSpelling(String spelling) {

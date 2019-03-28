@@ -3,7 +3,6 @@ package utilities;
 import objects.UserRequest;
 import objects.Word;
 import objects.Meaning;
-import objects.PartsOfSpeech;
 import org.bson.Document;
 
 import java.util.*;
@@ -16,7 +15,7 @@ public class DictUtil {
 
     private static final LogPrint log = new LogPrint(DictUtil.class);
 
-    public static int randomIntInRange(final int lowest, final int highest) {
+    /* package private */ static int randomIntInRange(final int lowest, final int highest) {
         return new Random().nextInt(highest - lowest + 1) + lowest;
     }
 
@@ -40,14 +39,12 @@ public class DictUtil {
     }
 
     private static Meaning generateARandomMeaning(final String wordSpelling) {
-        final Meaning meaning = new Meaning();
         final String meaningString =  BanglaUtil.generateRandomSentence(3);
-        meaning.setMeaning(meaningString);
-
         final String exampleSentence =  BanglaUtil.generateSentenceWithWord(wordSpelling);
-        meaning.setExampleSentence(exampleSentence);
-        meaning.setPartOfSpeech(new PartsOfSpeech().getPartsOfSpeeches().iterator().next());
-        return meaning;
+        return Meaning.builder()
+            .meaning(meaningString)
+            .exampleSentence(exampleSentence)
+            .build();
     }
 
     public static Set<Word> generateRandomWordSet(int numberOfWords){
@@ -61,33 +58,30 @@ public class DictUtil {
 
     private static Word generateARandomWord() {
         final int wordLength = randomIntInRange(2, 9);
-        final Word word = new Word();
-        word.setWordSpelling(BanglaUtil.generateRandomWord(wordLength));
-        return word;
+        return Word.builder()
+            .wordSpelling(BanglaUtil.generateRandomWord(wordLength))
+            .build();
     }
 
-    public static Word generateARandomWord(final PartsOfSpeech partsOfSpeech ) {
+    public static Word generateARandomWord(final String partsOfSpeech ) {
         int wordLength = randomIntInRange(2, 9);
         final String wordSpelling = BanglaUtil.generateRandomWord(wordLength);
 
-        final Word word = new Word();
-        word.setWordSpelling(wordSpelling);
-
         final HashMap<String,Meaning> meaningsMap = new HashMap<>();
+        int numberOfMeaningForPOS = randomIntInRange(1,3);
 
-        for (final String partOfSpeech : partsOfSpeech.getPartsOfSpeeches()) {
-            int numberOfMeaningForPOS = randomIntInRange(1,3);
-            for(int j = 0; j < numberOfMeaningForPOS ; j++) {
-                wordLength = randomIntInRange(2, 9);
-                String meaningString = BanglaUtil.generateRandomWord(wordLength);
-                String exampleSentence = BanglaUtil.generateSentenceWithWord(meaningString);
-                int strength = randomIntInRange(0 , 10);
-                //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
-                //meaningsMap.put(meaning.getId(), meaning);
-            }
+        for(int j = 0; j < numberOfMeaningForPOS ; j++) {
+            wordLength = randomIntInRange(2, 9);
+            String meaningString = BanglaUtil.generateRandomWord(wordLength);
+            String exampleSentence = BanglaUtil.generateSentenceWithWord(meaningString);
+            int strength = randomIntInRange(0 , 10);
+            //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
+            //meaningsMap.put(meaning.getId(), meaning);
         }
-        word.setMeaningsMap(meaningsMap);
-        return word;
+
+        return Word.builder()
+            .wordSpelling(wordSpelling)
+            .build();
     }
 
     public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {

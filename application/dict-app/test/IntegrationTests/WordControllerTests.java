@@ -99,7 +99,7 @@ public class WordControllerTests extends WithApplication {
 
             //Making sure the data persisted
             String wordId = createdJNode.get("id").toString().replaceAll("\"","");
-            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(wordId) );
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordById(wordId) );
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(wordFromDB, Arrays.asList("id")));
         });
     }
@@ -272,7 +272,7 @@ public class WordControllerTests extends WithApplication {
             Assert.assertEquals(updateRequestWordJNode, updatedJNode);
 
             //Making sure the data persisted
-            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordByWordId(createdWord.getId()));
+            JsonNode wordFromDB = convertWordToJsonResponse( wordLogic.getWordById(createdWord.getId()));
             Assert.assertEquals(updateRequestWordJNode, wordFromDB);
         });
     }
@@ -351,7 +351,7 @@ public class WordControllerTests extends WithApplication {
 
         Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getId()) );
         assertEquals(OK, result.status());
-        wordLogic.getWordByWordId(word.getId()); //Should throw EntityDoesNotExist exception
+        wordLogic.getWordById(word.getId()); //Should throw EntityDoesNotExist exception
     }
 
     /* Create tests */
@@ -379,7 +379,7 @@ public class WordControllerTests extends WithApplication {
 
             //Making sure the data persisted
             String meaningId = createdJNode.get("id").toString().replaceAll("\"","");
-            word =  wordLogic.getWordByWordId(word.getId());
+            word =  wordLogic.getWordById(word.getId());
             Meaning meaning = word.getMeaningsMap().get(meaningId);
             JsonNode meaningJson = convertMeaningToResponseJNode(meaning);
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsFromJsonNode(meaningJson, Collections.singletonList("id")));
@@ -481,7 +481,7 @@ public class WordControllerTests extends WithApplication {
 
             //Making sure the data persisted
             String meaningId = updatedJNode.get("id").toString().replaceAll("\"","");
-            word =  wordLogic.getWordByWordId(word.getId());
+            word =  wordLogic.getWordById(word.getId());
             meaning = word.getMeaningsMap().get(meaningId);
             Assert.assertEquals(updatedJNode, convertMeaningToResponseJNode(meaning));
         });
@@ -565,7 +565,7 @@ public class WordControllerTests extends WithApplication {
 
         Result result = route( fakeRequest(DELETE,"/api/v1/words/" + word.getId() + "/meanings/" + meaning.getId()) );
         assertEquals(OK, result.status());
-        Assert.assertNull(wordLogic.getWordByWordId(word.getId()).getMeaningsMap().get(meaning.getId()));
+        Assert.assertNull(wordLogic.getWordById(word.getId()).getMeaningsMap().get(meaning.getId()));
     }
 
     /* Delete Word Test: */

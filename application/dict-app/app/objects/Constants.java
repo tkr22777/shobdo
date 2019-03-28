@@ -11,7 +11,7 @@ public final class Constants {
 
     public static final String WORD_ID_PREFIX = "WD";
     public static final String MEANING_ID_PREFIX = "MNG";
-    public static final String REQ_ID_PREFIX = "REQ";
+    public static final String REQUEST_ID_PREFIX = "REQ";
 
     //Meta constant keys
     public static final String MEANING_STRING = "MEANING STRING";
@@ -27,17 +27,22 @@ public final class Constants {
 
     //Messages
     public static final String ENTITY_NOT_FOUND = "Entity not found for:";
-    public static final String ENTITY_IS_DEACTIVE = "Entity deactive:";
-    public static final String ENTITY_LOCKED = "Entity is currently locked:";
+    public static final String ENTITY_IS_DELETED= "Entity has been deleted.";
     public static final String ID_NULLOREMPTY = "Id is null/empty/mismatch:";
     public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
     public static final String MEANING_NULLOREMPTY = "Meaning string is null/empty.";
     public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:%s";
     public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
+    public static final String ENTITY_LOCKED = "Entity is currently locked:";
 
     public static class Messages {
         public static String UserProvidedIdForbidden(final String id) {
             return String.format("User provided id is not permissible for create:%s", id);
         }
+
+        public static String WordSpellingExists(final String wordSpelling) {
+            return String.format("Word with the spelling: %s already exist", wordSpelling);
+        }
+
     }
 }

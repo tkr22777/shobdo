@@ -10,7 +10,7 @@ public final class BanglaUtil {
 
     private BanglaUtil() {}
 
-    public static String generateRandomSentence(final int numberOfWords) {
+    /* package private */ static String generateRandomSentence(final int numberOfWords) {
         final StringBuilder sentenceBuilder = new StringBuilder();
         for (int i = 0 ; i < numberOfWords ; i++) {
             final int number = DictUtil.randomIntInRange(1, 12);
@@ -23,7 +23,7 @@ public final class BanglaUtil {
         return sentenceBuilder.toString();
     }
 
-    public static String generateRandomWord(final int length) {
+    /* package private */ static String generateRandomWord(final int length) {
         final int start = Integer.parseInt(START_HEX, 16);
         final int end = Integer.parseInt(END_HEX, 16);
         final StringBuilder banglaString = new StringBuilder();
@@ -37,7 +37,7 @@ public final class BanglaUtil {
         return banglaString.toString();
     }
 
-    public static String generateSentenceWithWord(final String word) {
+    /* package private */ static String generateSentenceWithWord(final String word) {
         final String preSentence = generateRandomSentence(DictUtil.randomIntInRange(2, 6));
         final String postSentence = generateRandomSentence(DictUtil.randomIntInRange(2, 4));
         return preSentence + " " + word + " " + postSentence;

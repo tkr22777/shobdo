@@ -36,12 +36,13 @@ public class WordController extends Controller {
 
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
-        final JsonNode wordJson = request().body().asJson();
         final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode wordJson = request().body().asJson();
         parameters.put("requestBody", wordJson.toString());
 
-        return executeEndpoint(transactionId, requestId, "create", parameters, () ->
-            created(wordLogic.createWord(wordJson))
+        return executeEndpoint(transactionId, requestId, "createWord", parameters, () ->
+            created(wordLogic.createWord(wordJson).toJson())
         );
     }
 
@@ -52,8 +53,8 @@ public class WordController extends Controller {
         final String requestId = request().getHeader(X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
-        return executeEndpoint(transactionId, requestId, "getById", parameters, () ->
-            ok(wordLogic.getWordJNodeByWordId(wordId))
+        return executeEndpoint(transactionId, requestId, "getWordById", parameters, () ->
+            ok(wordLogic.getWordById(wordId).toJson())
         );
     }
 
@@ -62,20 +63,21 @@ public class WordController extends Controller {
 
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
-        final JsonNode body =  request().body().asJson();
         final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode body =  request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return executeEndpoint(transactionId, requestId, "getWordBySpellingPost", parameters, () -> {
+        return executeEndpoint(transactionId, requestId, "getWordBySpelling", parameters, () -> {
             if (!body.has(Constants.WORD_SPELLING_KEY)) {
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException("Word spelling has not been provided");
             }
 
             final String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
             try {
-                return ok(wordLogic.getWordJNodeBySpelling(wordSpelling));
+                return ok(wordLogic.getWordBySpelling(wordSpelling).toJson());
             } catch (Exception ex) {
-                throw new IllegalArgumentException("");
+                throw new RuntimeException("Server error while getting word by spelling");
             }
         });
     }
@@ -85,12 +87,28 @@ public class WordController extends Controller {
 
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
-        final JsonNode body = request().body().asJson();
         final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return executeEndpoint(transactionId, requestId, "update", parameters, () ->
-            ok(wordLogic.updateWordJNode(wordId, body))
+        return executeEndpoint(transactionId, requestId, "updateWordVersioned", parameters, () ->
+            ok(wordLogic.updateWord(wordId, body).toJson())
+        );
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result updateWordUserRequest(final String wordId) {
+
+        final String transactionId = request().getHeader(X_TRANSACTION_ID);
+        final String requestId = request().getHeader(X_REQUEST_ID);
+        final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode body = request().body().asJson();
+        parameters.put("requestBody", body.toString());
+
+        return executeEndpoint(transactionId, requestId, "updateWordVersioned", parameters, () ->
+                ok(wordLogic.updateWordVersioned(wordId, body).toJson())
         );
     }
 
@@ -99,9 +117,10 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
+
         parameters.put("wordId", wordId);
 
-        return executeEndpoint(transactionId, requestId, "delete", parameters, () -> {
+        return executeEndpoint(transactionId, requestId, "deleteWord", parameters, () -> {
             wordLogic.deleteWord(wordId);
             return ok();
         });
@@ -112,8 +131,9 @@ public class WordController extends Controller {
 
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
-        final JsonNode body = request().body().asJson();
         final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
         return executeEndpoint(transactionId, requestId, "searchWordsBySpelling", parameters, () -> {
@@ -131,7 +151,7 @@ public class WordController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result listWords(final String startWordId, final Integer limit) {
-        logger.info("List words starting from id:" + startWordId + ", limit:" + limit);
+        logger.info("List words beginning wordId:" + startWordId + ", limit:" + limit);
         return ok();
     }
 
@@ -141,8 +161,9 @@ public class WordController extends Controller {
 
         final String transactionId = request().getHeader(X_TRANSACTION_ID);
         final String requestId = request().getHeader(X_REQUEST_ID);
-        final JsonNode body = request().body().asJson();
         final Map<String,String> parameters = new HashMap<>();
+
+        final JsonNode body = request().body().asJson();
         parameters.put("wordId", wordId);
         parameters.put("requestBody", body.toString());
 

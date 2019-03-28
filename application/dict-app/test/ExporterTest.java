@@ -18,6 +18,7 @@ public class ExporterTest extends WithServer {
     LogPrint log = new LogPrint(ExporterTest.class);
     WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
 
+    /*
     @Test @Ignore
     public void createDictionaryFromSamsad() throws Exception {
 
@@ -26,7 +27,6 @@ public class ExporterTest extends WithServer {
         int total = 0;
         for(Word word: words) {
 
-            /*
             if(total == 0) break;
 
             if( "YES".equalsIgnoreCase(word.retrieveExtraMetaValuesForKey("SIMPLE_SPELLING"))
@@ -37,12 +37,11 @@ public class ExporterTest extends WithServer {
 
                 total++;
             }
-            */
             wordLogic.createWord(word);
             total++;
         }
 
         log.info("Total words: " + total);
     }
-
+    */
 }

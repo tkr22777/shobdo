@@ -32,7 +32,6 @@ public class WordLogicTest {
 
     @Before
     public void setup() {
-
         setupMocks();
         setupObjects();
     }
@@ -44,8 +43,9 @@ public class WordLogicTest {
     }
 
     public void setupObjects() {
-        theWord = new Word();
-        theWord.setWordSpelling(wordSpelling);
+        theWord = Word.builder()
+            .wordSpelling(wordSpelling)
+            .build();
     }
 
     //Create word

@@ -28,11 +28,11 @@ public interface WordDao {
      ArrayList<Word> list(String startWordId, int limit);
 
      //TODO create separate request dao
-     UserRequest createRequest(UserRequest request);
+     UserRequest createUserRequest(UserRequest request);
 
-     UserRequest getRequest(String requestId);
+     UserRequest getUserRequest(String requestId);
 
-     UserRequest updateRequest(UserRequest request);
+     UserRequest updateUserRequest(UserRequest request);
 
-     void deleteRequest(String requestId);
+     void deleteUserRequest(String requestId);
 }
