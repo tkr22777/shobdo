@@ -24,14 +24,6 @@ public class MiscTests {
     }
 
     @Test @Ignore
-    public void test() {
-        running(testServer(3333, fakeApplication(inMemoryDatabase())), HTMLUNIT, browser -> {
-            browser.goTo("http://localhost:3333");
-            assertTrue(browser.pageSource().contains("Your new application is ready."));
-        });
-    }
-
-    @Test @Ignore
     public void searchWordsByPrefixPerformanceTune() throws Exception{
 
         int i = 0;

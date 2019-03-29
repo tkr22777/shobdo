@@ -3,6 +3,7 @@ package caches;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 import objects.Word;
+import play.libs.Json;
 import redis.clients.jedis.Jedis;
 import utilities.*;
 
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class WordCache {
+public class WordCache {
 
     /* Redis expire time */
     private static final boolean USE_REDIS_EXPIRATION_TIME = true;
@@ -25,19 +26,15 @@ public final class WordCache {
         jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
     }
 
-    public Word getBySpelling(final String spelling) throws IOException {
+    public Word getBySpelling(final String spelling) {
         if (spelling == null) {
             return null;
         }
         final String key = getKeyForSpelling(spelling);
         final String wordJsonString = jedis.get(key);
         if (wordJsonString != null) {
-            try {
-                log.info("@WC003 Word [" + spelling + "] found in cache and returning");
-                return new ObjectMapper().readValue(wordJsonString, Word.class);
-            } catch (IOException ex) {
-                return null;
-            }
+            log.info("@WC003 Word [" + spelling + "] found in cache and returning");
+            return (Word) JsonUtil.jsonStringToObject(wordJsonString, Word.class);
         }
         return null;
     }

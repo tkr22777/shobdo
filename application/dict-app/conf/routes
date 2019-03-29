@@ -5,7 +5,7 @@
 ###############################################
 # 0. Splash dictionary message and test routes:
 ###############################################
-GET     /api/v1/                                         controllers.WordController.index()
+GET     /api/v1                                          controllers.WordController.index()
 
 ################################
 # CRUDL and search API for word:
@@ -65,3 +65,5 @@ POST    /api/v1/generate                                controllers.WordControll
 
 # 9. To clear/flush redis cache:
 GET     /api/v1/admin/flushcache                        controllers.AdminController.flushCache()
+
+GET     /assets/*file                                   controllers.Assets.at(path="public", file)

@@ -137,7 +137,7 @@ public class WordDaoMongoImpl implements WordDao {
 
         final Document requestDoc = wordCollection.find(query).first();
         log.info("@WDMI003 getById id: " + requestId + " mongoDoc:" + requestDoc);
-        return requestDoc == null ?  null: DictUtil.getRequestFromDocument(requestDoc, UserRequest.class);
+        return requestDoc == null ?  null: DictUtil.getUserRequestFromDocument(requestDoc, UserRequest.class);
     }
 
     @Override

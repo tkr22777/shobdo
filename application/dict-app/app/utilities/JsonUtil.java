@@ -1,6 +1,7 @@
 package utilities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -11,7 +12,8 @@ import java.util.Collection;
 public class JsonUtil {
 
     private final static LogPrint log = new LogPrint(JsonUtil.class);
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static ObjectMapper objectMapper = new ObjectMapper()
+        .configure(MapperFeature.USE_ANNOTATIONS, false);
 
     public static Object jsonStringToObject(String jsonString, Class<?> class_type ) {
         try {
@@ -62,7 +64,8 @@ public class JsonUtil {
         try {
             return objectMapper.treeToValue(jsonNode, class_type);
         } catch (Exception ex)  {
-            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to [ClassType:" + class_type + "]");
+            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to [ClassType:" + class_type
+                + "][Ex:" + ex.getMessage() + "]");
             throw new IllegalArgumentException("Invalid JsonNode:" + jsonNode + " for ClassType:" + class_type);
         }
     }

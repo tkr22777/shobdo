@@ -8,7 +8,6 @@ import daos.WordDao;
 import objects.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import play.libs.Json;
 import utilities.*;
 
 import javax.validation.constraints.NotNull;
@@ -74,17 +73,21 @@ public class WordLogic {
         words.forEach(this::createWord);
     }
 
-    //Todo add toJson to the word object
+    //Todo add toAPIJsonNode to the word object
     /* GET word by id */
     public Word getWordById(@NotNull final String wordId) {
         if (wordId == null || wordId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + wordId);
         }
-        return wordDao.getById(wordId);
+        final Word word = wordDao.getById(wordId);
+        if (word == null) {
+            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + wordId);
+        }
+        return word;
     }
 
     /* GET word by (exact) spelling */
-    public Word getWordBySpelling(final String spelling) throws IOException {
+    public Word getWordBySpelling(final String spelling) {
         if (spelling == null || spelling.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
         }
@@ -95,6 +98,9 @@ public class WordLogic {
         }
 
         final Word wordFromDB = wordDao.getBySpelling(spelling);
+        if (wordFromDB == null) {
+            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + spelling);
+        }
         if (wordFromDB != null) {
             wordCache.cacheWord(wordFromDB);
         }
@@ -325,15 +331,9 @@ public class WordLogic {
      */
 
     /* CREATE meaning */
-    public JsonNode createMeaningJNode(final String wordId, final JsonNode meaningJsonNode) {
+    public Meaning createMeaning(final String wordId, final JsonNode meaningJsonNode) {
         final Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
-        return convertMeaningToResponseJNode(createMeaning(wordId, meaning) );
-    }
-
-    public static JsonNode convertMeaningToResponseJNode(final Meaning meaning) {
-        final JsonNode jsonNode = Json.toJson(meaning);
-        final List attributesToRemove = Arrays.asList("strength", "entityMeta");
-        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
+        return createMeaning(wordId, meaning);
     }
 
     public List<Meaning> createMeaningsBatch(final String wordId, final Collection<Meaning> meanings) {
@@ -374,15 +374,9 @@ public class WordLogic {
     }
 
     /* GET meaning */
-    public JsonNode getMeaningJsonNodeByMeaningId(final String wordId, final String meaningId) {
-
-        final Meaning meaning = getMeaning(wordId, meaningId);
-        return meaning == null? null: convertMeaningToResponseJNode(meaning);
-    }
-
     public Meaning getMeaning(final String wordId, final String meaningId) {
         final Word word = getWordById(wordId);
-        final Meaning meaning = word.getMeaningsMap().get(meaningId);
+        final Meaning meaning = word.getMeaningsMap() == null ? null : word.getMeaningsMap().get(meaningId);
         if (meaning == null) {
             throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + meaningId);
         }
@@ -390,9 +384,9 @@ public class WordLogic {
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
-    public JsonNode updateMeaningJsonNode(final String wordId, final String meaningId, final JsonNode meaningJsonNode) {
+    public Meaning updateMeaning(final String wordId, final String meaningId, final JsonNode meaningJsonNode) {
         final Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
-        return convertMeaningToResponseJNode(updateMeaning(wordId, meaningId, meaning));
+        return updateMeaning(wordId, meaningId, meaning);
     }
 
     public Meaning updateMeaning(final String wordId, final String meaningId, final Meaning meaning) {

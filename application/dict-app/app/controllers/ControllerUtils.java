@@ -1,7 +1,8 @@
-package utilities;
+package controllers;
 
 import exceptions.EntityDoesNotExist;
 import play.mvc.Result;
+import utilities.LogPrint;
 
 import java.util.Map;
 import java.util.function.Supplier;

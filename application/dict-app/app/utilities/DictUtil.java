@@ -19,12 +19,12 @@ public class DictUtil {
         return new Random().nextInt(highest - lowest + 1) + lowest;
     }
 
-    public static UserRequest getRequestFromDocument(final Document dictionaryDocument, final Class<?> class_type) {
+    public static UserRequest getUserRequestFromDocument(final Document dictionaryDocument, final Class<?> class_type) {
         dictionaryDocument.remove("_id");
         return (UserRequest) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }
 
-    public static Word getWordFromDocument (final Document dictionaryDocument, final Class<?> class_type) {
+    public static Word getWordFromDocument(final Document dictionaryDocument, final Class<?> class_type) {
         dictionaryDocument.remove("_id");
         return (Word) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }

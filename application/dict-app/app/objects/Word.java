@@ -3,16 +3,19 @@ package objects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
-import lombok.Data;
-import utilities.JsonUtil;
+import lombok.*;
 
 import java.util.*;
 
 /**
  * Created by Tahsin Kabir on 8/21/16.
  */
-@Data @Builder
+@Data
+@Setter
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Word extends EntityMeta {
 
     private String id;
@@ -25,18 +28,20 @@ public class Word extends EntityMeta {
     private HashSet<String> synonyms;
 
     //meaningId to meanings map, easier to lookup
-    private final HashMap<String, Meaning> meaningsMap;
+    private HashMap<String, Meaning> meaningsMap;
 
     public void addMeaningToWord(final Meaning meaning) {
         if (meaning == null || meaning.getId() == null) {
             throw new RuntimeException("Meaning or MeaningId is null");
         }
+        if (meaningsMap == null) {
+            meaningsMap = new HashMap<>();
+        }
         getMeaningsMap().put(meaning.getId(), meaning);
     }
 
-    public JsonNode toJson() {
-        final JsonNode jsonNode = JsonUtil.objectToJsonNode(this);
-        return JsonUtil.removeFieldsFromJsonNode(jsonNode, Arrays.asList("entityMeta", "others"));
+    public JsonNode toAPIJsonNode() {
+        return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
     @Override

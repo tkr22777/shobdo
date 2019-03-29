@@ -1,12 +1,15 @@
 package unitTests;
 
 import caches.WordCache;
+import com.fasterxml.jackson.databind.JsonNode;
 import daos.WordDao;
 import logics.WordLogic;
+import objects.Meaning;
 import objects.Word;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import utilities.JsonUtil;
 import utilities.LogPrint;
 
 import java.io.IOException;
@@ -103,6 +106,5 @@ public class WordLogicTest {
 
     @Test @Ignore
     public void updateWord_wordIdSetWordsIdNotSet_addsWordCurrently() {
-
     }
 }

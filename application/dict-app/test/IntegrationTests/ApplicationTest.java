@@ -1,12 +1,12 @@
 package IntegrationTests;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
 import logics.WordLogic;
 import objects.Word;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
 import static play.test.Helpers.*;
 
 /**
@@ -39,39 +38,14 @@ public class ApplicationTest extends WithServer {
     @Test
     public void rootRouteTest() {
         running(fakeApplication(), () -> {
-                Result result = route(fakeRequest(GET, "/"));
-                assertEquals(OK, result.status());
-                assertEquals("The Bangla Dictionary!",contentAsString(result));
+                Result result = route(fakeRequest(GET, "/api/v1"));
+                Assert.assertEquals(OK, result.status());
+                Assert.assertEquals("বাংলা অভিধান এ স্বাগতম!",contentAsString(result));
             }
         );
     }
 
-    @Test
-    public void getRequestTest() {
-        running(fakeApplication(), () -> {
-            Result result = route(fakeRequest(GET, "/api/v1/gettest"));
-            assertEquals(OK, result.status());
-            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            assertEquals("Dictionary", jsonNode.get("Application").asText());
-            assertEquals("Bengali", jsonNode.get("Language").asText());
-        });
-    }
-
-    @Test
-    public void postRequestTest() {
-        running( fakeApplication(), () -> {
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode("{\"name\":\"SIN\"}");
-            Result result = route( fakeRequest(POST,"/api/v1/posttest").bodyJson(bodyJson) );
-            assertEquals(OK, result.status());
-
-            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            assertEquals("SIN", jsonNode.get("Name").asText());
-            assertEquals("3", jsonNode.get("Length").asText());
-            assertEquals("S", jsonNode.get("StartsWith").asText());
-        });
-    }
-
-    @Test @Ignore //Ignore because it is not a functionality test
+    @Test @Ignore //Ignore because it is not a test of functionality
     public void tempTestConfig() {
 
         String configString = "shobdo.config";
@@ -82,7 +56,7 @@ public class ApplicationTest extends WithServer {
         log.info("Config for mongodbhostname\"" + mongodbhostnameConfigString + "\":" + mongodbhostname);
     }
 
-    @Test @Ignore //Ignore because it is not a functionality test
+    @Test @Ignore //Ignore because it is not a test functionality
     public void testGuava() throws IOException {
 
         List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );

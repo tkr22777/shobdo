@@ -1,20 +1,25 @@
 package objects;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-@Data @AllArgsConstructor @Builder
-/* package private */ abstract class EntityMeta {
+@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class EntityMeta {
 
+    @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;
 
+    @JsonIgnore
     private String creatorId;
+    @JsonIgnore
     private String creationDate;
 
+    @JsonIgnore
     private String deleterId;
+    @JsonIgnore
     private String deletedDate;
-
-    EntityMeta() { }
 }
