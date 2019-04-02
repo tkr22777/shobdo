@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class EntityMeta {
+/* package private */ abstract class EntityMeta {
 
     @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;

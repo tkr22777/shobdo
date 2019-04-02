@@ -15,7 +15,7 @@ public class JsonUtil {
     private final static ObjectMapper objectMapper = new ObjectMapper()
         .configure(MapperFeature.USE_ANNOTATIONS, false);
 
-    public static Object jsonStringToObject(String jsonString, Class<?> class_type ) {
+    public static Object jStringToObject(String jsonString, Class<?> class_type ) {
         try {
             return objectMapper.readValue(jsonString, class_type);
         } catch (Exception ex) {
@@ -24,7 +24,7 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode jsonStringToJsonNode(String jsonString) {
+    public static JsonNode jStringToJNode(String jsonString) {
         try {
             return objectMapper.readTree(jsonString);
         } catch (Exception ex) {
@@ -33,7 +33,7 @@ public class JsonUtil {
         }
     }
 
-    public static String objectToJsonString(Object object) {
+    public static String objectToJString(Object object) {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (Exception ex) {
@@ -42,7 +42,7 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode objectToJsonNode(Object object) {
+    public static JsonNode objectToJNode(Object object) {
         try {
             return objectMapper.convertValue(object, JsonNode.class);
         } catch (Exception ex) {
@@ -51,16 +51,16 @@ public class JsonUtil {
         }
     }
 
-    public static ByteBuffer jsonNodeToByteBuffer(JsonNode jsonNode) {
+    public static ByteBuffer jNodeToByteBuffer(JsonNode jsonNode) {
         try {
             return ByteBuffer.wrap(objectMapper.writeValueAsBytes(jsonNode));
         } catch (Exception ex) {
-            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to ByteBuffer ");
+            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to ByteBuffer . Exception:" + ex.getStackTrace().toString());
             throw new IllegalArgumentException("Invalid JsonNode:" + jsonNode);
         }
     }
 
-    public static Object jsonNodeToObject(JsonNode jsonNode, Class<?> class_type) {
+    public static Object jNodeToObject(JsonNode jsonNode, Class<?> class_type) {
         try {
             return objectMapper.treeToValue(jsonNode, class_type);
         } catch (Exception ex)  {
@@ -70,24 +70,24 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode removeFieldsFromJsonNode(JsonNode node, Collection<String> attributes) {
+    public static JsonNode removeFieldsFromJNode(JsonNode node, Collection<String> attributes) {
         ObjectNode objectNode = node.deepCopy();
-        for(String attribute: attributes) {
+        for (String attribute: attributes) {
             objectNode.remove(attribute);
         }
-        return jsonStringToJsonNode(objectNode.toString());
+        return jStringToJNode(objectNode.toString());
     }
 
-    public static JsonNode nullFieldsFromJsonNode(JsonNode node, Collection<String> attributes) {
+    public static JsonNode nullFieldsOnJNode(JsonNode node, Collection<String> attributes) {
         ObjectNode objectNode = node.deepCopy();
-        for(String attribute: attributes) {
+        for (String attribute: attributes) {
             objectNode.putNull(attribute);
         }
-        return jsonStringToJsonNode(objectNode.toString());
+        return jStringToJNode(objectNode.toString());
     }
 
     public static Object documentToObject(Document doc, Class<?> class_type) {
-        return jsonStringToObject(doc.toJson(), class_type);
+        return jStringToObject(doc.toJson(), class_type);
     }
 
     public static Document objectToDocument(Object object) {

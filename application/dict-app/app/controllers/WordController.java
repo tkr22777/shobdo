@@ -85,7 +85,7 @@ public class WordController extends Controller {
         final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordVersioned", parameters, () ->
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters, () ->
             ok(wordLogic.updateWord(wordId, body).toAPIJsonNode())
         );
     }
@@ -100,8 +100,8 @@ public class WordController extends Controller {
         final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordVersioned", parameters, () ->
-                ok(wordLogic.updateWordVersioned(wordId, body).toAPIJsonNode())
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters, () ->
+                ok(wordLogic.updateWordWithUserRequest(wordId, body))
         );
     }
 
@@ -175,7 +175,7 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getMeaning" , new HashMap<>(), () -> {
             logger.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
             final Meaning meaning = wordLogic.getMeaning(wordId, meaningId);
-            return meaning == null ? notFound(Constants.ENTITY_NOT_FOUND + meaningId): ok(meaning.toAPIJsonNode());
+            return meaning == null ? notFound(Constants.Messages.EntityNotFound(meaningId)): ok(meaning.toAPIJsonNode());
         });
     }
 

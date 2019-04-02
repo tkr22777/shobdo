@@ -39,13 +39,13 @@ public class WordLogicTest {
         setupObjects();
     }
 
-    public void setupMocks() {
+    private void setupMocks() {
         mockWordDao = mock(WordDao.class);
         mockWordCache = mock(WordCache.class);
         wordLogic = new WordLogic(mockWordDao, mockWordCache);
     }
 
-    public void setupObjects() {
+    private void setupObjects() {
         theWord = Word.builder()
             .wordSpelling(wordSpelling)
             .build();
@@ -62,8 +62,7 @@ public class WordLogicTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void createWord_wordIdIsSet_throwsIAE() {
-
-        theWord.setId("WD_ID_SET_By_USER");
+        theWord.setId("WD_ID_SET");
         wordLogic.createWord(theWord);
     }
 

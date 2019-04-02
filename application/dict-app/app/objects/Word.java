@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
+import utilities.JsonUtil;
 
 import java.util.*;
 
@@ -42,6 +43,10 @@ public class Word extends EntityMeta {
 
     public JsonNode toAPIJsonNode() {
         return new ObjectMapper().convertValue(this, JsonNode.class);
+    }
+
+    public static Word fromWord(final Word word) {
+        return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
     }
 
     @Override

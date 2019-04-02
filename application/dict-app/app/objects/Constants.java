@@ -26,7 +26,6 @@ public final class Constants {
     public static final String REQUEST_MERGED = "Requests Merged";
 
     //Messages
-    public static final String ENTITY_NOT_FOUND = "Entity not found for:";
     public static final String ENTITY_IS_DELETED= "Entity has been deleted.";
     public static final String ID_NULLOREMPTY = "Id is null/empty/mismatch:";
     public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
@@ -42,6 +41,10 @@ public final class Constants {
 
         public static String WordSpellingExists(final String wordSpelling) {
             return String.format("Word with the spelling: %s already exist", wordSpelling);
+        }
+
+        public static String EntityNotFound(final String entityId) {
+            return String.format("Entity not found for id:%s", entityId);
         }
 
     }

@@ -18,7 +18,6 @@ public class MiscTests {
 
     @Before
     public void setup() {
-
         log = new LogPrint(MiscTests.class);
         wordLogic = WordLogic.createMongoBackedWordLogic();
     }

@@ -24,7 +24,6 @@ POST    /api/v1/words/postget                            controllers.WordControl
 PUT     /api/v1/words/:id                                controllers.WordController.updateWord(id: String)
 
 # 5. Update word user request:
-PUT     /api/v1/words/:id                                controllers.WordController.updateWordUserRequest(id: String)
 
 # 6. Delete word:
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)

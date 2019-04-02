@@ -11,7 +11,7 @@ public class UserRequest extends EntityMeta {
     private String id;
     private RequestOperation operation;
 
-    //The id's prefix should signify the type of the entity the request is intended for
     private String targetId;
+    private TargetType targetType; //Target type is required creates as the targetId still does not exist
     private JsonNode requestBody;
 }

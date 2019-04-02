@@ -59,20 +59,20 @@ public class DictUtil {
     private static Word generateARandomWord() {
         final int wordLength = randomIntInRange(2, 9);
         return Word.builder()
-            .wordSpelling(BanglaUtil.generateRandomWord(wordLength))
+            .wordSpelling(BanglaUtil.generateRandomWordString(wordLength))
             .build();
     }
 
     public static Word generateARandomWord(final String partsOfSpeech ) {
         int wordLength = randomIntInRange(2, 9);
-        final String wordSpelling = BanglaUtil.generateRandomWord(wordLength);
+        final String wordSpelling = BanglaUtil.generateRandomWordString(wordLength);
 
         final HashMap<String,Meaning> meaningsMap = new HashMap<>();
         int numberOfMeaningForPOS = randomIntInRange(1,3);
 
         for(int j = 0; j < numberOfMeaningForPOS ; j++) {
             wordLength = randomIntInRange(2, 9);
-            String meaningString = BanglaUtil.generateRandomWord(wordLength);
+            String meaningString = BanglaUtil.generateRandomWordString(wordLength);
             String exampleSentence = BanglaUtil.generateSentenceWithWord(meaningString);
             int strength = randomIntInRange(0 , 10);
             //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);

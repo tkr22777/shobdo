@@ -2,20 +2,17 @@ package controllers;
 
 import exceptions.EntityDoesNotExist;
 import play.mvc.Result;
+import play.mvc.Results;
 import utilities.LogPrint;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static play.mvc.Results.badRequest;
-import static play.mvc.Results.internalServerError;
-import static play.mvc.Results.notFound;
-
-public class ControllerUtils {
+/* package private */ class ControllerUtils {
 
     private static LogPrint log = new LogPrint(ControllerUtils.class);
 
-    public static Result executeEndpoint(final String transactionId,
+    /* package private */ static Result executeEndpoint(final String transactionId,
                                          final String parentRequestId,
                                          final String endpoint,
                                          final Map<String, String> parameters,
@@ -41,11 +38,11 @@ public class ControllerUtils {
             + "[Exception Message=%s]", transactionId, parentRequestId, endpoint, parameters, throwable.getMessage()));
 
         if (throwable instanceof EntityDoesNotExist) {
-            return notFound(throwable.getMessage());
+            return Results.notFound(throwable.getMessage());
         } else if (throwable instanceof IllegalArgumentException) {
-            return badRequest(throwable.getMessage());
+            return Results.badRequest(throwable.getMessage());
         } else {
-            return internalServerError(throwable.getMessage());
+            return Results.internalServerError(throwable.getMessage());
         }
     }
 }

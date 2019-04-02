@@ -31,8 +31,12 @@ public class Meaning extends EntityMeta {
         return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
+    public static Meaning fromMeaning(final Meaning meaning) {
+        return (Meaning) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(meaning), Meaning.class);
+    }
+
     @Override
     public String toString() {
-        return JsonUtil.objectToJsonString(this);
+        return JsonUtil.objectToJString(this);
     }
 }

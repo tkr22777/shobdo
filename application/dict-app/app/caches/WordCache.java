@@ -1,13 +1,10 @@
 package caches;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 import objects.Word;
-import play.libs.Json;
 import redis.clients.jedis.Jedis;
 import utilities.*;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +31,7 @@ public class WordCache {
         final String wordJsonString = jedis.get(key);
         if (wordJsonString != null) {
             log.info("@WC003 Word [" + spelling + "] found in cache and returning");
-            return (Word) JsonUtil.jsonStringToObject(wordJsonString, Word.class);
+            return (Word) JsonUtil.jStringToObject(wordJsonString, Word.class);
         }
         return null;
     }
