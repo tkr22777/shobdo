@@ -90,21 +90,6 @@ public class WordController extends Controller {
         );
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result updateWordUserRequest(final String wordId) {
-
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
-        final Map<String,String> parameters = new HashMap<>();
-
-        final JsonNode body = request().body().asJson();
-        parameters.put("requestBody", body.toString());
-
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters, () ->
-                ok(wordLogic.updateWordWithUserRequest(wordId, body))
-        );
-    }
-
     public Result deleteWord(final String wordId) {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);

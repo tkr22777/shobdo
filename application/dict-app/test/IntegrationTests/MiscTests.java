@@ -39,7 +39,7 @@ public class MiscTests {
                 log.info("Found in memory");
             } else {
                 log.info("Not found in memory");
-                results = wordLogic.searchWords(prefix, 10);
+                results = wordLogic.searchWords(prefix);
                 //if(i == 4)
                 //play.api.cache.Cache.set(prefix, results, 20000, );
             }

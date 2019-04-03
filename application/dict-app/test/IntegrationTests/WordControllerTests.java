@@ -48,7 +48,9 @@ public class WordControllerTests extends WithApplication {
     private void createMeaningsInDbForWord(String wordId, String wordSpelling, int numberOfMeanings) {
         createdMeaningForWord = new HashMap<>();
         List<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(wordSpelling, numberOfMeanings));
-        meaningList = wordLogic.createMeaningsBatch(wordId, meaningList);
+        meaningList = meaningList.stream()
+            .map(meaning -> wordLogic.createMeaning(wordId, meaning))
+            .collect(Collectors.toList());
         createdMeaningForWord.put(wordId, meaningList);
     }
 
@@ -295,7 +297,7 @@ public class WordControllerTests extends WithApplication {
             Word updateRequestWord = Word.fromWord(createdWord);
             updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling() + "বিবর্তিত"); //updating the spelling
             Meaning meaning = Meaning.builder()
-                .id(WordLogic.generateMeaningId())
+                .id("aMeaningId")
                 .build();
             updateRequestWord.addMeaningToWord(meaning);
             JsonNode updateRequestWordJNode = updateRequestWord.toAPIJsonNode();

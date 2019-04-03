@@ -5,13 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data @AllArgsConstructor @Builder
 public class UserRequest extends EntityMeta {
 
     private String id;
     private RequestOperation operation;
 
-    private String targetId;
-    private TargetType targetType; //Target type is required creates as the targetId still does not exist
+    private Map<TargetType, String> targetInfo;
+    private TargetType targetType; //Target type is required creates as the targetInfo still does not exist
     private JsonNode requestBody;
 }
