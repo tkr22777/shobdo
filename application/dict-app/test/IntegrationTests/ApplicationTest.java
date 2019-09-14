@@ -1,12 +1,12 @@
 package IntegrationTests;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
 import logics.WordLogic;
 import objects.Word;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,10 +14,10 @@ import play.mvc.Result;
 import play.test.WithServer;
 import utilities.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
 import static play.test.Helpers.*;
 
 /**
@@ -32,64 +32,20 @@ public class ApplicationTest extends WithServer {
 
     @Before
     public void setup() {
-
         log = new LogPrint(ApplicationTest.class);
     }
 
     @Test
-    public void simpleCheck() {
-        int a = 1 + 1;
-        assertEquals(2, a);
-    }
-
-    @Test @Ignore
-    public void renderTemplate() {
-        //Content html = views.html.ndex.render("Your new application is ready.");
-        //assertEquals("text/html", html.contentType());
-        //assertTrue(html.body().contains("Your new application is ready."));
-    }
-
-    @Test
     public void rootRouteTest() {
-
-        running( fakeApplication(), () -> {
-                Result result = route(fakeRequest(GET, "/"));
-                assertEquals(OK, result.status());
-                assertEquals("The Bangla Dictionary!",contentAsString(result));
+        running(fakeApplication(), () -> {
+                Result result = route(fakeRequest(GET, "/api/v1"));
+                Assert.assertEquals(OK, result.status());
+                Assert.assertEquals("বাংলা অভিধান এ স্বাগতম!",contentAsString(result));
             }
         );
     }
 
-    @Test
-    public void getRequestTest() {
-
-        running( fakeApplication(), () -> {
-            Result result = route(fakeRequest(GET, "/api/v1/gettest"));
-            assertEquals(OK, result.status());
-            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            assertEquals("Dictionary", jsonNode.get("Application").asText());
-            assertEquals("Bengali", jsonNode.get("Language").asText());
-        });
-    }
-
-    @Test
-    public void postRequestTest() {
-
-        running( fakeApplication(), () -> {
-
-            JsonNode bodyJson = JsonUtil.jsonStringToJsonNode("{\"name\":\"SIN\"}");
-            Result result = route( fakeRequest(POST,"/api/v1/posttest").bodyJson(bodyJson) );
-
-            assertEquals(OK, result.status());
-
-            JsonNode jsonNode = JsonUtil.jsonStringToJsonNode(contentAsString(result));
-            assertEquals("SIN", jsonNode.get("Name").asText());
-            assertEquals("3", jsonNode.get("Length").asText());
-            assertEquals("S", jsonNode.get("StartsWith").asText());
-        });
-    }
-
-    @Test @Ignore //Ignore because it is not a functionality test
+    @Test @Ignore //Ignore because it is not a test of functionality
     public void tempTestConfig() {
 
         String configString = "shobdo.config";
@@ -100,8 +56,8 @@ public class ApplicationTest extends WithServer {
         log.info("Config for mongodbhostname\"" + mongodbhostnameConfigString + "\":" + mongodbhostname);
     }
 
-    @Test @Ignore //Ignore because it is not a functionality test
-    public void testGuava() {
+    @Test @Ignore //Ignore because it is not a test functionality
+    public void testGuava() throws IOException {
 
         List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
 
@@ -109,7 +65,7 @@ public class ApplicationTest extends WithServer {
 
         String spelling = theWord.getWordSpelling();
 
-        WordLogic logic = WordLogic.factory();
+        WordLogic logic = WordLogic.createMongoBackedWordLogic();
 
         logic.createWord(theWord);
 
@@ -119,7 +75,7 @@ public class ApplicationTest extends WithServer {
                 .build(new CacheLoader<String, Word>() {
                     @Override
                     public Word load(String key) throws Exception {
-                        WordLogic logic = WordLogic.factory();
+                        WordLogic logic = WordLogic.createMongoBackedWordLogic();
                         return logic.getWordBySpelling(spelling);
                     }
                 });

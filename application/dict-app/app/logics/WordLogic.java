@@ -1,330 +1,286 @@
 package logics;
 
-import Exceptions.EntityDoesNotExist;
-import cache.WordCache;
+import com.google.common.base.Preconditions;
+import exceptions.EntityDoesNotExist;
+import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
-import daoImplementation.WordDaoMongoImpl;
+import daos.WordDaoMongoImpl;
 import daos.WordDao;
-import helpers.WordHelper;
 import objects.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import play.libs.Json;
 import utilities.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 /**
- * Created by tahsinkabir on 8/14/16.
+ * Created by Tahsin Kabir on 8/14/16.
  */
 public class WordLogic {
 
-    private WordDao wordDao;
-    private WordCache wordCache;
+    private final WordDao wordDao;
+    private final WordCache wordCache;
 
-    private BenchmarkLogger bmLog = new BenchmarkLogger(WordLogic.class);
-    private LogPrint log = new LogPrint(WordLogic.class);
+    private static final LogPrint logger = new LogPrint(WordLogic.class);
 
-    private static final String REQUEST_MERGED = "Requests Merged";
-
-    public static WordLogic factory() {
-
-        WordDao wordDao = new WordDaoMongoImpl();
-        return new WordLogic( wordDao, new WordCache() );
+    public static WordLogic createMongoBackedWordLogic() {
+        return new WordLogic(new WordDaoMongoImpl(), new WordCache());
     }
 
-    public WordLogic( WordDao wordDao, WordCache wordCache) {
-
+    public WordLogic(final WordDao wordDao, final WordCache wordCache) {
         this.wordDao = wordDao;
         this.wordCache = wordCache;
     }
 
+    private String generateWordId() {
+        return String.format("%s-%s", Constants.WORD_ID_PREFIX, UUID.randomUUID());
+    }
+
+    public String generateMeaningId() {
+        return String.format("%s-%s", Constants.MEANING_ID_PREFIX, UUID.randomUUID());
+    }
+
+    private String generateUserRequestId() {
+        return String.format("%s-%s", Constants.REQUEST_ID_PREFIX, UUID.randomUUID());
+    }
+
     /* Create */
-    public JsonNode createWord(JsonNode wordJsonNode) {
+    private void validateCreateWordObject(final Word word) {
+        if (word.getId() != null) {
+            throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(word.getId()));
+        }
 
-        Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
-        Word createdWord = createWord(word) ;
-        return convertWordToJsonResponse(createdWord);
-    }
-
-    public static String generateNewWordId() {
-        return Constants.WORD_ID_PREFIX + "-" + UUID.randomUUID();
-    }
-
-    private JsonNode convertWordToJsonResponse(Word word) {
-
-        JsonNode jsonNode = Json.toJson(word);
-        List attributesToRemove = Arrays.asList("extraMetaMap", "entityMeta");
-        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
-    }
-
-    public Word createWord(Word word) {
-
-        if(word.getId() != null)
-            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + word.getId());
-
-        if(word.getWordSpelling() == null || word.getWordSpelling().trim().length() == 0)
+        Preconditions.checkNotNull(word.getWordSpelling(), Constants.WORDSPELLING_NULLOREMPTY);
+        if (word.getWordSpelling().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+        }
 
-        Word existingWord = wordDao.getWordBySpelling( word.getWordSpelling() );
-        if( existingWord != null)
-            throw new IllegalArgumentException(Constants.CREATE_SPELLING_EXISTS + word.getWordSpelling());
+        final Word existingWord = wordDao.getBySpelling(word.getWordSpelling());
+        if (existingWord != null) {
+            throw new IllegalArgumentException(Constants.Messages.WordSpellingExists(word.getWordSpelling()));
+        }
 
         //word creation does not accept meanings
-        if(word.getMeaningsMap() != null && word.getMeaningsMap().size() > 0)
+        if (word.getMeaningsMap() != null && word.getMeaningsMap().size() > 0) {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
+        }
+    }
 
-        String wordId = generateNewWordId();
-        word.setId(wordId);
+    public Word createWord(final JsonNode wordJsonNode) {
+        final Word word = (Word) JsonUtil.jNodeToObject(wordJsonNode, Word.class);
+        return createWord(word);
+    }
 
-        //todo get creatorId from context
-        String creatorId =  "sin";
-        String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        EntityMeta entityMeta = new EntityMeta(EntityStatus.ACTIVE, EntityType.WORD, null, creatorId,
-                creationDateString, null, null, 0 );
-        word.setEntityMeta(entityMeta);
+    public Word createWord(final Word word) {
+        validateCreateWordObject(word);
 
-        wordDao.createWord(word);
+        word.setId(generateWordId());
+        wordDao.create(word);
         wordCache.cacheWord(word);
-
         return word;
     }
 
-    public void createWords(Collection<Word> words) {
+    //The following creates a word update request and returns the id
+    public String createUserRequestForWordCreation(final JsonNode wordJNode) {
 
-        for(Word word: words)
-            createWord(word);
+        final Word createWord = (Word) JsonUtil.jNodeToObject(wordJNode, Word.class);
+        validateCreateWordObject(createWord);
+
+        final UserRequest createRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(new HashMap<>())
+            .targetType(TargetType.WORD)
+            .operation(RequestOperation.CREATE)
+            .requestBody(JsonUtil.objectToJNode(createWord))
+            .build();
+
+        return wordDao.createUserRequest(createRequest).getId();
     }
 
+    //Todo add toAPIJsonNode to the word object
     /* GET word by id */
-    public JsonNode getWordJNodeByWordId(String wordId) {
-
-        Word word = getWordByWordId(wordId);
-        return convertWordToJsonResponse(word);
-    }
-
-    public Word getWordByWordId(String wordId) {
-
-        if( wordId == null || wordId.trim().length() == 0 )
+    public Word getWordById(@NotNull final String wordId) {
+        if (wordId == null || wordId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + wordId);
-
-        Word word = wordDao.getWordByWordId(wordId);
-
-        if( word == null)
-            throw new EntityDoesNotExist( Constants.ENTITY_NOT_FOUND + wordId);
-
+        }
+        final Word word = wordDao.getById(wordId);
+        if (word == null) {
+            throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(wordId));
+        }
         return word;
     }
 
     /* GET word by (exact) spelling */
-    public JsonNode getWordJNodeBySpelling(String spelling) {
+    public Word getWordBySpelling(@NotNull final String spelling) {
+        if (spelling == null || spelling.trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+        }
 
-        Word word = getWordBySpelling(spelling);
-        return word == null? null: convertWordToJsonResponse(word);
-    }
-
-    public Word getWordBySpelling(String spelling) {
-
-        if(spelling == null || spelling.trim().length() == 0)
-            throw new IllegalArgumentException("WLEX: getWordBySpelling word spelling is null or empty");
-
-        Word cachedWord = wordCache.getWordBySpelling(spelling);
-
-        if(cachedWord != null)
+        final Word cachedWord = wordCache.getBySpelling(spelling);
+        if (cachedWord != null) {
             return cachedWord;
+        }
 
-        Word wordFromDB = wordDao.getWordBySpelling(spelling);
-
-        if( wordFromDB == null)
-            throw new EntityDoesNotExist( Constants.ENTITY_NOT_FOUND + spelling);
+        final Word wordFromDB = wordDao.getBySpelling(spelling);
+        if (wordFromDB == null) {
+            throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(spelling));
+        }
 
         wordCache.cacheWord(wordFromDB);
         return wordFromDB;
     }
 
     /* Update */
-
-    public JsonNode updateWordJNode(String wordId, JsonNode wordJsonNode) {
-
-        Word word = (Word) JsonUtil.jsonNodeToObject(wordJsonNode, Word.class);
-        word.setId(wordId);
-        Word updatedWord = updateWordVersioned(word);
-        return convertWordToJsonResponse(updatedWord);
-    }
-
-    public Word updateWordVersioned(Word updateWord) {
-
-        try {
-
-            String requestId = createUpdateWordRequest(updateWord);
-            return approveWordRequest( requestId );
-
-        } catch (Exception ex) {
-
-            if(ex instanceof  IllegalArgumentException)
-                throw ex;
-
-            throw new InternalError("Word update failed : " + ex.getStackTrace().toString());
-        }
-    }
-
-    //todo make transactional
-    //The following creates a word update request and returns the requestId
-    public String createUpdateWordRequest(Word updateWord) {
-
-        if(updateWord.getId() == null || updateWord.getId().trim().length() == 0)
+    private void validateUpdateWordObject(final Word updateWord) {
+        if (updateWord.getId() == null || updateWord.getId().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
+        }
 
-        if(updateWord.getWordSpelling() == null || updateWord.getWordSpelling().trim().length() == 0)
+        if (updateWord.getWordSpelling() == null || updateWord.getWordSpelling().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+        }
 
-        if(updateWord.getMeaningsMap() != null && updateWord.getMeaningsMap().size() > 0)
+        if (updateWord.getMeaningsMap() != null && updateWord.getMeaningsMap().size() > 0) {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
+        }
 
-        String currentWordId = updateWord.getId();
-        getWordByWordId(currentWordId); //validating the update request for the word exists
-
-        //Create a UserRequest object for the word
-        String requestId = generateNewWordUpdateReqID();
-        String creatorId =  "sin";
-        String creationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        EntityMeta requestMeta = new EntityMeta( EntityStatus.ACTIVE, EntityType.REQUEST, null, creatorId,
-                creationDateString, null, null, 0 );
-        JsonNode body = JsonUtil.objectToJsonNode(updateWord);
-        UserRequest updateRequest = new UserRequest(requestId, currentWordId, EntityType.WORD, RequestOperation.UPDATE,
-                body, requestMeta);
-        wordDao.createRequest(updateRequest);
-
-        return requestId;
-    }
-
-    private UserRequest getRequest(String requestId) {
-
-        if(requestId == null || requestId.trim().length() == 0)
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
-
-        UserRequest storedRequest = wordDao.getRequestById(requestId);
-
-        if(storedRequest == null)
-            throw new IllegalArgumentException( Constants.ENTITY_NOT_FOUND + requestId );
-
-        if(!storedRequest.getEntityMeta().getStatus().equals(EntityStatus.ACTIVE))
-            throw new IllegalArgumentException( Constants.ENTITY_IS_DEACTIVE + requestId );
-
-        return storedRequest;
-    }
-
-    //todo make transactional
-    //approveWordRequest applies the requested changes to a word
-    public Word approveWordRequest(String requestId) {
-
-        UserRequest storedRequest  = getRequest(requestId);
-
-        switch (storedRequest.getOperation()) {
-
-            case CREATE:
-                return approveCreateWordRequest(storedRequest);
-            case UPDATE:
-                return approveUpdateWordRequest(storedRequest);
-            case DELETE:
-                return approveDeleteWordRequest(storedRequest);
-            default:
-                return null;
+        if (getWordById(updateWord.getId()) == null) {
+            throw new IllegalArgumentException(Constants.Messages.EntityNotFound(updateWord.getId()));
         }
     }
 
-    private Word approveCreateWordRequest(UserRequest request){
-
-        return null;
+    public Word updateWord(final String wordId, final JsonNode wordJsonNode) {
+        final Word word = (Word) JsonUtil.jNodeToObject(wordJsonNode, Word.class);
+        word.setId(wordId);
+        return updateWord(word);
     }
 
-    private Word approveUpdateWordRequest(UserRequest request){
+    /* package private */ Word updateWord(final Word word) {
+        validateUpdateWordObject(word);
+        final Word currentWord = getWordById(word.getId());
 
-        String currentWordId = request.getTargetId();
-        Word currentWord = getWordByWordId(currentWordId);
+        //Only allow spelling, synonyms and antonyms to be updated
+        final Word updatedWord = Word.builder()
+            .id(currentWord.getId())
+            .meaningsMap(currentWord.getMeaningsMap())
+            .wordSpelling(word.getWordSpelling())
+            .synonyms(word.getSynonyms())
+            .antonyms(word.getAntonyms())
+            .build();
 
-        //Keeping backup of current word
-        Word currentWordBackup = deepCopyWord(currentWord);
-        currentWordBackup = modifyToDeactivatedWordEntry(currentWordBackup);
-
-        //Updated the word with the updates
-        JsonNode updateWordBody = request.getBody();
-        Word updateRequestWord = (Word) JsonUtil.jsonNodeToObject( updateWordBody, Word.class);
-        currentWord.setWordSpelling( updateRequestWord.getWordSpelling() );
-        currentWord.setSynonyms( updateRequestWord.getSynonyms());
-        currentWord.setAntonyms( updateRequestWord.getAntonyms());
-        currentWord.setExtraMetaValue(REQUEST_MERGED, request.getRequestId());
-        currentWord.setExtraMetaValue(request.getRequestId(), currentWordBackup.toString() );
-
-        updateWordWithCache(currentWord);
-
-        saveRequestAsMerged(request); //Update the request as merged
-        return currentWord;
+        wordDao.update(updatedWord); //update the entry in DB
+        wordCache.cacheWord(updatedWord);
+        return updatedWord;
     }
 
-    private void updateWordWithCache(Word currentWord) {
+    //The following creates a word update request and returns the id
+    private String createUserRequestForWordUpdate(final String wordId, final JsonNode wordJsonNode) {
 
-        wordDao.updateWord(currentWord); //update the entry in DB
-        wordCache.cacheWord(currentWord);
-    }
+        final Word updateWord = (Word) JsonUtil.jNodeToObject(wordJsonNode, Word.class);
+        updateWord.setId(wordId);
+        validateUpdateWordObject(updateWord);
 
-    private Word modifyToDeactivatedWordEntry(Word currentWordCopy) {
+        final Map<TargetType, String> targetInfo = new HashMap<>();
+        targetInfo.put(TargetType.WORD, updateWord.getId());
 
-        //keeping the old word in the current words extra meta map with requestId
-        currentWordCopy.setId( generateNewWordId() );
-        EntityMeta currentCopyMeta = currentWordCopy.getEntityMeta();
+        final UserRequest updateRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(targetInfo)
+            .targetType(TargetType.WORD)
+            .operation(RequestOperation.UPDATE)
+            .requestBody(JsonUtil.objectToJNode(updateWord))
+            .build();
 
-        String validatorId = "validatorId";
-        currentCopyMeta.setValidatorId(validatorId);
-
-        String currentWordId = currentWordCopy.getId();
-        currentCopyMeta.setParentId(currentWordId);
-        currentCopyMeta.setStatus(EntityStatus.DEACTIVE);
-        String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        currentCopyMeta.setDeactivationDate(deactivationDateString); //marked it as de-active
-
-        return currentWordCopy;
-    }
-
-    private void saveRequestAsMerged(UserRequest request) {
-
-        String validatorId = "validatorId";
-        EntityMeta requestMeta = request.getEntityMeta();
-        requestMeta.setValidatorId(validatorId);
-        requestMeta.setStatus(EntityStatus.DEACTIVE); //marked it as de-active
-        String deactivationDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        requestMeta.setDeactivationDate(deactivationDateString);
-        wordDao.updateRequest(request);
-    }
-
-    private Word approveDeleteWordRequest(UserRequest request){
-
-        return null;
-    }
-
-    public static Word deepCopyWord(Word word) {
-        return (Word) JsonUtil.jsonNodeToObject(JsonUtil.objectToJsonNode(word), Word.class);
-    }
-
-    public static Meaning deepCopyMeaning(Meaning meaning) {
-        return (Meaning) JsonUtil.jsonNodeToObject(JsonUtil.objectToJsonNode(meaning), Meaning.class);
-    }
-
-    public static String generateNewWordUpdateReqID() {
-        return Constants.REQ_ID_PREFIX + "-" + UUID.randomUUID();
+        return wordDao.createUserRequest(updateRequest).getId();
     }
 
     /* Delete Word */
+    public void deleteWord(final String wordId) {
+        final Word word = getWordById(wordId);
+        word.setStatus(EntityStatus.DELETED);
+        wordDao.update(word);
+        wordCache.invalidateWord(word);
+    }
 
-    public void deleteWord(String wordId) {
-        Word word = getWordByWordId(wordId);
-        word.getEntityMeta().setStatus(EntityStatus.DEACTIVE);
-        wordDao.updateWord(word);
-        wordCache.uncacheWord(word);
+    private String createUserRequestForWordDeletion(final String wordId) {
+
+        final Map<TargetType, String> targetInfo = new HashMap<>();
+        targetInfo.put(TargetType.WORD, wordId);
+
+        final UserRequest deleteRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(targetInfo)
+            .targetType(TargetType.WORD)
+            .operation(RequestOperation.DELETE)
+            .build();
+
+        return wordDao.createUserRequest(deleteRequest).getId();
+    }
+
+    private UserRequest getRequest(@NotNull final String requestId) {
+        if (requestId == null || requestId.trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + requestId);
+        }
+        return wordDao.getUserRequest(requestId);
+    }
+
+    //todo make transactional
+    //approveUserRequest applies the requested changes to a word
+    public boolean approveUserRequest(final String requestId) {
+
+        final UserRequest request  = getRequest(requestId);
+        final String wordId;
+        switch (request.getTargetType()) {
+            case WORD:
+                switch (request.getOperation()) {
+                    case CREATE:
+                        createWord(request.getRequestBody());
+                        break;
+                    case UPDATE:
+                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
+                        updateWord(wordId, request.getRequestBody());
+                        break;
+                    case DELETE:
+                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
+                        deleteWord(wordId);
+                        break;
+                }
+                break;
+            case MEANING:
+                final String meaningId;
+                switch (request.getOperation()) {
+                    case CREATE:
+                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
+                        createMeaning(wordId, request.getRequestBody());
+                        break;
+                    case UPDATE:
+                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
+                        meaningId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.MEANING));
+                        updateMeaning(wordId, meaningId, request.getRequestBody());
+                        break;
+                    case DELETE:
+                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
+                        meaningId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.MEANING));
+                        deleteMeaning(wordId, meaningId);
+                        break;
+                }
+                break;
+        }
+        saveRequestAsMerged("deleterId", request);
+        return true;
+    }
+
+    private void saveRequestAsMerged(final String approverId, final UserRequest request) {
+        request.setStatus(EntityStatus.DELETED);
+        request.setDeleterId(approverId);
+        final String deletionDateString = (new DateTime(DateTimeZone.UTC)).toString();
+        request.setDeletedDate(deletionDateString);
+        wordDao.updateUserRequest(request);
     }
 
     /* LIST words todo */
-    public ArrayList<Word> listWords(String startWordId, Integer limit) {
+    public ArrayList<Word> listWords(final String startWordId, final Integer limit) {
         return new ArrayList<>();
     }
 
@@ -334,62 +290,39 @@ public class WordLogic {
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
      How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
      */
-    public Set<String> searchWords(String searchSting) {
-        return searchWords(searchSting, Constants.SEARCH_SPELLING_LIMIT);
-    }
+    public Set<String> searchWords(final String searchString) {
 
-    public Set<String> searchWords(String searchString, int limit){
-
-        if(searchString == null || searchString.trim().length() == 0)
+        if (searchString == null || searchString.trim().length() == 0) {
             return new HashSet<>();
+        }
 
         Set<String> words = wordCache.getWordsForSearchString(searchString);
-
-        if(words != null && words.size() > 0)
+        if (words != null && words.size() > 0) {
             return words;
+        }
 
-        bmLog.start();
-        words = wordDao.searchWordSpellingsWithPrefixMatch(searchString, limit);
-
-        if ( words != null && words.size() > 0 ) {
-
-            bmLog.end("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
+        words = wordDao.searchSpellingsBySpelling(searchString, Constants.SEARCH_SPELLING_LIMIT);
+        if (words != null && words.size() > 0 ) {
+            logger.info("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
             wordCache.cacheWordsForSearchString(searchString, words);
             return words;
         }
 
-        bmLog.end("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
+        logger.info("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
         return new HashSet<>();
     }
 
     public long totalWordCount(){
-        return wordDao.totalWordCount();
+        return wordDao.totalCount();
     }
 
     public void deleteAllWords(){
-        wordDao.deleteAllWords();
+        wordDao.deleteAll();
     }
 
     public void flushCache(){
         wordCache.flushCache();
     }
-
-    public static Word copyToNewWordObject(Word providedWord) {
-
-        if(providedWord == null)
-            return null;
-
-        Word toReturnWord = new Word();
-
-        if(providedWord.getWordSpelling() != null)
-            toReturnWord.setWordSpelling(providedWord.getWordSpelling());
-
-        if(providedWord.getExtraMetaMap() != null)
-            toReturnWord.setExtraMetaMap( providedWord.getExtraMetaMap() );
-
-        return toReturnWord;
-    }
-
 
     /** CRUDL for meaning of a word:
      * most of the operations will deal with getting the word
@@ -400,119 +333,160 @@ public class WordLogic {
      */
 
     /* CREATE meaning */
-    public JsonNode createMeaningJNode(String wordId, JsonNode meaningJsonNode) {
-        Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
-        return convertMeaningToResponseJNode( createMeaning(wordId, meaning) );
-    }
-
-    public static JsonNode convertMeaningToResponseJNode(Meaning meaning) {
-
-        JsonNode jsonNode = Json.toJson(meaning);
-        List attributesToRemove = Arrays.asList("strength", "entityMeta");
-        return JsonUtil.removeFieldsFromJsonNode(jsonNode, attributesToRemove);
-    }
-
-    public List<Meaning> createMeaningsBatch(String wordId, Collection<Meaning> meanings) {
-
-        ArrayList<Meaning> createdMeaning = new ArrayList<>();
-        for (Meaning meaning: meanings) {
-            createdMeaning.add( createMeaning(wordId,meaning) );
+    private void validateCreateMeaningObject(final String wordId, final Meaning meaning) {
+        if (meaning.getId() != null) {
+            throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(meaning.getId()));
         }
-        return createdMeaning;
+
+        if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
+        }
+
+        final Word currentWord = getWordById(wordId);
+        if (currentWord == null) {
+            throw new IllegalArgumentException(Constants.Messages.EntityNotFound(wordId));
+        }
     }
 
-    public Meaning createMeaning(String wordId, Meaning meaning) {
+    public Meaning createMeaning(final String wordId, final JsonNode meaningJsonNode) {
+        final Meaning meaning = (Meaning) JsonUtil.jNodeToObject(meaningJsonNode, Meaning.class);
+        return createMeaning(wordId, meaning);
+    }
 
-        if(meaning.getId() != null)
-            throw new IllegalArgumentException(Constants.CREATE_ID_NOT_PERMITTED + meaning.getId());
+    public Meaning createMeaning(final String wordId, final Meaning meaning) {
 
-        if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
-            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
+        validateCreateMeaningObject(wordId, meaning);
 
-        Word currentWord = getWordByWordId(wordId);
+        meaning.setId(generateMeaningId());
 
-        if(currentWord == null)
-            throw new IllegalArgumentException(Constants.ENTITY_NOT_FOUND + wordId);
+        final Word currentWord = getWordById(wordId);
+        currentWord.addMeaningToWord(meaning);
 
-        String meaningId = generateNewMeaningId();
-        meaning.setId( meaningId );
-        WordHelper.addMeaningToWord(currentWord, meaning);
-
-        wordDao.updateWord(currentWord);
+        wordDao.update(currentWord);
         return meaning;
     }
 
-    public static String generateNewMeaningId() {
-        return Constants.MEANING_ID_PREFIX + UUID.randomUUID();
+    //The following creates a word update request and returns the id
+    public String createUserRequestForMeaningCreation(final String wordId, final JsonNode meaningJNode) {
+
+        final Meaning meaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
+
+        validateCreateMeaningObject(wordId, meaning);
+
+        final Map<TargetType, String> targetInfo = new HashMap<>();
+        targetInfo.put(TargetType.WORD, wordId);
+
+        final UserRequest createRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(targetInfo)
+            .targetType(TargetType.MEANING)
+            .operation(RequestOperation.CREATE)
+            .requestBody(JsonUtil.objectToJNode(meaning))
+            .build();
+
+        return wordDao.createUserRequest(createRequest).getId();
     }
 
     /* GET meaning */
-    public JsonNode getMeaningJsonNodeByMeaningId(String wordId, String meaningId) {
-
-        Meaning meaning = getMeaning(wordId, meaningId);
-        return meaning == null? null: convertMeaningToResponseJNode(meaning);
-    }
-
-    public Meaning getMeaning(String wordId, String meaningId) {
-
-        Word word = getWordByWordId(wordId);
-
-        Meaning meaning = word.getMeaningsMap().get(meaningId);
-
-        if(meaning == null)
-            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + meaningId);
-
+    public Meaning getMeaning(final String wordId, final String meaningId) {
+        final Word word = getWordById(wordId);
+        final Meaning meaning = word.getMeaningsMap() == null ? null : word.getMeaningsMap().get(meaningId);
+        if (meaning == null) {
+            throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(meaningId));
+        }
         return meaning;
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
-    public JsonNode updateMeaningJsonNode(String wordId, String meaningId, JsonNode meaningJsonNode) {
+    private void validateUpdateMeaningObject(final String wordId, final Meaning meaning) {
+        if (meaning.getId() == null) {
+            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
+        }
 
-        Meaning meaning = (Meaning) JsonUtil.jsonNodeToObject(meaningJsonNode, Meaning.class);
-        return convertMeaningToResponseJNode(updateMeaning(wordId, meaningId, meaning));
+        if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
+        }
+
+        final Word currentWord = getWordById(wordId);
+        final Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getId());
+
+        if (currentMeaning == null) {
+            throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(meaning.getId()));
+        }
     }
 
-    public Meaning updateMeaning(String wordId, String meaningId, Meaning meaning) {
+    public Meaning updateMeaning(final String wordId, final String meaningId, final JsonNode meaningJsonNode) {
+        final Meaning meaning = (Meaning) JsonUtil.jNodeToObject(meaningJsonNode, Meaning.class);
+        meaning.setId(meaningId);
+        return updateMeaning(wordId, meaning);
+    }
 
-        if(meaningId == null || !meaningId.equalsIgnoreCase(meaning.getId()))
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
-
-        if(meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0)
-            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
-
-        Word currentWord = getWordByWordId(wordId);
-
-        Meaning currentMeaning = currentWord.getMeaningsMap().get(meaningId);
-
-        if(currentMeaning == null)
-            throw new EntityDoesNotExist(Constants.ENTITY_NOT_FOUND + meaning.getId());
-
+    private Meaning updateMeaning(final String wordId, final Meaning meaning) {
+        validateUpdateMeaningObject(wordId,  meaning);
+        final Word currentWord = getWordById(wordId);
         currentWord.getMeaningsMap().put(meaning.getId(), meaning);
-
         updateWordWithCache(currentWord);
-
         return meaning;
     }
 
+    //The following creates a word update request and returns the id
+    private String createUserRequestForMeaningUpdate(final String wordId, final JsonNode meaningJNode) {
+
+        final Meaning updateMeaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
+        validateUpdateMeaningObject(wordId, updateMeaning);
+
+        final Map<TargetType, String> targetInfo = new HashMap<>();
+        targetInfo.put(TargetType.WORD, wordId);
+        targetInfo.put(TargetType.MEANING, updateMeaning.getId());
+
+        final UserRequest updateRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(targetInfo)
+            .targetType(TargetType.MEANING)
+            .operation(RequestOperation.UPDATE)
+            .requestBody(JsonUtil.objectToJNode(updateMeaning))
+            .build();
+
+        return wordDao.createUserRequest(updateRequest).getId();
+    }
+
     /* DELETE meaning */
-    public void deleteMeaning(String wordId, String meaningId) {
-
-        Word word = getWordByWordId(wordId);
-
-        if( word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0)
+    public void deleteMeaning(final String wordId, final String meaningId) {
+        final Word word = getWordById(wordId);
+        if (word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0) {
             return;
+        }
 
-        if(word.getMeaningsMap().get(meaningId) != null) {
+        if (word.getMeaningsMap().get(meaningId) != null) {
             word.getMeaningsMap().remove(meaningId);
             updateWordWithCache(word);
         }
     }
 
-    /* LIST meaning todo implement using WORD's interfaces */
-    public ArrayList<Meaning> listMeanings(String wordId) {
+    //The following creates a word update request and returns the id
+    private String createUserRequestForMeaningUpdate(final String wordId, final String meangingId) {
 
-        return new ArrayList<>();
+        final Map<TargetType, String> targetInfo = new HashMap<>();
+        targetInfo.put(TargetType.WORD, wordId);
+        targetInfo.put(TargetType.MEANING, meangingId);
+
+        final UserRequest updateRequest = UserRequest.builder()
+            .id(generateUserRequestId())
+            .targetInfo(targetInfo)
+            .targetType(TargetType.MEANING)
+            .operation(RequestOperation.DELETE)
+            .build();
+
+        return wordDao.createUserRequest(updateRequest).getId();
     }
 
+    private void updateWordWithCache(final Word updatedWord) {
+        wordDao.update(updatedWord); //update the entry in DB
+        wordCache.cacheWord(updatedWord);
+    }
 
+    /* LIST meaning todo implement using WORD's interfaces */
+    public ArrayList<Meaning> listMeanings(String wordId) {
+        return new ArrayList<>();
+    }
 }

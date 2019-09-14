@@ -1,73 +1,60 @@
 package objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
 import utilities.JsonUtil;
+
 import java.util.*;
 
 /**
- * Created by tahsinkabir on 8/21/16.
+ * Created by Tahsin Kabir on 8/21/16.
  */
 @Data
-public class Word {
+@Setter
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Word extends EntityMeta {
 
     private String id;
     private String wordSpelling;
 
-    private HashMap<String, Meaning> meaningsMap = new HashMap<>(); //Think of this as the document store for meanings
-    private ArrayList<String> antonyms = new ArrayList<>(); //antonym wordIds, should it be id mapped to word spellings
-    private ArrayList<String> synonyms = new ArrayList<>(); //synonym wordIds, should it be id mapped to word spellings
+    //set of spellings of antonyms of the word
+    private HashSet<String> antonyms;
 
-    private HashMap<String,List<String>> extraMetaMap;
-    private EntityMeta entityMeta;
+    //set of spellings of synonyms of the word
+    private HashSet<String> synonyms;
 
-    public Word() {};
+    //meaningId to meanings map, easier to lookup
+    private HashMap<String, Meaning> meaningsMap;
 
-    public Word( String id, String wordSpelling) {
-
-        this.id = id;
-        this.wordSpelling = wordSpelling;
-    }
-
-    public void setExtraMetaValue(String key, String value) {
-
-        setExtraMetaValue(key, Arrays.asList(value));
-    }
-
-    public void setExtraMetaValue(String key, List<String> newValues) {
-
-        if(extraMetaMap == null)
-            extraMetaMap = new HashMap<>();
-
-        List<String> values = extraMetaMap.get(key);
-
-        if( values == null )
-            values = new ArrayList<>();
-
-        values.addAll(newValues);
-
-        extraMetaMap.put(key, values);
-    }
-
-    public List<String> retrieveExtraMetaValuesForKey(String key) {
-
-        return extraMetaMap.get(key);
-    }
-
-    public void removeExtraMetaValueForKey(String key) {
-
-        removeExtraMetaValueForKeys(Arrays.asList(key));
-    }
-
-    public void removeExtraMetaValueForKeys(Collection<String> keys) {
-
-        for(String key: keys) {
-            extraMetaMap.remove(key);
+    public void addMeaningToWord(final Meaning meaning) {
+        if (meaning == null || meaning.getId() == null) {
+            throw new RuntimeException("Meaning or MeaningId is null");
         }
+        if (meaningsMap == null) {
+            meaningsMap = new HashMap<>();
+        }
+        getMeaningsMap().put(meaning.getId(), meaning);
+    }
+
+    public JsonNode toAPIJsonNode() {
+        return new ObjectMapper().convertValue(this, JsonNode.class);
+    }
+
+    public static Word fromWord(final Word word) {
+        return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
     }
 
     @Override
     public String toString() {
-        return JsonUtil.objectToJsonString(this);
+        try {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        } catch (JsonProcessingException jpe) {
+            return "ERROR 101";
+        }
     }
 }

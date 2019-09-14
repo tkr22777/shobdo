@@ -1,23 +1,25 @@
 package objects;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-@Data @AllArgsConstructor
-public class EntityMeta {
+@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+/* package private */ abstract class EntityMeta {
 
-    //private String id;
+    @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;
-    @NonNull private EntityType type = EntityType.UNKNOWN;
 
-    private String parentId; //null for pioneer object
-    @NonNull private String creatorId; //creator is the deleter of the parent if parentId is present
+    @JsonIgnore
+    private String creatorId;
+    @JsonIgnore
+    private String creationDate;
 
-    @NonNull private String creationDate;
-    private String deactivationDate;
-
-    //V1.5 validation of updates
-    private String validatorId; //if validatorId is present, then the object has been validated
-    private int version = 0;
+    @JsonIgnore
+    private String deleterId;
+    @JsonIgnore
+    private String deletedDate;
 }

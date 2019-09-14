@@ -1,10 +1,9 @@
 package objects;
 
-//Shobdo Object/Entity Status
+//Object/Entity Status
 public enum  EntityStatus {
-
     ACTIVE("ACTIVE"),
-    DEACTIVE("DEACTIVE");
+    DELETED("DELETED");
 
     private final String status;
 
@@ -12,4 +11,7 @@ public enum  EntityStatus {
         this.status = status;
     }
 
+    public String getStatus() {
+        return status;
+    }
 }

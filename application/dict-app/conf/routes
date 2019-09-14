@@ -5,9 +5,7 @@
 ###############################################
 # 0. Splash dictionary message and test routes:
 ###############################################
-GET     /api/v1/                                         controllers.WordController.index()
-GET     /api/v1/gettest                                  controllers.AdminController.testGet()
-POST    /api/v1/posttest                                 controllers.AdminController.testPost()
+GET     /api/v1                                          controllers.WordController.index()
 
 ################################
 # CRUDL and search API for word:
@@ -19,20 +17,22 @@ POST    /api/v1/words                                    controllers.WordControl
 # 2. Get word:
 GET     /api/v1/words/:id                                controllers.WordController.getWordByWordId(id: String)
 
-# 3. POST Get word by spelling: (body contains "wordSpelling" key and query value since Bengali chars do not play well in route :( )
+# 3. POST Get word by spelling: (requestBody contains "wordSpelling" key and query value since Bengali chars do not play well in route :( )
 POST    /api/v1/words/postget                            controllers.WordController.getWordBySpellingPost()
 
 # 4. Update word:
 PUT     /api/v1/words/:id                                controllers.WordController.updateWord(id: String)
 
-# 5. Delete word:
+# 5. Update word user request:
+
+# 6. Delete word:
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)
 
-# 6. List words
+# 7. List words
 GET     /api/v1/words/list                               controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
-# 7. Search words by spelling:
-#    body contains "searchString"
+# 8. Search words by spelling:
+#    requestBody contains "searchString"
 POST    /api/v1/words/search                             controllers.WordController.searchWordsBySpelling()
 
 ##############################
@@ -59,21 +59,10 @@ GET     /api/v1/words/:wordId/meanings/list              controllers.WordControl
 ##############
 # CRUDL for users GENERAL, REVIEWER, ADMIN
 
-# 8. Generate random dictionary, body contains wordCount:
+# 8. Generate random dictionary, requestBody contains wordCount:
 POST    /api/v1/generate                                controllers.WordController.createRandomDictionary()
 
 # 9. To clear/flush redis cache:
 GET     /api/v1/admin/flushcache                        controllers.AdminController.flushCache()
 
-####################################################
-# THE FOLLOWINGS ARE EXTRA TEMPORARY EXAMPLE ROUTES:
-####################################################
-
-# An example controller showing a sample home page
-GET     /                             controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET     /count                        controllers.CountController.count
-# An example controller showing how to write asynchronous code
-GET     /message                      controllers.AsyncController.message
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                                   controllers.Assets.at(path="public", file)

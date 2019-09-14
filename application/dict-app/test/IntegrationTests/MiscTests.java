@@ -18,17 +18,8 @@ public class MiscTests {
 
     @Before
     public void setup() {
-
         log = new LogPrint(MiscTests.class);
-        wordLogic = WordLogic.factory();
-    }
-
-    @Test @Ignore
-    public void test() {
-        running(testServer(3333, fakeApplication(inMemoryDatabase())), HTMLUNIT, browser -> {
-            browser.goTo("http://localhost:3333");
-            assertTrue(browser.pageSource().contains("Your new application is ready."));
-        });
+        wordLogic = WordLogic.createMongoBackedWordLogic();
     }
 
     @Test @Ignore
@@ -48,7 +39,7 @@ public class MiscTests {
                 log.info("Found in memory");
             } else {
                 log.info("Not found in memory");
-                results = wordLogic.searchWords(prefix, 10);
+                results = wordLogic.searchWords(prefix);
                 //if(i == 4)
                 //play.api.cache.Cache.set(prefix, results, 20000, );
             }

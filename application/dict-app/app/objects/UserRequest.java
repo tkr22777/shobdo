@@ -1,17 +1,19 @@
 package objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
-@Data @AllArgsConstructor
-public class UserRequest {
+import java.util.Map;
 
-    private String requestId;
-    private String targetId;
-    private EntityType targetType;
+@Data @AllArgsConstructor @Builder
+public class UserRequest extends EntityMeta {
+
+    private String id;
     private RequestOperation operation;
-    private JsonNode body;
-    private EntityMeta entityMeta;
+
+    private Map<TargetType, String> targetInfo;
+    private TargetType targetType; //Target type is required creates as the targetInfo still does not exist
+    private JsonNode requestBody;
 }

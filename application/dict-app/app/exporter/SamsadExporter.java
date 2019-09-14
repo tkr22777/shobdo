@@ -2,7 +2,7 @@ package exporter;
 
 import logics.WordLogic;
 import objects.Word;
-import utilities.Constants;
+import objects.Constants;
 import utilities.DictUtil;
 import utilities.LogPrint;
 import utilities.FileReadUtil;
@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by tahsinkabir on 9/1/16.
+ * Created by Tahsin Kabir on 9/1/16.
  */
 
 //This is a helper class to export Samsad database file's entries to dictionary objects
@@ -38,7 +38,6 @@ public class SamsadExporter {
 
     private static int printIndex = 0;
 
-
     public void setup(){
 
         MAP_OF_TYPES.put("বি","বিশেষ্য");
@@ -50,6 +49,7 @@ public class SamsadExporter {
         SET_OF_TYPES = new HashSet<>( MAP_OF_TYPES.values() );
     }
 
+    /*
     public Collection<Word> getDictiionary() {
 
         setup();
@@ -79,14 +79,15 @@ public class SamsadExporter {
 
         return fixSpellingAndMeanings(words);
     }
+    */
 
-
+    /*
     public Word createCrudeWord(String line) {
 
         Word word = new Word();
 
         //word.setId( DictUtil.generateNewWordId() );
-        word.setExtraMetaValue(Constants.ORIGINAL_STRING, line);
+        word.addExtraMetaValue(Constants.ORIGINAL_STRING, line);
 
         //Spelling
         int endIndexOfSpelling = line.indexOf("[");
@@ -96,15 +97,17 @@ public class SamsadExporter {
         //Eng pronunciation
         int endIndexOfEngPronunciation = line.indexOf("]");
         String engPronunciation = line.substring(endIndexOfSpelling + 1, endIndexOfEngPronunciation).trim();
-        word.setExtraMetaValue( Constants.ENG_PRONUN_STRING, engPronunciation);
+        word.addExtraMetaValue( Constants.ENG_PRONUN_STRING, engPronunciation);
 
         //Meaning
         String meaning = line.substring(endIndexOfEngPronunciation + 1, line.length()).trim();
-        word.setExtraMetaValue( Constants.MEANING_STRING, meaning);
+        word.addExtraMetaValue( Constants.MEANING_STRING, meaning);
 
         return word;
     }
+    */
 
+    /*
     public Collection<Word> fixSpellingAndMeanings(ArrayList<Word> words) {
 
         //What should we do about these unfixed ones?!
@@ -176,7 +179,9 @@ public class SamsadExporter {
         return allMeaning;
     }
 
+    */
 
+    /*
     public FixMeaningReturn fixMeaning(Collection<Word> words) {
 
         FixMeaningReturn fixMeaningReturn = new FixMeaningReturn();
@@ -200,34 +205,34 @@ public class SamsadExporter {
 
         if(meaning.contains("<b>")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("MeaningContainsB", "<b>", false);
+            word.addExtraMetaValue("MeaningContainsB", "<b>", false);
         }
 
         if(meaning.contains("☐")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("MeaningContainsBox", "☐", false);
+            word.addExtraMetaValue("MeaningContainsBox", "☐", false);
         }
 
         if(meaning.contains("<eng")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("MeaningContainsEng", "<eng", false);
+            word.addExtraMetaValue("MeaningContainsEng", "<eng", false);
         }
 
         if(meaning.contains("sup")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("MeaningContainsSup", "sup", false);
+            word.addExtraMetaValue("MeaningContainsSup", "sup", false);
         }
 
         if( meaning.substring(0,1).equalsIgnoreCase("(")) {
             simpleMeaning = false;
-            word.setExtraMetaValue("StartsWithBracket", "(", false);
+            word.addExtraMetaValue("StartsWithBracket", "(", false);
         }
 
         if( simpleMeaning ) {
 
             simpleMeaningBucket.add(meaning);
 
-            word.setExtraMetaValue("SIMPLE_MEANING", "YES", false);
+            word.addExtraMetaValue("SIMPLE_MEANING", "YES", false);
 
             int indexOfDot = meaning.indexOf(".");
 
@@ -243,7 +248,7 @@ public class SamsadExporter {
 
                     typeMeaningSet.add(typePrefix);
 
-                    word.setExtraMetaValue("UNDERSTANDABLE_TYPE", "YES", false);
+                    word.addExtraMetaValue("UNDERSTANDABLE_TYPE", "YES", false);
 
                     String meaningId = "MN_" + UUID.randomUUID();
 
@@ -265,12 +270,13 @@ public class SamsadExporter {
                 }
             }
         }
-        */
 
         return fixMeaningReturn;
     }
+    */
 
 
+    /*
     private Map<String,Word> createWordMapFromListDiplicateSpellingFix(Collection<Word> words) {
 
         //Has duplicate key
@@ -286,9 +292,9 @@ public class SamsadExporter {
                 // ^^ means duplicate found, we are adding them to the same words meta map without updating
 
                 Word firstOne = wordMap.get(spelling);
-                firstOne.setExtraMetaValue(Constants.MEANING_STRING, word.getExtraMetaMap().get(Constants.MEANING_STRING));
-                firstOne.setExtraMetaValue(Constants.ORIGINAL_STRING, word.getExtraMetaMap().get(Constants.ORIGINAL_STRING));
-                firstOne.setExtraMetaValue(Constants.ENG_PRONUN_STRING, word.getExtraMetaMap().get(Constants.ENG_PRONUN_STRING));
+                firstOne.addExtraMetaValue(Constants.MEANING_STRING, word.getExtraMetaMap().get(Constants.MEANING_STRING));
+                firstOne.addExtraMetaValue(Constants.ORIGINAL_STRING, word.getExtraMetaMap().get(Constants.ORIGINAL_STRING));
+                firstOne.addExtraMetaValue(Constants.ENG_PRONUN_STRING, word.getExtraMetaMap().get(Constants.ENG_PRONUN_STRING));
                 wordMap.put(spelling, firstOne);
                 duplicates.add(spelling);
 
@@ -450,19 +456,20 @@ public class SamsadExporter {
         Collection<Word> unfixed;
     }
 
+    /*
     private FixSpellingReturn fixSpelling(ArrayList<Word> words) {
 
-        //Has duplicate key
+        // Has duplicate key
         Map<String,Word> wordMapClean = new HashMap<>();
         Map<String,Word> wordMapFirstGen = createWordMapFromListDiplicateSpellingFix(words);
 
-        //Getting all the available spelling string, might contain multiple actual string
+        // Getting all the available spelling string, might contain multiple actual string
         List<String> allSpellings = new ArrayList<>(wordMapFirstGen.keySet());
         Collections.sort(allSpellings);
         log.info("Total all spellings: " + allSpellings.size());
         //DictUtil.printStringsByTag("All Spelling:", allSpellings, 400 , 10, false);
 
-        /*START OF SIMPLE SPELLING*/
+        // START OF SIMPLE SPELLING
         List<String> complexSpellings = allSpellings.stream()
                 .filter( s -> s.contains("<")
                         || s.contains( ">")
@@ -482,13 +489,13 @@ public class SamsadExporter {
         //DictUtil.printStringsByTag("Simpletons spelling:", simpletons, 0, 10, true);
         Map<String, Word> simpleWords = DictUtil.filterForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
         wordMapClean.putAll(simpleWords);
-        /*END OF SIMPLE*/
+        // END OF SIMPLE
 
 
         Map<String,Word> wordMapSecondGenSimpleRemoved = DictUtil.removeKeyValuesForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
         log.info("Word map after simple removal size: " + wordMapSecondGenSimpleRemoved.size());
 
-        /* Start of SUP */
+        // Start of SUP
         //Example 1: ধার<sup>1</sup>
         //Example 2: ঝোলা<sup>2</sup>'
         List<String> simpleSups = complexSpellings.stream()
@@ -511,7 +518,7 @@ public class SamsadExporter {
         Map<String,Word> supWords = fixSupSpellingWords(wordMapSecondGenSimpleRemoved, simpleSups);
         wordMapClean.putAll(supWords);
         log.info("Total after simple and sup: " + wordMapClean.size());
-        /* End of SUP */
+        //END OF SUP
 
         Map<String,Word> wordMapThirdGenSimpleAndSupRemoved = DictUtil.removeKeyValuesForKeys(wordMapSecondGenSimpleRemoved, new HashSet<>(simpleSups) );
         log.info("Word map after simple and sup removal size: " + wordMapThirdGenSimpleAndSupRemoved.size());
@@ -610,4 +617,5 @@ public class SamsadExporter {
 
         return fixSpellingReturn;
     }
+    */
 }
