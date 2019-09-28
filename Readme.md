@@ -6,7 +6,7 @@ A Bangla Dictionary Webservice
 
 Microservices can be found at the application directory.
 
-Currect list of services:
+Current list of services:
 
 * dict-app:
 
