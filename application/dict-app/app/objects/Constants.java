@@ -46,6 +46,5 @@ public final class Constants {
         public static String EntityNotFound(final String entityId) {
             return String.format("Entity not found for id:%s", entityId);
         }
-
     }
 }

@@ -14,6 +14,7 @@ import utilities.JsonUtil;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 public class Meaning extends EntityMeta {
 
     private String id;
@@ -25,7 +26,7 @@ public class Meaning extends EntityMeta {
     //private String english; //poribhasha
 
     //how strongly does this meaning apply to the word, 0 means unset, higher is stronger
-    private int strength = 0;
+    private int strength;
 
     public JsonNode toAPIJsonNode() {
         return new ObjectMapper().convertValue(this, JsonNode.class);

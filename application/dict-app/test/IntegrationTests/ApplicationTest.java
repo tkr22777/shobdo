@@ -11,14 +11,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import play.mvc.Result;
+import play.test.Helpers;
 import play.test.WithServer;
 import utilities.*;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static play.test.Helpers.*;
 
 /**
  *
@@ -37,23 +36,18 @@ public class ApplicationTest extends WithServer {
 
     @Test
     public void rootRouteTest() {
-        running(fakeApplication(), () -> {
-                Result result = route(fakeRequest(GET, "/api/v1"));
-                Assert.assertEquals(OK, result.status());
-                Assert.assertEquals("বাংলা অভিধান এ স্বাগতম!",contentAsString(result));
+        Helpers.running(Helpers.fakeApplication(), () -> {
+                Result result = Helpers.route(Helpers.fakeRequest(Helpers.GET, "/api/v1"));
+                Assert.assertEquals(Helpers.OK, result.status());
+                Assert.assertEquals("বাংলা অভিধান এ স্বাগতম!", Helpers.contentAsString(result));
             }
         );
     }
 
     @Test @Ignore //Ignore because it is not a test of functionality
     public void tempTestConfig() {
-
-        String configString = "shobdo.config";
-        String config = ConfigFactory.load().getString(configString);
-        String mongodbhostnameConfigString = "shobdo.mongodbhostname";
-        String mongodbhostname = ConfigFactory.load().getString(mongodbhostnameConfigString);
-        log.info("Config for \"" + configString + "\":" + config);
-        log.info("Config for mongodbhostname\"" + mongodbhostnameConfigString + "\":" + mongodbhostname);
+        Assert.assertEquals("SHOBDO.CONFIG", ConfigFactory.load().getString("shobdo.config"));
+        Assert.assertEquals("127.0.0.1", ConfigFactory.load().getString("shobdo.mongodbhostname"));
     }
 
     @Test @Ignore //Ignore because it is not a test functionality
@@ -62,13 +56,11 @@ public class ApplicationTest extends WithServer {
         List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
 
         Word theWord = words.get(0);
-
         String spelling = theWord.getWordSpelling();
 
         WordLogic logic = WordLogic.createMongoBackedWordLogic();
 
         logic.createWord(theWord);
-
         LoadingCache<String, Word> wordLoadingCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(20, TimeUnit.MILLISECONDS)
                 .expireAfterWrite(20, TimeUnit.MILLISECONDS)

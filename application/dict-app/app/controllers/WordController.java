@@ -38,8 +38,11 @@ public class WordController extends Controller {
         final JsonNode wordJson = request().body().asJson();
         parameters.put("requestBody", wordJson.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "createWord", parameters, () ->
-            created(wordLogic.createWord(wordJson).toAPIJsonNode())
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "createWord", parameters,
+            () -> created(
+                wordLogic.createWord(wordJson)
+                    .toAPIJsonNode()
+            )
         );
     }
 
@@ -50,8 +53,11 @@ public class WordController extends Controller {
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordById", parameters, () ->
-            ok(wordLogic.getWordById(wordId).toAPIJsonNode())
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordById", parameters,
+            () -> ok(
+                wordLogic.getWordById(wordId)
+                    .toAPIJsonNode()
+            )
         );
     }
 
@@ -65,14 +71,19 @@ public class WordController extends Controller {
         final JsonNode body =  request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordBySpelling", parameters, () -> {
-            if (!body.has(Constants.WORD_SPELLING_KEY)) {
-                throw new IllegalArgumentException("Word spelling has not been provided");
-            }
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordBySpelling", parameters,
+            () -> {
+                if (!body.has(Constants.WORD_SPELLING_KEY)) {
+                    throw new IllegalArgumentException("Word spelling has not been provided");
+                }
 
-            final String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
-            return ok(wordLogic.getWordBySpelling(wordSpelling).toAPIJsonNode());
-        });
+                final String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
+                return ok(
+                    wordLogic.getWordBySpelling(wordSpelling)
+                        .toAPIJsonNode()
+                );
+            }
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -85,8 +96,11 @@ public class WordController extends Controller {
         final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters, () ->
-            ok(wordLogic.updateWord(wordId, body).toAPIJsonNode())
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters,
+            () -> ok(
+                wordLogic.updateWord(wordId, body)
+                    .toAPIJsonNode()
+            )
         );
     }
 
@@ -98,10 +112,12 @@ public class WordController extends Controller {
 
         parameters.put("wordId", wordId);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "deleteWord", parameters, () -> {
-            wordLogic.deleteWord(wordId);
-            return ok();
-        });
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "deleteWord", parameters,
+            () -> {
+                wordLogic.deleteWord(wordId);
+                return ok();
+            }
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -114,17 +130,19 @@ public class WordController extends Controller {
         final JsonNode body = request().body().asJson();
         parameters.put("requestBody", body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "searchWordsBySpelling", parameters, () -> {
-            if (!body.has(Constants.SEARCH_STRING_KEY)) {
-                return badRequest();
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "searchWordsBySpelling", parameters,
+            () -> {
+                if (!body.has(Constants.SEARCH_STRING_KEY)) {
+                    return badRequest();
+                }
+                final String searchString = body.get(Constants.SEARCH_STRING_KEY).asText();
+                if  (searchString.length() > 0) {
+                    return ok(Json.toJson(wordLogic.searchWords(searchString)));
+                } else {
+                    return ok(Json.toJson(new HashMap<>()));
+                }
             }
-            final String searchString = body.get(Constants.SEARCH_STRING_KEY).asText();
-            if  (searchString.length() > 0) {
-                return ok(Json.toJson(wordLogic.searchWords(searchString)));
-            } else {
-                return ok(Json.toJson(new HashMap<>()));
-            }
-        });
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -147,8 +165,11 @@ public class WordController extends Controller {
 
         logger.info("Here body:" + body.toString());
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "createMeaning" , parameters, () ->
-            created(wordLogic.createMeaning(wordId, body).toAPIJsonNode())
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "createMeaning" , parameters,
+            () -> created(
+                wordLogic.createMeaning(wordId, body)
+                    .toAPIJsonNode()
+            )
         );
     }
 
@@ -157,11 +178,14 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "getMeaning" , new HashMap<>(), () -> {
-            logger.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
-            final Meaning meaning = wordLogic.getMeaning(wordId, meaningId);
-            return meaning == null ? notFound(Constants.Messages.EntityNotFound(meaningId)): ok(meaning.toAPIJsonNode());
-        });
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "getMeaning" , new HashMap<>(),
+            () -> {
+                logger.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
+                final Meaning meaning = wordLogic.getMeaning(wordId, meaningId);
+                return meaning == null ? notFound(Constants.Messages.EntityNotFound(meaningId)) :
+                    ok(meaning.toAPIJsonNode());
+            }
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -170,12 +194,14 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateMeaning", new HashMap<>(), () -> {
-            final JsonNode meaningJsonNode = request().body().asJson();
-            logger.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
-                    + " on word with id:" + wordId);
-            return ok(wordLogic.updateMeaning(wordId, meaningId, meaningJsonNode).toAPIJsonNode());
-        });
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "updateMeaning", new HashMap<>(),
+            () -> {
+                final JsonNode meaningJsonNode = request().body().asJson();
+                logger.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
+                        + " on word with id:" + wordId);
+                return ok(wordLogic.updateMeaning(wordId, meaningId, meaningJsonNode).toAPIJsonNode());
+            }
+        );
     }
 
     public Result deleteMeaning(final String wordId, final String meaningId) {
@@ -183,11 +209,13 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "deleteMeaning", new HashMap<>(), () -> {
-            logger.debug("Delete meaning: " + meaningId + " on word with id:" + wordId);
-            wordLogic.deleteMeaning(wordId, meaningId);
-            return ok();
-        });
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "deleteMeaning", new HashMap<>(),
+            () -> {
+                logger.debug("Delete meaning: " + meaningId + " on word with id:" + wordId);
+                wordLogic.deleteMeaning(wordId, meaningId);
+                return ok();
+            }
+        );
     }
 
     public Result listMeanings(final String wordId) {
@@ -195,11 +223,13 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(), () -> {
-            logger.debug("List meaningsMap on word with id:" + wordId);
-            wordLogic.listMeanings(wordId);
-            return ok();
-        });
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(),
+            () -> {
+                logger.debug("List meaningsMap on word with id:" + wordId);
+                wordLogic.listMeanings(wordId);
+                return ok();
+            }
+        );
     }
 
     @BodyParser.Of(BodyParser.Json.class)

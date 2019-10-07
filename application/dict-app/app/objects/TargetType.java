@@ -1,7 +1,7 @@
 package objects;
 
 public enum  TargetType {
-    WORD("Word"),
+    WORD("WORD"),
     MEANING("MEANING");
 
     private final String type;
