@@ -44,10 +44,10 @@ public class ApplicationTest extends WithServer {
         );
     }
 
-    @Test @Ignore //Ignore because it is not functionality test
-    public void tempTestConfig() {
+    @Test
+    public void testConfig() {
         Assert.assertEquals("SHOBDO.CONFIG", ConfigFactory.load().getString("shobdo.config"));
-        Assert.assertEquals("127.0.0.1", ConfigFactory.load().getString("shobdo.mongodbhostname"));
+        Assert.assertEquals("27017", ConfigFactory.load().getString("shobdo.mongodbport"));
     }
 
     @Test @Ignore //Ignore because it is not a functionality test

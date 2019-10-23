@@ -314,7 +314,7 @@ public class WordControllerTests extends WithApplication {
 
     /* Delete Word Test */
     @Test(expected = EntityDoesNotExist.class)
-    public void deleteWord_existingWord_deletesSuccessfully() throws IOException {
+    public void deleteWord_existingWord_deletesSuccessfully() {
 
         createWordsInDb(1);
         String spelling = createdWords.get(0).getSpelling();
@@ -561,7 +561,7 @@ public class WordControllerTests extends WithApplication {
     }
 
     @Test
-    public void searchWordsByPrefix() throws Exception {
+    public void searchWordsByPrefix() {
 
         createWordsInDb(50);
 
