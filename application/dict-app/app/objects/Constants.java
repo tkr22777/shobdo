@@ -13,13 +13,8 @@ public final class Constants {
     public static final String MEANING_ID_PREFIX = "MNG";
     public static final String REQUEST_ID_PREFIX = "REQ";
 
-    //Meta constant keys
-    public static final String MEANING_STRING = "MEANING STRING";
-    public static final String ORIGINAL_STRING = "ORIGINAL STRING";
-    public static final String ENG_PRONUN_STRING = "ENG PRONUNCIATION";
-
     //REST REQUEST FIELD NAMES
-    public static final String WORD_SPELLING_KEY = "wordSpelling";
+    public static final String SPELLING_KEY = "spelling";
     public static final String SEARCH_STRING_KEY = "searchString";
     public static final String WORD_COUNT_KEY = "wordCount";
 
@@ -28,9 +23,9 @@ public final class Constants {
     //Messages
     public static final String ENTITY_IS_DELETED= "Entity has been deleted.";
     public static final String ID_NULLOREMPTY = "Id is null/empty/mismatch:";
-    public static final String WORDSPELLING_NULLOREMPTY = "WordSpelling is null/empty.";
+    public static final String SPELLING_NULLOREMPTY = "spelling is null/empty.";
     public static final String MEANING_NULLOREMPTY = "Meaning string is null/empty.";
-    public static final String CREATE_SPELLING_EXISTS = "WordSpelling exists:%s";
+    public static final String CREATE_SPELLING_EXISTS = "spelling exists:%s";
     public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
     public static final String ENTITY_LOCKED = "Entity is currently locked:";
 
@@ -39,8 +34,8 @@ public final class Constants {
             return String.format("User provided id is not permissible for create:%s", id);
         }
 
-        public static String WordSpellingExists(final String wordSpelling) {
-            return String.format("Word with the spelling: %s already exist", wordSpelling);
+        public static String SpellingExists(final String spelling) {
+            return String.format("Word with the spelling: %s already exist", spelling);
         }
 
         public static String EntityNotFound(final String entityId) {

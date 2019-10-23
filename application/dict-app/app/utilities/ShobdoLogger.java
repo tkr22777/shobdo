@@ -6,11 +6,11 @@ import java.util.Date;
 /**
  * Created by Tahsin Kabir on 8/21/16.
  */
-public final class LogPrint {
+public final class ShobdoLogger {
 
     private final Class<?> class_type;
 
-    public LogPrint(Class<?> class_type){
+    public ShobdoLogger(Class<?> class_type){
         this.class_type = class_type;
     }
 

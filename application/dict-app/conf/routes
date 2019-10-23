@@ -17,7 +17,7 @@ POST    /api/v1/words                                    controllers.WordControl
 # 2. Get word:
 GET     /api/v1/words/:id                                controllers.WordController.getWordByWordId(id: String)
 
-# 3. POST Get word by spelling: (requestBody contains "wordSpelling" key and query value since Bengali chars do not play well in route :( )
+# 3. POST Get word by spelling: body contains "spelling" key and query value as Bengali unicode chars breaks route :(
 POST    /api/v1/words/postget                            controllers.WordController.getWordBySpellingPost()
 
 # 4. Update word:
@@ -51,7 +51,7 @@ PUT     /api/v1/words/:wordId/meanings/:meaningId        controllers.WordControl
 # 4. Delete a specific meaning of a word
 DELETE  /api/v1/words/:wordId/meanings/:meaningId        controllers.WordController.deleteMeaning(wordId: String, meaningId: String)
 
-# 5. List meaningsMap of a word
+# 5. List meanings of a word
 GET     /api/v1/words/:wordId/meanings/list              controllers.WordController.listMeanings(wordId: String)
 
 ##############

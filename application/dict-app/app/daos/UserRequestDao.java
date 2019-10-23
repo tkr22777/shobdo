@@ -3,7 +3,7 @@ package daos;
 import objects.UserRequest;
 import java.util.ArrayList;
 
-public interface RequestDao {
+public interface UserRequestDao {
 
      UserRequest create(UserRequest request);
 
@@ -13,7 +13,7 @@ public interface RequestDao {
 
      void delete(String requestId);
 
-     long totalCount();
+     long count();
 
      ArrayList<UserRequest> list(String startId, int limit);
 }

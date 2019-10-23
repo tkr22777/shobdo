@@ -13,9 +13,8 @@ import play.test.WithApplication;
 import objects.Constants;
 import utilities.DictUtil;
 import utilities.JsonUtil;
-import utilities.LogPrint;
+import utilities.ShobdoLogger;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,25 +27,29 @@ import static play.test.Helpers.contentAsString;
  */
 public class WordControllerTests extends WithApplication {
 
-    LogPrint log;
-    WordLogic wordLogic;
-    ArrayList<Word> createdWords;
-    Map<String, List<Meaning>> createdMeaningForWord;
+    private final ShobdoLogger log;
+    private final WordLogic wordLogic;
+    private final ArrayList<Word> createdWords;
+    private final Map<String, List<Meaning>> createdMeaningForWord;
+
+    public WordControllerTests() {
+        log = new ShobdoLogger(WordControllerTests.class);
+        wordLogic = WordLogic.createMongoBackedWordLogic();
+        createdWords = new ArrayList<>();
+        createdMeaningForWord = new HashMap<>();
+    }
 
     @Before
     public void setup() {
-        log = new LogPrint(WordControllerTests.class);
-        wordLogic = WordLogic.createMongoBackedWordLogic();
     }
 
     private void createWordsInDb(int numberOfWords) {
-        createdWords = new ArrayList<>(DictUtil.generateRandomWordSet(numberOfWords));
-        createdWords.forEach(word -> wordLogic.createWord(word));
+        createdWords.addAll(DictUtil.generateRandomWordSet(numberOfWords));
+        createdWords.forEach(wordLogic::createWord);
     }
 
-    private void createMeaningsInDbForWord(String wordId, String wordSpelling, int numberOfMeanings) {
-        createdMeaningForWord = new HashMap<>();
-        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(wordSpelling, numberOfMeanings));
+    private void createMeaningsInDbForWord(String wordId, String spelling, int numberOfMeanings) {
+        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(spelling, numberOfMeanings));
         meaningList = meaningList.stream()
             .map(meaning -> wordLogic.createMeaning(wordId, meaning))
             .collect(Collectors.toList());
@@ -55,6 +58,8 @@ public class WordControllerTests extends WithApplication {
 
     @After
     public void clearSetups() {
+        createdWords.clear();
+        createdMeaningForWord.clear();
         wordLogic.deleteAllWords();  //cleaning up for tests
         wordLogic.flushCache();
     }
@@ -67,8 +72,8 @@ public class WordControllerTests extends WithApplication {
 
             String jsonWordString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                "  \"meaningsMap\" : { },\n" +
+                "  \"spelling\" : \"ঞতটতথঙ\",\n" +
+                "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
                 "  \"synonyms\" : [ ]\n" +
             "}";
@@ -93,11 +98,11 @@ public class WordControllerTests extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
 
             createWordsInDb(1);
-            String existingWordSpelling = createdWords.get(0).getWordSpelling();
+            String existingSpelling = createdWords.get(0).getSpelling();
             String jsonWordString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"wordSpelling\" : \"" + existingWordSpelling +"\",\n" +
-                "  \"meaningsMap\" : { },\n" +
+                "  \"spelling\" : \"" + existingSpelling +"\",\n" +
+                "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
                 "  \"synonyms\" : [ ]\n" +
             "}";
@@ -105,7 +110,7 @@ public class WordControllerTests extends WithApplication {
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.Messages.WordSpellingExists(existingWordSpelling), contentAsString(result));
+            Assert.assertEquals(Constants.Messages.SpellingExists(existingSpelling), contentAsString(result));
         });
     }
 
@@ -119,8 +124,8 @@ public class WordControllerTests extends WithApplication {
 
             String jsonWordString = "{\n" +
                 "  \"id\" : \"" + existingWordId + "\",\n" +
-                "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                "  \"meaningsMap\" : { },\n" +
+                "  \"spelling\" : \"ঞতটতথঙ\",\n" +
+                "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
                 "  \"synonyms\" : [ ]\n" +
             "}";
@@ -139,8 +144,8 @@ public class WordControllerTests extends WithApplication {
 
             String jsonWordString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                "  \"meaningsMap\" : { \"aMeaningId\":  { \"id\": \"aMeaningId\"}  },\n" +
+                "  \"spelling\" : \"ঞতটতথঙ\",\n" +
+                "  \"meanings\" : { \"aMeaningId\":  { \"id\": \"aMeaningId\"}  },\n" +
                 "  \"antonyms\" : [ ],\n" +
                 "  \"synonyms\" : [ ]\n" +
             "}";
@@ -151,7 +156,6 @@ public class WordControllerTests extends WithApplication {
             Assert.assertEquals(Constants.MEANING_PROVIDED, contentAsString(result));
         });
     }
-
 
     /* Get tests */
     @Test
@@ -178,14 +182,14 @@ public class WordControllerTests extends WithApplication {
 
     //Bengali characters do not work on the API routes, thus POST body based word retrieval
     @Test
-    public void getWordBySpellingPost_existingWordSpellingForWordsInDb_wordReturned() {
+    public void getWordBySpellingPost_existingSpellingForWordsInDb_wordReturned() {
 
         Helpers.running(Helpers.fakeApplication(), () -> {
 
             createWordsInDb(1);
             Word createdWord = createdWords.get(0);
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty(Constants.WORD_SPELLING_KEY, createdWord.getWordSpelling());
+            jsonObject.addProperty(Constants.SPELLING_KEY, createdWord.getSpelling());
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
 
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
@@ -195,11 +199,11 @@ public class WordControllerTests extends WithApplication {
     }
 
     @Test
-    public void getWordBySpellingPost_nonExistentWordSpellingForWordsInDb_returnedNotFound() {
+    public void getWordBySpellingPost_nonExistentSpellingForWordsInDb_returnedNotFound() {
 
         Helpers.running(Helpers.fakeApplication(), () -> {
 
-            String jsonWordString = "{\"" + Constants.WORD_SPELLING_KEY + "\":\"NonExistentSpelling\"}";
+            String jsonWordString = "{\"" + Constants.SPELLING_KEY + "\":\"NonExistentSpelling\"}";
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
 
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
@@ -231,7 +235,7 @@ public class WordControllerTests extends WithApplication {
             Word createdWord = createdWords.get(0);
 
             Word updateRequestWord = Word.fromWord(createdWord);
-            updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling() + "বিবর্তিত"); //updating the spelling
+            updateRequestWord.setSpelling(updateRequestWord.getSpelling() + "বিবর্তিত"); //updating the spelling
             JsonNode updateRequestWordJNode = updateRequestWord.toAPIJsonNode();
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
@@ -254,8 +258,8 @@ public class WordControllerTests extends WithApplication {
             String wordId = "TestWordId";
             String jsonWordString = "{\n" +
                 "  \"id\" : \"" +  wordId + "\",\n" +
-                "  \"wordSpelling\" : \"ঞতটতথঙ\",\n" +
-                "  \"meaningsMap\" : { },\n" +
+                "  \"spelling\" : \"ঞতটতথঙ\",\n" +
+                "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
                 "  \"synonyms\" : [ ]\n" +
             "}";
@@ -276,12 +280,12 @@ public class WordControllerTests extends WithApplication {
             Word createdWord = createdWords.get(0);
 
             Word updateRequestWord = Word.fromWord(createdWord);
-            updateRequestWord.setWordSpelling("");
+            updateRequestWord.setSpelling("");
             JsonNode updateRequestWordJNode = updateRequestWord.toAPIJsonNode();
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.WORDSPELLING_NULLOREMPTY, contentAsString(result));
+            Assert.assertEquals(Constants.SPELLING_NULLOREMPTY, contentAsString(result));
         });
     }
 
@@ -294,7 +298,7 @@ public class WordControllerTests extends WithApplication {
             Word createdWord = createdWords.get(0);
 
             Word updateRequestWord = Word.fromWord(createdWord);
-            updateRequestWord.setWordSpelling(updateRequestWord.getWordSpelling() + "বিবর্তিত"); //updating the spelling
+            updateRequestWord.setSpelling(updateRequestWord.getSpelling() + "বিবর্তিত"); //updating the spelling
             Meaning meaning = Meaning.builder()
                 .id("aMeaningId")
                 .build();
@@ -309,11 +313,11 @@ public class WordControllerTests extends WithApplication {
 
     /* Delete Word Test */
     @Test(expected = EntityDoesNotExist.class)
-    public void deleteWord_existingWord_deletesSuccessfully() throws IOException {
+    public void deleteWord_existingWord_deletesSuccessfully() {
 
         createWordsInDb(1);
-        String wordSpelling = createdWords.get(0).getWordSpelling();
-        Word word = wordLogic.getWordBySpelling(wordSpelling);
+        String spelling = createdWords.get(0).getSpelling();
+        Word word = wordLogic.getWordBySpelling(spelling);
         Assert.assertNotNull(word);
         Assert.assertNotNull(word.getId());
 
@@ -336,7 +340,7 @@ public class WordControllerTests extends WithApplication {
                 "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
                 "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                 "  \"strength\" : 0,\n" +
-                "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ " + word.getWordSpelling() + " ঙঞজতঢণটজঠধ \"\n" +
+                "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ " + word.getSpelling() + " ঙঞজতঢণটজঠধ \"\n" +
             "}";
 
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonMeaningString);
@@ -349,7 +353,7 @@ public class WordControllerTests extends WithApplication {
             //Making sure the data persisted
             String meaningId = createdJNode.get("id").toString().replaceAll("\"","");
             word =  wordLogic.getWordById(word.getId());
-            Meaning meaning = word.getMeaningsMap().get(meaningId);
+            Meaning meaning = word.getMeanings().get(meaningId);
             JsonNode meaningJson = meaning.toAPIJsonNode();
             Assert.assertEquals(bodyJson, JsonUtil.nullFieldsOnJNode(meaningJson, Collections.singletonList("id")));
         });
@@ -405,7 +409,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             Word createdWord = createdWords.get(0);
-            createMeaningsInDbForWord(createdWord.getId(), createdWord.getWordSpelling(), 1);
+            createMeaningsInDbForWord(createdWord.getId(), createdWord.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(createdWord.getId()).get(0);
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.GET, "/api/v1/words/" + createdWord.getId() + "/meanings/" + meaning.getId()));
@@ -436,7 +440,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             Word word = createdWords.get(0);
-            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
@@ -453,7 +457,7 @@ public class WordControllerTests extends WithApplication {
             //Making sure the data persisted
             String meaningId = updatedJNode.get("id").toString().replaceAll("\"","");
             word =  wordLogic.getWordById(word.getId());
-            meaning = word.getMeaningsMap().get(meaningId);
+            meaning = word.getMeanings().get(meaningId);
             Assert.assertEquals(updatedJNode, meaning.toAPIJsonNode());
         });
     }
@@ -465,7 +469,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             Word word = createdWords.get(0);
-            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
@@ -486,7 +490,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             Word word = createdWords.get(0);
-            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
@@ -508,7 +512,7 @@ public class WordControllerTests extends WithApplication {
 
             createWordsInDb(1);
             Word word = createdWords.get(0);
-            createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+            createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
@@ -528,7 +532,7 @@ public class WordControllerTests extends WithApplication {
 
         createWordsInDb(1);
         Word word = createdWords.get(0);
-        createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+        createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
         Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
         Assert.assertNotNull(meaning);
@@ -544,7 +548,7 @@ public class WordControllerTests extends WithApplication {
 
         createWordsInDb(1);
         Word word = createdWords.get(0);
-        createMeaningsInDbForWord(word.getId(), word.getWordSpelling(), 1);
+        createMeaningsInDbForWord(word.getId(), word.getSpelling(), 1);
         Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
         Assert.assertNotNull(meaning);
@@ -556,18 +560,18 @@ public class WordControllerTests extends WithApplication {
     }
 
     @Test
-    public void searchWordsByPrefix() throws Exception {
+    public void searchWordsByPrefix() {
 
         createWordsInDb(50);
 
-        String spelling = createdWords.get(0).getWordSpelling();
+        String spelling = createdWords.get(0).getSpelling();
         String prefix = spelling.substring(0,1);
 
         log.info("Test searchWordsByPrefix, prefix: " + prefix);
 
         Set<String> spellingsWithPrefixes = createdWords.stream()
-            .filter(word -> word.getWordSpelling().startsWith(prefix))
-            .map(word-> word.getWordSpelling())
+            .filter(word -> word.getSpelling().startsWith(prefix))
+            .map(word-> word.getSpelling())
             .collect(Collectors.toSet());
 
         log.info("Spelling with prefixes:" + spellingsWithPrefixes);

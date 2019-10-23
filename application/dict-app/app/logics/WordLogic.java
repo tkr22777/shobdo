@@ -1,6 +1,8 @@
 package logics;
 
 import com.google.common.base.Preconditions;
+import daos.UserRequestDao;
+import daos.UserRequestDaoMongoImpl;
 import exceptions.EntityDoesNotExist;
 import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,16 +23,20 @@ public class WordLogic {
 
     private final WordDao wordDao;
     private final WordCache wordCache;
+    private final UserRequestDao userRequestDao;
 
-    private static final LogPrint logger = new LogPrint(WordLogic.class);
+    private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
     public static WordLogic createMongoBackedWordLogic() {
-        return new WordLogic(new WordDaoMongoImpl(), new WordCache());
+        return new WordLogic(new WordDaoMongoImpl(), WordCache.getCache(), new UserRequestDaoMongoImpl());
     }
 
-    public WordLogic(final WordDao wordDao, final WordCache wordCache) {
+    public WordLogic(final WordDao wordDao,
+                     final WordCache wordCache,
+                     final UserRequestDao userRequestDao) {
         this.wordDao = wordDao;
         this.wordCache = wordCache;
+        this.userRequestDao = userRequestDao;
     }
 
     private String generateWordId() {
@@ -51,18 +57,18 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(word.getId()));
         }
 
-        Preconditions.checkNotNull(word.getWordSpelling(), Constants.WORDSPELLING_NULLOREMPTY);
-        if (word.getWordSpelling().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+        Preconditions.checkNotNull(word.getSpelling(), Constants.SPELLING_NULLOREMPTY);
+        if (word.getSpelling().trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
         }
 
-        final Word existingWord = wordDao.getBySpelling(word.getWordSpelling());
+        final Word existingWord = wordDao.getBySpelling(word.getSpelling());
         if (existingWord != null) {
-            throw new IllegalArgumentException(Constants.Messages.WordSpellingExists(word.getWordSpelling()));
+            throw new IllegalArgumentException(Constants.Messages.SpellingExists(word.getSpelling()));
         }
 
         //word creation does not accept meanings
-        if (word.getMeaningsMap() != null && word.getMeaningsMap().size() > 0) {
+        if (word.getMeanings() != null && word.getMeanings().size() > 0) {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
         }
     }
@@ -95,7 +101,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(createWord))
             .build();
 
-        return wordDao.createUserRequest(createRequest).getId();
+        return userRequestDao.create(createRequest).getId();
     }
 
     //Todo add toAPIJsonNode to the word object
@@ -114,7 +120,7 @@ public class WordLogic {
     /* GET word by (exact) spelling */
     public Word getWordBySpelling(@NotNull final String spelling) {
         if (spelling == null || spelling.trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
         }
 
         final Word cachedWord = wordCache.getBySpelling(spelling);
@@ -137,11 +143,11 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
         }
 
-        if (updateWord.getWordSpelling() == null || updateWord.getWordSpelling().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.WORDSPELLING_NULLOREMPTY);
+        if (updateWord.getSpelling() == null || updateWord.getSpelling().trim().length() == 0) {
+            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
         }
 
-        if (updateWord.getMeaningsMap() != null && updateWord.getMeaningsMap().size() > 0) {
+        if (updateWord.getMeanings() != null && updateWord.getMeanings().size() > 0) {
             throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
         }
 
@@ -163,8 +169,8 @@ public class WordLogic {
         //Only allow spelling, synonyms and antonyms to be updated
         final Word updatedWord = Word.builder()
             .id(currentWord.getId())
-            .meaningsMap(currentWord.getMeaningsMap())
-            .wordSpelling(word.getWordSpelling())
+            .meanings(currentWord.getMeanings())
+            .spelling(word.getSpelling())
             .synonyms(word.getSynonyms())
             .antonyms(word.getAntonyms())
             .build();
@@ -192,7 +198,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(updateWord))
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     /* Delete Word */
@@ -215,14 +221,14 @@ public class WordLogic {
             .operation(RequestOperation.DELETE)
             .build();
 
-        return wordDao.createUserRequest(deleteRequest).getId();
+        return userRequestDao.create(deleteRequest).getId();
     }
 
     private UserRequest getRequest(@NotNull final String requestId) {
         if (requestId == null || requestId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + requestId);
         }
-        return wordDao.getUserRequest(requestId);
+        return userRequestDao.get(requestId);
     }
 
     //todo make transactional
@@ -276,7 +282,7 @@ public class WordLogic {
         request.setDeleterId(approverId);
         final String deletionDateString = (new DateTime(DateTimeZone.UTC)).toString();
         request.setDeletedDate(deletionDateString);
-        wordDao.updateUserRequest(request);
+        userRequestDao.update(request);
     }
 
     /* LIST words todo */
@@ -313,7 +319,7 @@ public class WordLogic {
     }
 
     public long totalWordCount(){
-        return wordDao.totalCount();
+        return wordDao.count();
     }
 
     public void deleteAllWords(){
@@ -384,13 +390,13 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(meaning))
             .build();
 
-        return wordDao.createUserRequest(createRequest).getId();
+        return userRequestDao.create(createRequest).getId();
     }
 
     /* GET meaning */
     public Meaning getMeaning(final String wordId, final String meaningId) {
         final Word word = getWordById(wordId);
-        final Meaning meaning = word.getMeaningsMap() == null ? null : word.getMeaningsMap().get(meaningId);
+        final Meaning meaning = word.getMeanings() == null ? null : word.getMeanings().get(meaningId);
         if (meaning == null) {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(meaningId));
         }
@@ -408,7 +414,7 @@ public class WordLogic {
         }
 
         final Word currentWord = getWordById(wordId);
-        final Meaning currentMeaning = currentWord.getMeaningsMap().get(meaning.getId());
+        final Meaning currentMeaning = currentWord.getMeanings().get(meaning.getId());
 
         if (currentMeaning == null) {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(meaning.getId()));
@@ -424,7 +430,7 @@ public class WordLogic {
     private Meaning updateMeaning(final String wordId, final Meaning meaning) {
         validateUpdateMeaningObject(wordId,  meaning);
         final Word currentWord = getWordById(wordId);
-        currentWord.getMeaningsMap().put(meaning.getId(), meaning);
+        currentWord.getMeanings().put(meaning.getId(), meaning);
         updateWordWithCache(currentWord);
         return meaning;
     }
@@ -447,18 +453,18 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(updateMeaning))
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     /* DELETE meaning */
     public void deleteMeaning(final String wordId, final String meaningId) {
         final Word word = getWordById(wordId);
-        if (word.getMeaningsMap() == null || word.getMeaningsMap().size() == 0) {
+        if (word.getMeanings() == null || word.getMeanings().size() == 0) {
             return;
         }
 
-        if (word.getMeaningsMap().get(meaningId) != null) {
-            word.getMeaningsMap().remove(meaningId);
+        if (word.getMeanings().get(meaningId) != null) {
+            word.getMeanings().remove(meaningId);
             updateWordWithCache(word);
         }
     }
@@ -477,7 +483,7 @@ public class WordLogic {
             .operation(RequestOperation.DELETE)
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     private void updateWordWithCache(final Word updatedWord) {

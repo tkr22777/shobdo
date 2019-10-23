@@ -8,7 +8,7 @@ import java.io.FileReader;
  */
 public class FileReadUtil {
 
-    private LogPrint log = new LogPrint(FileReadUtil.class);
+    private ShobdoLogger log = new ShobdoLogger(FileReadUtil.class);
     private BufferedReader reader;
 
     public FileReadUtil(String fileLocation) {
@@ -40,5 +40,4 @@ public class FileReadUtil {
         }
         return reader;
     }
-
 }

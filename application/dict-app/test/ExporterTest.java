@@ -1,11 +1,6 @@
-import exporter.SamsadExporter;
 import logics.WordLogic;
-import objects.Word;
-import org.junit.Ignore;
-import org.junit.Test;
 import play.test.WithServer;
-import utilities.LogPrint;
-import java.util.Collection;
+import utilities.ShobdoLogger;
 
 /**
  *
@@ -15,7 +10,7 @@ import java.util.Collection;
  */
 public class ExporterTest extends WithServer {
 
-    LogPrint log = new LogPrint(ExporterTest.class);
+    ShobdoLogger log = new ShobdoLogger(ExporterTest.class);
     WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
 
     /*
