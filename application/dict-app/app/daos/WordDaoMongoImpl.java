@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.typesafe.config.ConfigFactory;
+import objects.Constants;
 import objects.EntityStatus;
 import objects.UserRequest;
 import objects.Word;
@@ -28,10 +29,9 @@ public class WordDaoMongoImpl implements WordDao {
 
     private static final String ID_PARAM = "id";
     private static final String STATUS_PARAM = "status";
-    private static final String WORD_SPELLING_PARAM = "wordSpelling";
 
     private final MongoCollection<Document> wordCollection;
-    private static final LogPrint log = new LogPrint(WordDaoMongoImpl.class);
+    private static final ShobdoLogger log = new ShobdoLogger(WordDaoMongoImpl.class);
 
     public WordDaoMongoImpl() {
         final String MONGODB_HOSTNAME = ConfigFactory.load().getString("shobdo.mongodbhostname");
@@ -46,7 +46,7 @@ public class WordDaoMongoImpl implements WordDao {
     public Word create(final Word word) {
         final Document wordDoc = JsonUtil.objectToDocument(word);
         wordCollection.insertOne(wordDoc);
-        log.info("Creating word on database: " + word.getWordSpelling());
+        log.info("Creating word on database: " + word.getSpelling());
         return word;
     }
 
@@ -63,7 +63,7 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public Word getBySpelling(final String spelling) {
         final BasicDBObject query = new BasicDBObject();
-        query.put(WORD_SPELLING_PARAM, spelling);
+        query.put(Constants.SPELLING_KEY, spelling);
         query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
         final Document wordDoc = wordCollection.find(query).first();
         log.info("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
@@ -88,18 +88,18 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
         final BasicDBObject query = new BasicDBObject();
-        query.put(WORD_SPELLING_PARAM, Pattern.compile("^" + spellingQuery + ".*"));
+        query.put(Constants.SPELLING_KEY, Pattern.compile("^" + spellingQuery + ".*"));
         query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
 
         final MongoCursor<Document> words = wordCollection.find(query)
-            .projection(Projections.include(WORD_SPELLING_PARAM))
+            .projection(Projections.include(Constants.SPELLING_KEY))
             .limit(limit)
             .batchSize(100)
             .iterator();
 
         final Set<String> result = new HashSet<>();
         while(words.hasNext()) {
-            result.add(words.tryNext().get(WORD_SPELLING_PARAM).toString());
+            result.add(words.tryNext().get(Constants.SPELLING_KEY).toString());
         }
         log.info("@WDMI006 searching words by spelling: " + spellingQuery);
         return result;

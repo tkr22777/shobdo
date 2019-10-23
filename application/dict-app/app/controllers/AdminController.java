@@ -3,7 +3,7 @@ package controllers;
 import logics.WordLogic;
 import play.mvc.Controller;
 import play.mvc.Result;
-import utilities.LogPrint;
+import utilities.ShobdoLogger;
 
 /**
  * Created by Tahsin Kabir on 12/31/16.
@@ -11,7 +11,7 @@ import utilities.LogPrint;
 public class AdminController extends Controller {
 
     private static final WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
-    private static final LogPrint logger = new LogPrint(AdminController.class);
+    private static final ShobdoLogger logger = new ShobdoLogger(AdminController.class);
 
     public Result flushCache() {
         logger.info("Flushing cache!");

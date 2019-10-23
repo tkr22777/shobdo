@@ -9,7 +9,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import objects.Constants;
 import utilities.DictUtil;
-import utilities.LogPrint;
+import utilities.ShobdoLogger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class WordController extends Controller {
 
     private static final WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
-    private static final LogPrint logger = new LogPrint(WordController.class);
+    private static final ShobdoLogger logger = new ShobdoLogger(WordController.class);
 
     public Result index() {
         return ok("বাংলা অভিধান এ স্বাগতম!");
@@ -73,13 +73,13 @@ public class WordController extends Controller {
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordBySpelling", parameters,
             () -> {
-                if (!body.has(Constants.WORD_SPELLING_KEY)) {
+                if (!body.has(Constants.SPELLING_KEY)) {
                     throw new IllegalArgumentException("Word spelling has not been provided");
                 }
 
-                final String wordSpelling = body.get(Constants.WORD_SPELLING_KEY).asText();
+                final String spelling = body.get(Constants.SPELLING_KEY).asText();
                 return ok(
-                    wordLogic.getWordBySpelling(wordSpelling)
+                    wordLogic.getWordBySpelling(spelling)
                         .toAPIJsonNode()
                 );
             }
@@ -225,7 +225,7 @@ public class WordController extends Controller {
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(),
             () -> {
-                logger.debug("List meaningsMap on word with id:" + wordId);
+                logger.debug("List meanings on word with id:" + wordId);
                 wordLogic.listMeanings(wordId);
                 return ok();
             }

@@ -11,7 +11,7 @@ import java.util.Collection;
 
 public class JsonUtil {
 
-    private final static LogPrint log = new LogPrint(JsonUtil.class);
+    private final static ShobdoLogger log = new ShobdoLogger(JsonUtil.class);
     private final static ObjectMapper objectMapper = new ObjectMapper()
         .configure(MapperFeature.USE_ANNOTATIONS, false);
 

@@ -21,7 +21,7 @@ import java.util.*;
 public class Word extends EntityMeta {
 
     private String id;
-    private String wordSpelling;
+    private String spelling;
 
     //set of spellings of antonyms of the word
     private HashSet<String> antonyms;
@@ -30,16 +30,16 @@ public class Word extends EntityMeta {
     private HashSet<String> synonyms;
 
     //meaningId to meanings map, easier to lookup
-    private HashMap<String, Meaning> meaningsMap;
+    private HashMap<String, Meaning> meanings;
 
     public void addMeaningToWord(final Meaning meaning) {
         if (meaning == null || meaning.getId() == null) {
             throw new RuntimeException("Meaning or MeaningId is null");
         }
-        if (meaningsMap == null) {
-            meaningsMap = new HashMap<>();
+        if (meanings == null) {
+            meanings = new HashMap<>();
         }
-        getMeaningsMap().put(meaning.getId(), meaning);
+        getMeanings().put(meaning.getId(), meaning);
     }
 
     public JsonNode toAPIJsonNode() {

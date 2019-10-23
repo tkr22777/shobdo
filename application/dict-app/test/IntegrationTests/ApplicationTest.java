@@ -27,11 +27,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class ApplicationTest extends WithServer {
 
-    LogPrint log;
+    ShobdoLogger log;
 
     @Before
     public void setup() {
-        log = new LogPrint(ApplicationTest.class);
+        log = new ShobdoLogger(ApplicationTest.class);
     }
 
     @Test
@@ -44,19 +44,19 @@ public class ApplicationTest extends WithServer {
         );
     }
 
-    @Test @Ignore //Ignore because it is not a test of functionality
+    @Test @Ignore //Ignore because it is not functionality test
     public void tempTestConfig() {
         Assert.assertEquals("SHOBDO.CONFIG", ConfigFactory.load().getString("shobdo.config"));
         Assert.assertEquals("127.0.0.1", ConfigFactory.load().getString("shobdo.mongodbhostname"));
     }
 
-    @Test @Ignore //Ignore because it is not a test functionality
+    @Test @Ignore //Ignore because it is not a functionality test
     public void testGuava() throws IOException {
 
         List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
 
         Word theWord = words.get(0);
-        String spelling = theWord.getWordSpelling();
+        String spelling = theWord.getSpelling();
 
         WordLogic logic = WordLogic.createMongoBackedWordLogic();
 
@@ -76,13 +76,13 @@ public class ApplicationTest extends WithServer {
 
             long start = System.currentTimeMillis();
             Word wordFromCache = logic.getWordBySpelling(spelling);
-            log.info("Word From Cache, Spelling: " + wordFromCache.getWordSpelling());
+            log.info("Word From Cache, Spelling: " + wordFromCache.getSpelling());
             log.info("Word From Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
 
             start = System.currentTimeMillis();
             try {
                 Word wordFromOtherCache = wordLoadingCache.get(spelling);
-                log.info("Word From Guava Cache, Spelling: " + wordFromOtherCache.getWordSpelling());
+                log.info("Word From Guava Cache, Spelling: " + wordFromOtherCache.getSpelling());
                 log.info("Word From Guava Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
             } catch (Exception ex) {
                 log.info("Error getting object from guava cache");

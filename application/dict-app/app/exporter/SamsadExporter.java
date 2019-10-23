@@ -1,14 +1,8 @@
 package exporter;
 
-import logics.WordLogic;
-import objects.Word;
-import objects.Constants;
-import utilities.DictUtil;
-import utilities.LogPrint;
-import utilities.FileReadUtil;
+import utilities.ShobdoLogger;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Tahsin Kabir on 9/1/16.
@@ -18,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class SamsadExporter {
 
-    private LogPrint log = new LogPrint(SamsadExporter.class);
+    private ShobdoLogger log = new ShobdoLogger(SamsadExporter.class);
 
     private static final ArrayList<String> supBucket = new ArrayList<>();
     private static final ArrayList<String> commaBucket = new ArrayList<>();
@@ -92,7 +86,7 @@ public class SamsadExporter {
         //Spelling
         int endIndexOfSpelling = line.indexOf("[");
         String spelling = line.substring(0, endIndexOfSpelling).trim();
-        word.setWordSpelling(spelling);
+        word.setspelling(spelling);
 
         //Eng pronunciation
         int endIndexOfEngPronunciation = line.indexOf("]");
@@ -148,9 +142,9 @@ public class SamsadExporter {
 
             if(filtered.size() == meanings.size() ) {
 
-                //DictUtil.printStringsByTag( word.getWordSpelling() + " Meaning(s): ", meaningsMap, 0, 100, false);
+                //DictUtil.printStringsByTag( word.getspelling() + " Meaning(s): ", meanings, 0, 100, false);
 
-                simpleMeaningWords.put(word.getWordSpelling(), word);
+                simpleMeaningWords.put(word.getspelling(), word);
             }
         }
 
@@ -170,7 +164,7 @@ public class SamsadExporter {
                 if(spellings == null)
                     spellings = new HashSet<>();
 
-                spellings.add(word.getWordSpelling());
+                spellings.add(word.getspelling());
 
                 allMeaning.put(meaning, spellings);
             }
@@ -193,7 +187,7 @@ public class SamsadExporter {
                 .filter( entry -> entry.getValue().size() < 5 && entry.getValue().size() > 2)
                 .forEach(entry -> log.info(entry.getValue() + " : " + entry.getKey() ) );
 
-        //DictUtil.printStringsByTag("All Meangins:", meaningsMap, 1000 , 1000, false);
+        //DictUtil.printStringsByTag("All Meangins:", meanings, 1000 , 1000, false);
 
         Map<String, Word> wordMap = createWordMapFromListDiplicateSpellingFix(words);
         Map<String, Word> simpleMeaningWordMap = findSpellingsWithSimpleMeanings(words);
@@ -286,7 +280,7 @@ public class SamsadExporter {
 
         for(Word word: words) {
 
-            String spelling = word.getWordSpelling();
+            String spelling = word.getspelling();
 
             if(wordMap.containsKey(spelling)) {
                 // ^^ means duplicate found, we are adding them to the same words meta map without updating
@@ -300,7 +294,7 @@ public class SamsadExporter {
 
             } else {
 
-                wordMap.put(word.getWordSpelling(), word);
+                wordMap.put(word.getspelling(), word);
             }
         }
         return wordMap;
@@ -320,7 +314,7 @@ public class SamsadExporter {
 
         for(Word word: filteredSupWordMap.values()){
 
-            String spelling = word.getWordSpelling();
+            String spelling = word.getspelling();
 
             if( spelling.contains("<") ){
 
@@ -340,14 +334,14 @@ public class SamsadExporter {
             }
 
             allSpellingList.add(spelling);
-            word.setWordSpelling(spelling);
+            word.setspelling(spelling);
             words.add(word);
         }
 
 
         log.info("All spelling list size:"  + allSpellingList.size());
         HashSet<String> allspellingSet = new HashSet<>(allSpellingList);
-        log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meaningsMap are merged
+        log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meanings are merged
 
         Map<String, Word> finishedSupWord = createWordMapFromListDiplicateSpellingFix(words);
 
@@ -366,15 +360,15 @@ public class SamsadExporter {
 
         for (Word word : filteredCommaWordMap.values()) {
 
-            String wordSpelling = word.getWordSpelling();
+            String spelling = word.getspelling();
 
             ArrayList<Word> newWords = new ArrayList<>();
 
-            if (wordSpelling.contains(",")) {
+            if (spelling.contains(",")) {
 
-                String[] spellings = wordSpelling.split(",");
+                String[] spellings = spelling.split(",");
                 if (print < 40)
-                    log.info("Spelling before:" + wordSpelling);
+                    log.info("Spelling before:" + spelling);
                 if (print < 40) {
                     log.info("spellings after: " + spellings.toString());
                     print++;
@@ -384,19 +378,19 @@ public class SamsadExporter {
 
                     Word newWord = WordLogic.copyToNewWordObject(word);
 
-                    newWord.setWordSpelling(spelling.trim());
+                    newWord.setspelling(spelling.trim());
 
                     newWords.add(newWord);
                 }
 
                 if(newWords.size() > 5) {
-                    log.info("More than 8 variations:" + wordSpelling);
+                    log.info("More than 8 variations:" + spelling);
                     log.info("More than 8 variations word:" + word);
                 }
 
             } else {
 
-                log.info("What the hell spelling in comma filter!: " + wordSpelling);
+                log.info("What the hell spelling in comma filter!: " + spelling);
             }
 
             words.addAll(newWords);
@@ -418,23 +412,23 @@ public class SamsadExporter {
 
         for (Word word : dashWordMap.values()) {
 
-            String wordSpelling = word.getWordSpelling();
+            String spelling = word.getspelling();
 
-            if (wordSpelling.contains("-")) {
+            if (spelling.contains("-")) {
 
-                String newSpelling = new String(wordSpelling);
+                String newSpelling = new String(spelling);
 
                 newSpelling = newSpelling.replaceAll("-", "");
 
                 if (print < 40)
-                    log.info("Spelling before:" + wordSpelling);
+                    log.info("Spelling before:" + spelling);
                 if (print < 40) {
                     log.info("spellings after: " + newSpelling);
                     print++;
                 }
 
                 Word newWord = WordLogic.copyToNewWordObject(word);
-                newWord.setWordSpelling(newSpelling);
+                newWord.setspelling(newSpelling);
 
                 words.add(word);
                 words.add(newWord);

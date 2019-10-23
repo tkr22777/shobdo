@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class DictUtil {
 
-    private static final LogPrint log = new LogPrint(DictUtil.class);
+    private static final ShobdoLogger log = new ShobdoLogger(DictUtil.class);
 
     /* package private */ static int randomIntInRange(final int lowest, final int highest) {
         return new Random().nextInt(highest - lowest + 1) + lowest;
@@ -29,18 +29,18 @@ public class DictUtil {
         return (Word) JsonUtil.documentToObject(dictionaryDocument, class_type);
     }
 
-    public static Set<Meaning> generateRandomMeaning(final String wordSpelling, final int numberOfMeanings){
+    public static Set<Meaning> generateRandomMeaning(final String spelling, final int numberOfMeanings){
         final Set<Meaning> meanings = new HashSet<>();
         for (int i = 0 ; i < numberOfMeanings ; i++) {
-            Meaning meaning = generateARandomMeaning(wordSpelling);
+            Meaning meaning = generateARandomMeaning(spelling);
             meanings.add(meaning);
         }
         return meanings;
     }
 
-    private static Meaning generateARandomMeaning(final String wordSpelling) {
+    private static Meaning generateARandomMeaning(final String spelling) {
         final String meaningString =  BanglaUtil.generateRandomSentence(3);
-        final String exampleSentence =  BanglaUtil.generateSentenceWithWord(wordSpelling);
+        final String exampleSentence =  BanglaUtil.generateSentenceWithWord(spelling);
         return Meaning.builder()
             .meaning(meaningString)
             .exampleSentence(exampleSentence)
@@ -59,15 +59,15 @@ public class DictUtil {
     private static Word generateARandomWord() {
         final int wordLength = randomIntInRange(2, 9);
         return Word.builder()
-            .wordSpelling(BanglaUtil.generateRandomWordString(wordLength))
+            .spelling(BanglaUtil.generateRandomWordString(wordLength))
             .build();
     }
 
     public static Word generateARandomWord(final String partsOfSpeech ) {
         int wordLength = randomIntInRange(2, 9);
-        final String wordSpelling = BanglaUtil.generateRandomWordString(wordLength);
+        final String spelling = BanglaUtil.generateRandomWordString(wordLength);
 
-        final HashMap<String,Meaning> meaningsMap = new HashMap<>();
+        final HashMap<String,Meaning> meanings = new HashMap<>();
         int numberOfMeaningForPOS = randomIntInRange(1,3);
 
         for(int j = 0; j < numberOfMeaningForPOS ; j++) {
@@ -76,11 +76,11 @@ public class DictUtil {
             String exampleSentence = BanglaUtil.generateSentenceWithWord(meaningString);
             int strength = randomIntInRange(0 , 10);
             //Meaning meaning = new Meaning(partOfSpeech, meaningString, exampleSentence, strength);
-            //meaningsMap.put(meaning.getId(), meaning);
+            //meanings.put(meaning.getId(), meaning);
         }
 
         return Word.builder()
-            .wordSpelling(wordSpelling)
+            .spelling(spelling)
             .build();
     }
 
