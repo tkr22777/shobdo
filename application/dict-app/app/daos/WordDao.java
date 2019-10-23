@@ -26,13 +26,4 @@ public interface WordDao {
      void deleteAll();
 
      ArrayList<Word> list(String startWordId, int limit);
-
-     //TODO create separate request dao
-     UserRequest createUserRequest(UserRequest request);
-
-     UserRequest getUserRequest(String requestId);
-
-     UserRequest updateUserRequest(UserRequest request);
-
-     void deleteUserRequest(String requestId);
 }

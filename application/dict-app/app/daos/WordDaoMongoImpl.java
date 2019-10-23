@@ -24,11 +24,7 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    private static final String DB_NAME = "Dictionary";
     private static final String COLLECTION_NAME = "Words";
-
-    private static final String ID_PARAM = "id";
-    private static final String STATUS_PARAM = "status";
 
     private final MongoCollection<Document> wordCollection;
     private static final ShobdoLogger log = new ShobdoLogger(WordDaoMongoImpl.class);
@@ -38,7 +34,7 @@ public class WordDaoMongoImpl implements WordDao {
         final int MONGODB_PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodbport"));
         log.info("@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]");
         wordCollection = new MongoClient(MONGODB_HOSTNAME, MONGODB_PORT)
-            .getDatabase(DB_NAME)
+            .getDatabase(MongoImplUtil.DB_NAME)
             .getCollection(COLLECTION_NAME);
     }
 
@@ -52,29 +48,26 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Word getById(final String wordId) {
-        final BasicDBObject query = new BasicDBObject();
-        query.put(ID_PARAM, wordId);
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
+        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
+        query.put(MongoImplUtil.ID_PARAM, wordId);
         final Document wordDoc = wordCollection.find(query).first();
         log.info("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: DictUtil.getWordFromDocument(wordDoc, Word.class);
+        return wordDoc == null ? null: MongoImplUtil.getWordFromDocument(wordDoc, Word.class);
     }
 
     @Override
     public Word getBySpelling(final String spelling) {
-        final BasicDBObject query = new BasicDBObject();
+        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
         query.put(Constants.SPELLING_KEY, spelling);
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
         final Document wordDoc = wordCollection.find(query).first();
         log.info("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: DictUtil.getWordFromDocument(wordDoc, Word.class);
+        return wordDoc == null ? null: MongoImplUtil.getWordFromDocument(wordDoc, Word.class);
     }
 
     @Override
     public Word update(final Word word) {
-        final BasicDBObject query = new BasicDBObject();
-        query.put(ID_PARAM, word.getId());
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
+        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
+        query.put(MongoImplUtil.ID_PARAM, word.getId());
         final Document wordDocument = JsonUtil.objectToDocument(word);
         wordCollection.replaceOne(query, wordDocument);
         return word;
@@ -87,9 +80,8 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
-        final BasicDBObject query = new BasicDBObject();
+        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
         query.put(Constants.SPELLING_KEY, Pattern.compile("^" + spellingQuery + ".*"));
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
 
         final MongoCursor<Document> words = wordCollection.find(query)
             .projection(Projections.include(Constants.SPELLING_KEY))
@@ -120,39 +112,4 @@ public class WordDaoMongoImpl implements WordDao {
         return new ArrayList<>();
     }
 
-    /* Consider moving them to request dao with requests collection */
-    @Override
-    public UserRequest createUserRequest(final UserRequest request) {
-        final Document requestDoc = JsonUtil.objectToDocument(request);
-        wordCollection.insertOne(requestDoc);
-        log.info("@WDMI002 createUserRequest Saving request to database: " + request.getId());
-        return request;
-    }
-
-    @Override
-    public UserRequest getUserRequest(final String requestId) {
-        final BasicDBObject query = new BasicDBObject();
-        query.put(ID_PARAM, requestId);
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
-
-        final Document requestDoc = wordCollection.find(query).first();
-        log.info("@WDMI003 getById id: " + requestId + " mongoDoc:" + requestDoc);
-        return requestDoc == null ?  null: DictUtil.getUserRequestFromDocument(requestDoc, UserRequest.class);
-    }
-
-    @Override
-    public UserRequest updateUserRequest(final UserRequest request) {
-        final BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put(ID_PARAM, request.getId());
-        searchQuery.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
-
-        final Document requestDoc = JsonUtil.objectToDocument(request);
-        wordCollection.replaceOne(searchQuery, requestDoc);
-        return request;
-    }
-
-    @Override
-    public void deleteUserRequest(final String requestId) {
-        //so delete via update/setting the deleted timestamp, status deleted
-    }
 }

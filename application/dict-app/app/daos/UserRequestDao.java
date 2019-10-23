@@ -3,7 +3,7 @@ package daos;
 import objects.UserRequest;
 import java.util.ArrayList;
 
-public interface RequestDao {
+public interface UserRequestDao {
 
      UserRequest create(UserRequest request);
 

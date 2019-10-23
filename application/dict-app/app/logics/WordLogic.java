@@ -1,6 +1,8 @@
 package logics;
 
 import com.google.common.base.Preconditions;
+import daos.UserRequestDao;
+import daos.UserRequestDaoMongoImpl;
 import exceptions.EntityDoesNotExist;
 import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,17 +22,21 @@ import java.util.*;
 public class WordLogic {
 
     private final WordDao wordDao;
+    private final UserRequestDao userRequestDao;
     private final WordCache wordCache;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
     public static WordLogic createMongoBackedWordLogic() {
-        return new WordLogic(new WordDaoMongoImpl(), new WordCache());
+        return new WordLogic(new WordDaoMongoImpl(), new WordCache(), new UserRequestDaoMongoImpl());
     }
 
-    public WordLogic(final WordDao wordDao, final WordCache wordCache) {
+    public WordLogic(final WordDao wordDao,
+                     final WordCache wordCache,
+                     final UserRequestDao userRequestDao) {
         this.wordDao = wordDao;
         this.wordCache = wordCache;
+        this.userRequestDao = userRequestDao;
     }
 
     private String generateWordId() {
@@ -95,7 +101,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(createWord))
             .build();
 
-        return wordDao.createUserRequest(createRequest).getId();
+        return userRequestDao.create(createRequest).getId();
     }
 
     //Todo add toAPIJsonNode to the word object
@@ -192,7 +198,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(updateWord))
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     /* Delete Word */
@@ -215,14 +221,14 @@ public class WordLogic {
             .operation(RequestOperation.DELETE)
             .build();
 
-        return wordDao.createUserRequest(deleteRequest).getId();
+        return userRequestDao.create(deleteRequest).getId();
     }
 
     private UserRequest getRequest(@NotNull final String requestId) {
         if (requestId == null || requestId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + requestId);
         }
-        return wordDao.getUserRequest(requestId);
+        return userRequestDao.get(requestId);
     }
 
     //todo make transactional
@@ -276,7 +282,7 @@ public class WordLogic {
         request.setDeleterId(approverId);
         final String deletionDateString = (new DateTime(DateTimeZone.UTC)).toString();
         request.setDeletedDate(deletionDateString);
-        wordDao.updateUserRequest(request);
+        userRequestDao.update(request);
     }
 
     /* LIST words todo */
@@ -384,7 +390,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(meaning))
             .build();
 
-        return wordDao.createUserRequest(createRequest).getId();
+        return userRequestDao.create(createRequest).getId();
     }
 
     /* GET meaning */
@@ -447,7 +453,7 @@ public class WordLogic {
             .requestBody(JsonUtil.objectToJNode(updateMeaning))
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     /* DELETE meaning */
@@ -477,7 +483,7 @@ public class WordLogic {
             .operation(RequestOperation.DELETE)
             .build();
 
-        return wordDao.createUserRequest(updateRequest).getId();
+        return userRequestDao.create(updateRequest).getId();
     }
 
     private void updateWordWithCache(final Word updatedWord) {
