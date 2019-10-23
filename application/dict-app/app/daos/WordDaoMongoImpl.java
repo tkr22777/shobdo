@@ -1,12 +1,10 @@
 package daos;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
-import com.typesafe.config.ConfigFactory;
 import objects.Constants;
 import objects.Word;
 import org.bson.Document;
@@ -22,23 +20,16 @@ import java.util.regex.Pattern;
  */
 public class WordDaoMongoImpl implements WordDao {
 
-    private static final String COLLECTION_NAME = "Words";
-
     private final MongoCollection<Document> wordCollection;
     private static final ShobdoLogger log = new ShobdoLogger(WordDaoMongoImpl.class);
 
     public WordDaoMongoImpl() {
-        final String MONGODB_HOSTNAME = ConfigFactory.load().getString("shobdo.mongodbhostname");
-        final int MONGODB_PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodbport"));
-        log.info("@WDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]");
-        wordCollection = new MongoClient(MONGODB_HOSTNAME, MONGODB_PORT)
-            .getDatabase(MImplUtil.DB_NAME)
-            .getCollection(COLLECTION_NAME);
+        wordCollection = MongoManager.getWordCollection();
     }
 
     @Override
     public Word create(final Word word) {
-        final Document wordDoc = MImplUtil.toDocument(word);
+        final Document wordDoc = MongoManager.toDocument(word);
         wordCollection.insertOne(wordDoc);
         log.info("Creating word on database: " + word.getSpelling());
         return word;
@@ -46,27 +37,27 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Word getById(final String wordId) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
-        query.put(MImplUtil.ID_PARAM, wordId);
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
+        query.put(MongoManager.ID_PARAM, wordId);
         final Document wordDoc = wordCollection.find(query).first();
         log.info("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: MImplUtil.toWord(wordDoc);
+        return wordDoc == null ? null: MongoManager.toWord(wordDoc);
     }
 
     @Override
     public Word getBySpelling(final String spelling) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
         query.put(Constants.SPELLING_KEY, spelling);
         final Document wordDoc = wordCollection.find(query).first();
         log.info("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: MImplUtil.toWord(wordDoc);
+        return wordDoc == null ? null: MongoManager.toWord(wordDoc);
     }
 
     @Override
     public Word update(final Word word) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
-        query.put(MImplUtil.ID_PARAM, word.getId());
-        final Document wordDocument = MImplUtil.toDocument(word);
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
+        query.put(MongoManager.ID_PARAM, word.getId());
+        final Document wordDocument = MongoManager.toDocument(word);
         wordCollection.replaceOne(query, wordDocument);
         return word;
     }
@@ -78,7 +69,7 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
         query.put(Constants.SPELLING_KEY, Pattern.compile("^" + spellingQuery + ".*"));
 
         final MongoCursor<Document> words = wordCollection.find(query)

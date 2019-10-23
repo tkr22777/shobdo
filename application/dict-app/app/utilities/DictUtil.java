@@ -15,6 +15,9 @@ public class DictUtil {
 
     private static final ShobdoLogger log = new ShobdoLogger(DictUtil.class);
 
+    private DictUtil() {
+    }
+
     /* package private */ static int randomIntInRange(final int lowest, final int highest) {
         return new Random().nextInt(highest - lowest + 1) + lowest;
     }

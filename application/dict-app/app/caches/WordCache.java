@@ -15,12 +15,18 @@ public class WordCache {
     private static final int REDIS_EXPIRE_TIME_SECONDS= 60 * 60 * 6;
 
     private static final ShobdoLogger log = new ShobdoLogger(WordCache.class);
-    private final Jedis jedis;
+    private static Jedis jedis;
 
-    public WordCache() {
-        final String DEFAULT_REDIS_HOSTNAME = ConfigFactory.load().getString("shobdo.redishostname");
-        log.info("@WC001 Connect to redis [host:" +  DEFAULT_REDIS_HOSTNAME + "][port:6379]." );
-        jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
+    private WordCache() {
+    }
+
+    public static WordCache getCache() {
+        if (jedis == null) {
+            final String DEFAULT_REDIS_HOSTNAME = ConfigFactory.load().getString("shobdo.redis.hostname");
+            log.info("@WC001 Connect to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].");
+            jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
+        }
+        return new WordCache();
     }
 
     public Word getBySpelling(final String spelling) {

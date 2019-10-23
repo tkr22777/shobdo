@@ -46,8 +46,14 @@ public class ApplicationTest extends WithServer {
 
     @Test
     public void testConfig() {
-        Assert.assertEquals("SHOBDO.CONFIG", ConfigFactory.load().getString("shobdo.config"));
-        Assert.assertEquals("27017", ConfigFactory.load().getString("shobdo.mongodbport"));
+        Assert.assertEquals("27017",
+            ConfigFactory.load().getString("shobdo.mongodb.port"));
+        Assert.assertEquals("Dictionary",
+            ConfigFactory.load().getString("shobdo.mongodb.database.dbname"));
+        Assert.assertEquals("Words",
+            ConfigFactory.load().getString("shobdo.mongodb.database.collection.words"));
+        Assert.assertEquals("UserRequests",
+            ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests"));
     }
 
     @Test @Ignore //Ignore because it is not a functionality test

@@ -28,7 +28,7 @@ public class WordLogic {
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
     public static WordLogic createMongoBackedWordLogic() {
-        return new WordLogic(new WordDaoMongoImpl(), new WordCache(), new UserRequestDaoMongoImpl());
+        return new WordLogic(new WordDaoMongoImpl(), WordCache.getCache(), new UserRequestDaoMongoImpl());
     }
 
     public WordLogic(final WordDao wordDao,

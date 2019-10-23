@@ -12,24 +12,16 @@ import java.util.ArrayList;
 
 public class UserRequestDaoMongoImpl implements UserRequestDao {
 
-    private static final String DB_NAME = "Dictionary";
-    private static final String COLLECTION_NAME = "Words";
-
     private static final ShobdoLogger log = new ShobdoLogger(WordDaoMongoImpl.class);
     private final MongoCollection<Document> userRequestCollection;
 
     public UserRequestDaoMongoImpl() {
-        final String MONGODB_HOSTNAME = ConfigFactory.load().getString("shobdo.mongodbhostname");
-        final int MONGODB_PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodbport"));
-        log.info("@RDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]");
-        userRequestCollection = new MongoClient(MONGODB_HOSTNAME, MONGODB_PORT)
-            .getDatabase(DB_NAME)
-            .getCollection(COLLECTION_NAME);
+        userRequestCollection = MongoManager.getUserRequestsCollection();
     }
 
     @Override
     public UserRequest create(final UserRequest request) {
-        final Document requestDoc = MImplUtil.toDocument(request);
+        final Document requestDoc = MongoManager.toDocument(request);
         userRequestCollection.insertOne(requestDoc);
         log.info("@WDMI002 createUserRequest Saving request to database: " + request.getId());
         return request;
@@ -37,20 +29,20 @@ public class UserRequestDaoMongoImpl implements UserRequestDao {
 
     @Override
     public UserRequest get(String id) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
-        query.put(MImplUtil.ID_PARAM, id);
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
+        query.put(MongoManager.ID_PARAM, id);
 
         final Document requestDoc = userRequestCollection.find(query).first();
         log.info("@WDMI003 getById id: " + id + " mongoDoc:" + requestDoc);
-        return requestDoc == null ?  null: MImplUtil.toUserRequest(requestDoc);
+        return requestDoc == null ?  null: MongoManager.toUserRequest(requestDoc);
     }
 
     @Override
     public UserRequest update(UserRequest request) {
-        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
-        query.put(MImplUtil.ID_PARAM, request.getId());
+        final BasicDBObject query = MongoManager.getActiveObjectQuery();
+        query.put(MongoManager.ID_PARAM, request.getId());
 
-        final Document requestDoc = MImplUtil.toDocument(request);
+        final Document requestDoc = MongoManager.toDocument(request);
         userRequestCollection.replaceOne(query, requestDoc);
         return request;
     }

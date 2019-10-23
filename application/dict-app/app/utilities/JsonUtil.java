@@ -13,6 +13,9 @@ public class JsonUtil {
     private final static ObjectMapper objectMapper = new ObjectMapper()
         .configure(MapperFeature.USE_ANNOTATIONS, false);
 
+    private JsonUtil() {
+    }
+
     public static Object jStringToObject(String jsonString, Class<?> class_type ) {
         try {
             return objectMapper.readValue(jsonString, class_type);
