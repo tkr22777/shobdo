@@ -52,10 +52,6 @@ public class Word extends EntityMeta {
 
     @Override
     public String toString() {
-        try {
-            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-        } catch (JsonProcessingException jpe) {
-            return "ERROR 101";
-        }
+        return JsonUtil.objectToJString(this);
     }
 }

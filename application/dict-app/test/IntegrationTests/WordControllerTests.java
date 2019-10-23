@@ -15,7 +15,6 @@ import utilities.DictUtil;
 import utilities.JsonUtil;
 import utilities.ShobdoLogger;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,7 +110,7 @@ public class WordControllerTests extends WithApplication {
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.Messages.spellingExists(existingSpelling), contentAsString(result));
+            Assert.assertEquals(Constants.Messages.SpellingExists(existingSpelling), contentAsString(result));
         });
     }
 

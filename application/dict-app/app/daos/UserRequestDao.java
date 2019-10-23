@@ -13,7 +13,7 @@ public interface UserRequestDao {
 
      void delete(String requestId);
 
-     long totalCount();
+     long count();
 
      ArrayList<UserRequest> list(String startId, int limit);
 }

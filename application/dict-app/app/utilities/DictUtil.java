@@ -19,8 +19,6 @@ public class DictUtil {
         return new Random().nextInt(highest - lowest + 1) + lowest;
     }
 
-
-
     public static Set<Meaning> generateRandomMeaning(final String spelling, final int numberOfMeanings){
         final Set<Meaning> meanings = new HashSet<>();
         for (int i = 0 ; i < numberOfMeanings ; i++) {
@@ -62,7 +60,7 @@ public class DictUtil {
         final HashMap<String,Meaning> meanings = new HashMap<>();
         int numberOfMeaningForPOS = randomIntInRange(1,3);
 
-        for(int j = 0; j < numberOfMeaningForPOS ; j++) {
+        for (int j = 0; j < numberOfMeaningForPOS ; j++) {
             wordLength = randomIntInRange(2, 9);
             String meaningString = BanglaUtil.generateRandomWordString(wordLength);
             String exampleSentence = BanglaUtil.generateSentenceWithWord(meaningString);
@@ -78,8 +76,9 @@ public class DictUtil {
 
     public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {
 
-        if (strings == null)
+        if (strings == null) {
             return;
+        }
 
         List<?> toPrint = strings;
 
@@ -88,7 +87,7 @@ public class DictUtil {
             Collections.shuffle(toPrint);
         }
 
-        for(int i = start ; i < toPrint.size() && i <  start + limit ; i++) {
+        for (int i = start ; i < toPrint.size() && i <  start + limit ; i++) {
             log.info("#" + i + " " + tag + ": '"+ toPrint.get(i).toString() + "'");
         }
     }

@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.bson.Document;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 
 public class JsonUtil {
@@ -51,15 +49,6 @@ public class JsonUtil {
         }
     }
 
-    public static ByteBuffer jNodeToByteBuffer(JsonNode jsonNode) {
-        try {
-            return ByteBuffer.wrap(objectMapper.writeValueAsBytes(jsonNode));
-        } catch (Exception ex) {
-            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to ByteBuffer . Exception:" + ex.getStackTrace().toString());
-            throw new IllegalArgumentException("Invalid JsonNode:" + jsonNode);
-        }
-    }
-
     public static Object jNodeToObject(JsonNode jsonNode, Class<?> class_type) {
         try {
             return objectMapper.treeToValue(jsonNode, class_type);
@@ -70,32 +59,11 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode removeFieldsFromJNode(JsonNode node, Collection<String> attributes) {
-        ObjectNode objectNode = node.deepCopy();
-        for (String attribute: attributes) {
-            objectNode.remove(attribute);
-        }
-        return jStringToJNode(objectNode.toString());
-    }
-
     public static JsonNode nullFieldsOnJNode(JsonNode node, Collection<String> attributes) {
         ObjectNode objectNode = node.deepCopy();
         for (String attribute: attributes) {
             objectNode.putNull(attribute);
         }
         return jStringToJNode(objectNode.toString());
-    }
-
-    public static Object documentToObject(Document doc, Class<?> class_type) {
-        return jStringToObject(doc.toJson(), class_type);
-    }
-
-    public static Document objectToDocument(Object object) {
-        try {
-            return Document.parse(objectMapper.writeValueAsString(object) );
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("objectToDocument error. Object["
-                    + object.toString() + "][Ex:" + ex.getStackTrace().toString());
-        }
     }
 }

@@ -13,11 +13,6 @@ public final class Constants {
     public static final String MEANING_ID_PREFIX = "MNG";
     public static final String REQUEST_ID_PREFIX = "REQ";
 
-    //Meta constant keys
-    public static final String MEANING_STRING = "MEANING STRING";
-    public static final String ORIGINAL_STRING = "ORIGINAL STRING";
-    public static final String ENG_PRONUN_STRING = "ENG PRONUNCIATION";
-
     //REST REQUEST FIELD NAMES
     public static final String SPELLING_KEY = "spelling";
     public static final String SEARCH_STRING_KEY = "searchString";
@@ -39,7 +34,7 @@ public final class Constants {
             return String.format("User provided id is not permissible for create:%s", id);
         }
 
-        public static String spellingExists(final String spelling) {
+        public static String SpellingExists(final String spelling) {
             return String.format("Word with the spelling: %s already exist", spelling);
         }
 

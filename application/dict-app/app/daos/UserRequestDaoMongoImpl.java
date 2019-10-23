@@ -4,10 +4,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.typesafe.config.ConfigFactory;
-import objects.EntityStatus;
 import objects.UserRequest;
 import org.bson.Document;
-import utilities.JsonUtil;
 import utilities.ShobdoLogger;
 
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ public class UserRequestDaoMongoImpl implements UserRequestDao {
 
     @Override
     public UserRequest create(final UserRequest request) {
-        final Document requestDoc = JsonUtil.objectToDocument(request);
+        final Document requestDoc = MImplUtil.toDocument(request);
         userRequestCollection.insertOne(requestDoc);
         log.info("@WDMI002 createUserRequest Saving request to database: " + request.getId());
         return request;
@@ -39,20 +37,20 @@ public class UserRequestDaoMongoImpl implements UserRequestDao {
 
     @Override
     public UserRequest get(String id) {
-        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
-        query.put(MongoImplUtil.ID_PARAM, id);
+        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
+        query.put(MImplUtil.ID_PARAM, id);
 
         final Document requestDoc = userRequestCollection.find(query).first();
         log.info("@WDMI003 getById id: " + id + " mongoDoc:" + requestDoc);
-        return requestDoc == null ?  null: MongoImplUtil.getUserRequestFromDocument(requestDoc, UserRequest.class);
+        return requestDoc == null ?  null: MImplUtil.toUserRequest(requestDoc);
     }
 
     @Override
     public UserRequest update(UserRequest request) {
-        final BasicDBObject query = MongoImplUtil.getActiveObjectQuery();
-        query.put(MongoImplUtil.ID_PARAM, request.getId());
+        final BasicDBObject query = MImplUtil.getActiveObjectQuery();
+        query.put(MImplUtil.ID_PARAM, request.getId());
 
-        final Document requestDoc = JsonUtil.objectToDocument(request);
+        final Document requestDoc = MImplUtil.toDocument(request);
         userRequestCollection.replaceOne(query, requestDoc);
         return request;
     }
@@ -63,7 +61,7 @@ public class UserRequestDaoMongoImpl implements UserRequestDao {
     }
 
     @Override
-    public long totalCount() {
+    public long count() {
         return 0;
     }
 

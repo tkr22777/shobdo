@@ -22,8 +22,8 @@ import java.util.*;
 public class WordLogic {
 
     private final WordDao wordDao;
-    private final UserRequestDao userRequestDao;
     private final WordCache wordCache;
+    private final UserRequestDao userRequestDao;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
@@ -64,7 +64,7 @@ public class WordLogic {
 
         final Word existingWord = wordDao.getBySpelling(word.getSpelling());
         if (existingWord != null) {
-            throw new IllegalArgumentException(Constants.Messages.spellingExists(word.getSpelling()));
+            throw new IllegalArgumentException(Constants.Messages.SpellingExists(word.getSpelling()));
         }
 
         //word creation does not accept meanings
@@ -319,7 +319,7 @@ public class WordLogic {
     }
 
     public long totalWordCount(){
-        return wordDao.totalCount();
+        return wordDao.count();
     }
 
     public void deleteAllWords(){
