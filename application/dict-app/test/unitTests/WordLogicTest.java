@@ -25,7 +25,6 @@ public class WordLogicTest {
 
     private WordDao mockWordDao;
     private WordCache mockWordCache;
-    private UserRequestDao mockUserRequestDao;
 
     private WordLogic wordLogic;
 
@@ -41,7 +40,7 @@ public class WordLogicTest {
     private void setupMocks() {
         mockWordDao = mock(WordDao.class);
         mockWordCache = mock(WordCache.class);
-        wordLogic = new WordLogic(mockWordDao, mockWordCache, mockUserRequestDao);
+        wordLogic = new WordLogic(mockWordDao, mockWordCache);
     }
 
     private void setupObjects() {

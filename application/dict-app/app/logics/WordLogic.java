@@ -1,16 +1,12 @@
 package logics;
 
 import com.google.common.base.Preconditions;
-import daos.UserRequestDao;
-import daos.UserRequestDaoMongoImpl;
 import exceptions.EntityDoesNotExist;
 import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import daos.WordDaoMongoImpl;
 import daos.WordDao;
 import objects.*;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import utilities.*;
 
 import javax.validation.constraints.NotNull;
@@ -23,20 +19,17 @@ public class WordLogic {
 
     private final WordDao wordDao;
     private final WordCache wordCache;
-    private final UserRequestDao userRequestDao;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
     public static WordLogic createMongoBackedWordLogic() {
-        return new WordLogic(new WordDaoMongoImpl(), WordCache.getCache(), new UserRequestDaoMongoImpl());
+        return new WordLogic(new WordDaoMongoImpl(), WordCache.getCache());
     }
 
     public WordLogic(final WordDao wordDao,
-                     final WordCache wordCache,
-                     final UserRequestDao userRequestDao) {
+                     final WordCache wordCache) {
         this.wordDao = wordDao;
         this.wordCache = wordCache;
-        this.userRequestDao = userRequestDao;
     }
 
     private String generateWordId() {
@@ -47,12 +40,8 @@ public class WordLogic {
         return String.format("%s-%s", Constants.MEANING_ID_PREFIX, UUID.randomUUID());
     }
 
-    private String generateUserRequestId() {
-        return String.format("%s-%s", Constants.REQUEST_ID_PREFIX, UUID.randomUUID());
-    }
-
     /* Create */
-    private void validateCreateWordObject(final Word word) {
+    public void validateCreateWordObject(final Word word) {
         if (word.getId() != null) {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(word.getId()));
         }
@@ -85,23 +74,6 @@ public class WordLogic {
         wordDao.create(word);
         wordCache.cacheWord(word);
         return word;
-    }
-
-    //The following creates a word update request and returns the id
-    public String createUserRequestForWordCreation(final JsonNode wordJNode) {
-
-        final Word createWord = (Word) JsonUtil.jNodeToObject(wordJNode, Word.class);
-        validateCreateWordObject(createWord);
-
-        final UserRequest createRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(new HashMap<>())
-            .targetType(TargetType.WORD)
-            .operation(RequestOperation.CREATE)
-            .requestBody(JsonUtil.objectToJNode(createWord))
-            .build();
-
-        return userRequestDao.create(createRequest).getId();
     }
 
     //Todo add toAPIJsonNode to the word object
@@ -138,7 +110,7 @@ public class WordLogic {
     }
 
     /* Update */
-    private void validateUpdateWordObject(final Word updateWord) {
+    public void validateUpdateWordObject(final Word updateWord) {
         if (updateWord.getId() == null || updateWord.getId().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
         }
@@ -180,109 +152,12 @@ public class WordLogic {
         return updatedWord;
     }
 
-    //The following creates a word update request and returns the id
-    private String createUserRequestForWordUpdate(final String wordId, final JsonNode wordJsonNode) {
-
-        final Word updateWord = (Word) JsonUtil.jNodeToObject(wordJsonNode, Word.class);
-        updateWord.setId(wordId);
-        validateUpdateWordObject(updateWord);
-
-        final Map<TargetType, String> targetInfo = new HashMap<>();
-        targetInfo.put(TargetType.WORD, updateWord.getId());
-
-        final UserRequest updateRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(targetInfo)
-            .targetType(TargetType.WORD)
-            .operation(RequestOperation.UPDATE)
-            .requestBody(JsonUtil.objectToJNode(updateWord))
-            .build();
-
-        return userRequestDao.create(updateRequest).getId();
-    }
-
     /* Delete Word */
     public void deleteWord(final String wordId) {
         final Word word = getWordById(wordId);
         word.setStatus(EntityStatus.DELETED);
         wordDao.update(word);
         wordCache.invalidateWord(word);
-    }
-
-    private String createUserRequestForWordDeletion(final String wordId) {
-
-        final Map<TargetType, String> targetInfo = new HashMap<>();
-        targetInfo.put(TargetType.WORD, wordId);
-
-        final UserRequest deleteRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(targetInfo)
-            .targetType(TargetType.WORD)
-            .operation(RequestOperation.DELETE)
-            .build();
-
-        return userRequestDao.create(deleteRequest).getId();
-    }
-
-    private UserRequest getRequest(@NotNull final String requestId) {
-        if (requestId == null || requestId.trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + requestId);
-        }
-        return userRequestDao.get(requestId);
-    }
-
-    //todo make transactional
-    //approveUserRequest applies the requested changes to a word
-    public boolean approveUserRequest(final String requestId) {
-
-        final UserRequest request  = getRequest(requestId);
-        final String wordId;
-        switch (request.getTargetType()) {
-            case WORD:
-                switch (request.getOperation()) {
-                    case CREATE:
-                        createWord(request.getRequestBody());
-                        break;
-                    case UPDATE:
-                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
-                        updateWord(wordId, request.getRequestBody());
-                        break;
-                    case DELETE:
-                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
-                        deleteWord(wordId);
-                        break;
-                }
-                break;
-            case MEANING:
-                final String meaningId;
-                switch (request.getOperation()) {
-                    case CREATE:
-                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
-                        createMeaning(wordId, request.getRequestBody());
-                        break;
-                    case UPDATE:
-                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
-                        meaningId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.MEANING));
-                        updateMeaning(wordId, meaningId, request.getRequestBody());
-                        break;
-                    case DELETE:
-                        wordId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.WORD));
-                        meaningId = Preconditions.checkNotNull(request.getTargetInfo().get(TargetType.MEANING));
-                        deleteMeaning(wordId, meaningId);
-                        break;
-                }
-                break;
-        }
-        saveRequestAsMerged("deleterId", request);
-        return true;
-    }
-
-    private void saveRequestAsMerged(final String approverId, final UserRequest request) {
-        request.setStatus(EntityStatus.DELETED);
-        request.setDeleterId(approverId);
-        final String deletionDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        request.setDeletedDate(deletionDateString);
-        userRequestDao.update(request);
     }
 
     /* LIST words todo */
@@ -339,7 +214,7 @@ public class WordLogic {
      */
 
     /* CREATE meaning */
-    private void validateCreateMeaningObject(final String wordId, final Meaning meaning) {
+    public void validateCreateMeaningObject(final String wordId, final Meaning meaning) {
         if (meaning.getId() != null) {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(meaning.getId()));
         }
@@ -372,27 +247,6 @@ public class WordLogic {
         return meaning;
     }
 
-    //The following creates a word update request and returns the id
-    public String createUserRequestForMeaningCreation(final String wordId, final JsonNode meaningJNode) {
-
-        final Meaning meaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
-
-        validateCreateMeaningObject(wordId, meaning);
-
-        final Map<TargetType, String> targetInfo = new HashMap<>();
-        targetInfo.put(TargetType.WORD, wordId);
-
-        final UserRequest createRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(targetInfo)
-            .targetType(TargetType.MEANING)
-            .operation(RequestOperation.CREATE)
-            .requestBody(JsonUtil.objectToJNode(meaning))
-            .build();
-
-        return userRequestDao.create(createRequest).getId();
-    }
-
     /* GET meaning */
     public Meaning getMeaning(final String wordId, final String meaningId) {
         final Word word = getWordById(wordId);
@@ -404,7 +258,7 @@ public class WordLogic {
     }
 
     /* UPDATE meaning todo implement using WORD's interfaces */
-    private void validateUpdateMeaningObject(final String wordId, final Meaning meaning) {
+    public void validateUpdateMeaningObject(final String wordId, final Meaning meaning) {
         if (meaning.getId() == null) {
             throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
         }
@@ -435,26 +289,6 @@ public class WordLogic {
         return meaning;
     }
 
-    //The following creates a word update request and returns the id
-    private String createUserRequestForMeaningUpdate(final String wordId, final JsonNode meaningJNode) {
-
-        final Meaning updateMeaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
-        validateUpdateMeaningObject(wordId, updateMeaning);
-
-        final Map<TargetType, String> targetInfo = new HashMap<>();
-        targetInfo.put(TargetType.WORD, wordId);
-        targetInfo.put(TargetType.MEANING, updateMeaning.getId());
-
-        final UserRequest updateRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(targetInfo)
-            .targetType(TargetType.MEANING)
-            .operation(RequestOperation.UPDATE)
-            .requestBody(JsonUtil.objectToJNode(updateMeaning))
-            .build();
-
-        return userRequestDao.create(updateRequest).getId();
-    }
 
     /* DELETE meaning */
     public void deleteMeaning(final String wordId, final String meaningId) {
@@ -467,23 +301,6 @@ public class WordLogic {
             word.getMeanings().remove(meaningId);
             updateWordWithCache(word);
         }
-    }
-
-    //The following creates a word update request and returns the id
-    private String createUserRequestForMeaningUpdate(final String wordId, final String meangingId) {
-
-        final Map<TargetType, String> targetInfo = new HashMap<>();
-        targetInfo.put(TargetType.WORD, wordId);
-        targetInfo.put(TargetType.MEANING, meangingId);
-
-        final UserRequest updateRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetInfo(targetInfo)
-            .targetType(TargetType.MEANING)
-            .operation(RequestOperation.DELETE)
-            .build();
-
-        return userRequestDao.create(updateRequest).getId();
     }
 
     private void updateWordWithCache(final Word updatedWord) {
