@@ -29,7 +29,7 @@ PUT     /api/v1/words/:id                                controllers.WordControl
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)
 
 # 7. List words
-GET     /api/v1/words/list                               controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
+GET     /api/v1/words                                    controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
 # 8. Search words by spelling:
 #    requestBody contains "searchString"
@@ -52,7 +52,7 @@ PUT     /api/v1/words/:wordId/meanings/:meaningId        controllers.WordControl
 DELETE  /api/v1/words/:wordId/meanings/:meaningId        controllers.WordController.deleteMeaning(wordId: String, meaningId: String)
 
 # 5. List meanings of a word
-GET     /api/v1/words/:wordId/meanings/list              controllers.WordController.listMeanings(wordId: String)
+GET     /api/v1/words/:wordId/meanings                   controllers.WordController.listMeanings(wordId: String)
 
 ##############
 # Admin stuff:
