@@ -32,15 +32,29 @@ public class WordLogic {
         this.wordCache = wordCache;
     }
 
-    private String generateWordId() {
-        return String.format("%s-%s", Constants.WORD_ID_PREFIX, UUID.randomUUID());
+
+    public String generateWordIdCheckDB() {
+        int numberOfTries = 10;
+        for (int i = 0; i < numberOfTries; i++) {
+            String wordId = DictUtil.generateWordId();
+            if (wordDao.getById(wordId) == null) {
+                return wordId;
+            }
+        }
+        throw new RuntimeException(String.format("Exhausted %s tries creating wordId", numberOfTries));
     }
 
-    public String generateMeaningId() {
+    private String generateMeaningId() {
         return String.format("%s-%s", Constants.MEANING_ID_PREFIX, UUID.randomUUID());
     }
 
     /* Create */
+    /* Validation criteria:
+        1. No user provided Id
+        2. Spelling cannot be null or empty
+        3. Barred to create word with an existing spelling.
+        4. Cannot create word with meaning, user must add meaning later
+     */
     public void validateCreateWordObject(final Word word) {
         if (word.getId() != null) {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(word.getId()));
@@ -69,14 +83,12 @@ public class WordLogic {
 
     public Word createWord(final Word word) {
         validateCreateWordObject(word);
-
-        word.setId(generateWordId());
+        word.setId(generateWordIdCheckDB());
         wordDao.create(word);
         wordCache.cacheWord(word);
         return word;
     }
 
-    //Todo add toAPIJsonNode to the word object
     /* GET word by id */
     public Word getWordById(@NotNull final String wordId) {
         if (wordId == null || wordId.trim().length() == 0) {
@@ -134,7 +146,10 @@ public class WordLogic {
         return updateWord(word);
     }
 
-    /* package private */ Word updateWord(final Word word) {
+    /*
+      Spec: Word meanings cannot be updated using updateWord, stays as it is.
+     */
+    public Word updateWord(final Word word) {
         validateUpdateWordObject(word);
         final Word currentWord = getWordById(word.getId());
 

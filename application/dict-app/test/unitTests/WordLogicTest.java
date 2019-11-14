@@ -50,9 +50,15 @@ public class WordLogicTest {
     }
 
     //Create word
+    @Ignore @Test
+    //TODO
+    public void generateWordId_wordIdExists_throwsRuntimeException() {
+    }
+
     @Test
     public void createWord_wordIdIsNotSet_createWordDaoCalled() {
         when(mockWordDao.create(any())).thenReturn(theWord);
+        when(mockWordDao.getById(anyString())).thenReturn(null);
         wordLogic.createWord(theWord);
         verify(mockWordDao, times(1)).create(any(Word.class));
         verify(mockWordCache, times(1)).cacheWord(any(Word.class));

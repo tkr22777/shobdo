@@ -62,7 +62,7 @@ public class JsonUtil {
         }
     }
 
-    public static JsonNode nullFieldsOnJNode(JsonNode node, Collection<String> attributes) {
+    public static JsonNode nullFields(JsonNode node, Collection<String> attributes) {
         ObjectNode objectNode = node.deepCopy();
         for (String attribute: attributes) {
             objectNode.putNull(attribute);

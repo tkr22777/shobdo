@@ -1,20 +1,10 @@
 #!/usr/bin/python
-import sys, io, re
+import sys, re
 
-file_loc="../data/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt"
-dict_file = open(file_loc,"r")
-#TotalLines 23528
-#LINES_TO_TEST = 1000
-LINES_TO_TEST = 5
 DEBUG = False
 INFO = True
 TypeTable = {}
 i = 0
-
-def readline(dict_file):
-	line = dict_file.readline()
-	if DEBUG: sys.stdout.write("#" + str(i) + ":" +  line)
-	return line
 
 def getWordEndPos(line):
 	return line.index('[')
@@ -25,7 +15,7 @@ def getEngEndPos(line):
 def getWord(line):
 	WORD_END_POS = getWordEndPos(line)
 	if DEBUG:
-		print "Word end position:%d" % (WORD_END_POS)
+		print("Word end position:%d" % (WORD_END_POS))
 	word = line[:WORD_END_POS].strip()
 	return word
 	#return word.split(', ')
@@ -40,7 +30,7 @@ def getEng(line):
 def theRest(line):
 	ENG_END_POS = getEngEndPos(line)
 	the_rest = line[ENG_END_POS + 1:].strip()
-	if DEBUG: print "The Rest\t\t:'%s'" %(the_rest)
+	if DEBUG: print("The(Rest\t\t:'%s'" %(the_rest))
 	return the_rest
 
 def findType(a_definition):
@@ -49,7 +39,7 @@ def findType(a_definition):
 	try:
 		count = the_rest.index('. ') + 1;
 	except Exception:
-		if DEBUG: print "Found Error For DotSpace(. )"
+		if DEBUG: print("Found Error For DotSpace(. )")
 		count = len(the_rest)
 
 	substring = the_rest[:count]
@@ -72,14 +62,55 @@ string = 'Hey Jude<b>1</b> <b>T</b> <b>32</b>'
 def getDifferntDefinitions(definitions):
 	return regex_complied.split(definitions)
 
+
 def main():
+
 	j = 0
-	for i in range(0,LINES_TO_TEST):
 
-		line = readline(dict_file)
+	file_loc = "../data/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt"
+	file_loc = "/Users/tahsin/Dropbox/Work/shobdo/resources/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt"
 
-		print "Word #%d:" %(i)
+	dict_file = open(file_loc, "r")
 
+	LINES_TO_TEST = 22000
+
+	lines = []
+
+	for i in range(LINES_TO_TEST):
+		lines.append(dict_file.readline())
+
+	#lines.sort()
+
+	print(["*"] * 20)
+
+	line = lines[1]
+
+	charMap = {}
+
+	lineLen = {}
+
+	for line in lines:
+		lineRange = int(len(line) / 10)
+		if lineRange not in lineLen:
+			lineLen[lineRange] = [line]
+		else:
+			lineLen[lineRange].append(line)
+
+		for char in line:
+			if char not in charMap:
+				charMap[char] = 1
+			else:
+				charMap[char] = charMap[char] + 1
+
+	for key in lineLen:
+		if key == 90:
+			print(key)
+			lines = lineLen[key]
+			for line in lines:
+				print(line)
+
+	"""
+		print("Word #%d:" %(i) + " line:" + line)
 		the_rest = theRest(line)
 
 		if len(getDifferntDefinitions(the_rest)) < 2:
@@ -87,12 +118,13 @@ def main():
 			j = j + 1
 
 			word = getWord(line)
-			if INFO: print "Bangla Word\t\t#%d:\t'%s'" %(i,word)
+			if INFO: print("Bangla Word\t\t#%d:\t'%s'" %(i,word))
 
 			eng = getEng(line)
-			if INFO: print "English Pronunciation\t#%d:\t'%s'" %(i,eng)
+			if INFO: print("English Pronunciation\t#%d:\t'%s'" %(i,eng))
 
-			if INFO: print "Transaltion\t\t#%d:\t'%s'" %(i,the_rest)
+			if INFO: print("Transaltion\t\t#%d:\t'%s'" %(i,the_rest))
 			print
+	"""
 				
 if __name__ == "__main__": main()

@@ -5,6 +5,9 @@ import objects.Word;
 import redis.clients.jedis.Jedis;
 import utilities.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -72,7 +75,12 @@ public class WordCache {
             return null;
         }
         final String key = getKeyForSearchString(searchString);
-        final Set<String> spellings = jedis.smembers(key);
+        final String result = jedis.get(key);
+        if (result == null) {
+            return null;
+        }
+        final Set<String> spellings = (Set<String>) JsonUtil.jStringToObject(result, Set.class);
+
         if (spellings != null && spellings.size() > 0) {
             log.info("@WC005 Search result found and returning from cache. Count: " + spellings.size() + ".");
             return spellings;
@@ -87,11 +95,7 @@ public class WordCache {
             return;
         }
         final String key = getKeyForSearchString(searchString);
-        final String wordsString = String.join("-|-",
-            spellings.stream()
-                .map(w->toString()).collect(Collectors.toList())
-        );
-        jedis.set(key, wordsString);
+        jedis.set(key, JsonUtil.objectToJString(spellings));
         if (USE_REDIS_EXPIRATION_TIME) {
             jedis.expire(key, REDIS_EXPIRE_TIME_SECONDS);
         }
