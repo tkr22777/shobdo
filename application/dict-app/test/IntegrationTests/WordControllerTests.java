@@ -49,7 +49,7 @@ public class WordControllerTests extends WithApplication {
     }
 
     private void createMeaningsInDbForWord(String wordId, String spelling, int numberOfMeanings) {
-        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateRandomMeaning(spelling, numberOfMeanings));
+        List<Meaning> meaningList = new ArrayList<>(DictUtil.genMeaning(spelling, numberOfMeanings));
         meaningList = meaningList.stream()
             .map(meaning -> wordLogic.createMeaning(wordId, meaning))
             .collect(Collectors.toList());
@@ -83,12 +83,12 @@ public class WordControllerTests extends WithApplication {
             Assert.assertEquals(Helpers.CREATED, result.status());
 
             JsonNode createdJNode = JsonUtil.jStringToJNode(contentAsString(result));
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsOnJNode(createdJNode, Arrays.asList("id")));
+            Assert.assertEquals(bodyJson, JsonUtil.nullFields(createdJNode, Arrays.asList("id")));
 
             //Making sure the data persisted
             String wordId = createdJNode.get("id").toString().replaceAll("\"","");
             JsonNode wordFromDB = wordLogic.getWordById(wordId).toAPIJsonNode();
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsOnJNode(wordFromDB, Arrays.asList("id")));
+            Assert.assertEquals(bodyJson, JsonUtil.nullFields(wordFromDB, Arrays.asList("id")));
         });
     }
 
@@ -119,11 +119,10 @@ public class WordControllerTests extends WithApplication {
 
         Helpers.running(Helpers.fakeApplication(), () -> {
 
-            createWordsInDb(1);
-            String existingWordId = createdWords.get(0).getId();
+            String wordId = DictUtil.generateWordId();
 
             String jsonWordString = "{\n" +
-                "  \"id\" : \"" + existingWordId + "\",\n" +
+                "  \"id\" : \"" + wordId + "\",\n" +
                 "  \"spelling\" : \"ঞতটতথঙ\",\n" +
                 "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
@@ -133,7 +132,7 @@ public class WordControllerTests extends WithApplication {
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.Messages.UserProvidedIdForbidden(existingWordId), contentAsString(result));
+            Assert.assertEquals(Constants.Messages.UserProvidedIdForbidden(wordId), contentAsString(result));
         });
     }
 
@@ -192,7 +191,8 @@ public class WordControllerTests extends WithApplication {
             jsonObject.addProperty(Constants.SPELLING_KEY, createdWord.getSpelling());
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
 
-            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
+            Result result = Helpers.route(
+                Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
             Assert.assertEquals(OK, result.status());
             Assert.assertEquals(createdWord.toAPIJsonNode().toString(), contentAsString(result));
         });
@@ -206,7 +206,8 @@ public class WordControllerTests extends WithApplication {
             String jsonWordString = "{\"" + Constants.SPELLING_KEY + "\":\"NonExistentSpelling\"}";
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
 
-            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
+            Result result = Helpers.route(
+                Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.NOT_FOUND, result.status());
             Assert.assertEquals(Constants.Messages.EntityNotFound( "NonExistentSpelling"), contentAsString(result));
         });
@@ -220,7 +221,8 @@ public class WordControllerTests extends WithApplication {
             String jsonWordString = "{\"InvalidSearchKeyField\":\"NonExistentSpelling\"}";
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
 
-            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
+            Result result = Helpers.route(
+                Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
         });
     }
@@ -238,7 +240,9 @@ public class WordControllerTests extends WithApplication {
             updateRequestWord.setSpelling(updateRequestWord.getSpelling() + "বিবর্তিত"); //updating the spelling
             JsonNode updateRequestWordJNode = updateRequestWord.toAPIJsonNode();
 
-            Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
+            Result result = Helpers.route(Helpers.fakeRequest(
+                Helpers.PUT, String.format("/api/v1/words/%s", updateRequestWord.getId()))
+                .bodyJson(updateRequestWordJNode));
             Assert.assertEquals(OK, result.status());
 
             JsonNode updatedJNode = JsonUtil.jStringToJNode(contentAsString(result));
@@ -265,7 +269,9 @@ public class WordControllerTests extends WithApplication {
             "}";
 
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
-            Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + wordId).bodyJson(bodyJson));
+            Result result = Helpers.route(
+                Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + wordId)
+                    .bodyJson(bodyJson));
             Assert.assertEquals(Helpers.NOT_FOUND, result.status());
             Assert.assertEquals(Constants.Messages.EntityNotFound(wordId), contentAsString(result));
         });
@@ -348,14 +354,13 @@ public class WordControllerTests extends WithApplication {
                 .bodyJson(bodyJson));
             Assert.assertEquals(Helpers.CREATED, result.status());
             JsonNode createdJNode = JsonUtil.jStringToJNode(contentAsString(result));
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsOnJNode(createdJNode, Collections.singletonList("id")));
+            Assert.assertEquals(bodyJson, JsonUtil.nullFields(createdJNode, Arrays.asList("id")));
 
             //Making sure the data persisted
             String meaningId = createdJNode.get("id").toString().replaceAll("\"","");
-            word =  wordLogic.getWordById(word.getId());
+            word = wordLogic.getWordById(word.getId());
             Meaning meaning = word.getMeanings().get(meaningId);
-            JsonNode meaningJson = meaning.toAPIJsonNode();
-            Assert.assertEquals(bodyJson, JsonUtil.nullFieldsOnJNode(meaningJson, Collections.singletonList("id")));
+            Assert.assertEquals(bodyJson, JsonUtil.nullFields(meaning.toAPIJNode(), Arrays.asList("id")));
         });
     }
 
@@ -374,7 +379,8 @@ public class WordControllerTests extends WithApplication {
 
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonMeaningString);
 
-            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/invalidId/meanings").bodyJson(bodyJson));
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/invalidId/meanings")
+                .bodyJson(bodyJson));
             Assert.assertEquals(Helpers.NOT_FOUND, result.status());
             Assert.assertEquals(Constants.Messages.EntityNotFound( "invalidId"), contentAsString(result));
         });
@@ -395,7 +401,8 @@ public class WordControllerTests extends WithApplication {
 
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonMeaningString);
 
-            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/someWordId/meanings").bodyJson(bodyJson));
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/someWordId/meanings")
+                .bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
             Assert.assertEquals(Constants.MEANING_NULLOREMPTY, contentAsString(result));
         });
@@ -412,9 +419,10 @@ public class WordControllerTests extends WithApplication {
             createMeaningsInDbForWord(createdWord.getId(), createdWord.getSpelling(), 1);
             Meaning meaning = createdMeaningForWord.get(createdWord.getId()).get(0);
 
-            Result result = Helpers.route(Helpers.fakeRequest(Helpers.GET, "/api/v1/words/" + createdWord.getId() + "/meanings/" + meaning.getId()));
+            Result result = Helpers.route(Helpers.fakeRequest(
+                Helpers.GET, "/api/v1/words/" + createdWord.getId() + "/meanings/" + meaning.getId()));
             Assert.assertEquals(OK, result.status());
-            Assert.assertEquals(meaning.toAPIJsonNode().toString(), contentAsString(result));
+            Assert.assertEquals(meaning.toAPIJNode().toString(), contentAsString(result));
         });
     }
 
@@ -445,7 +453,7 @@ public class WordControllerTests extends WithApplication {
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
             meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
-            JsonNode meaningRequestJNode = meaningRequest.toAPIJsonNode();
+            JsonNode meaningRequestJNode = meaningRequest.toAPIJNode();
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
@@ -458,7 +466,7 @@ public class WordControllerTests extends WithApplication {
             String meaningId = updatedJNode.get("id").toString().replaceAll("\"","");
             word =  wordLogic.getWordById(word.getId());
             meaning = word.getMeanings().get(meaningId);
-            Assert.assertEquals(updatedJNode, meaning.toAPIJsonNode());
+            Assert.assertEquals(updatedJNode, meaning.toAPIJNode());
         });
     }
 
@@ -474,7 +482,7 @@ public class WordControllerTests extends WithApplication {
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
             meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
-            JsonNode meaningRequestJNode = meaningRequest.toAPIJsonNode();
+            JsonNode meaningRequestJNode = meaningRequest.toAPIJNode();
 
             String route = "/api/v1/words/invalidWordId/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
@@ -496,7 +504,7 @@ public class WordControllerTests extends WithApplication {
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
             meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
             meaningRequest.setId("invalidMeaningId");
-            JsonNode meaningRequestJNode = meaningRequest.toAPIJsonNode();
+            JsonNode meaningRequestJNode = meaningRequest.toAPIJNode();
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
@@ -517,7 +525,7 @@ public class WordControllerTests extends WithApplication {
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
             meaningRequest.setMeaning("");
-            JsonNode meaningRequestJNode = meaningRequest.toAPIJsonNode();
+            JsonNode meaningRequestJNode = meaningRequest.toAPIJNode();
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
@@ -582,8 +590,8 @@ public class WordControllerTests extends WithApplication {
             jsonObject.addProperty(Constants.SEARCH_STRING_KEY, prefix);
             JsonNode requestBodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/search").bodyJson(requestBodyJson));
-
             Assert.assertEquals(OK, result.status());
+
             JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
             JsonNode expectedResult = JsonUtil.objectToJNode(spellingsWithPrefixes);
             log.info("results json:" + resultsJson);

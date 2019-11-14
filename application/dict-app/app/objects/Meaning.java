@@ -28,7 +28,7 @@ public class Meaning extends EntityMeta {
     //how strongly does this meaning apply to the word, 0 means unset, higher is stronger
     private int strength;
 
-    public JsonNode toAPIJsonNode() {
+    public JsonNode toAPIJNode() {
         return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 

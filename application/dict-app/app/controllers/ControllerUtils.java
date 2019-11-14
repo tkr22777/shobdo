@@ -42,6 +42,7 @@ import java.util.function.Supplier;
         } else if (throwable instanceof IllegalArgumentException) {
             return Results.badRequest(throwable.getMessage());
         } else {
+            throwable.printStackTrace();
             return Results.internalServerError(throwable.getMessage());
         }
     }
