@@ -46,7 +46,6 @@ function wordSearch(element) {
     var searchQueryString = $('#wordSearchBox').val().trim();
     console.log("WordSearch searchQueryString: " + searchQueryString );
     var containsEng = containsEnglishCharacters(searchQueryString);
-
     console.log("Ridmik Conversion: " + convertToRidmik(searchQueryString))
 
     if( searchQueryString.length > 0 && !containsEng ) { // event.keyCode == 13 && //keyCode 13 is enter
@@ -64,9 +63,9 @@ function handleTestGetResult(data, status, jqXHR) {
 function meaningSearch(textContent) {
 
     var meaningRoute = "http://127.0.0.1:32779/api/v1/words/postget"
-    var meaningBody = JSON.stringify( { wordSpelling : textContent } );
+    var meaningBody = JSON.stringify( { spelling : textContent } );
     console.log("Meaning route: "  + meaningRoute);
-    console.log("Meaning route: "  + meaningBody);
+    console.log("Meaning body: "  + meaningBody);
     RESTPostCall(meaningRoute, meaningBody, handleWordMeaningResult);
 }
 
@@ -128,30 +127,22 @@ function setMeaningHolder() {
 
 function handleMeaningData(data) {
 
-    var meanings = data.meaningForPartsOfSpeeches;
-    var extraMap = data.extraMetaMap;
+    var meanings = data.meanings;
 
     var i = 0;
-    var returnString = "<h4><u>" + data.wordSpelling + "</u>";
-    /*
+    var returnString = "<h4><u>" + data.spelling + "</u>";
     for(var key in meanings) {
 
-        var thePartOfSpeech = meanings[key].partsOfSpeech;
-        returnString = returnString + " " + i + " " + thePartOfSpeech + ": \n "
-        var theMeanings = meanings[key].meanings;
-        var j = 0;
-        for(var key in theMeanings) {
-            var aMeaning = theMeanings[key].meaning;
-            var theExmaple = theMeanings[key].example;
-            console.log(i + " " + j + " Meaning:" + aMeaning);
-            console.log(i + " " + j + " Example:" + theExmaple);
-            returnString = returnString + " " + j + " Meaning: " + aMeaning + ", Example: " + theExmaple + "\n ";
-            j = j + 1
-        }
+        console.log(i + " PartsOfSpeech:" + meanings[key].partsOfSpeech);
+        console.log(i + " Meaning:" + meanings[key].meaning);
+        console.log(i + " Example:" + meanings[key].exampleSentence);
+        returnString = returnString + " " + i + " POS:" + meanings[key].partsOfSpeech
+        returnString = returnString + " Meaning: " + meanings[key].meaning
+        returnString = returnString + " Example: " + meanings[key].exampleSentence
         returnString = returnString + " \n";
         i = i + 1;
-    }*/
-    returnString = returnString + ": " + extraMap['MEANING STRING'] + "</h4>";
+    }
+    returnString = returnString + "</h4>";
     console.log(returnString);
     return returnString;
 }
