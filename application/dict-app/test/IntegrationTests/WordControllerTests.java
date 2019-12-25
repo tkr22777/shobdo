@@ -18,7 +18,6 @@ import utilities.ShobdoLogger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.POST;
 import static play.test.Helpers.contentAsString;
 
@@ -165,7 +164,7 @@ public class WordControllerTests extends WithApplication {
             Word createdWord = createdWords.get(0);
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.GET,"/api/v1/words/" + createdWord.getId()));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
             Assert.assertEquals(createdWord.toAPIJsonNode().toString(), contentAsString(result));
         });
     }
@@ -193,7 +192,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = Helpers.route(
                 Helpers.fakeRequest(POST,"/api/v1/words/postget").bodyJson(bodyJson));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
             Assert.assertEquals(createdWord.toAPIJsonNode().toString(), contentAsString(result));
         });
     }
@@ -243,7 +242,7 @@ public class WordControllerTests extends WithApplication {
             Result result = Helpers.route(Helpers.fakeRequest(
                 Helpers.PUT, String.format("/api/v1/words/%s", updateRequestWord.getId()))
                 .bodyJson(updateRequestWordJNode));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
 
             JsonNode updatedJNode = JsonUtil.jStringToJNode(contentAsString(result));
             Assert.assertEquals(updateRequestWordJNode, updatedJNode);
@@ -328,7 +327,7 @@ public class WordControllerTests extends WithApplication {
         Assert.assertNotNull(word.getId());
 
         Result result = Helpers.route(Helpers.fakeRequest(Helpers.DELETE,"/api/v1/words/" + word.getId()));
-        Assert.assertEquals(OK, result.status());
+        Assert.assertEquals(Helpers.OK, result.status());
         wordLogic.getWordById(word.getId()); //Should throw EntityDoesNotExist exception
     }
 
@@ -421,7 +420,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = Helpers.route(Helpers.fakeRequest(
                 Helpers.GET, "/api/v1/words/" + createdWord.getId() + "/meanings/" + meaning.getId()));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
             Assert.assertEquals(meaning.toAPIJNode().toString(), contentAsString(result));
         });
     }
@@ -457,7 +456,7 @@ public class WordControllerTests extends WithApplication {
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
 
             JsonNode updatedJNode = JsonUtil.jStringToJNode(contentAsString(result));
             Assert.assertEquals(meaningRequestJNode, updatedJNode);
@@ -547,7 +546,7 @@ public class WordControllerTests extends WithApplication {
         Assert.assertNotNull(meaning.getId());
 
         Result result = Helpers.route(Helpers.fakeRequest(Helpers.DELETE,"/api/v1/words/" + word.getId() + "/meanings/" + meaning.getId()));
-        Assert.assertEquals(OK, result.status());
+        Assert.assertEquals(Helpers.OK, result.status());
         wordLogic.getMeaning(word.getId(), meaning.getId()); //Should throw EntityDoesNotExist exception
     }
 
@@ -565,6 +564,102 @@ public class WordControllerTests extends WithApplication {
         Result result = Helpers.route(Helpers.fakeRequest(Helpers.DELETE,"/api/v1/words/" + "invalidWordId" + "/meanings/" + meaning.getId()));
         Assert.assertEquals(Helpers.NOT_FOUND, result.status());
         Assert.assertEquals(Constants.Messages.EntityNotFound( "invalidWordId"), contentAsString(result));
+    }
+
+    /* Add Antonym Test */
+    @Test
+    public void addAntonym_validSpellingOfNonExistingWord_antonymAddedCorrectly() {
+
+        Helpers.running(Helpers.fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            Word word = createdWords.get(0);
+
+            String jsonAntonymString = "{\n" +
+                "  \"spelling\" : \"বিবর্তিত\",\n" +
+                "  \"targetWordId\" : null,\n" +
+                "  \"strength\" : 0\n" +
+                "}";
+
+            JsonNode body = JsonUtil.jStringToJNode(jsonAntonymString);
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/" + word.getId() + "/antonym/add")
+                .bodyJson(body));
+            Assert.assertEquals(Helpers.CREATED, result.status());
+            JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
+            Assert.assertEquals(body, resultsJson);
+        });
+    }
+
+    @Test
+    public void addAntonym_validSpellingOfExistingWord_antonymAddedCorrectly() {
+
+        Helpers.running(Helpers.fakeApplication(), () -> {
+
+            createWordsInDb(2);
+            Word word = createdWords.get(0);
+            Word targetWord = createdWords.get(1);
+
+            String jsonAntonymString = "{\n" +
+                "  \"spelling\" : \"" + targetWord.getSpelling() +"\",\n" +
+                "  \"targetWordId\" : \"" + targetWord.getId() + "\",\n" +
+                "  \"strength\" : 0\n" +
+                "}";
+
+            JsonNode body = JsonUtil.jStringToJNode(jsonAntonymString);
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/" + word.getId() + "/antonym/add")
+                .bodyJson(body));
+            Assert.assertEquals(Helpers.CREATED, result.status());
+            JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
+            Assert.assertEquals(body, resultsJson);
+        });
+    }
+
+    /* Add Synonym Test */
+    @Test
+    public void addSynonym_validSpellingOfNonExistingWord_synonymAddedCorrectly() {
+
+        Helpers.running(Helpers.fakeApplication(), () -> {
+
+            createWordsInDb(1);
+            Word word = createdWords.get(0);
+
+            String jsonSynonymString = "{\n" +
+                "  \"spelling\" : \"বিবর্তিত\",\n" +
+                "  \"targetWordId\" : null,\n" +
+                "  \"strength\" : 0\n" +
+                "}";
+
+            JsonNode body = JsonUtil.jStringToJNode(jsonSynonymString);
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/" + word.getId() + "/synonym/add")
+                .bodyJson(body));
+            Assert.assertEquals(Helpers.CREATED, result.status());
+            JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
+            Assert.assertEquals(body, resultsJson);
+        });
+    }
+
+    @Test
+    public void addSynonym_validSpellingOfExistingWord_synonymAddedCorrectly() {
+
+        Helpers.running(Helpers.fakeApplication(), () -> {
+
+            createWordsInDb(2);
+            Word word = createdWords.get(0);
+            Word targetWord = createdWords.get(1);
+
+            String jsonSynonymString = "{\n" +
+                "  \"spelling\" : \"" + targetWord.getSpelling() +"\",\n" +
+                "  \"targetWordId\" : \"" + targetWord.getId() + "\",\n" +
+                "  \"strength\" : 0\n" +
+                "}";
+
+            JsonNode body = JsonUtil.jStringToJNode(jsonSynonymString);
+            Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/" + word.getId() + "/synonym/add")
+                .bodyJson(body));
+            Assert.assertEquals(Helpers.CREATED, result.status());
+            JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
+            Assert.assertEquals(body, resultsJson);
+        });
     }
 
     @Test
@@ -590,7 +685,7 @@ public class WordControllerTests extends WithApplication {
             jsonObject.addProperty(Constants.SEARCH_STRING_KEY, prefix);
             JsonNode requestBodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/search").bodyJson(requestBodyJson));
-            Assert.assertEquals(OK, result.status());
+            Assert.assertEquals(Helpers.OK, result.status());
 
             JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
             JsonNode expectedResult = JsonUtil.objectToJNode(spellingsWithPrefixes);
