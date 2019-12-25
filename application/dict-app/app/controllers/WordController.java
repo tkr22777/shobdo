@@ -164,8 +164,6 @@ public class WordController extends Controller {
         parameters.put("wordId", wordId);
         parameters.put("requestBody", body.toString());
 
-        logger.info("Here body:" + body.toString());
-
         return ControllerUtils.executeEndpoint(transactionId, requestId, "createMeaning" , parameters,
             () -> created(
                 wordLogic.createMeaning(wordId, body)
@@ -228,6 +226,68 @@ public class WordController extends Controller {
             () -> {
                 logger.debug("List meanings on word with id:" + wordId);
                 wordLogic.listMeanings(wordId);
+                return ok();
+            }
+        );
+    }
+
+    /* Antonym related API */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result addAntonym(final String wordId) {
+
+        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "addAntonym", new HashMap<>(),
+            () -> {
+                return created(
+                    wordLogic.addAntonym(wordId, request().body().asJson())
+                        .toAPIJsonNode()
+                );
+            }
+        );
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result removeAntonym(final String wordId) {
+
+        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeAntonym", new HashMap<>(),
+            () -> {
+                wordLogic.removeAntonym(wordId, request().body().asJson());
+                return ok();
+            }
+        );
+    }
+
+    /* Synonym related API */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result addSynonym(final String wordId) {
+
+        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "addSynonym", new HashMap<>(),
+            () -> {
+                return created(
+                    wordLogic.addSynonym(wordId, request().body().asJson())
+                        .toAPIJsonNode()
+                );
+            }
+        );
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result removeSynonym(final String wordId) {
+
+        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeSynonym", new HashMap<>(),
+            () -> {
+                wordLogic.removeSynonym(wordId, request().body().asJson());
                 return ok();
             }
         );

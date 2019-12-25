@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import lombok.*;
+import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 import utilities.JsonUtil;
 
 import java.util.*;
@@ -25,10 +26,10 @@ public class Word extends EntityMeta {
     private String spelling;
 
     //set of spellings of antonyms of the word
-    private HashSet<String> antonyms;
+    private HashSet<Antonym> antonyms;
 
     //set of spellings of synonyms of the word
-    private HashSet<String> synonyms;
+    private HashSet<Synonym> synonyms;
 
     //meaningId to meanings map, easier to lookup
     private HashMap<String, Meaning> meanings;
@@ -41,6 +42,34 @@ public class Word extends EntityMeta {
             meanings = new HashMap<>();
         }
         getMeanings().put(meaning.getId(), meaning);
+    }
+
+    public void addAntonym(final Antonym antonym) {
+        if (this.antonyms == null) {
+            this.antonyms = new HashSet<>();
+        }
+        antonyms.add(antonym);
+    }
+
+    public void removeAntonym(final Antonym antonym) {
+        if (this.antonyms == null) {
+            this.antonyms = new HashSet<>();
+        }
+        antonyms.remove(antonym);
+    }
+
+    public void addSynonym(final Synonym synonym) {
+        if (this.synonyms == null) {
+            this.synonyms = new HashSet<>();
+        }
+        synonyms.add(synonym);
+    }
+
+    public void removeSynonym(final Synonym synonym) {
+        if (this.synonyms == null) {
+            this.synonyms = new HashSet<>();
+        }
+        synonyms.remove(synonym);
     }
 
     public JsonNode toAPIJsonNode() {

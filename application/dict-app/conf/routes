@@ -54,6 +54,26 @@ DELETE  /api/v1/words/:wordId/meanings/:meaningId        controllers.WordControl
 # 5. List meanings of a word
 GET     /api/v1/words/:wordId/meanings                   controllers.WordController.listMeanings(wordId: String)
 
+###################################
+# API for adding/removing antonyms:
+###################################
+
+# 1. Add an antonym to a word
+POST    /api/v1/words/:wordId/antonym/add                controllers.WordController.addAntonym(wordId: String)
+
+# 2. Remove an antonym from a word
+POST    /api/v1/words/:wordId/antonym/remove             controllers.WordController.removeAntonym(wordId: String)
+
+###################################
+# API for adding/removing synonyms:
+###################################
+
+# 1. Add an antonym to a word
+POST    /api/v1/words/:wordId/synonym/add                controllers.WordController.addSynonym(wordId: String)
+
+# 2. Remove an antonym from a word
+POST    /api/v1/words/:wordId/synonym/remove             controllers.WordController.removeSynonym(wordId: String)
+
 ##############
 # Admin stuff:
 ##############

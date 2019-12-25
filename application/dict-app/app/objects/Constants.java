@@ -15,6 +15,7 @@ public final class Constants {
 
     //REST REQUEST FIELD NAMES
     public static final String SPELLING_KEY = "spelling";
+    public static final String STRENGTH_KEY = "strength";
     public static final String SEARCH_STRING_KEY = "searchString";
     public static final String WORD_COUNT_KEY = "wordCount";
 
