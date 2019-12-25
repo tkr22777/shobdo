@@ -156,8 +156,10 @@ public class WordLogic {
     public Word updateWord(final Word word) {
         validateUpdateWordObject(word);
         Lock wordLock = locks.get(word.getId());
+        logger.info(wordLock.toString());
         try {
             wordLock.lock();
+            logger.info(wordLock.toString());
             final Word currentWord = getWordById(word.getId());
             final Word updatedWord = Word.builder()
                 .id(currentWord.getId())
@@ -272,6 +274,7 @@ public class WordLogic {
             final Word currentWord = getWordById(wordId);
             currentWord.addMeaningToWord(meaning);
             wordDao.update(currentWord);
+            wordCache.cacheWord(currentWord);
             return meaning;
         } finally {
             wordLock.unlock();
@@ -319,7 +322,8 @@ public class WordLogic {
             validateUpdateMeaningObject(wordId, meaning);
             final Word word = getWordById(wordId);
             word.getMeanings().put(meaning.getId(), meaning);
-            updateWordWithCache(word);
+            wordDao.update(word); //update the entry in DB
+            wordCache.cacheWord(word);
             return meaning;
         } finally {
           wordLock.unlock();
@@ -339,16 +343,12 @@ public class WordLogic {
 
             if (word.getMeanings().get(meaningId) != null) {
                 word.getMeanings().remove(meaningId);
-                updateWordWithCache(word);
+                wordDao.update(word); //update the entry in DB
+                wordCache.cacheWord(word);
             }
         } finally {
             wordLock.unlock();
         }
-    }
-
-    private void updateWordWithCache(final Word updatedWord) {
-        wordDao.update(updatedWord); //update the entry in DB
-        wordCache.cacheWord(updatedWord);
     }
 
     /* LIST meaning TODO implement using WORD's interfaces */
@@ -366,8 +366,10 @@ public class WordLogic {
                               final String antonymSpelling,
                               final int strength) {
         Lock wordLock = locks.get(wordId);
+        logger.info(wordLock.toString());
         try {
             wordLock.lock();
+            logger.info(wordLock.toString());
             final Word word = getWordById(wordId);
             Word antonymWord = null;
             try {
@@ -383,7 +385,8 @@ public class WordLogic {
                 .build();
 
             word.addAntonym(antonym);
-            updateWord(word);
+            wordDao.update(word);
+            wordCache.cacheWord(word);
             return antonym;
         } finally {
             wordLock.unlock();
@@ -403,7 +406,8 @@ public class WordLogic {
             wordLock.lock();
             final Word word = getWordById(wordId);
             word.removeAntonym(Antonym.builder().spelling(antonymSpelling).build());
-            updateWord(word);
+            wordDao.update(word);
+            wordCache.cacheWord(word);
         } finally {
             wordLock.unlock();
         }
@@ -437,7 +441,8 @@ public class WordLogic {
                 .build();
 
             word.addSynonym(synonym);
-            updateWord(word);
+            wordDao.update(word);
+            wordCache.cacheWord(word);
             return synonym;
         } finally {
             wordLock.unlock();
@@ -457,7 +462,8 @@ public class WordLogic {
             wordLock.lock();
             final Word word = getWordById(wordId);
             word.removeSynonym(Synonym.builder().spelling(synonymSpelling).build());
-            updateWord(word);
+            wordDao.update(word);
+            wordCache.cacheWord(word);
         } finally {
             wordLock.unlock();
         }

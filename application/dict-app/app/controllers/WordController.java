@@ -238,13 +238,12 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        logger.debug("Add antonym to word with id" + wordId);
-
         return ControllerUtils.executeEndpoint(transactionId, requestId, "addAntonym", new HashMap<>(),
             () -> {
-                JsonNode body = request().body().asJson();
-                logger.debug("Add antonym to word with id:" + wordId + " body" + body.toString());
-                return created(wordLogic.addAntonym(wordId, body).toAPIJsonNode());
+                return created(
+                    wordLogic.addAntonym(wordId, request().body().asJson())
+                        .toAPIJsonNode()
+                );
             }
         );
     }
@@ -270,10 +269,11 @@ public class WordController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "addAntonym", new HashMap<>(),
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "addSynonym", new HashMap<>(),
             () -> {
                 return created(
-                    wordLogic.addSynonym(wordId, request().body().asJson()).toAPIJsonNode()
+                    wordLogic.addSynonym(wordId, request().body().asJson())
+                        .toAPIJsonNode()
                 );
             }
         );
