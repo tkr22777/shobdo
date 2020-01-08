@@ -24,6 +24,7 @@ public class Word extends EntityMeta {
 
     private String id;
     private String spelling;
+    private String tempMeaningString;
 
     //set of spellings of antonyms of the word
     private HashSet<Antonym> antonyms;

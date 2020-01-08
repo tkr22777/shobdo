@@ -2,6 +2,7 @@ package utilities;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Arrays;
 
 /**
  * Created by Tahsin Kabir on 9/1/16.
@@ -27,7 +28,8 @@ public class FileReadUtil {
         try {
             reader.close();
         } catch (Exception ex){
-            log.info("Error closin file. Exception:" + ex.getStackTrace().toString());
+            log.info("Error closing file.");
+            ex.printStackTrace();
         }
     }
 
@@ -36,7 +38,8 @@ public class FileReadUtil {
         try {
             reader = new BufferedReader(new FileReader(fileLocation));
         } catch (Exception ex){
-            log.info("Error reading opening file. Exception:" + ex.getStackTrace().toString());
+            log.info("Error reading opening file.");
+            ex.printStackTrace();
         }
         return reader;
     }

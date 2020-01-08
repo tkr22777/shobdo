@@ -1,6 +1,11 @@
+import importer.SamsadImporter;
 import logics.WordLogic;
+import objects.Word;
+import org.junit.Test;
 import play.test.WithServer;
 import utilities.ShobdoLogger;
+
+import java.util.List;
 
 /**
  *
@@ -8,10 +13,21 @@ import utilities.ShobdoLogger;
  * If you are interested in mocking a whole application, see the wiki for more details.
  *
  */
-public class ExporterTest extends WithServer {
+public class ImporterTest extends WithServer {
 
-    ShobdoLogger log = new ShobdoLogger(ExporterTest.class);
+    ShobdoLogger log = new ShobdoLogger(ImporterTest.class);
     WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
+
+    @Test
+    public void testImporter() throws Exception {
+        List<Word> words = new SamsadImporter().getDictiionary();
+        words.forEach(word ->  {
+            try {
+                wordLogic.createWord(word);
+            } catch (Exception ex) {
+            }
+        });
+    }
 
     /*
     @Test @Ignore

@@ -127,6 +127,11 @@ function setMeaningHolder() {
 
 function handleMeaningData(data) {
 
+    console.log(data);
+
+    return data.tempMeaningString;
+
+    /*
     var meanings = data.meanings;
 
     var i = 0;
@@ -145,6 +150,7 @@ function handleMeaningData(data) {
     returnString = returnString + "</h4>";
     console.log(returnString);
     return returnString;
+    */
 }
 
 

@@ -1,8 +1,13 @@
-package exporter;
+package importer;
 
+import objects.Constants;
+import objects.Word;
+import scala.concurrent.java8.FuturesConvertersImpl;
+import utilities.FileReadUtil;
 import utilities.ShobdoLogger;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Tahsin Kabir on 9/1/16.
@@ -10,9 +15,9 @@ import java.util.*;
 
 //This is a helper class to export Samsad database file's entries to dictionary objects
 
-public class SamsadExporter {
+public class SamsadImporter {
 
-    private ShobdoLogger log = new ShobdoLogger(SamsadExporter.class);
+    private ShobdoLogger log = new ShobdoLogger(SamsadImporter.class);
 
     private static final ArrayList<String> supBucket = new ArrayList<>();
     private static final ArrayList<String> commaBucket = new ArrayList<>();
@@ -25,7 +30,7 @@ public class SamsadExporter {
 
     private static final Set<String> typeMeaningSet = new HashSet<>();
 
-    private final String BANGLA_TO_BANGLA_FILE_LOCATION = "../../../../data/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt";
+    private final String BANGLA_TO_BANGLA_FILE_LOCATION = "/Users/tahsin/Dropbox/Work/shobdo/resources/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt";
 
     private static final Map<String,String> MAP_OF_TYPES = new HashMap<>();
     private static Set<String> SET_OF_TYPES = new HashSet<>();
@@ -43,63 +48,100 @@ public class SamsadExporter {
         SET_OF_TYPES = new HashSet<>( MAP_OF_TYPES.values() );
     }
 
-    /*
-    public Collection<Word> getDictiionary() {
+    public List<Word> getDictiionary() {
 
-        setup();
+        List<String> lines = getLinesFromFile(BANGLA_TO_BANGLA_FILE_LOCATION, 24000);
 
-        FileReadUtil fileReadUtilB2B = new FileReadUtil(BANGLA_TO_BANGLA_FILE_LOCATION);
+        List<Word> wordFromFiles = lines.stream()
+            .map(line -> createCrudeWord(line))
+            .filter(wd -> !(
+                wd.getSpelling().contains("sup")
+                || wd.getSpelling().contains("style"))
+                || wd.getSpelling().contains("719"))
+            .collect(Collectors.toList());
 
-        String line = "";
+        System.out.println("Total Words:" + wordFromFiles.size());
 
-        int lines_to_read = 240000;
+        Set<String> spellings = wordFromFiles.stream()
+            .map(w -> w.getSpelling())
+            .collect(Collectors.toSet());
 
-        ArrayList<Word> words = new ArrayList<Word>(lines_to_read);
+        TreeMap<Character, Set<String>> charToSpelling = new TreeMap<>();
+        spellings.forEach(
+            spelling  -> {
+                for (Character aChar: spelling.toCharArray()) {
+                    charToSpelling.computeIfAbsent(aChar, v -> new HashSet<String>())
+                        .add(spelling);
+                }
+            }
+        );
 
-        for ( int i = 0; i < lines_to_read ; i++ ) {
-
-            line = fileReadUtilB2B.getLine();
-
-            if (line == null)
-                break;
-
-            Word word = createCrudeWord(line);
-
-            if(word != null)
-                words.add( word );
+        System.out.println("Total Spellings:" + wordFromFiles.size());
+        System.out.println("Total chars:" + charToSpelling.size());
+        for (Character c: charToSpelling.keySet()) {
+            System.out.print("Char " + c + " spelling count:" + charToSpelling.get(c).size() );
+            System.out.println(" Ex Spelling:" + charToSpelling.get(c).stream().sorted().limit(100).collect(Collectors.toList()).toString() );
         }
+        /*
+        wordFromFiles.stream().limit(200)
+            .forEach(w -> System.out.println(w.toAPIJsonNode().toString()));
+         */
 
-        fileReadUtilB2B.closeReader();
+        return wordFromFiles;
+        /*
+        Collections.sort(lines, Comparator.comparingInt(String::length));
+        System.out.println("Lines before:" + lines.size());
+        List<String> fileredlines = lines.stream()
+            .filter(
+                m -> (
+                    ! ( m.contains("b")
+                    ||  m.contains("☐")
+                    ||  m.contains("<eng")
+                    ||  m.contains("<sup")
+                    ||  m.startsWith("(")
+                    )
+                )
+            ).collect(Collectors.toList());
+        System.out.println("Filtered lines:" + fileredlines.size());
+        //fileredlines.forEach(line -> System.out.println(line));
 
-        return fixSpellingAndMeanings(words);
+        lines.removeAll(fileredlines);
+        System.out.println("Remaining Lines:" + lines.size());
+        lines.stream().limit(1000).forEach(line -> System.out.println(line));
+        return null;
+        */
     }
-    */
 
-    /*
+    public List<String> getLinesFromFile(String location, int N) {
+        List<String> lines = new LinkedList<String>();
+        FileReadUtil fileReadUtilB2B = new FileReadUtil(location);
+        for (int i = 0; i < N; i++) {
+            String line = fileReadUtilB2B.getLine();
+            if (line == null) {
+                break;
+            }
+            lines.add(line);
+        }
+        fileReadUtilB2B.closeReader();
+        return lines;
+    }
+
     public Word createCrudeWord(String line) {
 
-        Word word = new Word();
-
-        //word.setId( DictUtil.generateNewWordId() );
-        word.addExtraMetaValue(Constants.ORIGINAL_STRING, line);
-
-        //Spelling
         int endIndexOfSpelling = line.indexOf("[");
         String spelling = line.substring(0, endIndexOfSpelling).trim();
-        word.setspelling(spelling);
 
-        //Eng pronunciation
-        int endIndexOfEngPronunciation = line.indexOf("]");
-        String engPronunciation = line.substring(endIndexOfSpelling + 1, endIndexOfEngPronunciation).trim();
-        word.addExtraMetaValue( Constants.ENG_PRONUN_STRING, engPronunciation);
+        int endIndexOfEngSpell = line.indexOf("]");  //Eng pronunciation
+        /* String engPronunciation = line.substring(endIndexOfSpelling + 1, endIndexOfEngSpell).trim(); */
 
         //Meaning
-        String meaning = line.substring(endIndexOfEngPronunciation + 1, line.length()).trim();
-        word.addExtraMetaValue( Constants.MEANING_STRING, meaning);
+        String meaning = line.substring(endIndexOfEngSpell + 1).trim();
 
-        return word;
+        return Word.builder()
+            .spelling(spelling)
+            .tempMeaningString(meaning)
+            .build();
     }
-    */
 
     /*
     public Collection<Word> fixSpellingAndMeanings(ArrayList<Word> words) {
