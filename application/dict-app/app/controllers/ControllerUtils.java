@@ -18,7 +18,7 @@ import java.util.function.Supplier;
                                          final Map<String, String> parameters,
                                          final Supplier<Result> supplier) {
 
-        log.info(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+        log.debug(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
             transactionId, parentRequestId, endpoint, parameters));
 
         try {
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
                                           final Map<String, String> parameters,
                                           final Throwable throwable) {
 
-        log.info(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
+        log.debug(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
             + "[Exception Message=%s]", transactionId, parentRequestId, endpoint, parameters, throwable.getMessage()));
 
         if (throwable instanceof EntityDoesNotExist) {

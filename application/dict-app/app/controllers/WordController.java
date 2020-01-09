@@ -137,11 +137,7 @@ public class WordController extends Controller {
                     return badRequest();
                 }
                 final String searchString = body.get(Constants.SEARCH_STRING_KEY).asText();
-                if  (searchString.length() > 0) {
-                    return ok(Json.toJson(wordLogic.searchWords(searchString)));
-                } else {
-                    return ok(Json.toJson(new HashMap<>()));
-                }
+                return ok(Json.toJson(wordLogic.searchWords(searchString)));
             }
         );
     }
@@ -161,7 +157,6 @@ public class WordController extends Controller {
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
-        parameters.put("wordId", wordId);
         parameters.put("requestBody", body.toString());
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "createMeaning" , parameters,
@@ -179,7 +174,6 @@ public class WordController extends Controller {
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getMeaning" , new HashMap<>(),
             () -> {
-                logger.info("Get meaning with meaningId:" + meaningId  + " of word with id:" + wordId);
                 final Meaning meaning = wordLogic.getMeaning(wordId, meaningId);
                 return meaning == null ? notFound(Constants.Messages.EntityNotFound(meaningId)) :
                     ok(meaning.toAPIJNode());
@@ -196,9 +190,9 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "updateMeaning", new HashMap<>(),
             () -> {
                 final JsonNode meaningJsonNode = request().body().asJson();
-                logger.info("Update meaning with meaningId: " + meaningId + " with json:" + meaningJsonNode
-                        + " on word with id:" + wordId);
-                return ok(wordLogic.updateMeaning(wordId, meaningId, meaningJsonNode).toAPIJNode());
+                return ok(wordLogic.updateMeaning(wordId, meaningId, meaningJsonNode)
+                    .toAPIJNode()
+                );
             }
         );
     }
@@ -323,13 +317,17 @@ public class WordController extends Controller {
 
                 logger.info("Total words for be created:" + words.size());
 
-                List<Word> createdWords = words.stream().map( w -> {
+                List<Word> createdWords = words.stream()
+                    .map( w -> {
                         try {
                             return wordLogic.createWord(w);
                         } catch (Exception ex) {
                             return null;
                         }
-                    }).filter( w -> w != null).collect(Collectors.toList());
+                    }
+                    )
+                    .filter(w -> w != null)
+                    .collect(Collectors.toList());
 
                 logger.info("Total words created:" + createdWords.size());
 

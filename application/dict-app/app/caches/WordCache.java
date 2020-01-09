@@ -1,11 +1,8 @@
 package caches;
 
-import com.google.common.base.Preconditions;
 import com.typesafe.config.ConfigFactory;
-import lombok.NonNull;
 import objects.Word;
 import redis.clients.jedis.Jedis;
-import scala.concurrent.java8.FuturesConvertersImpl;
 import utilities.*;
 
 import java.util.Set;
