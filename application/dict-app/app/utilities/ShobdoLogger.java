@@ -22,6 +22,10 @@ public final class ShobdoLogger {
         System.out.println("[DEBUG]["+ getCurrentTimeStamp() +"]"+"[" + class_type.toString() + "]:" + log );
     }
 
+    public void error(String log){
+        System.out.println("[ERROR]["+ getCurrentTimeStamp() +"]"+"[" + class_type.toString() + "]:" + log );
+    }
+
     private String getCurrentTimeStamp() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         return dateFormat.format(new Date());
