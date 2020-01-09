@@ -21,12 +21,14 @@ public class ImporterTest extends WithServer {
     @Test
     public void testImporter() throws Exception {
         List<Word> words = new SamsadImporter().getDictiionary();
+        /*
         words.forEach(word ->  {
             try {
                 wordLogic.createWord(word);
             } catch (Exception ex) {
             }
         });
+        */
     }
 
     /*

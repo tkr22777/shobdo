@@ -1,21 +1,18 @@
 function printLove() {
-
         console.log("I love you so much yo!");
         convertToRidmik();
 }
 
 function convertToRidmik(englishString) {
-
     var parser = new RidmikParser();
     return parser.toBangla(englishString);
 }
 
 function testTransliterate() {
 
-    if( google.language != null) {
+    if (google.language != null) {
 
         google.language.transliterate(["k"],"en","bn", function(result) {
-
             if (result.error) {
               console.log("There was an errror transliterating!");
             } else {
@@ -23,33 +20,35 @@ function testTransliterate() {
             }
             console.log(JSON.stringify(result));
         });
+
     } else {
-        if(google == null)
+        if (google == null) {
             console.log("google is null");
+        }
 
-        if(google.language == null)
+        if (google.language == null) {
             console.log("google.language is null");
+        }
     }
-
 }
 
 function containsEnglishCharacters(searchTerm) {
 
-    if( searchTerm.match(/[a-z]/i) )
+    if (searchTerm.match(/[a-z]/i)) {
         return true;
-    else
+    } else {
         return false;
+    }
 }
 
 function wordSearch(element) {
 
     var searchQueryString = $('#wordSearchBox').val().trim();
-    console.log("WordSearch searchQueryString: " + searchQueryString );
+    console.log("WordSearch searchQueryString: " + searchQueryString);
     var containsEng = containsEnglishCharacters(searchQueryString);
     console.log("Ridmik Conversion: " + convertToRidmik(searchQueryString))
 
-    if( searchQueryString.length > 0 && !containsEng ) { // event.keyCode == 13 && //keyCode 13 is enter
-
+    if (searchQueryString.length > 0 && !containsEng) { //event.keyCode == 13 && keyCode 13 is enter
         var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
         var searchBody = JSON.stringify( { searchString : searchQueryString } );
         RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
@@ -69,7 +68,7 @@ function meaningSearch(textContent) {
     RESTPostCall(meaningRoute, meaningBody, handleWordMeaningResult);
 }
 
-function RESTPostCall( route, postBodyString, onSuccessFunction) {
+function RESTPostCall(route, postBodyString, onSuccessFunction) {
    jQuery.ajax({
         type: "POST",
         url: route,
@@ -83,7 +82,7 @@ function RESTPostCall( route, postBodyString, onSuccessFunction) {
     });
 }
 
-function RESTGetCall( route, onSuccessFunction) {
+function RESTGetCall(route, onSuccessFunction) {
    jQuery.ajax({
         type: "GET",
         url: route,

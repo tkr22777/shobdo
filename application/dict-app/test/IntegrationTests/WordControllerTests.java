@@ -71,6 +71,7 @@ public class WordControllerTests extends WithApplication {
 
             String jsonWordString = "{\n" +
                 "  \"id\" : null,\n" +
+                "  \"tempMeaningString\" : null,\n" +
                 "  \"spelling\" : \"ঞতটতথঙ\",\n" +
                 "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
