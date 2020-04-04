@@ -16,45 +16,49 @@ import utilities.ShobdoLogger;
 
 /* package private */ class MongoManager {
 
-    public static final String ID_PARAM = "id";
-    private static final String STATUS_PARAM = "status";
-
-    private final static ObjectMapper objectMapper = new ObjectMapper()
-        .configure(MapperFeature.USE_ANNOTATIONS, false);
-
-    private static final String MONGODB_HOSTNAME = ConfigFactory.load().getString("shobdo.mongodb.hostname");
-    private static final int MONGODB_PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodb.port"));
-    private static final String DB_NAME = ConfigFactory.load().getString("shobdo.mongodb.database.dbname");
-    private static final String WORD_COLLECTION_NAME = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
-    private static final String USER_REQUEST_COLLECTION_NAME = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
-
     private static final ShobdoLogger log = new ShobdoLogger(MongoManager.class);
 
+    /* DB HOST INFO */
+    private static final String HOSTNAME = ConfigFactory.load().getString("shobdo.mongodb.hostname");
+    private static final int PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodb.port"));
+
+    /* DB */
+    private static final String DB_NAME = ConfigFactory.load().getString("shobdo.mongodb.database.dbname");
+    // Mongodb singleton client
     private static MongoDatabase mongoDB;
+
+    /* Collections */
     private static MongoCollection wordCollection;
     private static MongoCollection userRequestsCollection;
+
+    private static final String COL_WORDS    = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
+    private static final String COL_REQUESTS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
+
+    /* helper fields */
+    public static final String ID_PARAM = "id";
+    private static final String STATUS_PARAM = "status";
 
     private MongoManager() {
     }
 
-    private static MongoDatabase getDatabase() {
+    private static synchronized MongoDatabase getDatabase() {
         if (mongoDB == null) {
-            log.info("@RDMI001 Connecting to mongodb [host:" + MONGODB_HOSTNAME + "][port:" + MONGODB_PORT + "]");
-            mongoDB = new MongoClient(MONGODB_HOSTNAME, MONGODB_PORT).getDatabase(DB_NAME);
+            log.info("@RDMI001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
+            mongoDB = new MongoClient(HOSTNAME, PORT).getDatabase(DB_NAME);
         }
         return mongoDB;
     }
 
-    public static MongoCollection getWordCollection() {
+    public static synchronized MongoCollection getWordCollection() {
         if (wordCollection == null) {
-            wordCollection = getDatabase().getCollection(WORD_COLLECTION_NAME);
+            wordCollection = getDatabase().getCollection(COL_WORDS);
         }
         return wordCollection;
     }
 
-    public static MongoCollection getUserRequestsCollection() {
+    public static synchronized MongoCollection getUserRequestsCollection() {
         if (userRequestsCollection == null) {
-            userRequestsCollection = getDatabase().getCollection(USER_REQUEST_COLLECTION_NAME);
+            userRequestsCollection = getDatabase().getCollection(COL_REQUESTS);
         }
         return userRequestsCollection;
     }
@@ -77,7 +81,8 @@ import utilities.ShobdoLogger;
 
     public static Document toDocument(Object object) {
         try {
-            return Document.parse(objectMapper.writeValueAsString(object) );
+            ObjectMapper mapper = new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
+            return Document.parse(mapper.writeValueAsString(object));
         } catch (Exception ex) {
             throw new IllegalArgumentException("objectToDocument error. Object["
                 + object.toString() + "][Ex:" + ex.getStackTrace().toString());

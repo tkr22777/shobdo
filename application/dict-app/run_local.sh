@@ -1,2 +1,2 @@
 #!/bin/bash
-activator run
+sbt run
