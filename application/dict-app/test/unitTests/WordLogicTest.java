@@ -1,7 +1,6 @@
 package unitTests;
 
 import caches.WordCache;
-import daos.UserRequestDao;
 import daos.WordDao;
 import logics.WordLogic;
 import objects.Word;
@@ -61,7 +60,7 @@ public class WordLogicTest {
         when(mockWordDao.getById(anyString())).thenReturn(null);
         wordLogic.createWord(theWord);
         verify(mockWordDao, times(1)).create(any(Word.class));
-        verify(mockWordCache, times(1)).cacheWord(any(Word.class));
+        verify(mockWordCache, times(1)).cacheBySpelling(any(Word.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -80,7 +79,7 @@ public class WordLogicTest {
         when(mockWordCache.getBySpelling(spelling)).thenReturn(theWord);
         wordLogic.getWordBySpelling(spelling);
         verify(mockWordDao, never()).getBySpelling(anyString());
-        verify(mockWordCache, never()).cacheWord(any(Word.class));
+        verify(mockWordCache, never()).cacheBySpelling(any(Word.class));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class WordLogicTest {
         when(mockWordDao.getBySpelling(spelling)).thenReturn(theWord);
         wordLogic.getWordBySpelling(spelling);
         verify(mockWordDao, times(1) ).getBySpelling(spelling);
-        verify(mockWordCache, times(1) ).cacheWord(theWord);
+        verify(mockWordCache, times(1) ).cacheBySpelling(theWord);
     }
 
     @Test (expected = IllegalArgumentException.class) @Ignore

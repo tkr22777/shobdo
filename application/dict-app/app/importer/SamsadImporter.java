@@ -1,8 +1,6 @@
 package importer;
 
-import objects.Constants;
 import objects.Word;
-import scala.concurrent.java8.FuturesConvertersImpl;
 import utilities.FileReadUtil;
 import utilities.ShobdoLogger;
 
@@ -13,81 +11,104 @@ import java.util.stream.Collectors;
  * Created by Tahsin Kabir on 9/1/16.
  */
 
-//This is a helper class to export Samsad database file's entries to dictionary objects
-
 public class SamsadImporter {
 
     private ShobdoLogger log = new ShobdoLogger(SamsadImporter.class);
 
-    private static final ArrayList<String> supBucket = new ArrayList<>();
-    private static final ArrayList<String> commaBucket = new ArrayList<>();
-    private static final ArrayList<String> dashBucket = new ArrayList<>();
-    private static final ArrayList<String> spaceBucket = new ArrayList<>();
-
-    private static final ArrayList<String> simpleBucket = new ArrayList<>();
-    private static final ArrayList<String> simpleMeaningBucket = new ArrayList<>();
-    private static final ArrayList<String> understandableSimpleMeaningBucket = new ArrayList<>();
-
-    private static final Set<String> typeMeaningSet = new HashSet<>();
-
     private final String BANGLA_TO_BANGLA_FILE_LOCATION = "/Users/tahsin/Dropbox/Work/shobdo/resources/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt";
-
-    private static final Map<String,String> MAP_OF_TYPES = new HashMap<>();
-    private static Set<String> SET_OF_TYPES = new HashSet<>();
 
     private static int printIndex = 0;
 
-    public void setup(){
+    private List<String> getLinesFromFile(String location, int N) {
+        List<String> lines = new LinkedList<>();
+        FileReadUtil fileReadUtilB2B = new FileReadUtil(location);
+        for (int i = 0; i < N; i++) {
+            String line = fileReadUtilB2B.getLine();
+            if (line == null) {
+                break;
+            }
+            lines.add(line);
+        }
+        fileReadUtilB2B.closeReader();
+        return lines;
+    }
 
-        MAP_OF_TYPES.put("বি","বিশেষ্য");
-        MAP_OF_TYPES.put("বিন","বিশেষণ");
-        MAP_OF_TYPES.put("সর্ব","সর্বনাম");
-        MAP_OF_TYPES.put("অব্য","অব্যয়");
-        MAP_OF_TYPES.put("ক্রি","ক্রিয়া");
+    private Word createCrudeWord(String line) {
 
-        SET_OF_TYPES = new HashSet<>( MAP_OF_TYPES.values() );
+        int endIndexOfSpelling = line.indexOf("[");
+        String spelling = line.substring(0, endIndexOfSpelling).trim();
+
+        int endIndexOfEngSpell = line.indexOf("]");  //Eng pronunciation
+        /* String endSpell = line.substring(endIndexOfSpelling + 1, endIndexOfEngSpell).trim(); */
+
+        //Meaning
+        String meaning = line.substring(endIndexOfEngSpell + 1).trim();
+
+        return Word.builder()
+            .spelling(spelling)
+            .tempMeaningString(meaning)
+            .build();
     }
 
     public List<Word> getDictiionary() {
 
         List<String> lines = getLinesFromFile(BANGLA_TO_BANGLA_FILE_LOCATION, 24000);
 
-        List<Word> wordFromFiles = lines.stream()
+        return lines.stream()
             .map(line -> createCrudeWord(line))
             .filter(wd -> !(
                 wd.getSpelling().contains("sup")
-                || wd.getSpelling().contains("style"))
+                    || wd.getSpelling().contains("style"))
                 || wd.getSpelling().contains("719"))
             .collect(Collectors.toList());
+    }
 
-        System.out.println("Total Words:" + wordFromFiles.size());
+    public void test(List<Word> wordFromFiles) {
 
         Set<String> spellings = wordFromFiles.stream()
             .map(w -> w.getSpelling())
             .collect(Collectors.toSet());
 
         TreeMap<Character, Set<String>> charToSpelling = new TreeMap<>();
+        TreeMap<Character, Set<String>> firstCharToSpelling = new TreeMap<>();
         spellings.forEach(
             spelling  -> {
                 for (Character aChar: spelling.toCharArray()) {
                     charToSpelling.computeIfAbsent(aChar, v -> new HashSet<String>())
                         .add(spelling);
                 }
+
+                char firstChar = spelling.charAt(0);
+                firstCharToSpelling.computeIfAbsent(firstChar, v -> new HashSet<>())
+                    .add(spelling);
             }
         );
 
         System.out.println("Total Spellings:" + wordFromFiles.size());
+        /*
         System.out.println("Total chars:" + charToSpelling.size());
         for (Character c: charToSpelling.keySet()) {
             System.out.print("Char " + c + " spelling count:" + charToSpelling.get(c).size() );
             System.out.println(" Ex Spelling:" + charToSpelling.get(c).stream().sorted().limit(100).collect(Collectors.toList()).toString() );
         }
+        */
+
+        System.out.println("Total first chars:" + firstCharToSpelling.size());
+        System.out.println("First chars:" + firstCharToSpelling.keySet().toString());
+
+        /*
+        for (Character c: firstCharToSpelling.keySet()) {
+            String outString = String.format("First Char:%c\t Char Value:%d \t Spelling Count:%d\t", c, (int)c, firstCharToSpelling.get(c).size()) ;
+            System.out.print(outString);
+            System.out.println(" Spelling:" + firstCharToSpelling.get(c).stream().sorted().limit(100).collect(Collectors.toList()).toString());
+        }
+        */
+
         /*
         wordFromFiles.stream().limit(200)
             .forEach(w -> System.out.println(w.toAPIJsonNode().toString()));
          */
 
-        return wordFromFiles;
         /*
         Collections.sort(lines, Comparator.comparingInt(String::length));
         System.out.println("Lines before:" + lines.size());
@@ -111,547 +132,4 @@ public class SamsadImporter {
         return null;
         */
     }
-
-    public List<String> getLinesFromFile(String location, int N) {
-        List<String> lines = new LinkedList<String>();
-        FileReadUtil fileReadUtilB2B = new FileReadUtil(location);
-        for (int i = 0; i < N; i++) {
-            String line = fileReadUtilB2B.getLine();
-            if (line == null) {
-                break;
-            }
-            lines.add(line);
-        }
-        fileReadUtilB2B.closeReader();
-        return lines;
-    }
-
-    public Word createCrudeWord(String line) {
-
-        int endIndexOfSpelling = line.indexOf("[");
-        String spelling = line.substring(0, endIndexOfSpelling).trim();
-
-        int endIndexOfEngSpell = line.indexOf("]");  //Eng pronunciation
-        /* String engPronunciation = line.substring(endIndexOfSpelling + 1, endIndexOfEngSpell).trim(); */
-
-        //Meaning
-        String meaning = line.substring(endIndexOfEngSpell + 1).trim();
-
-        return Word.builder()
-            .spelling(spelling)
-            .tempMeaningString(meaning)
-            .build();
-    }
-
-    /*
-    public Collection<Word> fixSpellingAndMeanings(ArrayList<Word> words) {
-
-        //What should we do about these unfixed ones?!
-        FixSpellingReturn fixSpellingReturn =  fixSpelling(words);
-        FixMeaningReturn fixMeaningReturn = fixMeaning(fixSpellingReturn.fixed);
-
-        return fixSpellingReturn.fixed;
-    }
-
-    class FixMeaningReturn {
-
-        Collection<Word> fixed;
-        Collection<Word> unfixed;
-    }
-
-    private Map<String, Word> findSpellingsWithSimpleMeanings(Collection<Word> words) {
-
-        Map<String, Word> simpleMeaningWords = new HashMap<>();
-
-        List<String> allMeaning = new ArrayList<>();
-
-        for(Word word: words) {
-
-            List<String> meanings = word.retrieveExtraMetaValuesForKey(Constants.MEANING_STRING);
-
-            allMeaning.addAll(meanings);
-
-            List<String> filtered =  meanings.stream().filter(
-                    m -> (
-                            //Doesn't contain
-                            ! (      m.contains("b")
-                                    ||  m.contains("☐")
-                                    ||  m.contains("<eng")
-                                    ||  m.contains("<sup")
-                                    ||  m.startsWith("(")
-                            )
-                    ) ).collect(Collectors.toList());
-
-            if(filtered.size() == meanings.size() ) {
-
-                //DictUtil.printStringsByTag( word.getspelling() + " Meaning(s): ", meanings, 0, 100, false);
-
-                simpleMeaningWords.put(word.getspelling(), word);
-            }
-        }
-
-        return simpleMeaningWords;
-    }
-
-    private LinkedHashMap<String, Set<String>> getAllMeanings(Collection<Word> words){
-
-        LinkedHashMap<String,Set<String>> allMeaning = new LinkedHashMap<>();
-
-        for(Word word: words) {
-
-            for(String meaning: word.retrieveExtraMetaValuesForKey(Constants.MEANING_STRING)){
-
-                Set<String> spellings = allMeaning.get(meaning);
-
-                if(spellings == null)
-                    spellings = new HashSet<>();
-
-                spellings.add(word.getspelling());
-
-                allMeaning.put(meaning, spellings);
-            }
-        }
-
-        return allMeaning;
-    }
-
-    */
-
-    /*
-    public FixMeaningReturn fixMeaning(Collection<Word> words) {
-
-        FixMeaningReturn fixMeaningReturn = new FixMeaningReturn();
-
-        LinkedHashMap<String,Set<String>> meanings = getAllMeanings(words);
-
-        meanings.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey() )
-                .filter( entry -> entry.getValue().size() < 5 && entry.getValue().size() > 2)
-                .forEach(entry -> log.info(entry.getValue() + " : " + entry.getKey() ) );
-
-        //DictUtil.printStringsByTag("All Meangins:", meanings, 1000 , 1000, false);
-
-        Map<String, Word> wordMap = createWordMapFromListDiplicateSpellingFix(words);
-        Map<String, Word> simpleMeaningWordMap = findSpellingsWithSimpleMeanings(words);
-        Map<String, Word> wordMapFirstGen = DictUtil.removeKeyValuesForKeys(wordMap, simpleMeaningWordMap.keySet());
-
-
-        /*
-        boolean simpleMeaning = true;
-
-        if(meaning.contains("<b>")) {
-            simpleMeaning = false;
-            word.addExtraMetaValue("MeaningContainsB", "<b>", false);
-        }
-
-        if(meaning.contains("☐")) {
-            simpleMeaning = false;
-            word.addExtraMetaValue("MeaningContainsBox", "☐", false);
-        }
-
-        if(meaning.contains("<eng")) {
-            simpleMeaning = false;
-            word.addExtraMetaValue("MeaningContainsEng", "<eng", false);
-        }
-
-        if(meaning.contains("sup")) {
-            simpleMeaning = false;
-            word.addExtraMetaValue("MeaningContainsSup", "sup", false);
-        }
-
-        if( meaning.substring(0,1).equalsIgnoreCase("(")) {
-            simpleMeaning = false;
-            word.addExtraMetaValue("StartsWithBracket", "(", false);
-        }
-
-        if( simpleMeaning ) {
-
-            simpleMeaningBucket.add(meaning);
-
-            word.addExtraMetaValue("SIMPLE_MEANING", "YES", false);
-
-            int indexOfDot = meaning.indexOf(".");
-
-            String typePrefix = null;
-
-            if(indexOfDot > 0 && indexOfDot < 5) {
-
-                typePrefix = meaning.substring(0, indexOfDot).trim();
-
-                if( MAP_OF_TYPES.get(typePrefix) != null) {
-
-                    understandableSimpleMeaningBucket.add( meaning );
-
-                    typeMeaningSet.add(typePrefix);
-
-                    word.addExtraMetaValue("UNDERSTANDABLE_TYPE", "YES", false);
-
-                    String meaningId = "MN_" + UUID.randomUUID();
-
-                    String type = MAP_OF_TYPES.get(typePrefix);
-
-                    String meaningAfterType = meaning.substring(indexOfDot + 1).trim();
-
-                    String example = "__EXAMPLE_NOT_SET__";
-
-                    int strength = -1;
-
-                    Meaning meaningObj = new Meaning(meaningId, type, meaningAfterType, example, -1 );
-
-                    MeaningForPartsOfSpeech meaningForPartsOfSpeech = new MeaningForPartsOfSpeech(type,
-                           Arrays.asList(meaningObj) );
-
-                    word.addMeaningForPartsOfSpeech(meaningForPartsOfSpeech);
-
-                }
-            }
-        }
-
-        return fixMeaningReturn;
-    }
-    */
-
-
-    /*
-    private Map<String,Word> createWordMapFromListDiplicateSpellingFix(Collection<Word> words) {
-
-        //Has duplicate key
-        Map<String,Word> wordMap =  new HashMap<>();
-
-        Set<String> duplicates = new HashSet<>();
-
-        for(Word word: words) {
-
-            String spelling = word.getspelling();
-
-            if(wordMap.containsKey(spelling)) {
-                // ^^ means duplicate found, we are adding them to the same words meta map without updating
-
-                Word firstOne = wordMap.get(spelling);
-                firstOne.addExtraMetaValue(Constants.MEANING_STRING, word.getExtraMetaMap().get(Constants.MEANING_STRING));
-                firstOne.addExtraMetaValue(Constants.ORIGINAL_STRING, word.getExtraMetaMap().get(Constants.ORIGINAL_STRING));
-                firstOne.addExtraMetaValue(Constants.ENG_PRONUN_STRING, word.getExtraMetaMap().get(Constants.ENG_PRONUN_STRING));
-                wordMap.put(spelling, firstOne);
-                duplicates.add(spelling);
-
-            } else {
-
-                wordMap.put(word.getspelling(), word);
-            }
-        }
-        return wordMap;
-    }
-
-    //Mostly duplicate spelling fix
-    private Map<String, Word> fixSupSpellingWords(Map<String,Word> allWordMap, List<String> supSpellings) {
-
-        Map<String,Word> filteredSupWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(supSpellings));
-
-        //DictUtil.printStringsByTag("Sup Words", new ArrayList<>( filteredSupWordMap.values()) , 0, 10, true);
-
-        List<Word> words = new ArrayList<>();
-
-        List<String> allSpellingList = new ArrayList<>();
-        int print = 0;
-
-        for(Word word: filteredSupWordMap.values()){
-
-            String spelling = word.getspelling();
-
-            if( spelling.contains("<") ){
-
-                if(print < 10)
-                    log.info("Spelling before:" + spelling);
-
-                spelling = spelling.substring(0, spelling.indexOf("<"));
-
-                if(print < 10) {
-                    log.info("Spelling after: " + spelling);
-                    print++;
-                }
-
-            } else {
-
-                log.info("What the hell spelling: " + spelling);
-            }
-
-            allSpellingList.add(spelling);
-            word.setspelling(spelling);
-            words.add(word);
-        }
-
-
-        log.info("All spelling list size:"  + allSpellingList.size());
-        HashSet<String> allspellingSet = new HashSet<>(allSpellingList);
-        log.info("All spelling set size:"  + allspellingSet.size()); //Should be less as they are duplicate and the meanings are merged
-
-        Map<String, Word> finishedSupWord = createWordMapFromListDiplicateSpellingFix(words);
-
-        //DictUtil.printStringsByTag("Sup Words After:", new ArrayList<>( finishedSupWord.values()) , 0, 100, true);
-        return finishedSupWord;
-    }
-
-    //Comma spelling fix
-    private Map<String, Word> fixCommaSpellingWords(Map<String,Word> allWordMap, List<String> commaSpellings) {
-
-        Map<String, Word> filteredCommaWordMap = DictUtil.filterForKeys(allWordMap, new HashSet<>(commaSpellings));
-        //DictUtil.printStringsByTag("Comma Words", new ArrayList<>(filteredCommaWordMap.values()), 0, 10, true);
-        List<Word> words = new ArrayList<>();
-
-        int print = 0;
-
-        for (Word word : filteredCommaWordMap.values()) {
-
-            String spelling = word.getspelling();
-
-            ArrayList<Word> newWords = new ArrayList<>();
-
-            if (spelling.contains(",")) {
-
-                String[] spellings = spelling.split(",");
-                if (print < 40)
-                    log.info("Spelling before:" + spelling);
-                if (print < 40) {
-                    log.info("spellings after: " + spellings.toString());
-                    print++;
-                }
-
-                for(String spelling: spellings) {
-
-                    Word newWord = WordLogic.copyToNewWordObject(word);
-
-                    newWord.setspelling(spelling.trim());
-
-                    newWords.add(newWord);
-                }
-
-                if(newWords.size() > 5) {
-                    log.info("More than 8 variations:" + spelling);
-                    log.info("More than 8 variations word:" + word);
-                }
-
-            } else {
-
-                log.info("What the hell spelling in comma filter!: " + spelling);
-            }
-
-            words.addAll(newWords);
-        }
-
-        Map<String, Word> finishedCommaWords = createWordMapFromListDiplicateSpellingFix(words);
-        //DictUtil.printStringsByTag("Comma Words After:", new ArrayList<>(finishedCommaWords.values()), 0, 10, false);
-
-        return finishedCommaWords;
-    }
-
-    //Simple dash spelling fix
-    private Map<String, Word> fixSimpelDashSpellingWords(Map<String,Word> dashWordMap) {
-
-        //DictUtil.printStringsByTag("Dash Words", new ArrayList<>(dashWordMap.values()), 0, 10, true);
-        List<Word> words = new ArrayList<>();
-
-        int print = 0;
-
-        for (Word word : dashWordMap.values()) {
-
-            String spelling = word.getspelling();
-
-            if (spelling.contains("-")) {
-
-                String newSpelling = new String(spelling);
-
-                newSpelling = newSpelling.replaceAll("-", "");
-
-                if (print < 40)
-                    log.info("Spelling before:" + spelling);
-                if (print < 40) {
-                    log.info("spellings after: " + newSpelling);
-                    print++;
-                }
-
-                Word newWord = WordLogic.copyToNewWordObject(word);
-                newWord.setspelling(newSpelling);
-
-                words.add(word);
-                words.add(newWord);
-
-            } else {
-                words.add(word);
-            }
-        }
-
-        Map<String, Word> finishedDashWords = createWordMapFromListDiplicateSpellingFix(words);
-        //DictUtil.printStringsByTag("Dash Words After:", new ArrayList<>(finishedDashWords.values()), 0, 10, false);
-
-        return finishedDashWords;
-    }
-
-    class FixSpellingReturn {
-
-        Collection<Word> fixed;
-        Collection<Word> unfixed;
-    }
-
-    /*
-    private FixSpellingReturn fixSpelling(ArrayList<Word> words) {
-
-        // Has duplicate key
-        Map<String,Word> wordMapClean = new HashMap<>();
-        Map<String,Word> wordMapFirstGen = createWordMapFromListDiplicateSpellingFix(words);
-
-        // Getting all the available spelling string, might contain multiple actual string
-        List<String> allSpellings = new ArrayList<>(wordMapFirstGen.keySet());
-        Collections.sort(allSpellings);
-        log.info("Total all spellings: " + allSpellings.size());
-        //DictUtil.printStringsByTag("All Spelling:", allSpellings, 400 , 10, false);
-
-        // START OF SIMPLE SPELLING
-        List<String> complexSpellings = allSpellings.stream()
-                .filter( s -> s.contains("<")
-                        || s.contains( ">")
-                        || s.contains( ")")
-                        || s.contains( "(")
-                        || s.contains( "?")
-                        || s.contains( ",")
-                        || s.contains( "-")
-                        || s.contains( " ")
-                        || s.contains( "sup") )
-                .collect(Collectors.toList());
-
-        List<String> simpletons = new ArrayList<>( allSpellings);
-        simpletons.removeAll(complexSpellings); //Found 14000 simpleton spellings
-        log.info("Simpleton size: " + simpletons.size());
-
-        //DictUtil.printStringsByTag("Simpletons spelling:", simpletons, 0, 10, true);
-        Map<String, Word> simpleWords = DictUtil.filterForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
-        wordMapClean.putAll(simpleWords);
-        // END OF SIMPLE
-
-
-        Map<String,Word> wordMapSecondGenSimpleRemoved = DictUtil.removeKeyValuesForKeys(wordMapFirstGen, new HashSet<>(simpletons) );
-        log.info("Word map after simple removal size: " + wordMapSecondGenSimpleRemoved.size());
-
-        // Start of SUP
-        //Example 1: ধার<sup>1</sup>
-        //Example 2: ঝোলা<sup>2</sup>'
-        List<String> simpleSups = complexSpellings.stream()
-                .filter( s ->
-                        (   //contains the following
-                            s.contains( "sup")
-                                    ||  s.contains("<")
-                                    ||  s.contains( ">")
-                                    ||  s.contains( "?") )
-                            && !( //does not contain the the following
-                                       s.contains( ",")
-                                    || s.contains( ")")
-                                    || s.contains( "(")
-                                    || s.contains( "-")
-                                    || s.contains( " ") )
-                ).collect(Collectors.toList());
-
-        log.info("Simple Sup Size: " + simpleSups.size());
-        //DictUtil.printStringsByTag("Simple sup:", simpleSups, 0, 10, true);
-        Map<String,Word> supWords = fixSupSpellingWords(wordMapSecondGenSimpleRemoved, simpleSups);
-        wordMapClean.putAll(supWords);
-        log.info("Total after simple and sup: " + wordMapClean.size());
-        //END OF SUP
-
-        Map<String,Word> wordMapThirdGenSimpleAndSupRemoved = DictUtil.removeKeyValuesForKeys(wordMapSecondGenSimpleRemoved, new HashSet<>(simpleSups) );
-        log.info("Word map after simple and sup removal size: " + wordMapThirdGenSimpleAndSupRemoved.size());
-        complexSpellings.removeAll(simpleSups);
-
-        List<String> simpleComma = complexSpellings.stream()
-                .filter( s ->
-                        ( //contains the following
-                            s.contains( ",")
-                            && s.contains( " ")
-
-                        ) && !( //does not contain the the following
-                                s.contains( "sup")
-                                || s.contains( ">")
-                                || s.contains("<")
-                                || s.contains( ")")
-                                || s.contains( "(")
-                                || s.contains( "?")
-                                || s.contains( "-") )
-                ).collect(Collectors.toList());
-
-        log.info("Simple Comma Size: " + simpleComma.size());
-        //DictUtil.printStringsByTag("Simple Comma(,):", simpleComma, 0, 10, true);
-
-        Map<String,Word> commaWords = fixCommaSpellingWords(wordMapThirdGenSimpleAndSupRemoved, simpleComma);
-        wordMapClean.putAll(commaWords);
-        log.info("Wordmap clean size:" + wordMapClean.size());
-
-        Map<String,Word> wordMapFourthGenSimpleSupCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapThirdGenSimpleAndSupRemoved, new HashSet<>(simpleComma) );
-        log.info("Word map after simple, sup & comma removal size: " + wordMapFourthGenSimpleSupCommaRemoved.size());
-
-        complexSpellings.removeAll(simpleComma);
-
-        List<String> simpleDash = complexSpellings.stream()
-                .filter( s ->
-                        //contains the following
-                        s.contains( "-")
-                                && !( //does not contain the the following
-                                s.contains( "sup")
-                                        || s.contains( ">")
-                                        || s.contains("<")
-                                        || s.contains( "?")
-                                        || s.contains( ")")
-                                        || s.contains( "(")
-                                        || s.contains( ",")
-                                        || s.contains( " ") )
-                ).collect(Collectors.toList());
-
-        log.info("Simple Dash Size: " + simpleDash.size());
-        //DictUtil.printStringsByTag("Simple Dash(-):", simpleDash, 0, 10, true);
-
-        Map<String, Word> dashWordMap = DictUtil.filterForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash));
-        Map<String,Word> fixedDashWords = fixSimpelDashSpellingWords(dashWordMap);
-        wordMapClean.putAll(fixedDashWords);
-        log.info("Wordmap clean size after dash:" + wordMapClean.size());
-
-        Map<String,Word> wordMapFifthGenSimpleSupCommaDashRemoved = DictUtil.removeKeyValuesForKeys(wordMapFourthGenSimpleSupCommaRemoved, new HashSet<>(simpleDash) );
-        log.info("Word map after simple, sup, comma and dash removal size: " + wordMapFifthGenSimpleSupCommaDashRemoved.size());
-
-        complexSpellings.removeAll(simpleDash);
-
-        List<String> simpleCommaDash = complexSpellings.stream()
-                .filter( s ->
-                        //contains the following
-                        s.contains( "-")
-                        && s.contains( ",")
-                                && s.contains( " ")
-                                && !( //does not contain the the following
-                                    s.contains( "sup")
-                                        || s.contains( ">")
-                                        || s.contains("<")
-                                        || s.contains( "?")
-                                        || s.contains( ")")
-                                        || s.contains( "(") )
-                ).collect(Collectors.toList());
-
-        log.info("Simple simpleCommaDash Size: " + simpleCommaDash.size());
-        //DictUtil.printStringsByTag("Simple Comma Dash(, -):", simpleCommaDash, 0, 10, true);
-
-        Map<String,Word> commaRemovedDashedMap = fixCommaSpellingWords(wordMapFifthGenSimpleSupCommaDashRemoved, simpleCommaDash);
-        Map<String,Word> commaDashRemovedCommaDashedMap = fixSimpelDashSpellingWords(commaRemovedDashedMap);
-        wordMapClean.putAll(commaDashRemovedCommaDashedMap);
-
-        Map<String,Word> wordMapSixthGenSimpleSupCommaDashDashCommaRemoved = DictUtil.removeKeyValuesForKeys(wordMapFifthGenSimpleSupCommaDashRemoved, new HashSet<>(simpleCommaDash) );
-        //DictUtil.printStringsByTag("Comma Removed Dashed: ", new ArrayList<>(commaDashRemovedCommaDashedMap.values()) , 0, 10, true);
-
-        complexSpellings.removeAll(simpleCommaDash);
-
-        log.info("Wordmap clean size after comma dash comma:" + wordMapClean.size());
-        log.info("Complex Remaining: " + complexSpellings.size());
-        //DictUtil.printStringsByTag("Complex :", complexSpellings, 0, 10, true);
-
-        FixSpellingReturn fixSpellingReturn = new FixSpellingReturn();
-        fixSpellingReturn.fixed = wordMapClean.values();
-        fixSpellingReturn.unfixed = wordMapSixthGenSimpleSupCommaDashDashCommaRemoved.values();
-
-        return fixSpellingReturn;
-    }
-    */
 }

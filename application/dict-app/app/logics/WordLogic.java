@@ -84,7 +84,7 @@ public class WordLogic {
                 if (wordDao.getById(wordId) == null) {
                     word.setId(wordId);
                     wordDao.create(word);
-                    wordCache.cacheWord(word);
+                    wordCache.cacheBySpelling(word);
                     return word;
                 }
             }
@@ -120,7 +120,7 @@ public class WordLogic {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(spelling));
         }
 
-        wordCache.cacheWord(wordFromDB);
+        wordCache.cacheBySpelling(wordFromDB);
         return wordFromDB;
     }
 
@@ -169,7 +169,7 @@ public class WordLogic {
                 .antonyms(word.getAntonyms())
                 .build();
             wordDao.update(updatedWord); //update the entry in DB
-            wordCache.cacheWord(updatedWord);
+            wordCache.cacheBySpelling(updatedWord);
             return updatedWord;
         } finally {
             wordLock.unlock();
@@ -184,7 +184,7 @@ public class WordLogic {
             final Word word = getWordById(wordId);
             word.setStatus(EntityStatus.DELETED);
             wordDao.update(word);
-            wordCache.invalidateWord(word);
+            wordCache.invalidateBySpelling(word);
         } finally {
             wordLock.unlock();
         }
@@ -274,7 +274,7 @@ public class WordLogic {
             final Word currentWord = getWordById(wordId);
             currentWord.addMeaningToWord(meaning);
             wordDao.update(currentWord);
-            wordCache.cacheWord(currentWord);
+            wordCache.cacheBySpelling(currentWord);
             return meaning;
         } finally {
             wordLock.unlock();
@@ -323,7 +323,7 @@ public class WordLogic {
             final Word word = getWordById(wordId);
             word.getMeanings().put(meaning.getId(), meaning);
             wordDao.update(word); //update the entry in DB
-            wordCache.cacheWord(word);
+            wordCache.cacheBySpelling(word);
             return meaning;
         } finally {
           wordLock.unlock();
@@ -344,7 +344,7 @@ public class WordLogic {
             if (word.getMeanings().get(meaningId) != null) {
                 word.getMeanings().remove(meaningId);
                 wordDao.update(word); //update the entry in DB
-                wordCache.cacheWord(word);
+                wordCache.cacheBySpelling(word);
             }
         } finally {
             wordLock.unlock();
@@ -386,7 +386,7 @@ public class WordLogic {
 
             word.addAntonym(antonym);
             wordDao.update(word);
-            wordCache.cacheWord(word);
+            wordCache.cacheBySpelling(word);
             return antonym;
         } finally {
             wordLock.unlock();
@@ -407,7 +407,7 @@ public class WordLogic {
             final Word word = getWordById(wordId);
             word.removeAntonym(Antonym.builder().spelling(antonymSpelling).build());
             wordDao.update(word);
-            wordCache.cacheWord(word);
+            wordCache.cacheBySpelling(word);
         } finally {
             wordLock.unlock();
         }
@@ -442,7 +442,7 @@ public class WordLogic {
 
             word.addSynonym(synonym);
             wordDao.update(word);
-            wordCache.cacheWord(word);
+            wordCache.cacheBySpelling(word);
             return synonym;
         } finally {
             wordLock.unlock();
@@ -463,7 +463,7 @@ public class WordLogic {
             final Word word = getWordById(wordId);
             word.removeSynonym(Synonym.builder().spelling(synonymSpelling).build());
             wordDao.update(word);
-            wordCache.cacheWord(word);
+            wordCache.cacheBySpelling(word);
         } finally {
             wordLock.unlock();
         }
