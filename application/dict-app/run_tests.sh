@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Running All Tests:"
-activator clean test
+sbt test
 echo ""
 
 

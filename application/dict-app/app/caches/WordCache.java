@@ -14,6 +14,8 @@ public class WordCache {
     private static final int REDIS_EXPIRE_TIME_SECONDS= 60 * 60 * 6;
 
     private static final ShobdoLogger log = new ShobdoLogger(WordCache.class);
+
+    /* the following are singletons */
     private static Jedis jedis;
     private static WordCache instance;
 
