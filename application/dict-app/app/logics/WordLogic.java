@@ -5,8 +5,7 @@ import com.google.common.util.concurrent.Striped;
 import exceptions.EntityDoesNotExist;
 import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
-import daos.WordDaoMongoImpl;
-import daos.WordDao;
+import daos.*;
 import objects.*;
 import utilities.*;
 

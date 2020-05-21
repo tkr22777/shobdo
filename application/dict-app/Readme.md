@@ -1,4 +1,18 @@
-The Shobdo backend webservice:
+Notice:
+=======
+
+This service is now in dev mode. Things may be broken. 
+TODO: fix everything and update this readme.
+Okay cool!
+
+If you a dev, follow along.
+- Use java 8 when importing to IntelliJ. 
+- Install routes file plugin on IntelliJ.
+- Allow annotation processing on IntelliJ.
+- Spin up the mongo docker from scripts directory 
+- All tests should now pass!
+
+The Shobdo webservice:
 ==============================
 
 This file will be packaged with your application when using `activator dist`.

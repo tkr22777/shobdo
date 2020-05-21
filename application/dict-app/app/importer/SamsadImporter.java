@@ -15,7 +15,7 @@ public class SamsadImporter {
 
     private ShobdoLogger log = new ShobdoLogger(SamsadImporter.class);
 
-    private final String BANGLA_TO_BANGLA_FILE_LOCATION = "/Users/tahsin/Dropbox/Work/shobdo/resources/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt";
+    private final String BANGLA_TO_BANGLA_FILE_LOCATION = "/Users/tahsin/Dropbox/Work/shobdo/data/external/DictWebUChicagoSamsad_BANGLA_TO_BANGLA.txt";
 
     private static int printIndex = 0;
 
