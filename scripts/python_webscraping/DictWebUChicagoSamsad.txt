@@ -1,0 +1,120 @@
+<html><head>
+	<!-- <LINK REL=stylesheet  HREF="/dsal.css" TYPE="text/css"> -->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title></title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<title>Samsada Bangala abhidhana</title>
+
+<META NAME ="description" CONTENT ="Online version of Sailendra Biswas's 'Samsada Bangala abhidhana. 7th ed.' 
+from the Digital Dictionaries of South Asia">
+<META NAME ="keywords" CONTENT ="Bengali Dictionary, Online Bengali Dictionary, Bengali Online Dictionary">
+
+<META NAME ="DC.title" CONTENT ="Samsada Bangala abhidhana. 7th ed.">
+<META NAME ="DC.creator" CONTENT ="Biswas, Sailendra, 1918-">
+<META NAME ="DC.subject" SCHEME ="LCSH" CONTENT ="Bengali language -- Dictionaries">
+<META NAME ="DC.Contributor" CONTENT="Digital South Asia Library">
+<META NAME ="DC.publisher" CONTENT ="Kalikata : Sahitya Samsad">
+<META NAME ="DC.date" CONTENT ="2004">
+<META NAME ="DC.type" CONTENT ="Dictionary">
+<META NAME ="DC.format" CONTENT ="text/enriched; text/html; text/plain;">
+<META NAME ="DC.language"  SCHEME ="ISO 639-2"  CONTENT ="eng">
+<META NAME ="DC.language"  SCHEME ="ISO 639-2"  CONTENT ="ben">
+<META NAME ="DC.Date.Created" CONTENT ="2005-06-10">
+<META NAME ="DC.Identifier" SCHEME ="URL" CONTENT ="http://dsal.uchicago.edu/dictionaries/biswas-bangala/">
+<META NAME ="DC.identifier" SCHEME ="PURL" CONTENT ="http://www.purl.oclc.org/dsal/dictionaries/PK1687.B490">
+
+</head>
+
+<body bgcolor="white" link="navy" text="black" vlink="green">
+
+<table bgcolor="#FFFFFF" width="95%" cellspacing="2" cellpadding="2" border="0"><tr>
+<td align="left">
+<a href="http://dsal.uchicago.edu/dictionaries/"><img src="../../dictionaries/graphics/ddsa-small.jpg" alt="Digital Dictionaries of South Asia" border="0"></a>
+</td>
+<td>
+<a href="http://dsal.uchicago.edu/dictionaries/biswas-bangala/"><img src="../../dictionaries/graphics/biswas-bangala.jpg" alt="Samsada Bangala abhidhana" border="0"></a>
+</td></tr></table>
+
+</body>
+</html><br><br><table width="75%"><tr><td><a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=1&display=utf8">Previous Page [1]</a></td><td>Page 002</td><td><a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=3&display=utf8">Next Page [3]</a></td></tr></table><div class="blue">See this page in <a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=2&display=simple">simple ASCII</a></div><P>
+<span style="font-size:larger">অকঠিন</span> [ akaṭhina ]   বিণ. কঠিন্য নেই এমন; কোমল, মৃদু। [সং.  ন+কঠিন]।</P>
+<P>
+<span style="font-size:larger">অকঠোর</span> [ akaṭhōra ]   বিণ. কঠোরতা নেই এমন, অকঠিন; কোমল।  [সং. ন+কঠোর]।</P>
+<P>
+<span style="font-size:larger">অকন্টক</span> [ akanṭaka ]   বিণ. <b>1</b> কন্টকহীন, কাঁটাশূন্য, নিষ্কন্টক; <b>2</b> (আল.)  নিরুপদ্রব; <b>3</b> নিঃশত্রু। [সং. ন+কন্টক]।</P>
+<P>
+<span style="font-size:larger">অকথন</span> [ akathana ]   বি. কুকথা। ☐ বিণ. অকথ্য, অবক্তব্য, প্রকাশ করা  যায় না এমন। [সং. ন+কথন]।</P>
+<P>
+<span style="font-size:larger">অকথা</span> [ akathā ]   বি. অনুচিত কথা, অশ্লীল কথা [সং ন. (অপ্রশস্ত  অর্থে)+কথা]।</P>
+<P>
+<span style="font-size:larger">অকথিত</span> [ akathita ]   বিণ. অনুক্ত, না-বলা, অনুচ্চারিত (অকথিত  কাহিনী)। [স. ন+কথিত]।</P>
+<P>
+<span style="font-size:larger">অকথ্য</span> [ akathya ]   দ্র <b>অকথনীয়</b>।</P>
+<P>
+<span style="font-size:larger">অকপট</span> [ akapaṭa ]   বিণ. কপটতাহীন, ছলনাহীন, সরল (অকপট  ভক্তি, অকপট স্বীকারোক্তি)। [সং. ন+কপট]। ̃ <b>তা</b> বি.  সরলতা। ̃ <b>চিত্ত</b> বিণ. সরলমনা। <b>অকপটে</b> ক্রি-বিণ.  সরলভাবে, ছলনা না করে (অকপটে মনের কথা বলল)।</P>
+<P>
+<span style="font-size:larger">অকম্প, অকম্পিত, অকম্প্র</span> [ akampa, akampita, akampra ]   বিণ. <b>1</b> কম্পনহীন, স্হির,  নিশ্চল (অকম্প প্রদীপশিখা); <b>2</b> অবিচলিত (অকম্পিত  হৃদয়ে)। [সং, ন+কম্প, ন+কম্পিত, ন+কম্প্র]।</P>
+<P>
+<span style="font-size:larger">অকর</span> [ akara ]   বিণ. <b>1</b> করহীন, হস্তহীন; <b>2</b> নিষ্কর, শুষ্ক বা করের  অযোগ্য। [সং. ন+কর]।</P>
+<P>
+<span style="font-size:larger">অকরণ</span> [ akaraṇa ]   বি. <b>1</b> না করা, করণ বা কাজের অভার; <b>2</b> অনুচিত  কাজ। [সং. ন (অ)+করন]। <b>অকরণীয়</b> বিণ. <b>1</b> অকর্তব্য,  করার অযোগ্য; <b>2</b> বিবাহাদি সম্পর্ক স্হাপনের অযোগ্য  (অকরণীয় ঘর)।</P>
+<P>
+<span style="font-size:larger">অকরণী</span> [ akaraṇī ]   বি. (গণি.) যে রাশি করণী নয় অর্থাত্ যার মূল বার  করলে কোনো ভাগশেষ থাকে না, <eng>rational quantity</eng>  (যেমন 25=5)। [সং. ন+করণ+ঈ (স্ত্রী)]।</P>
+<P>
+<span style="font-size:larger">অকরণীয়</span> [ akaraṇī&#x1e8f;a ]   দ্র <b>অকরণ।</b></P>
+<P>
+<span style="font-size:larger">অকরুণ</span> [ akaruṇa ]   বিণ. দয়াহীন, নির্দয়, নিষ্ঠুর, করুণা নেই এমন  (অকরুণ ভাগ্য)। [সং. ন+করুণা]।</P>
+<P>
+<span style="font-size:larger">অকরোটি, (বার্জি.) অকরোটী</span> [ akarōṭi, (bārji.) akarōṭī ]   বি. আংশিক বা সম্পূর্ণ  করোটিহীন, মেরুদণ্ডী প্রাণীর নিম্নস্তরভুক্ত জন্তু, <eng>acrania</eng>  (বি.প.)। [সং. ন (অভাবার্থে)+করোটি]।</P>
+<P>
+<span style="font-size:larger">অকর্ণ</span> [ akarṇa ]   বিণ. <b>1</b> কর্ণহীন, কান নেই এমন; <b>2</b> শ্রবণহীন, বধির।  ☐ বি. <b>1</b> বধির ব্যক্তি, কালা; <b>2</b> সাপ। [সং. ন+কর্ণ]।</P>
+<P>
+<span style="font-size:larger">অকর্তব্য</span> [ akartabya ]   বিণ. করা উচিত নয় এমন, অকরণীয়। [সং.  ন+কর্তব্য]।</P>
+<P>
+<span style="font-size:larger">অকর্তা (-র্তৃ)</span> [ akartā (-rtṛ) ]   বি. যে কর্তা নয় (কে কর্তা কে অকর্তা বুঝি  না) ☐ বিণ. <b>1</b> কর্তৃত্বহীন; <b>2</b> নিষ্ক্রিয়, ক্রিয়াহীন। [সং.  ন+কর্তা]। <b>অকর্তৃত্ব</b> বি. কর্তৃত্বহীনতা; প্রাধান্যহীনতা।</P>
+<P>
+<span style="font-size:larger">অকর্ম (-র্মন্)</span> [ akarma (-rman) ]   বি. <b>1</b> অকাজ, কুকাজ অপকর্ম; <b>2</b> কর্মের  অভাব, নিষ্ক্রিয়তা, ক্রিয়াহীনতা। [সং. ন+কর্মন্]। ̃ <b>ক</b>    বিণ. (ব্যাক.) কর্মপদহীন অর্থাত্ যে ক্রিয়ার কর্ম নেই  (অকর্মক ক্রিয়া), <eng>intransitive, </eng> ̃ <b>ণ্য</b> বিণ. যে লোক  কোনো কাজের নয় এমন, অপদার্থ, অক্ষম। ̃ <b>ণ্যাতা</b> বিণ.  অক্ষমতা, অযোগ্যতা। <b>অকর্মা</b> (-র্মন্) বিণ. <b>1</b> কর্মহীন; <b>2</b>  অলস; <b>3</b> অকর্মণ্য। ☐ বি. অকর্মণ্য ব্যক্তি। <b>অকর্মার ধাড়ি</b>  অত্যন্ত অলস ব্যক্তি; একেবারে অকর্মণ্য ও অলস ব্যক্তি।</P>
+<P>
+<span style="font-size:larger">অকর্মা</span> [ akarmā ]   দ্র <b>অকর্ম</b>।</P>
+<P>
+<span style="font-size:larger">অকলঙ্ক</span> [ akalaṅka ]   বিণ. কলঙ্কশূন্য, নির্দোষ, অনিন্দা ('অকলঙ্ক নামে  তব কলঙ্ক রটিবে')। [সং. ন+কলঙ্ক]। <b>অকলঙ্কিত</b> বিণ.  কলঙ্কিত বা দূষিত নয় এমন, নির্মল। <b>অকলঙ্কী</b> (-ঙ্কিন্)  বিণ. নিষ্কলঙ্ক, নির্দোষ, নির্মল ('অকলঙ্কী চাঁদ')।</P>
+<P>
+<span style="font-size:larger">অকলুষ</span> [ akaluṣa ]   বি. কলুষ দোষ মল বা পাপের অভাব। ☐ বিণ. <b>1</b>  নিষ্পাপ; নির্দোষ; <b>2</b> মালিন্যহীন। [সং. ন+কলুষ]।  <b>অকলুষিত</b> বিণ. দোষযুক্ত বা মালিন্যযুক্ত নয় এমন,  নির্দোষ; অমলিন (অকলুষিত মন)।</P>
+<P>
+<span style="font-size:larger">অকল্পিত</span> [ akalpita ]   বিণ. <b>1</b> কল্পিত বা মনগড়া নয় এমন, কল্পনাসৃষ্ট  নয় এমন, প্রকৃত, সত্য; <b>2</b> যা কল্পনাও করা যায়নি এমন।  [সং. ন+কল্পিত]।</P>
+<P>
+<span style="font-size:larger">অকল্মষ</span> [ akalmaṣa ]   বিণ. যার কল্মষ অর্থাত্ পাপ নেই, নিষ্পাপ  (অকল্মষ চরিত্র)। [সং. ন+কল্মষ]।</P>
+<P>
+<span style="font-size:larger">অকল্যাণ</span> [ akalyāṇa ]   বি. অমঙ্গল, অনিষ্ঠ (গৃহস্হের অকল্যাণ হবে)।  [সং. ন+কল্যাণ]। ̃ <b>কর</b> বিণ. অমঙ্গলজনক, অশুভ।</P>
+<P>
+<span style="font-size:larger">অকষ্ট</span> [ akaṣṭa ]   বিণ. কষ্টহীন, ক্লেশহীন। [সং. ন+কষ্ট]।</P>
+<P>
+<span style="font-size:larger">অকষ্ট-কল্পনা</span> [ akaṣṭa-kalpanā ]   বি. স্বতঃস্ফূর্ত কল্পনা বা রচনা, অনায়াসসাধ্য  কল্পনা বা রচনা। [সং. ন+কষ্ট+কল্পনা]। <b>অকষ্ট-কল্পিত</b> বিণ.  কষ্টকল্পিত নয় এমন; অনায়াসসাধ্য, স্বতঃস্ফূর্তভাবে  রচিত।</P>
+<P>
+<span style="font-size:larger">অকষ্ট-বদ্ধ</span> [ akaṣṭa-baddha ]   বিণ. অত্যন্ত বিপন্ন, অত্যন্ত বিপদগ্রস্ত। [বাং. অ  (যথার্থ বা অত্যন্ত অর্থে) + সং. কষ্ট + বদ্ধ]।</P>
+<P>
+<span style="font-size:larger">অকস্মাত্</span> [ akasmāt ]   অব্য. ক্রি-বিণ. <b>1</b> হঠাত্, সহসা, অতর্কিতভাবে,  আচমকা ('অকস্মাত্ স্বপ্ন গেল টুটে'; সু. দ.); <b>2</b> অকারণে,  কোনো কারণ ছাড়াই। [সং. ন+কস্মাত্]।</P>
+<P>
+<span style="font-size:larger">অকাজ</span> [ akāja ]   বি. <b>1</b> যা কাজ নয়; বাজে কাজ, অনুচিত কাজ  (অকাজের গোঁসাই); <b>2</b> কাজের অভাব। [বাং. অ (মন্দ  অর্থে) + কাজ]।</P>
+<P>
+<span style="font-size:larger">অকাট</span> [ akāṭa ]   দ্র <b>আকাট</b>।</P>
+<P>
+<span style="font-size:larger">অকাট্য</span> [ akāṭya ]   বিণ. যা কাটা বা খণ্ডন করা যায় না, অখণ্ডনীয়  (অকাট্য যুক্তি) [সং. ন+বাং. কাট্য (প্রাক্. √ কট্ট  থেকে)]।</P>
+<P>
+<span style="font-size:larger">অকাণ্ড</span> [ akāṇḍa ]   বি. গুঁড়ি বা কাণ্ডহীন বৃক্ষ। ☐ বিণ. <b>1</b> অঘটনীয়; <b>2</b>  আকস্মিক, অতর্কিত;  <b>3</b> কাণ্ডহীন। [সং. ন+কাণ্ড]।  <b>অকাণ্ডে</b> ক্রি-বিণ. <b>1</b> হঠাত্, অকস্মাত্; <b>2</b> বিনা কারণে।</P>
+<P>
+<span style="font-size:larger">অকাতর</span> [ akātara ]   বিণ. <b>1</b> কাতর নয় এমন; <b>2</b> ব্যাকুলতাশূন্য; <b>3</b>  নিঃশঙ্ক;  <b>4</b> সহিষ্ণু (পরিশ্রমে অকাতর)। <b>অকাতরে</b>  ক্রি-বিণ. <b>1</b> অক্লেশে, অনায়াসে (অকাতরে দান করা); <b>2</b>  অকুণ্ঠচিত্তে; <b>3</b> অবাধে (অকাতরে ঘুমাছে)।</P>
+<P>
+<span style="font-size:larger">অকাম</span> [ akāma ]   বিণ. নিষ্কাম, বাসনাশূন্য, কাম বা ভোগবাসনা নেই  এমন;  <b>2</b> জিতেন্দ্রিয়। [সং.ন+কাম]। ☐বি (আঞ্চ.)</P>
+<table width="75%"><tr><td><a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=1&display=utf8">Previous Page [1]</a></td><td>Page 002</td><td><a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=3&display=utf8">Next Page [3]</a></td></tr></table><div class="blue">See this page in <a href="/cgi-bin/romadict.pl?table=biswas-bangala&page=2&display=simple">simple ASCII</a></div><hr width ="75%">
+
+<div align ="center" class ="bitblue">
+<a href="http://dsal.uchicago.edu/dictionaries/biswas-bangala/">Back to the Search Page </a>&nbsp; | &nbsp;
+<a href="http://dsal.uchicago.edu/dictionaries/">Back to 
+the DDSA Page</a><br><br>
+</div>
