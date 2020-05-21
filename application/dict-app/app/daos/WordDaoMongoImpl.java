@@ -31,7 +31,7 @@ public class WordDaoMongoImpl implements WordDao {
     public Word create(final Word word) {
         final Document wordDoc = MongoManager.toDocument(word);
         wordCollection.insertOne(wordDoc);
-        log.info("Creating word on database: " + word.getSpelling());
+        log.debug("Creating word on database: " + word.getSpelling());
         return word;
     }
 
@@ -40,7 +40,7 @@ public class WordDaoMongoImpl implements WordDao {
         final BasicDBObject query = MongoManager.getActiveObjectQuery();
         query.put(MongoManager.ID_PARAM, wordId);
         final Document wordDoc = wordCollection.find(query).first();
-        log.info("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
+        log.debug("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
         return wordDoc == null ? null: MongoManager.toWord(wordDoc);
     }
 
@@ -49,7 +49,7 @@ public class WordDaoMongoImpl implements WordDao {
         final BasicDBObject query = MongoManager.getActiveObjectQuery();
         query.put(Constants.SPELLING_KEY, spelling);
         final Document wordDoc = wordCollection.find(query).first();
-        log.info("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
+        log.debug("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
         return wordDoc == null ? null: MongoManager.toWord(wordDoc);
     }
 
@@ -79,10 +79,10 @@ public class WordDaoMongoImpl implements WordDao {
             .iterator();
 
         final Set<String> result = new HashSet<>();
-        while(words.hasNext()) {
+        while (words.hasNext()) {
             result.add(words.tryNext().get(Constants.SPELLING_KEY).toString());
         }
-        log.info("@WDMI006 searching words by spelling: " + spellingQuery);
+        log.debug("@WDMI006 searching words by spelling: " + spellingQuery);
         return result;
     }
 
@@ -93,7 +93,7 @@ public class WordDaoMongoImpl implements WordDao {
 
     public void deleteAll() {
         final DeleteResult result = wordCollection.deleteMany(new BasicDBObject());
-        log.info("Delete db entries: " + result);
+        log.debug("Delete db entries: " + result);
     }
 
     @Override

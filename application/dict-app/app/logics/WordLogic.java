@@ -79,6 +79,7 @@ public class WordLogic {
         int numberOfTries = 10;
         for (int i = 0; i < numberOfTries; i++) {
             String wordId = DictUtil.generateWordId();
+            //To do, use distributed synchronization
             synchronized (wordId.intern()) {
                 if (wordDao.getById(wordId) == null) {
                     word.setId(wordId);
@@ -155,10 +156,8 @@ public class WordLogic {
     public Word updateWord(final Word word) {
         validateUpdateWordObject(word);
         Lock wordLock = locks.get(word.getId());
-        logger.info(wordLock.toString());
         try {
             wordLock.lock();
-            logger.info(wordLock.toString());
             final Word currentWord = getWordById(word.getId());
             final Word updatedWord = Word.builder()
                 .id(currentWord.getId())

@@ -128,7 +128,7 @@ function handleMeaningData(data) {
 
     console.log(data);
 
-    return data.tempMeaningString;
+    return data.tempMeaning;
 
     /*
     var meanings = data.meanings;

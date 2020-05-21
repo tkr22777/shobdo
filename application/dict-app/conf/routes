@@ -36,6 +36,19 @@ GET     /api/v1/words                                    controllers.WordControl
 POST    /api/v1/words/search                             controllers.WordController.searchWordsBySpelling()
 
 ##############################
+# User Request APIs for Word :
+##############################
+
+# Create request for word creation:
+POST    /api/v1/requests/words                           controllers.UserRequestController.createUserRequestForWordCreation()
+
+# Create request for word update:
+POST    /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordUpdate(wordId: String)
+
+# Create request for word deletion:
+POST    /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordDeletion(wordId: String)
+
+##############################
 # CRUDL API for word meanings:
 ##############################
 
