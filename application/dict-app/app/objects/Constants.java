@@ -1,8 +1,5 @@
 package objects;
 
-/**
- * Created by Tahsin Kabir on 11/24/16.
- */
 public final class Constants {
 
     private Constants() {}

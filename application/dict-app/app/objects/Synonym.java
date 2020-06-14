@@ -6,9 +6,6 @@ import lombok.*;
 
 import java.util.Objects;
 
-/**
- * Created by Tahsin Kabir on 6/16/16.
- */
 @Data
 @Setter
 @Getter

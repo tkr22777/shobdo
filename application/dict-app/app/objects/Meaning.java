@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import utilities.JsonUtil;
 
-/**
- * Created by Tahsin Kabir on 6/16/16.
- */
 @Data
 @Setter
 @Getter

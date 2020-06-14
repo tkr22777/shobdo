@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by Tahsin Kabir on 5/28/16.
- */
 public class WordController extends Controller {
 
     private static final WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();

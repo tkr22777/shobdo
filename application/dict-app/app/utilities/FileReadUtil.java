@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
 
-/**
- * Created by Tahsin Kabir on 9/1/16.
- */
 public class FileReadUtil {
 
     private ShobdoLogger log = new ShobdoLogger(FileReadUtil.class);

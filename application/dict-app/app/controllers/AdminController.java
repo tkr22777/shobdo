@@ -5,9 +5,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.ShobdoLogger;
 
-/**
- * Created by Tahsin Kabir on 12/31/16.
- */
 public class AdminController extends Controller {
 
     private static final WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();

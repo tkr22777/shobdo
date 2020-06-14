@@ -13,9 +13,6 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
-/**
- * Created by Tahsin Kabir on 8/14/16.
- */
 public class WordLogic {
 
     private final WordDao wordDao;

@@ -7,9 +7,6 @@ import utilities.JsonUtil;
 
 import java.util.*;
 
-/**
- * Created by Tahsin Kabir on 8/21/16.
- */
 @Data
 @Setter
 @Getter

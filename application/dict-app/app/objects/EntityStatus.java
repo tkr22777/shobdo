@@ -1,6 +1,5 @@
 package objects;
 
-//Object/Entity Status
 public enum  EntityStatus {
     ACTIVE("ACTIVE"),
     DELETED("DELETED");

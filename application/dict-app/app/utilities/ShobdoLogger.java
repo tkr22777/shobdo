@@ -3,9 +3,6 @@ package utilities;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Tahsin Kabir on 8/21/16.
- */
 public final class ShobdoLogger {
 
     private final Class<?> class_type;

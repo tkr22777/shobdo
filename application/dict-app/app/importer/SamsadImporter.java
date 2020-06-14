@@ -7,10 +7,6 @@ import utilities.ShobdoLogger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by Tahsin Kabir on 9/1/16.
- */
-
 public class SamsadImporter {
 
     private ShobdoLogger log = new ShobdoLogger(SamsadImporter.class);

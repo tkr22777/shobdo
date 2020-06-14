@@ -15,9 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-/**
- * Created by Tahsin Kabir on 8/14/16.
- */
 public class WordDaoMongoImpl implements WordDao {
 
     private final MongoCollection<Document> wordCollection;

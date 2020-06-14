@@ -7,9 +7,6 @@ import objects.Meaning;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by Tahsin Kabir on 8/27/16.
- */
 public class DictUtil {
 
     private static final ShobdoLogger log = new ShobdoLogger(DictUtil.class);
