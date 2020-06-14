@@ -1,3 +1,5 @@
+package integration;
+
 import importer.SamsadImporter;
 import logics.WordLogic;
 import objects.Word;

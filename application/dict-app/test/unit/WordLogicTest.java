@@ -1,4 +1,4 @@
-package unitTests;
+package unit;
 
 import caches.WordCache;
 import daos.WordDao;

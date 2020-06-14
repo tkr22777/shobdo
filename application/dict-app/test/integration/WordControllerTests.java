@@ -1,4 +1,4 @@
-package IntegrationTests;
+package integration;
 
 import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
