@@ -37,7 +37,7 @@ public class UserRequestLogic {
 
     public UserRequest getRequest(@NotNull final String requestId) {
         if (requestId == null || requestId.trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + requestId);
+            throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + requestId);
         }
         return userRequestDao.get(requestId);
     }

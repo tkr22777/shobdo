@@ -152,7 +152,7 @@ public class WordControllerTests extends WithApplication {
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
             Result result = Helpers.route(Helpers.fakeRequest(POST, "/api/v1/words").bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.MEANING_PROVIDED, contentAsString(result));
+            Assert.assertEquals(Constants.MESSAGES_MEANING_PROVIDED, contentAsString(result));
         });
     }
 
@@ -291,7 +291,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.SPELLING_NULLOREMPTY, contentAsString(result));
+            Assert.assertEquals(Constants.MESSAGES_SPELLING_NULLOREMPTY, contentAsString(result));
         });
     }
 
@@ -313,7 +313,7 @@ public class WordControllerTests extends WithApplication {
 
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,"/api/v1/words/" + updateRequestWord.getId()).bodyJson(updateRequestWordJNode));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.MEANING_PROVIDED, contentAsString(result));
+            Assert.assertEquals(Constants.MESSAGES_MEANING_PROVIDED, contentAsString(result));
         });
     }
 
@@ -404,7 +404,7 @@ public class WordControllerTests extends WithApplication {
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/someWordId/meanings")
                 .bodyJson(bodyJson));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.MEANING_NULLOREMPTY, contentAsString(result));
+            Assert.assertEquals(Constants.MESSAGES_MEANING_NULLOREMPTY, contentAsString(result));
         });
     }
 
@@ -530,7 +530,7 @@ public class WordControllerTests extends WithApplication {
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
             Result result = Helpers.route(Helpers.fakeRequest(Helpers.PUT,route).bodyJson(meaningRequestJNode));
             Assert.assertEquals(Helpers.BAD_REQUEST, result.status());
-            Assert.assertEquals(Constants.MEANING_NULLOREMPTY, contentAsString(result));
+            Assert.assertEquals(Constants.MESSAGES_MEANING_NULLOREMPTY, contentAsString(result));
         });
     }
 

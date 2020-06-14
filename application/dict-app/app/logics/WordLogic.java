@@ -50,9 +50,9 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(word.getId()));
         }
 
-        Preconditions.checkNotNull(word.getSpelling(), Constants.SPELLING_NULLOREMPTY);
+        Preconditions.checkNotNull(word.getSpelling(), Constants.MESSAGES_SPELLING_NULLOREMPTY);
         if (word.getSpelling().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
         }
 
         final Word existingWord = wordDao.getBySpelling(word.getSpelling());
@@ -62,7 +62,7 @@ public class WordLogic {
 
         //word creation does not accept meanings
         if (word.getMeanings() != null && word.getMeanings().size() > 0) {
-            throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
+            throw new IllegalArgumentException(Constants.MESSAGES_MEANING_PROVIDED);
         }
     }
 
@@ -92,7 +92,7 @@ public class WordLogic {
     /* GET word by id */
     public Word getWordById(@NotNull final String wordId) {
         if (wordId == null || wordId.trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY + wordId);
+            throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + wordId);
         }
         final Word word = wordDao.getById(wordId);
         if (word == null) {
@@ -104,7 +104,7 @@ public class WordLogic {
     /* GET word by (exact) spelling */
     public Word getWordBySpelling(@NotNull final String spelling) {
         if (spelling == null || spelling.trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
         }
 
         final Word cachedWord = wordCache.getBySpelling(spelling);
@@ -124,15 +124,15 @@ public class WordLogic {
     /* Update */
     public void validateUpdateWordObject(final Word updateWord) {
         if (updateWord.getId() == null || updateWord.getId().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY);
         }
 
         if (updateWord.getSpelling() == null || updateWord.getSpelling().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.SPELLING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
         }
 
         if (updateWord.getMeanings() != null && updateWord.getMeanings().size() > 0) {
-            throw new IllegalArgumentException(Constants.MEANING_PROVIDED);
+            throw new IllegalArgumentException(Constants.MESSAGES_MEANING_PROVIDED);
         }
 
         if (getWordById(updateWord.getId()) == null) {
@@ -245,7 +245,7 @@ public class WordLogic {
         }
 
         if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_MEANING_NULLOREMPTY);
         }
 
         final Word currentWord = getWordById(wordId);
@@ -289,11 +289,11 @@ public class WordLogic {
     /* UPDATE meaning todo implement using WORD's interfaces */
     public void validateUpdateMeaningObject(final String wordId, final Meaning meaning) {
         if (meaning.getId() == null) {
-            throw new IllegalArgumentException(Constants.ID_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY);
         }
 
         if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
-            throw new IllegalArgumentException(Constants.MEANING_NULLOREMPTY);
+            throw new IllegalArgumentException(Constants.MESSAGES_MEANING_NULLOREMPTY);
         }
 
         final Word currentWord = getWordById(wordId);
