@@ -18,17 +18,13 @@ public class Word extends EntityMeta {
 
     private String id;
     private String spelling;
-    private String tempMeaningString;
+    private Set<Antonym> antonyms;
+    private Set<Synonym> synonyms;
 
-    //set of spellings of antonyms of the word
-    private HashSet<Antonym> antonyms;
-
-    //set of spellings of synonyms of the word
-    private HashSet<Synonym> synonyms;
-
-    //meaningId to meanings map, easier to lookup
+    //Map of meaningId to meaning objects for the the word, easier to lookup to following operations
     private HashMap<String, Meaning> meanings;
 
+    /* Should move these logic to word logic? */
     public void addMeaningToWord(final Meaning meaning) {
         if (meaning == null || meaning.getId() == null) {
             throw new RuntimeException("Meaning or MeaningId is null");
@@ -67,12 +63,12 @@ public class Word extends EntityMeta {
         synonyms.remove(synonym);
     }
 
-    public JsonNode toAPIJsonNode() {
-        return new ObjectMapper().convertValue(this, JsonNode.class);
-    }
-
     public static Word fromWord(final Word word) {
         return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
+    }
+
+    public JsonNode toAPIJsonNode() {
+        return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
     @Override

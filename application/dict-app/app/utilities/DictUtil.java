@@ -1,11 +1,13 @@
 package utilities;
 
 import objects.Constants;
-import objects.Word;
 import objects.Meaning;
+import objects.Word;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 public class DictUtil {
 
@@ -22,77 +24,38 @@ public class DictUtil {
         return String.format("%s-%s", Constants.PREFIX_WORD_ID, UUID.randomUUID());
     }
 
-    public static Set<Meaning> genMeaning(final String wordSpelling, final int count){
+    public static Set<Meaning> generateMeanings(final String spelling, final int count){
         final Set<Meaning> meanings = new HashSet<>();
         for (int i = 0 ; i < count ; i++) {
-            Meaning meaning = genAMeaning(wordSpelling);
+            Meaning meaning = generateMeaning(spelling);
             meanings.add(meaning);
         }
         return meanings;
     }
 
-    private static Meaning genAMeaning(final String wordSpelling) {
+    private static Meaning generateMeaning(final String spelling) {
         final String meaningString =  BanglaUtil.generateRandomSentence(3);
-        final String exampleSentence =  BanglaUtil.generateSentenceWithWord(wordSpelling);
+        final String exampleSentence =  BanglaUtil.generateSentenceWithWord(spelling);
         return Meaning.builder()
             .meaning(meaningString)
             .exampleSentence(exampleSentence)
             .build();
     }
 
-    public static Set<Word> generateRandomWordSet(int numberOfWords){
+    public static Set<Word> generateRandomWordSet(int count){
         final Set<Word> words = new HashSet<>();
-        for (int i = 0 ; i < numberOfWords ; i++) {
-            final Word word = genARandomWord();
+        for (int i = 0 ; i < count ; i++) {
+            final Word word = generateRandomWord();
             words.add(word);
         }
         return words;
     }
 
     /* does not add wordId */
-    public static Word genARandomWord() {
+    public static Word generateRandomWord() {
         final int wordLength = randIntInRange(2, 22);
         return Word.builder()
             .spelling(BanglaUtil.generateRandomWordString(wordLength))
             .build();
-    }
-
-    public static void printStringsByTag(String tag, List<?> strings, int start, int limit, boolean randomize) {
-
-        if (strings == null) {
-            return;
-        }
-
-        List<?> toPrint = strings;
-        if (randomize) {
-            toPrint = new ArrayList<>(strings);
-            Collections.shuffle(toPrint);
-        }
-
-        for (int i = start ; i < toPrint.size() && i <  start + limit ; i++) {
-            log.info("#" + i + " " + tag + ": '"+ toPrint.get(i).toString() + "'");
-        }
-    }
-
-    public static Map<String, Word> removeKeyValuesForKeys(Map<String, Word> map, Set<String> keys) {
-        return map.entrySet().stream()
-            .filter(e -> !keys.contains(e.getKey() ) )
-            .collect(
-                Collectors.toMap(
-                    e -> e.getKey(),
-                    e -> e.getValue()
-                )
-            );
-    }
-
-    public static Map<String, Word> filterForKeys(Map<String, Word> map, Set<String> keys) {
-        return map.entrySet().stream()
-            .filter(e -> keys.contains(e.getKey()))
-            .collect(
-                Collectors.toMap(
-                    e->e.getKey(),
-                    e->e.getValue()
-                )
-            );
     }
 }

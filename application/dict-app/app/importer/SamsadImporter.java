@@ -42,7 +42,7 @@ public class SamsadImporter {
 
         return Word.builder()
             .spelling(spelling)
-            .tempMeaningString(meaning)
+            //.tempMeaningString(meaning)
             .build();
     }
 

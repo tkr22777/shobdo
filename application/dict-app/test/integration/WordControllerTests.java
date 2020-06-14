@@ -48,7 +48,7 @@ public class WordControllerTests extends WithApplication {
     }
 
     private void createMeaningsInDbForWord(String wordId, String spelling, int numberOfMeanings) {
-        List<Meaning> meaningList = new ArrayList<>(DictUtil.genMeaning(spelling, numberOfMeanings));
+        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateMeanings(spelling, numberOfMeanings));
         meaningList = meaningList.stream()
             .map(meaning -> wordLogic.createMeaning(wordId, meaning))
             .collect(Collectors.toList());
@@ -71,7 +71,6 @@ public class WordControllerTests extends WithApplication {
 
             String jsonWordString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"tempMeaningString\" : null,\n" +
                 "  \"spelling\" : \"ঞতটতথঙ\",\n" +
                 "  \"meanings\" : { },\n" +
                 "  \"antonyms\" : [ ],\n" +
@@ -344,8 +343,9 @@ public class WordControllerTests extends WithApplication {
             String jsonMeaningString = "{\n" +
                 "  \"id\" : null,\n" +
                 "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
-                "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                 "  \"strength\" : 0,\n" +
+                "  \"partOfSpeech\" : \"অব্যয়\",\n" +
+                "  \"pronunciation\" : null,\n" +
                 "  \"exampleSentence\" : \"থঞথঠঝচচতখছট খঝণঠধঙ " + word.getSpelling() + " ঙঞজতঢণটজঠধ \"\n" +
             "}";
 

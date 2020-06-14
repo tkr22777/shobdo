@@ -302,7 +302,7 @@ public class WordController extends Controller {
                 for (int count = 0; count < wordCount; count++) {
                     int numOfTries = 100;
                     for (int tryCount = 0; tryCount < numOfTries; tryCount++) {
-                        Word word = DictUtil.genARandomWord();
+                        Word word = DictUtil.generateRandomWord();
                         if (wordSpellingSet.contains(word.getSpelling())) {
                             continue;
                         }
@@ -332,7 +332,7 @@ public class WordController extends Controller {
 
                 for (Word word: createdWords) {
                     allMeanings.addAll(
-                        DictUtil.genMeaning(word.getSpelling(), DictUtil.randIntInRange(1, 5))
+                        DictUtil.generateMeanings(word.getSpelling(), DictUtil.randIntInRange(1, 5))
                             .stream()
                             .map(meaning -> wordLogic.createMeaning(word.getId(), meaning))
                             .collect(Collectors.toList())

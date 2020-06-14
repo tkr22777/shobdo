@@ -18,7 +18,7 @@ public class Antonym {
     private String spelling;
 
     //wordId of the word which has the antonym as its spelling
-    @JsonIgnore //why ignore?
+    @JsonIgnore //Ignore to not expose to API
     private String targetWordId;
 
     //determines how strong of an antonym it is

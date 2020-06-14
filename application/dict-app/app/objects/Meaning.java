@@ -15,22 +15,18 @@ import utilities.JsonUtil;
 public class Meaning extends EntityMeta {
 
     private String id;
-    private String partOfSpeech; //pod-porichoy
-    private String meaning; //ortho
-    private String exampleSentence;
-    //private String pronunciation; //uccharon
-    //private String origin; //but-potti
-    //private String english; //poribhasha
-
-    //how strongly does this meaning apply to the word, 0 means unset, higher is stronger
+    private String meaning;
     private int strength;
-
-    public JsonNode toAPIJNode() {
-        return new ObjectMapper().convertValue(this, JsonNode.class);
-    }
+    private String partOfSpeech;
+    private String pronunciation;
+    private String exampleSentence;
 
     public static Meaning fromMeaning(final Meaning meaning) {
         return (Meaning) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(meaning), Meaning.class);
+    }
+
+    public JsonNode toAPIJNode() {
+        return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
     @Override

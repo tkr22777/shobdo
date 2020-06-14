@@ -6,11 +6,11 @@ public enum  EntityStatus {
 
     private final String status;
 
-    EntityStatus(final String status)  {
-        this.status = status;
-    }
-
     public String getStatus() {
         return status;
+    }
+
+    EntityStatus(final String status)  {
+        this.status = status;
     }
 }

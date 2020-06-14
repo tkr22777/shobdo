@@ -1,4 +1,5 @@
 package objects;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ public class Synonym {
     private String spelling;
 
     //wordId of the word which has the synonym as its spelling
-    @JsonIgnore
+    @JsonIgnore  //Ignore to not expose to API
     private String targetWordId;
 
     //determines how strong of an antonym it is

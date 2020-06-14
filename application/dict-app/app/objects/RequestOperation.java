@@ -6,11 +6,11 @@ public enum RequestOperation {
     UPDATE("UPDATE"),
     DELETE("DELETE");
 
+    private final String operation;
+
     public String getOperation() {
         return operation;
     }
-
-    private final String operation;
 
     RequestOperation(final String operation)  {
         this.operation = operation;
