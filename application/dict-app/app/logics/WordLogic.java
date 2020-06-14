@@ -35,7 +35,7 @@ public class WordLogic {
 
     private String generateMeaningId() {
         /* TODO validate unique meaningId generation by having a reverse lookup */
-        return String.format("%s-%s", Constants.MEANING_ID_PREFIX, UUID.randomUUID());
+        return String.format("%s-%s", Constants.PREFIX_MEANING_ID, UUID.randomUUID());
     }
 
     /* Create */

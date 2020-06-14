@@ -47,16 +47,19 @@ public class UserRequestDaoMongoImpl implements UserRequestDao {
 
     @Override
     public void delete(String requestId) {
+        //TODO implement
         //so delete via update/setting the deleted timestamp, status deleted
     }
 
     @Override
     public long count() {
+        //TODO implement
         return 0;
     }
 
     @Override
     public ArrayList<UserRequest> list(String startId, int limit) {
+        //TODO implement
         return null;
     }
 }

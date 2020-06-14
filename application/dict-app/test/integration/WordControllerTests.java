@@ -188,7 +188,7 @@ public class WordControllerTests extends WithApplication {
             createWordsInDb(1);
             Word createdWord = createdWords.get(0);
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty(Constants.SPELLING_KEY, createdWord.getSpelling());
+            jsonObject.addProperty(Constants.KEY_SPELLING, createdWord.getSpelling());
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
 
             Result result = Helpers.route(
@@ -203,7 +203,7 @@ public class WordControllerTests extends WithApplication {
 
         Helpers.running(Helpers.fakeApplication(), () -> {
 
-            String jsonWordString = "{\"" + Constants.SPELLING_KEY + "\":\"NonExistentSpelling\"}";
+            String jsonWordString = "{\"" + Constants.KEY_SPELLING + "\":\"NonExistentSpelling\"}";
             JsonNode bodyJson = JsonUtil.jStringToJNode(jsonWordString);
 
             Result result = Helpers.route(
@@ -683,7 +683,7 @@ public class WordControllerTests extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
 
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty(Constants.SEARCH_STRING_KEY, prefix);
+            jsonObject.addProperty(Constants.KEY_SEARCH_STRING, prefix);
             JsonNode requestBodyJson = JsonUtil.jStringToJNode(jsonObject.toString());
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/search").bodyJson(requestBodyJson));
             Assert.assertEquals(Helpers.OK, result.status());

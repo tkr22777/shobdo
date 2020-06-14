@@ -18,23 +18,28 @@ import utilities.ShobdoLogger;
 
     private static final ShobdoLogger log = new ShobdoLogger(MongoManager.class);
 
-    /* DB HOST INFO */
+    /* MONGODB HOST INFO */
     private static final String HOSTNAME = ConfigFactory.load().getString("shobdo.mongodb.hostname");
     private static final int PORT = Integer.parseInt(ConfigFactory.load().getString("shobdo.mongodb.port"));
 
-    /* DB */
+    /* MONGODB INFO */
     private static final String DB_NAME = ConfigFactory.load().getString("shobdo.mongodb.database.dbname");
-    // Mongodb singleton client
+
+    /* MONGODB SINGLETON CLIENT */
     private static MongoDatabase mongoDB;
 
-    /* Collections */
+    /* MONGODB COLLECTIONS */
+    private static final String COLLECTION_WORDS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
+    private static final String COLLECTION_RECORDS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
+
     private static MongoCollection wordCollection;
     private static MongoCollection userRequestsCollection;
 
-    private static final String COL_WORDS    = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
-    private static final String COL_REQUESTS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
-
-    /* helper fields */
+    /*
+    *  Helper fields:
+    *  Id: used as an identifier of objects stored as a document in a collection
+    *  Status: used as an mark the current status of an object in the database, check objects.EntityStatus
+    */
     public static final String ID_PARAM = "id";
     private static final String STATUS_PARAM = "status";
 
@@ -43,7 +48,7 @@ import utilities.ShobdoLogger;
 
     private static synchronized MongoDatabase getDatabase() {
         if (mongoDB == null) {
-            log.info("@RDMI001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
+            log.info("@MM001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
             mongoDB = new MongoClient(HOSTNAME, PORT).getDatabase(DB_NAME);
         }
         return mongoDB;
@@ -51,14 +56,14 @@ import utilities.ShobdoLogger;
 
     public static synchronized MongoCollection getWordCollection() {
         if (wordCollection == null) {
-            wordCollection = getDatabase().getCollection(COL_WORDS);
+            wordCollection = getDatabase().getCollection(COLLECTION_WORDS);
         }
         return wordCollection;
     }
 
     public static synchronized MongoCollection getUserRequestsCollection() {
         if (userRequestsCollection == null) {
-            userRequestsCollection = getDatabase().getCollection(COL_REQUESTS);
+            userRequestsCollection = getDatabase().getCollection(COLLECTION_RECORDS);
         }
         return userRequestsCollection;
     }

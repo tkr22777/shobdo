@@ -44,7 +44,7 @@ public class WordDaoMongoImpl implements WordDao {
     @Override
     public Word getBySpelling(final String spelling) {
         final BasicDBObject query = MongoManager.getActiveObjectQuery();
-        query.put(Constants.SPELLING_KEY, spelling);
+        query.put(Constants.KEY_SPELLING, spelling);
         final Document wordDoc = wordCollection.find(query).first();
         log.debug("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
         return wordDoc == null ? null: MongoManager.toWord(wordDoc);
@@ -61,23 +61,24 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public void delete(final String wordId) {
+        //TODO implement/verify
         //so delete via update/setting the deleted timestamp or flag
     }
 
     @Override
     public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
         final BasicDBObject query = MongoManager.getActiveObjectQuery();
-        query.put(Constants.SPELLING_KEY, Pattern.compile("^" + spellingQuery + ".*"));
+        query.put(Constants.KEY_SPELLING, Pattern.compile("^" + spellingQuery + ".*"));
 
         final MongoCursor<Document> words = wordCollection.find(query)
-            .projection(Projections.include(Constants.SPELLING_KEY))
+            .projection(Projections.include(Constants.KEY_SPELLING))
             .limit(limit)
             .batchSize(100)
             .iterator();
 
         final Set<String> result = new HashSet<>();
         while (words.hasNext()) {
-            result.add(words.tryNext().get(Constants.SPELLING_KEY).toString());
+            result.add(words.tryNext().get(Constants.KEY_SPELLING).toString());
         }
         log.debug("@WDMI006 searching words by spelling: " + spellingQuery);
         return result;
@@ -85,16 +86,19 @@ public class WordDaoMongoImpl implements WordDao {
 
     @Override
     public long count() {
+        //TODO implement/verify
         return wordCollection.count();
     }
 
     public void deleteAll() {
+        //TODO implement/verify
         final DeleteResult result = wordCollection.deleteMany(new BasicDBObject());
         log.debug("Delete db entries: " + result);
     }
 
     @Override
     public ArrayList<Word> list(final String startWordId, final int limit) {
+        //TODO implement/verify
         return new ArrayList<>();
     }
 

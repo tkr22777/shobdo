@@ -32,7 +32,7 @@ public class UserRequestLogic {
     }
 
     private String generateUserRequestId() {
-        return String.format("%s-%s", Constants.REQUEST_ID_PREFIX, UUID.randomUUID());
+        return String.format("%s-%s", Constants.PREFIX_REQUEST_ID, UUID.randomUUID());
     }
 
     public UserRequest getRequest(@NotNull final String requestId) {

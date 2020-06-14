@@ -6,17 +6,16 @@ public final class Constants {
 
     public static final int SEARCH_SPELLING_LIMIT = 40;
 
-    public static final String WORD_ID_PREFIX = "WD";
-    public static final String MEANING_ID_PREFIX = "MNG";
-    public static final String REQUEST_ID_PREFIX = "REQ";
+    public static final String PREFIX_WORD_ID = "WD";
+    public static final String PREFIX_MEANING_ID = "MNG";
+    public static final String PREFIX_REQUEST_ID = "REQ";
 
     //REST REQUEST FIELD NAMES
-    public static final String SPELLING_KEY = "spelling";
-    public static final String STRENGTH_KEY = "strength";
-    public static final String SEARCH_STRING_KEY = "searchString";
-    public static final String WORD_COUNT_KEY = "wordCount";
+    public static final String KEY_SPELLING = "spelling";
+    public static final String KEY_STRENGTH = "strength";
+    public static final String KEY_SEARCH_STRING = "searchString";
+    public static final String KEY_WORD_COUNT = "wordCount";
 
-    public static final String REQUEST_MERGED = "Requests Merged";
 
     //Messages
     public static final String ENTITY_IS_DELETED= "Entity has been deleted.";
@@ -26,6 +25,7 @@ public final class Constants {
     public static final String CREATE_SPELLING_EXISTS = "spelling exists:%s";
     public static final String MEANING_PROVIDED = "Mutating meaning not allowed with this route";
     public static final String ENTITY_LOCKED = "Entity is currently locked:";
+    public static final String REQUEST_MERGED = "Requests Merged";
 
     public static class Messages {
         public static String UserProvidedIdForbidden(final String id) {

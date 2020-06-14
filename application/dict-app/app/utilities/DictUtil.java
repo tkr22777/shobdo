@@ -19,7 +19,7 @@ public class DictUtil {
     }
 
     public static String generateWordId() {
-        return String.format("%s-%s", Constants.WORD_ID_PREFIX, UUID.randomUUID());
+        return String.format("%s-%s", Constants.PREFIX_WORD_ID, UUID.randomUUID());
     }
 
     public static Set<Meaning> genMeaning(final String wordSpelling, final int count){

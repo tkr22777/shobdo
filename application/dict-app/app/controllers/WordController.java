@@ -71,11 +71,11 @@ public class WordController extends Controller {
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordBySpelling", parameters,
             () -> {
-                if (!body.has(Constants.SPELLING_KEY)) {
+                if (!body.has(Constants.KEY_SPELLING)) {
                     throw new IllegalArgumentException("Word spelling has not been provided");
                 }
 
-                final String spelling = body.get(Constants.SPELLING_KEY).asText();
+                final String spelling = body.get(Constants.KEY_SPELLING).asText();
                 return ok(
                     wordLogic.getWordBySpelling(spelling)
                         .toAPIJsonNode()
@@ -130,10 +130,10 @@ public class WordController extends Controller {
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "searchWordsBySpelling", parameters,
             () -> {
-                if (!body.has(Constants.SEARCH_STRING_KEY)) {
+                if (!body.has(Constants.KEY_SEARCH_STRING)) {
                     return badRequest();
                 }
-                final String searchString = body.get(Constants.SEARCH_STRING_KEY).asText();
+                final String searchString = body.get(Constants.KEY_SEARCH_STRING).asText();
                 return ok(Json.toJson(wordLogic.searchWords(searchString)));
             }
         );
@@ -296,7 +296,7 @@ public class WordController extends Controller {
                 Set<String> wordSpellingSet = new HashSet<>();
                 Set<Word> words = new HashSet<>();
 
-                final int wordCount = Integer.parseInt(request().body().asJson().get(Constants.WORD_COUNT_KEY).asText());
+                final int wordCount = Integer.parseInt(request().body().asJson().get(Constants.KEY_WORD_COUNT).asText());
                 logger.info("Total word creation requested:" + wordCount);
 
                 for (int count = 0; count < wordCount; count++) {
