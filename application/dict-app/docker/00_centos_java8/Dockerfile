@@ -17,7 +17,7 @@ RUN mkdir /dict-app
 #The log directory
 RUN mkdir /dict-app/logs
 
-#The dependecty directory
+#The dependency directory
 RUN mkdir /dict-app/dependency
 
 WORKDIR /dict-app
