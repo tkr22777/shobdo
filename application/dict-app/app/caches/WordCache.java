@@ -11,7 +11,7 @@ public class WordCache {
 
     /* Redis expire time */
     private static final boolean USE_REDIS_EXPIRATION_TIME = true;
-    private static final int REDIS_EXPIRE_TIME_SECONDS= 60 * 60 * 6;
+    private static final int REDIS_EXPIRE_TIME_SECONDS= 6 * 60 * 60; //six hours
 
     private static final ShobdoLogger log = new ShobdoLogger(WordCache.class);
 
@@ -30,7 +30,6 @@ public class WordCache {
                 jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
             } catch (Exception ex) {
                 log.error("@WC002 Error while connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].");
-                //ex.printStackTrace();
             }
         }
 
