@@ -12,29 +12,17 @@ import utilities.ShobdoLogger;
 import java.io.IOException;
 
 import static org.mockito.Mockito.*;
-/**
- *
- * Simple (JUnit) tests that can call all parts of a play app.
- * If you are interested in mocking a whole application, see the wiki for more details.
- *
- */
+
 public class WordLogicTest {
 
     public ShobdoLogger log = new ShobdoLogger(WordLogicTest.class);
 
+    private WordLogic wordLogic;
     private WordDao mockWordDao;
     private WordCache mockWordCache;
 
-    private WordLogic wordLogic;
-
     private String spelling = "পিটন";
     private Word theWord;
-
-    @Before
-    public void setup() {
-        setupMocks();
-        setupObjects();
-    }
 
     private void setupMocks() {
         mockWordDao = mock(WordDao.class);
@@ -48,10 +36,16 @@ public class WordLogicTest {
             .build();
     }
 
+    @Before
+    public void setup() {
+        setupMocks();
+        setupObjects();
+    }
+
     //Create word
     @Ignore @Test
-    //TODO
     public void generateWordId_wordIdExists_throwsRuntimeException() {
+        //TODO
     }
 
     @Test

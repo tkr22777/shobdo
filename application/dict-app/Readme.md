@@ -6,6 +6,13 @@ TODO: fix everything and update this readme.
 Okay cool!
 
 If you a dev, follow along.
+If you want to build using command line:
+- Install sbt
+- Install docker
+- Spin up the mongo docker from scripts directory 
+- Run: sbt clean; sbt compile; sbt test;
+
+If you want to import to IntelliJ and develop on IntelliJ:
 - Use java 8 when importing to IntelliJ. 
 - Install routes file plugin on IntelliJ.
 - Allow annotation processing on IntelliJ.

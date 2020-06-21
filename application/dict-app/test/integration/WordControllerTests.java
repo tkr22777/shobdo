@@ -21,9 +21,6 @@ import java.util.stream.Collectors;
 import static play.test.Helpers.POST;
 import static play.test.Helpers.contentAsString;
 
-/**
- * Created by Tahsin Kabir on 1/7/17.
- */
 public class WordControllerTests extends WithApplication {
 
     private final ShobdoLogger log;
