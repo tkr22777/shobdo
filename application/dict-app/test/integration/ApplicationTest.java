@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
-import common.store.MongoStoreFactory;
+import common.stores.MongoStoreFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

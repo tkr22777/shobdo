@@ -1,19 +1,12 @@
-package common.store;
+package common.stores;
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
-import common.objects.EntityStatus;
-import objects.UserRequest;
-import word.objects.Word;
-import org.bson.Document;
-import utilities.JsonUtil;
 import utilities.ShobdoLogger;
 
+/* A central factory that returns collection, knows how for form valid queries and convert mongo documents to logical entities */
 public class MongoStoreFactory {
 
     private static final ShobdoLogger log = new ShobdoLogger(MongoStoreFactory.class);
@@ -34,14 +27,6 @@ public class MongoStoreFactory {
 
     private static MongoCollection wordCollection;
     private static MongoCollection userRequestsCollection;
-
-    /*
-    *  Helper fields:
-    *  Id: used as an identifier of objects stored as a document in a collection
-    *  Status: used as an mark the current status of an object in the database, check common.objects.EntityStatus
-    */
-    public static final String ID_PARAM = "id";
-    private static final String STATUS_PARAM = "status";
 
     private MongoStoreFactory() {
     }
@@ -68,29 +53,4 @@ public class MongoStoreFactory {
         return userRequestsCollection;
     }
 
-    public static BasicDBObject getActiveObjectQuery() {
-        final BasicDBObject query = new BasicDBObject();
-        query.put(MongoStoreFactory.STATUS_PARAM, EntityStatus.ACTIVE.toString());
-        return query;
-    }
-
-    public static UserRequest toUserRequest(final Document doc) {
-        doc.remove("_id");
-        return (UserRequest) JsonUtil.jStringToObject(doc.toJson(), UserRequest.class);
-    }
-
-    public static Word toWord(final Document doc) {
-        doc.remove("_id");
-        return (Word) JsonUtil.jStringToObject(doc.toJson(), Word.class);
-    }
-
-    public static Document toDocument(Object object) {
-        try {
-            ObjectMapper mapper = new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
-            return Document.parse(mapper.writeValueAsString(object));
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("objectToDocument error. Object["
-                + object.toString() + "][Ex:" + ex.getStackTrace().toString());
-        }
-    }
 }

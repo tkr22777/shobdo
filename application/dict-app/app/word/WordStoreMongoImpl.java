@@ -5,10 +5,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
-import common.store.MongoStoreFactory;
-import utilities.Constants;
+import common.stores.MongoQuery;
 import org.bson.Document;
-import utilities.*;
+import utilities.Constants;
+import utilities.ShobdoLogger;
 import word.objects.Word;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public Word create(final Word word) {
-        final Document wordDoc = MongoStoreFactory.toDocument(word);
+        final Document wordDoc = word.document();
         wordCollection.insertOne(wordDoc);
         log.debug("Creating word on database: " + word.getSpelling());
         return word;
@@ -35,27 +35,27 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public Word getById(final String wordId) {
-        final BasicDBObject query = MongoStoreFactory.getActiveObjectQuery();
-        query.put(MongoStoreFactory.ID_PARAM, wordId);
+        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
+        query.put(MongoQuery.ID_PARAM, wordId);
         final Document wordDoc = wordCollection.find(query).first();
         log.debug("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: MongoStoreFactory.toWord(wordDoc);
+        return wordDoc == null ? null: Word.fromBsonDoc(wordDoc);
     }
 
     @Override
     public Word getBySpelling(final String spelling) {
-        final BasicDBObject query = MongoStoreFactory.getActiveObjectQuery();
+        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
         query.put(Constants.KEY_SPELLING, spelling);
         final Document wordDoc = wordCollection.find(query).first();
         log.debug("@WDMI004 getBySpelling spelling: " + spelling + " MongoDoc:" + wordDoc);
-        return wordDoc == null ? null: MongoStoreFactory.toWord(wordDoc);
+        return wordDoc == null ? null: Word.fromBsonDoc(wordDoc);
     }
 
     @Override
     public Word update(final Word word) {
-        final BasicDBObject query = MongoStoreFactory.getActiveObjectQuery();
-        query.put(MongoStoreFactory.ID_PARAM, word.getId());
-        final Document wordDocument = MongoStoreFactory.toDocument(word);
+        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
+        query.put(MongoQuery.ID_PARAM, word.getId());
+        final Document wordDocument = word.document();
         wordCollection.replaceOne(query, wordDocument);
         return word;
     }
@@ -68,7 +68,7 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
-        final BasicDBObject query = MongoStoreFactory.getActiveObjectQuery();
+        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
         query.put(Constants.KEY_SPELLING, Pattern.compile("^" + spellingQuery + ".*"));
 
         final MongoCursor<Document> words = wordCollection.find(query)

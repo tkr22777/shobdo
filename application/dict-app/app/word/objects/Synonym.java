@@ -1,8 +1,7 @@
 package word.objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import common.objects.APIEntity;
 import lombok.*;
 
 import java.util.Objects;
@@ -13,7 +12,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Synonym {
+public class Synonym implements APIEntity {
 
     private String spelling;
 
@@ -23,10 +22,6 @@ public class Synonym {
 
     //determines how strong of an antonym it is
     private int strength;
-
-    public JsonNode toAPIJsonNode() {
-        return new ObjectMapper().convertValue(this, JsonNode.class);
-    }
 
     @Override
     public boolean equals(Object o) {

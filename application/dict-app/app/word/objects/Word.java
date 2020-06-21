@@ -1,12 +1,15 @@
 package word.objects;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.*;
 import common.objects.EntityMeta;
+import common.objects.APIEntity;
+import common.objects.MongoEntity;
+import lombok.*;
+import org.bson.Document;
 import utilities.JsonUtil;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Setter
@@ -15,7 +18,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class Word extends EntityMeta {
+public class Word extends EntityMeta implements APIEntity, MongoEntity {
 
     private String id;
     private String spelling;
@@ -64,16 +67,13 @@ public class Word extends EntityMeta {
         synonyms.remove(synonym);
     }
 
-    public static Word fromDocument(final Word word) {
-        return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
+    public static Word fromBsonDoc(final Document doc) {
+        doc.remove("_id");
+        return (Word) JsonUtil.jStringToObject(doc.toJson(), Word.class);
     }
 
     public static Word fromWord(final Word word) {
         return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
-    }
-
-    public JsonNode toAPIJsonNode() {
-        return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
     @Override

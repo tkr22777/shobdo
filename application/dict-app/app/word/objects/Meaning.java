@@ -1,9 +1,7 @@
 package word.objects;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import common.objects.APIEntity;
 import lombok.*;
-import common.objects.EntityMeta;
 import utilities.JsonUtil;
 
 @Data
@@ -13,7 +11,7 @@ import utilities.JsonUtil;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class Meaning extends EntityMeta {
+public class Meaning implements APIEntity {
 
     private String id;
     private String meaning;
@@ -24,10 +22,6 @@ public class Meaning extends EntityMeta {
 
     public static Meaning fromMeaning(final Meaning meaning) {
         return (Meaning) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(meaning), Meaning.class);
-    }
-
-    public JsonNode toAPIJNode() {
-        return new ObjectMapper().convertValue(this, JsonNode.class);
     }
 
     @Override

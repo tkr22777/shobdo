@@ -31,7 +31,7 @@ public class WordLogic {
         this.locks = Striped.lock(500);
     }
 
-    private static String generateWordId() {
+    private String generateWordId() {
         return String.format("%s-%s", Constants.PREFIX_WORD_ID, UUID.randomUUID());
     }
 

@@ -1,7 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import common.store.MongoStoreFactory;
+import common.stores.MongoStoreFactory;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -43,7 +43,7 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "createWord", parameters,
             () -> created(
                 wordLogic.createWord(wordJson)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -58,7 +58,7 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordById", parameters,
             () -> ok(
                 wordLogic.getWordById(wordId)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -82,7 +82,7 @@ public class WordController extends Controller {
                 final String spelling = body.get(Constants.KEY_SPELLING).asText();
                 return ok(
                     wordLogic.getWordBySpelling(spelling)
-                        .toAPIJsonNode()
+                        .jsonNode()
                 );
             }
         );
@@ -101,7 +101,7 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "updateWordWithUserRequest", parameters,
             () -> ok(
                 wordLogic.updateWord(wordId, body)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -163,7 +163,7 @@ public class WordController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "createMeaning" , parameters,
             () -> created(
                 wordLogic.createMeaning(wordId, body)
-                    .toAPIJNode()
+                    .jsonNode()
             )
         );
     }
@@ -177,7 +177,7 @@ public class WordController extends Controller {
             () -> {
                 final Meaning meaning = wordLogic.getMeaning(wordId, meaningId);
                 return meaning == null ? notFound(Constants.Messages.EntityNotFound(meaningId)) :
-                    ok(meaning.toAPIJNode());
+                    ok(meaning.jsonNode());
             }
         );
     }
@@ -192,7 +192,7 @@ public class WordController extends Controller {
             () -> {
                 final JsonNode meaningJsonNode = request().body().asJson();
                 return ok(wordLogic.updateMeaning(wordId, meaningId, meaningJsonNode)
-                    .toAPIJNode()
+                    .jsonNode()
                 );
             }
         );
@@ -237,7 +237,7 @@ public class WordController extends Controller {
             () -> {
                 return created(
                     wordLogic.addAntonym(wordId, request().body().asJson())
-                        .toAPIJsonNode()
+                        .jsonNode()
                 );
             }
         );
@@ -268,7 +268,7 @@ public class WordController extends Controller {
             () -> {
                 return created(
                     wordLogic.addSynonym(wordId, request().body().asJson())
-                        .toAPIJsonNode()
+                        .jsonNode()
                 );
             }
         );

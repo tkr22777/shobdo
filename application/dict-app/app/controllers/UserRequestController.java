@@ -1,7 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import common.store.MongoStoreFactory;
+import common.stores.MongoStoreFactory;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -36,7 +36,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "WordCreationRequest", new HashMap<>(),
             () -> created(
                 requestLogic.createUserRequestForWordCreation(wordJson)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -51,7 +51,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "WordUpdateRequest", new HashMap<>(),
             () -> ok(
                 requestLogic.createUserRequestForWordUpdate(wordId, wordJson)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -66,7 +66,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "WordDeletionRequest", new HashMap<>(),
             () -> created(
                 requestLogic.createUserRequestForWordDeletion(wordId)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -79,7 +79,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "GetUserRequest", new HashMap<>(),
             () -> ok(
                 requestLogic.getRequest(userRequestId)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -108,7 +108,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningCreationRequest", new HashMap<>(),
             () -> created(
                 requestLogic.createUserRequestForMeaningCreation(wordId, meaningJson)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -123,7 +123,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningUpdateRequest", new HashMap<>(),
             () -> created(
                 requestLogic.createUserRequestForMeaningUpdate(wordId, meaningJson)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }
@@ -137,7 +137,7 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningDeletionRequest", new HashMap<>(),
             () -> created(
                 requestLogic.createUserRequestForMeaningDeletion(wordId, meaningId)
-                    .toAPIJsonNode()
+                    .jsonNode()
             )
         );
     }

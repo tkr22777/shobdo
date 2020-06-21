@@ -1,6 +1,6 @@
 package integration;
 
-import common.store.MongoStoreFactory;
+import common.stores.MongoStoreFactory;
 import importer.SamsadImporter;
 import org.junit.Test;
 import play.test.WithServer;

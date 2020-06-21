@@ -1,6 +1,6 @@
 package controllers;
 
-import common.store.MongoStoreFactory;
+import common.stores.MongoStoreFactory;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
