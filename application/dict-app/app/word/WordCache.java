@@ -1,9 +1,9 @@
-package caches;
+package word;
 
 import com.typesafe.config.ConfigFactory;
-import objects.Word;
 import redis.clients.jedis.Jedis;
 import utilities.*;
+import word.objects.Word;
 
 import java.util.Set;
 

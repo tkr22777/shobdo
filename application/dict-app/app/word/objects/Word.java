@@ -1,8 +1,9 @@
-package objects;
+package word.objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
+import common.objects.EntityMeta;
 import utilities.JsonUtil;
 
 import java.util.*;
@@ -61,6 +62,10 @@ public class Word extends EntityMeta {
             this.synonyms = new HashSet<>();
         }
         synonyms.remove(synonym);
+    }
+
+    public static Word fromDocument(final Word word) {
+        return (Word) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(word), Word.class);
     }
 
     public static Word fromWord(final Word word) {

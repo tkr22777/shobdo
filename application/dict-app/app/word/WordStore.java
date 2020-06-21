@@ -1,11 +1,11 @@
-package daos;
+package word;
 
-import objects.Word;
+import word.objects.Word;
 
 import java.util.ArrayList;
 import java.util.Set;
 
-public interface WordDao {
+public interface WordStore {
 
      Word create(Word word);
 

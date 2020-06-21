@@ -93,7 +93,7 @@ POST    /api/v1/words/:wordId/synonym/remove             controllers.WordControl
 # CRUDL for users GENERAL, REVIEWER, ADMIN
 
 # 8. Generate random dictionary, requestBody contains wordCount:
-POST    /api/v1/generate                                controllers.WordController.createRandomDictionary()
+POST    /api/v1/generate                                controllers.AdminController.createRandomDictionary()
 
 # 9. To clear/flush redis cache:
 GET     /api/v1/admin/flushcache                        controllers.AdminController.flushCache()

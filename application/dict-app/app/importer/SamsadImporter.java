@@ -1,6 +1,6 @@
 package importer;
 
-import objects.Word;
+import word.objects.Word;
 import utilities.FileReadUtil;
 import utilities.ShobdoLogger;
 

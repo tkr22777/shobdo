@@ -1,19 +1,25 @@
 package integration;
 
-import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
-import logics.WordLogic;
-import objects.Meaning;
-import objects.Word;
-import org.junit.*;
+import common.store.MongoStoreFactory;
+import exceptions.EntityDoesNotExist;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import play.mvc.Result;
 import play.test.Helpers;
 import play.test.WithApplication;
-import objects.Constants;
-import utilities.DictUtil;
+import utilities.Constants;
 import utilities.JsonUtil;
 import utilities.ShobdoLogger;
+import utilities.TestUtil;
+import word.WordCache;
+import word.WordLogic;
+import word.WordStoreMongoImpl;
+import word.objects.Meaning;
+import word.objects.Word;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +36,8 @@ public class WordControllerTests extends WithApplication {
 
     public WordControllerTests() {
         log = new ShobdoLogger(WordControllerTests.class);
-        wordLogic = WordLogic.createMongoBackedWordLogic();
+        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        wordLogic = new WordLogic(storeMongo, WordCache.getCache());
         createdWords = new ArrayList<>();
         createdMeaningForWord = new HashMap<>();
     }
@@ -40,12 +47,12 @@ public class WordControllerTests extends WithApplication {
     }
 
     private void createWordsInDb(int numberOfWords) {
-        createdWords.addAll(DictUtil.generateRandomWordSet(numberOfWords));
+        createdWords.addAll(TestUtil.generateRandomWordSet(numberOfWords));
         createdWords.forEach(wordLogic::createWord);
     }
 
     private void createMeaningsInDbForWord(String wordId, String spelling, int numberOfMeanings) {
-        List<Meaning> meaningList = new ArrayList<>(DictUtil.generateMeanings(spelling, numberOfMeanings));
+        List<Meaning> meaningList = new ArrayList<>(TestUtil.generateMeanings(spelling, numberOfMeanings));
         meaningList = meaningList.stream()
             .map(meaning -> wordLogic.createMeaning(wordId, meaning))
             .collect(Collectors.toList());
@@ -115,7 +122,7 @@ public class WordControllerTests extends WithApplication {
 
         Helpers.running(Helpers.fakeApplication(), () -> {
 
-            String wordId = DictUtil.generateWordId();
+            String wordId = "SOME_GIVEN_WD_ID";
 
             String jsonWordString = "{\n" +
                 "  \"id\" : \"" + wordId + "\",\n" +

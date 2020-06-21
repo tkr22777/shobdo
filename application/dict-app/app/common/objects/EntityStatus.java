@@ -1,4 +1,4 @@
-package objects;
+package common.objects;
 
 public enum  EntityStatus {
     ACTIVE("ACTIVE"),

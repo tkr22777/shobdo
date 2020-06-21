@@ -1,13 +1,15 @@
-package logics;
+package word;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Striped;
+import common.objects.EntityStatus;
 import exceptions.EntityDoesNotExist;
-import caches.WordCache;
 import com.fasterxml.jackson.databind.JsonNode;
-import daos.*;
-import objects.*;
 import utilities.*;
+import word.objects.Antonym;
+import word.objects.Meaning;
+import word.objects.Synonym;
+import word.objects.Word;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -15,22 +17,22 @@ import java.util.concurrent.locks.Lock;
 
 public class WordLogic {
 
-    private final WordDao wordDao;
+    private final WordStore wordStore;
     private final WordCache wordCache;
     /* TODO use distributed lock */
     private final Striped<Lock> locks;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
-    public static WordLogic createMongoBackedWordLogic() {
-        return new WordLogic(new WordDaoMongoImpl(), WordCache.getCache());
-    }
-
-    public WordLogic(final WordDao wordDao,
+    public WordLogic(final WordStore wordStore,
                      final WordCache wordCache) {
-        this.wordDao = wordDao;
+        this.wordStore = wordStore;
         this.wordCache = wordCache;
         this.locks = Striped.lock(500);
+    }
+
+    private static String generateWordId() {
+        return String.format("%s-%s", Constants.PREFIX_WORD_ID, UUID.randomUUID());
     }
 
     private String generateMeaningId() {
@@ -55,7 +57,7 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
         }
 
-        final Word existingWord = wordDao.getBySpelling(word.getSpelling());
+        final Word existingWord = wordStore.getBySpelling(word.getSpelling());
         if (existingWord != null) {
             throw new IllegalArgumentException(Constants.Messages.SpellingExists(word.getSpelling()));
         }
@@ -75,12 +77,12 @@ public class WordLogic {
         validateCreateWordObject(word);
         int numberOfTries = 10;
         for (int i = 0; i < numberOfTries; i++) {
-            String wordId = DictUtil.generateWordId();
+            String wordId = generateWordId();
             //To do, use distributed synchronization
             synchronized (wordId.intern()) {
-                if (wordDao.getById(wordId) == null) {
+                if (wordStore.getById(wordId) == null) {
                     word.setId(wordId);
-                    wordDao.create(word);
+                    wordStore.create(word);
                     wordCache.cacheBySpelling(word);
                     return word;
                 }
@@ -94,7 +96,7 @@ public class WordLogic {
         if (wordId == null || wordId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + wordId);
         }
-        final Word word = wordDao.getById(wordId);
+        final Word word = wordStore.getById(wordId);
         if (word == null) {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(wordId));
         }
@@ -112,7 +114,7 @@ public class WordLogic {
             return cachedWord;
         }
 
-        final Word wordFromDB = wordDao.getBySpelling(spelling);
+        final Word wordFromDB = wordStore.getBySpelling(spelling);
         if (wordFromDB == null) {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(spelling));
         }
@@ -163,7 +165,7 @@ public class WordLogic {
                 .synonyms(word.getSynonyms())
                 .antonyms(word.getAntonyms())
                 .build();
-            wordDao.update(updatedWord); //update the entry in DB
+            wordStore.update(updatedWord); //update the entry in DB
             wordCache.cacheBySpelling(updatedWord);
             return updatedWord;
         } finally {
@@ -178,7 +180,7 @@ public class WordLogic {
             wordLock.lock();
             final Word word = getWordById(wordId);
             word.setStatus(EntityStatus.DELETED);
-            wordDao.update(word);
+            wordStore.update(word);
             wordCache.invalidateBySpelling(word);
         } finally {
             wordLock.unlock();
@@ -207,7 +209,7 @@ public class WordLogic {
             return words;
         }
 
-        words = wordDao.searchSpellingsBySpelling(searchString, Constants.SEARCH_SPELLING_LIMIT);
+        words = wordStore.searchSpellingsBySpelling(searchString, Constants.SEARCH_SPELLING_LIMIT);
         if (words != null && words.size() > 0 ) {
             logger.info("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
             wordCache.cacheWordsForSearchString(searchString, words);
@@ -219,11 +221,11 @@ public class WordLogic {
     }
 
     public long totalWordCount(){
-        return wordDao.count();
+        return wordStore.count();
     }
 
     public void deleteAllWords(){
-        wordDao.deleteAll();
+        wordStore.deleteAll();
     }
 
     public void flushCache(){
@@ -268,7 +270,7 @@ public class WordLogic {
             meaning.setId(generateMeaningId());
             final Word currentWord = getWordById(wordId);
             currentWord.addMeaningToWord(meaning);
-            wordDao.update(currentWord);
+            wordStore.update(currentWord);
             wordCache.cacheBySpelling(currentWord);
             return meaning;
         } finally {
@@ -317,7 +319,7 @@ public class WordLogic {
             validateUpdateMeaningObject(wordId, meaning);
             final Word word = getWordById(wordId);
             word.getMeanings().put(meaning.getId(), meaning);
-            wordDao.update(word); //update the entry in DB
+            wordStore.update(word); //update the entry in DB
             wordCache.cacheBySpelling(word);
             return meaning;
         } finally {
@@ -338,7 +340,7 @@ public class WordLogic {
 
             if (word.getMeanings().get(meaningId) != null) {
                 word.getMeanings().remove(meaningId);
-                wordDao.update(word); //update the entry in DB
+                wordStore.update(word); //update the entry in DB
                 wordCache.cacheBySpelling(word);
             }
         } finally {
@@ -380,7 +382,7 @@ public class WordLogic {
                 .build();
 
             word.addAntonym(antonym);
-            wordDao.update(word);
+            wordStore.update(word);
             wordCache.cacheBySpelling(word);
             return antonym;
         } finally {
@@ -401,7 +403,7 @@ public class WordLogic {
             wordLock.lock();
             final Word word = getWordById(wordId);
             word.removeAntonym(Antonym.builder().spelling(antonymSpelling).build());
-            wordDao.update(word);
+            wordStore.update(word);
             wordCache.cacheBySpelling(word);
         } finally {
             wordLock.unlock();
@@ -436,7 +438,7 @@ public class WordLogic {
                 .build();
 
             word.addSynonym(synonym);
-            wordDao.update(word);
+            wordStore.update(word);
             wordCache.cacheBySpelling(word);
             return synonym;
         } finally {
@@ -457,7 +459,7 @@ public class WordLogic {
             wordLock.lock();
             final Word word = getWordById(wordId);
             word.removeSynonym(Synonym.builder().spelling(synonymSpelling).build());
-            wordDao.update(word);
+            wordStore.update(word);
             wordCache.cacheBySpelling(word);
         } finally {
             wordLock.unlock();

@@ -1,9 +1,9 @@
 package unit;
 
-import caches.WordCache;
-import daos.WordDao;
-import logics.WordLogic;
-import objects.Word;
+import word.WordCache;
+import word.WordStore;
+import word.WordLogic;
+import word.objects.Word;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,16 +18,16 @@ public class WordLogicTest {
     public ShobdoLogger log = new ShobdoLogger(WordLogicTest.class);
 
     private WordLogic wordLogic;
-    private WordDao mockWordDao;
+    private WordStore mockWordStore;
     private WordCache mockWordCache;
 
     private String spelling = "পিটন";
     private Word theWord;
 
     private void setupMocks() {
-        mockWordDao = mock(WordDao.class);
+        mockWordStore = mock(WordStore.class);
         mockWordCache = mock(WordCache.class);
-        wordLogic = new WordLogic(mockWordDao, mockWordCache);
+        wordLogic = new WordLogic(mockWordStore, mockWordCache);
     }
 
     private void setupObjects() {
@@ -50,10 +50,10 @@ public class WordLogicTest {
 
     @Test
     public void createWord_wordIdIsNotSet_createWordDaoCalled() {
-        when(mockWordDao.create(any())).thenReturn(theWord);
-        when(mockWordDao.getById(anyString())).thenReturn(null);
+        when(mockWordStore.create(any())).thenReturn(theWord);
+        when(mockWordStore.getById(anyString())).thenReturn(null);
         wordLogic.createWord(theWord);
-        verify(mockWordDao, times(1)).create(any(Word.class));
+        verify(mockWordStore, times(1)).create(any(Word.class));
         verify(mockWordCache, times(1)).cacheBySpelling(any(Word.class));
     }
 
@@ -72,16 +72,16 @@ public class WordLogicTest {
     public void getWordBySpelling_foundCached_doNotCallDB() throws IOException {
         when(mockWordCache.getBySpelling(spelling)).thenReturn(theWord);
         wordLogic.getWordBySpelling(spelling);
-        verify(mockWordDao, never()).getBySpelling(anyString());
+        verify(mockWordStore, never()).getBySpelling(anyString());
         verify(mockWordCache, never()).cacheBySpelling(any(Word.class));
     }
 
     @Test
     public void getWordBySpelling_notCached_callDatabaseAndCache() throws IOException {
         when(mockWordCache.getBySpelling(spelling)).thenReturn(null);
-        when(mockWordDao.getBySpelling(spelling)).thenReturn(theWord);
+        when(mockWordStore.getBySpelling(spelling)).thenReturn(theWord);
         wordLogic.getWordBySpelling(spelling);
-        verify(mockWordDao, times(1) ).getBySpelling(spelling);
+        verify(mockWordStore, times(1) ).getBySpelling(spelling);
         verify(mockWordCache, times(1) ).cacheBySpelling(theWord);
     }
 

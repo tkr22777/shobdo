@@ -1,4 +1,4 @@
-package daos;
+package common.store;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,16 +7,16 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
-import objects.EntityStatus;
+import common.objects.EntityStatus;
 import objects.UserRequest;
-import objects.Word;
+import word.objects.Word;
 import org.bson.Document;
 import utilities.JsonUtil;
 import utilities.ShobdoLogger;
 
-/* package private */ class MongoManager {
+public class MongoStoreFactory {
 
-    private static final ShobdoLogger log = new ShobdoLogger(MongoManager.class);
+    private static final ShobdoLogger log = new ShobdoLogger(MongoStoreFactory.class);
 
     /* MONGODB HOST INFO */
     private static final String HOSTNAME = ConfigFactory.load().getString("shobdo.mongodb.hostname");
@@ -38,12 +38,12 @@ import utilities.ShobdoLogger;
     /*
     *  Helper fields:
     *  Id: used as an identifier of objects stored as a document in a collection
-    *  Status: used as an mark the current status of an object in the database, check objects.EntityStatus
+    *  Status: used as an mark the current status of an object in the database, check common.objects.EntityStatus
     */
     public static final String ID_PARAM = "id";
     private static final String STATUS_PARAM = "status";
 
-    private MongoManager() {
+    private MongoStoreFactory() {
     }
 
     private static synchronized MongoDatabase getDatabase() {
@@ -70,7 +70,7 @@ import utilities.ShobdoLogger;
 
     public static BasicDBObject getActiveObjectQuery() {
         final BasicDBObject query = new BasicDBObject();
-        query.put(MongoManager.STATUS_PARAM, EntityStatus.ACTIVE.toString());
+        query.put(MongoStoreFactory.STATUS_PARAM, EntityStatus.ACTIVE.toString());
         return query;
     }
 

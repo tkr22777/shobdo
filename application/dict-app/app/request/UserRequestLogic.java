@@ -1,14 +1,17 @@
-package logics;
+package request;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
-import daos.UserRequestDao;
-import daos.UserRequestDaoMongoImpl;
+import common.objects.EntityStatus;
 import objects.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import utilities.Constants;
 import utilities.JsonUtil;
 import utilities.ShobdoLogger;
+import word.objects.Meaning;
+import word.objects.Word;
+import word.WordLogic;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -17,16 +20,12 @@ import java.util.UUID;
 
 public class UserRequestLogic {
     private final WordLogic wordLogic;
-    private final UserRequestDao userRequestDao;
+    private final UserRequestStore userRequestDao;
 
     private static final ShobdoLogger logger = new ShobdoLogger(UserRequestLogic.class);
 
-    public static UserRequestLogic createMongoBackedRequestLogic() {
-        return new UserRequestLogic(WordLogic.createMongoBackedWordLogic(), new UserRequestDaoMongoImpl());
-    }
-
     public UserRequestLogic(final WordLogic wordLogic,
-                            final UserRequestDao userRequestDao) {
+                            final UserRequestStore userRequestDao) {
         this.wordLogic = wordLogic;
         this.userRequestDao = userRequestDao;
     }

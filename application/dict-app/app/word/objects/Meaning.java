@@ -1,8 +1,9 @@
-package objects;
+package word.objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
+import common.objects.EntityMeta;
 import utilities.JsonUtil;
 
 @Data

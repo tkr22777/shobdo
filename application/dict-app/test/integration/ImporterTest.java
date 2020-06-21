@@ -1,18 +1,22 @@
 package integration;
 
+import common.store.MongoStoreFactory;
 import importer.SamsadImporter;
-import logics.WordLogic;
-import objects.Word;
 import org.junit.Test;
 import play.test.WithServer;
 import utilities.ShobdoLogger;
+import word.WordCache;
+import word.WordLogic;
+import word.WordStoreMongoImpl;
+import word.objects.Word;
 
 import java.util.List;
 
 public class ImporterTest extends WithServer {
 
     ShobdoLogger log = new ShobdoLogger(ImporterTest.class);
-    WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
+    WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+    WordLogic wordLogic = new WordLogic(storeMongo, WordCache.getCache());
 
     @Test
     public void testImporter() throws Exception {

@@ -1,18 +1,30 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import logics.UserRequestLogic;
+import common.store.MongoStoreFactory;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import request.UserRequestLogic;
+import request.UserRequestStoreMongoImpl;
 import utilities.ShobdoLogger;
+import word.WordCache;
+import word.WordLogic;
+import word.WordStoreMongoImpl;
 
 import java.util.HashMap;
 
 public class UserRequestController extends Controller {
 
-    private static final UserRequestLogic requestLogic = UserRequestLogic.createMongoBackedRequestLogic();
+    private static UserRequestLogic requestLogic;
     private static final ShobdoLogger logger = new ShobdoLogger(UserRequestController.class);
+
+    public UserRequestController() {
+        WordStoreMongoImpl wordStoreMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        WordLogic wordLogic = new WordLogic(wordStoreMongo, WordCache.getCache());
+        UserRequestStoreMongoImpl userStoreMongo = new UserRequestStoreMongoImpl(MongoStoreFactory.getUserRequestsCollection());
+        requestLogic = new UserRequestLogic(wordLogic, userStoreMongo);
+    }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForWordCreation() {

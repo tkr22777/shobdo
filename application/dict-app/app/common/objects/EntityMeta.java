@@ -1,4 +1,4 @@
-package objects;
+package common.objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-/* package private */ abstract class EntityMeta {
+public abstract class EntityMeta {
 
     @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;

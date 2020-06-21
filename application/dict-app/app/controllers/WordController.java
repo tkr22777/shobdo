@@ -1,28 +1,32 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import logics.WordLogic;
-import objects.Meaning;
-import objects.Word;
+import common.store.MongoStoreFactory;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import objects.Constants;
-import utilities.DictUtil;
+import utilities.Constants;
 import utilities.ShobdoLogger;
+import word.WordCache;
+import word.WordLogic;
+import word.WordStoreMongoImpl;
+import word.objects.Meaning;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WordController extends Controller {
-
-    private static final WordLogic wordLogic = WordLogic.createMongoBackedWordLogic();
+    private static WordLogic wordLogic;
     private static final ShobdoLogger logger = new ShobdoLogger(WordController.class);
 
     public Result index() {
         return ok("বাংলা অভিধান এ স্বাগতম!");
+    }
+
+    public WordController() {
+        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        wordLogic = new WordLogic(storeMongo, WordCache.getCache());
     }
 
     //CREATE
@@ -60,7 +64,7 @@ public class WordController extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result getWordBySpellingPost() throws IOException {
+    public Result getWordBySpellingPost() {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
@@ -284,67 +288,4 @@ public class WordController extends Controller {
         );
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result createRandomDictionary() { //remove this route for eventual deployment
-
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
-
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(),
-            () -> {
-
-                Set<String> wordSpellingSet = new HashSet<>();
-                Set<Word> words = new HashSet<>();
-
-                final int wordCount = Integer.parseInt(request().body().asJson().get(Constants.KEY_WORD_COUNT).asText());
-                logger.info("Total word creation requested:" + wordCount);
-
-                for (int count = 0; count < wordCount; count++) {
-                    int numOfTries = 100;
-                    for (int tryCount = 0; tryCount < numOfTries; tryCount++) {
-                        Word word = DictUtil.generateRandomWord();
-                        if (wordSpellingSet.contains(word.getSpelling())) {
-                            continue;
-                        }
-                        wordSpellingSet.add(word.getSpelling());
-                        words.add(word);
-                        break;
-                    }
-                }
-
-                logger.info("Total words for be created:" + words.size());
-
-                List<Word> createdWords = words.stream()
-                    .map( w -> {
-                        try {
-                            return wordLogic.createWord(w);
-                        } catch (Exception ex) {
-                            return null;
-                        }
-                    }
-                    )
-                    .filter(w -> w != null)
-                    .collect(Collectors.toList());
-
-                logger.info("Total words created:" + createdWords.size());
-
-                List<Meaning> allMeanings = new ArrayList<>();
-
-                for (Word word: createdWords) {
-                    allMeanings.addAll(
-                        DictUtil.generateMeanings(word.getSpelling(), DictUtil.randIntInRange(1, 5))
-                            .stream()
-                            .map(meaning -> wordLogic.createMeaning(word.getId(), meaning))
-                            .collect(Collectors.toList())
-                    );
-                }
-
-                logger.info("Total meanings created:" + allMeanings.size());
-
-                return ok(String.format("Generated and added %s random words, %s meanings on the dictionary!",
-                    createdWords.size(), allMeanings.size()));
-            }
-        );
-
-    }
 }

@@ -1,4 +1,4 @@
-package objects;
+package word.objects;
 
 import java.util.Arrays;
 import java.util.HashSet;

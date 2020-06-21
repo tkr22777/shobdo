@@ -4,8 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.typesafe.config.ConfigFactory;
-import logics.WordLogic;
-import objects.Word;
+import common.store.MongoStoreFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,10 +12,16 @@ import org.junit.Test;
 import play.mvc.Result;
 import play.test.Helpers;
 import play.test.WithServer;
-import utilities.*;
+import utilities.ShobdoLogger;
+import utilities.TestUtil;
+import word.WordCache;
+import word.WordLogic;
+import word.WordStoreMongoImpl;
+import word.objects.Word;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ApplicationTest extends WithServer {
@@ -53,12 +58,13 @@ public class ApplicationTest extends WithServer {
     @Test @Ignore //Ignore because it is not a functionality test
     public void testGuava() throws IOException {
 
-        List<Word> words = new ArrayList<>( DictUtil.generateRandomWordSet(2) );
+        List<Word> words = new ArrayList<>( TestUtil.generateRandomWordSet(2) );
 
         Word theWord = words.get(0);
         String spelling = theWord.getSpelling();
 
-        WordLogic logic = WordLogic.createMongoBackedWordLogic();
+        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        WordLogic logic = new WordLogic(storeMongo, WordCache.getCache());
 
         logic.createWord(theWord);
         LoadingCache<String, Word> wordLoadingCache = CacheBuilder.newBuilder()
@@ -67,7 +73,7 @@ public class ApplicationTest extends WithServer {
                 .build(new CacheLoader<String, Word>() {
                     @Override
                     public Word load(String key) throws Exception {
-                        WordLogic logic = WordLogic.createMongoBackedWordLogic();
+                        WordLogic logic = new WordLogic(storeMongo, WordCache.getCache());
                         return logic.getWordBySpelling(spelling);
                     }
                 });

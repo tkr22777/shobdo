@@ -2,6 +2,7 @@ package objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import common.objects.EntityMeta;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

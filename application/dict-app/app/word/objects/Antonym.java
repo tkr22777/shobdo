@@ -1,4 +1,4 @@
-package objects;
+package word.objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
