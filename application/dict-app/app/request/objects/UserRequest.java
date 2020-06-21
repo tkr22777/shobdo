@@ -1,8 +1,7 @@
-package objects;
+package request.objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import common.objects.APIEntity;
-import common.objects.EntityMeta;
 import common.objects.MongoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class UserRequest extends EntityMeta implements APIEntity, MongoEntity {
+public class UserRequest extends MongoEntity implements APIEntity {
 
     private String id; /* The id of the user request */
     private RequestOperation operation; /* the operation type of the request */

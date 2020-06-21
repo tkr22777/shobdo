@@ -12,6 +12,17 @@ public class FileReadUtil {
         reader = getReader(fileLocation);
     }
 
+    private BufferedReader getReader(String fileLocation) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(fileLocation));
+        } catch (Exception ex){
+            log.info("Error reading opening file.");
+            ex.printStackTrace();
+        }
+        return reader;
+    }
+
     public String getLine() {
         try {
             return reader.readLine();
@@ -27,16 +38,5 @@ public class FileReadUtil {
             log.info("Error closing file.");
             ex.printStackTrace();
         }
-    }
-
-    private BufferedReader getReader(String fileLocation) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(fileLocation));
-        } catch (Exception ex){
-            log.info("Error reading opening file.");
-            ex.printStackTrace();
-        }
-        return reader;
     }
 }

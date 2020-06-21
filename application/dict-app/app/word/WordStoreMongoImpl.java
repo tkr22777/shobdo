@@ -35,8 +35,7 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public Word getById(final String wordId) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
-        query.put(MongoQuery.ID_PARAM, wordId);
+        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(wordId);
         final Document wordDoc = wordCollection.find(query).first();
         log.debug("Retrieving word by id: " + wordId + " MongoDoc:" + wordDoc);
         return wordDoc == null ? null: Word.fromBsonDoc(wordDoc);
@@ -53,8 +52,7 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public Word update(final Word word) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQuery();
-        query.put(MongoQuery.ID_PARAM, word.getId());
+        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(word.getId());
         final Document wordDocument = word.document();
         wordCollection.replaceOne(query, wordDocument);
         return word;
@@ -102,5 +100,4 @@ public class WordStoreMongoImpl implements WordStore {
         //TODO implement/verify
         return new ArrayList<>();
     }
-
 }

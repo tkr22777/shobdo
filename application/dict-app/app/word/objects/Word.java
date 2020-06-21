@@ -1,8 +1,7 @@
 package word.objects;
 
-import common.objects.EntityMeta;
-import common.objects.APIEntity;
 import common.objects.MongoEntity;
+import common.objects.APIEntity;
 import lombok.*;
 import org.bson.Document;
 import utilities.JsonUtil;
@@ -18,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class Word extends EntityMeta implements APIEntity, MongoEntity {
+public class Word extends MongoEntity implements APIEntity {
 
     private String id;
     private String spelling;

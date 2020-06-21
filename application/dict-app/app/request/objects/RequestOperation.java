@@ -1,4 +1,4 @@
-package objects;
+package request.objects;
 
 //REQUEST OPERATION TYPES
 public enum RequestOperation {

@@ -1,6 +1,6 @@
 package request;
 
-import objects.UserRequest;
+import request.objects.UserRequest;
 import java.util.ArrayList;
 
 public interface UserRequestStore {

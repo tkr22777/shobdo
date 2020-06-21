@@ -20,10 +20,10 @@ public class MongoQuery {
         return query;
     }
 
-    public static BasicDBObject getActiveObjectQuery(String id) {
+    public static BasicDBObject getActiveObjectQueryForId(String id) {
         final BasicDBObject query = new BasicDBObject();
-        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
         query.put(MongoQuery.ID_PARAM, id);
+        query.put(STATUS_PARAM, EntityStatus.ACTIVE.toString());
         return query;
     }
 }

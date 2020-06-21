@@ -1,4 +1,4 @@
-package objects;
+package request.objects;
 
 public enum  TargetType {
     WORD("WORD"),

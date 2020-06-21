@@ -3,7 +3,7 @@ package request;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import common.stores.MongoQuery;
-import objects.UserRequest;
+import request.objects.UserRequest;
 import org.bson.Document;
 import utilities.ShobdoLogger;
 import word.WordStoreMongoImpl;
@@ -29,7 +29,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
 
     @Override
     public UserRequest get(String id) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQuery(id);
+        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(id);
         final Document requestDoc = userRequestCollection.find(query).first();
         log.info("@WDMI003 getById id: " + id + " mongoDoc:" + requestDoc);
         return requestDoc == null ?  null: UserRequest.fromBsonDoc(requestDoc);
@@ -37,7 +37,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
 
     @Override
     public UserRequest update(UserRequest request) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQuery(request.getId());
+        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(request.getId());
         final Document requestDoc = request.document();
         userRequestCollection.replaceOne(query, requestDoc);
         return request;
