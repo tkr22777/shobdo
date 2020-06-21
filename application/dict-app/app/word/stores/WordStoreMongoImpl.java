@@ -59,10 +59,7 @@ public class WordStoreMongoImpl implements WordStore {
 
     @Override
     public void delete(final String wordId) {
-        //TODO implement/verify
-        final BasicDBObject query = Word.getActiveObjectQueryForId(wordId);
-        final Document wordDeletedDocument = getById(wordId).toDeletedDocument();
-        wordCollection.replaceOne(query, wordDeletedDocument);
+        //Actually implemented via update, check @WordLogic
     }
 
     @Override
@@ -91,7 +88,7 @@ public class WordStoreMongoImpl implements WordStore {
     }
 
     public void deleteAll() {
-        //TODO implement/verify
+        //TODO remove allowing mass deletion from here. Move to test section
         final DeleteResult result = wordCollection.deleteMany(new BasicDBObject());
         log.debug("Delete db entries: " + result);
     }

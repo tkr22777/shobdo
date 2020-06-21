@@ -1,6 +1,6 @@
 package common.objects;
 
-public enum  EntityStatus {
+public enum EntityStatus {
     ACTIVE("ACTIVE"),
     DELETED("DELETED");
 
