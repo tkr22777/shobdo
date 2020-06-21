@@ -14,9 +14,9 @@ import play.test.Helpers;
 import play.test.WithServer;
 import utilities.ShobdoLogger;
 import utilities.TestUtil;
-import word.WordCache;
+import word.caches.WordCache;
 import word.WordLogic;
-import word.WordStoreMongoImpl;
+import word.stores.WordStoreMongoImpl;
 import word.objects.Word;
 
 import java.io.IOException;

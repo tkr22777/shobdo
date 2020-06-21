@@ -8,6 +8,7 @@ import org.joda.time.DateTimeZone;
 import request.objects.RequestOperation;
 import request.objects.TargetType;
 import request.objects.UserRequest;
+import request.stores.UserRequestStore;
 import utilities.Constants;
 import utilities.JsonUtil;
 import utilities.ShobdoLogger;

@@ -1,4 +1,4 @@
-package word;
+package word.stores;
 
 import word.objects.Word;
 

@@ -16,6 +16,10 @@ public final class Constants {
     public static final String KEY_SEARCH_STRING = "searchString";
     public static final String KEY_WORD_COUNT = "wordCount";
 
+    //Mongodb specific
+    public static final String MONGO_DOC_KEY_ID = "id";
+    public static final String MONGO_DOC_KEY_STATUS = "status";
+
     //Messages
     public static final String MESSAGES_DELETED_ENTITY = "Entity has been deleted.";
     public static final String MESSAGES_ID_NULLOREMPTY      = "Id is null/empty/mismatch:";

@@ -6,7 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
 import utilities.ShobdoLogger;
 
-/* A central factory that returns collection, knows how for form valid queries and convert mongo documents to logical entities */
+/* A central factory that returns word and request collection */
 public class MongoStoreFactory {
 
     private static final ShobdoLogger log = new ShobdoLogger(MongoStoreFactory.class);
@@ -52,5 +52,4 @@ public class MongoStoreFactory {
         }
         return userRequestsCollection;
     }
-
 }

@@ -1,4 +1,4 @@
-package word;
+package word.caches;
 
 import com.typesafe.config.ConfigFactory;
 import redis.clients.jedis.Jedis;

@@ -1,4 +1,4 @@
-package request;
+package request.stores;
 
 import request.objects.UserRequest;
 import java.util.ArrayList;

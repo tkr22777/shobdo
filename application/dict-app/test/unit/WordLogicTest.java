@@ -1,7 +1,7 @@
 package unit;
 
-import word.WordCache;
-import word.WordStore;
+import word.caches.WordCache;
+import word.stores.WordStore;
 import word.WordLogic;
 import word.objects.Word;
 import org.junit.Before;

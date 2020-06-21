@@ -6,10 +6,12 @@ import common.objects.EntityStatus;
 import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import utilities.*;
+import word.caches.WordCache;
 import word.objects.Antonym;
 import word.objects.Meaning;
 import word.objects.Synonym;
 import word.objects.Word;
+import word.stores.WordStore;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;

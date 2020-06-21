@@ -8,9 +8,9 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.Constants;
 import utilities.ShobdoLogger;
-import word.WordCache;
+import word.caches.WordCache;
 import word.WordLogic;
-import word.WordStoreMongoImpl;
+import word.stores.WordStoreMongoImpl;
 import word.objects.Meaning;
 
 import java.util.HashMap;

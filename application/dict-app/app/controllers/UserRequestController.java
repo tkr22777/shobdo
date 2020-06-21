@@ -6,11 +6,11 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import request.UserRequestLogic;
-import request.UserRequestStoreMongoImpl;
+import request.stores.UserRequestStoreMongoImpl;
 import utilities.ShobdoLogger;
-import word.WordCache;
+import word.caches.WordCache;
 import word.WordLogic;
-import word.WordStoreMongoImpl;
+import word.stores.WordStoreMongoImpl;
 
 import java.util.HashMap;
 

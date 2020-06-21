@@ -1,12 +1,11 @@
-package request;
+package request.stores;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
-import common.stores.MongoQuery;
-import request.objects.UserRequest;
 import org.bson.Document;
+import request.objects.UserRequest;
 import utilities.ShobdoLogger;
-import word.WordStoreMongoImpl;
+import word.stores.WordStoreMongoImpl;
 
 import java.util.ArrayList;
 
@@ -21,7 +20,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
 
     @Override
     public UserRequest create(final UserRequest request) {
-        final Document requestDoc = request.document();
+        final Document requestDoc = request.toDocument();
         userRequestCollection.insertOne(requestDoc);
         log.info("@WDMI002 createUserRequest Saving request to database: " + request.getId());
         return request;
@@ -29,7 +28,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
 
     @Override
     public UserRequest get(String id) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(id);
+        final BasicDBObject query = UserRequest.getActiveObjectQueryForId(id);
         final Document requestDoc = userRequestCollection.find(query).first();
         log.info("@WDMI003 getById id: " + id + " mongoDoc:" + requestDoc);
         return requestDoc == null ?  null: UserRequest.fromBsonDoc(requestDoc);
@@ -37,8 +36,8 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
 
     @Override
     public UserRequest update(UserRequest request) {
-        final BasicDBObject query = MongoQuery.getActiveObjectQueryForId(request.getId());
-        final Document requestDoc = request.document();
+        final BasicDBObject query = UserRequest.getActiveObjectQueryForId(request.getId());
+        final Document requestDoc = request.toDocument();
         userRequestCollection.replaceOne(query, requestDoc);
         return request;
     }
