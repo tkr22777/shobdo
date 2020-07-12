@@ -1,6 +1,9 @@
 package common.stores;
 
+import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
@@ -33,8 +36,17 @@ public class MongoStoreFactory {
 
     private static synchronized MongoDatabase getDatabase() {
         if (mongoDB == null) {
-            log.info("@MM001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
-            mongoDB = new MongoClient(HOSTNAME, PORT).getDatabase(DB_NAME);
+            try {
+                log.info("@MM001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
+                MongoClientOptions options = MongoClientOptions.builder()
+                    .socketTimeout(3000)
+                    .connectTimeout(3000)
+                    .build();
+                MongoClient client = new MongoClient(new ServerAddress(HOSTNAME, PORT), options);
+                mongoDB = client.getDatabase(DB_NAME);
+            } catch (Exception ex) {
+                throw new RuntimeException(String.format("Could not connect to MongoDB host at: %s", HOSTNAME));
+            }
         }
         return mongoDB;
     }

@@ -11,8 +11,8 @@ services:
  shobdo:
   image: "dict-app"
   environment:
-  - "SHOBDO_MONGODBHOSTNAME=mongo"
-  - "SHOBDO_REDISHOSTNAME=redis"
+  - "SHOBDO_MONGODB_HOSTNAME=mongo"
+  - "SHOBDO_REDIS_HOSTNAME=redis"
   depends_on:
   - "redis"
   - "mongo"

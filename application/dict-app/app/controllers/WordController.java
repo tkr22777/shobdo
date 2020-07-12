@@ -25,8 +25,8 @@ public class WordController extends Controller {
     }
 
     public WordController() {
-        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
-        wordLogic = new WordLogic(storeMongo, WordCache.getCache());
+        WordStoreMongoImpl storeMongoDB = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        wordLogic = new WordLogic(storeMongoDB, WordCache.getCache());
     }
 
     //CREATE
