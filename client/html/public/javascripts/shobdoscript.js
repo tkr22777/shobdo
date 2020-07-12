@@ -1,8 +1,3 @@
-function printLove() {
-        console.log("I love you so much yo!");
-        convertToRidmik();
-}
-
 function convertToRidmik(englishString) {
     var parser = new RidmikParser();
     return parser.toBangla(englishString);
@@ -44,14 +39,28 @@ function containsEnglishCharacters(searchTerm) {
 function wordSearch(element) {
 
     var searchQueryString = $('#wordSearchBox').val().trim();
+
     console.log("WordSearch searchQueryString: " + searchQueryString);
     var containsEng = containsEnglishCharacters(searchQueryString);
+
     console.log("Ridmik Conversion: " + convertToRidmik(searchQueryString))
 
-    if (searchQueryString.length > 0 && !containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+    if (searchQueryString.length > 0) {
+
+      console.log("Search string length: " + searchQueryString.length)
+      if(containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+        var ridmikConverted = convertToRidmik(searchQueryString)
+        var containsEng = containsEnglishCharacters(ridmikConverted);
+        if(!containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+          var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
+          var searchBody = JSON.stringify( {searchString : ridmikConverted} );
+          RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
+        }
+      } else {
         var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
         var searchBody = JSON.stringify( { searchString : searchQueryString } );
         RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
+      }
     }
 }
 
@@ -117,39 +126,28 @@ function handleWordMeaningResult(data, status, jqXHR) {
 
 
 function clearMeaningHolder() {
-
 }
 
 function setMeaningHolder() {
-
 }
 
 function handleMeaningData(data) {
 
     console.log(data);
-
-    return data.tempMeaning;
-
-    /*
     var meanings = data.meanings;
-
     var i = 0;
-    var returnString = "<h4><u>" + data.spelling + "</u>";
+    var returnString = "<h4>Word<u>" + data.spelling + "</u>";
     for(var key in meanings) {
-
-        console.log(i + " PartsOfSpeech:" + meanings[key].partsOfSpeech);
         console.log(i + " Meaning:" + meanings[key].meaning);
         console.log(i + " Example:" + meanings[key].exampleSentence);
-        returnString = returnString + " " + i + " POS:" + meanings[key].partsOfSpeech
-        returnString = returnString + " Meaning: " + meanings[key].meaning
-        returnString = returnString + " Example: " + meanings[key].exampleSentence
+        returnString = returnString + "<br>" + i + " Meaning: " + meanings[key].meaning
+        returnString = returnString + "<br>" + i + " Example: " + meanings[key].exampleSentence
         returnString = returnString + " \n";
         i = i + 1;
     }
     returnString = returnString + "</h4>";
     console.log(returnString);
     return returnString;
-    */
 }
 
 
