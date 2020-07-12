@@ -1,12 +1,18 @@
 Notice:
 =======
 
-This service is now in dev mode. Things may be broken. 
+This service is now in dev mode. Things maybe are broken. 
+
 TODO: fix everything and update this readme.
-Okay cool!
+
+Cool!
 
 If you a dev, follow along.
-If you want to build using command line:
+
+If you want to build deployable docker image:
+- run the build docker image
+
+If you want to locally build using terminal:
 - Install sbt
 - Install docker
 - Spin up the mongo docker from scripts directory 

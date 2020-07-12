@@ -40,7 +40,7 @@ public class AdminController extends Controller {
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(),
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "createRandomDictionary", new HashMap<>(),
             () -> {
 
                 Set<String> wordSpellingSet = new HashSet<>();
@@ -65,7 +65,7 @@ public class AdminController extends Controller {
                 logger.info("Total words for be created:" + words.size());
 
                 List<Word> createdWords = words.stream()
-                    .map( w -> {
+                    .map(w -> {
                             try {
                                 return wordLogic.createWord(w);
                             } catch (Exception ex) {
