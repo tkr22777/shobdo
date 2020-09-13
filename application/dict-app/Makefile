@@ -1,3 +1,4 @@
+.PHONY : test spin-up-mongodb-container spin-up-redis-container
 DOCKER_IMAGE_NAME="dict-app"
 SERVICE_PORT="32779"
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -6,13 +7,13 @@ CURRENT_DIRECTOR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 clean:
 	sbt clean
 
-test: 
+test: spin-up-mongodb-container spin-up-redis-container
 	sbt clean test
 
-run: 
+run: spin-up-mongodb-container spin-up-redis-container
 	sbt clean run
 
-build:
+build: spin-up-mongodb-container spin-up-redis-container
 	rm -rf target/universal/*
 	sbt clean test dist
 
