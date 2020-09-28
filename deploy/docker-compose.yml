@@ -10,6 +10,8 @@ services:
   - "mongo"
  shobdo:
   image: "dict-app"
+  ports:
+  - "9000:9000"
   environment:
   - "SHOBDO_MONGODB_HOSTNAME=mongo"
   - "SHOBDO_REDIS_HOSTNAME=redis"
