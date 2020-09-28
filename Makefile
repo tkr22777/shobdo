@@ -1,4 +1,8 @@
 .PHONY : 
+#The following vars are a copy of application/dict-app/Makefile
+SUBNET="172.10.0.0/16"
+NETWORK_NAME="shobdo_net"
+CLIENT_IP="172.10.0.2"
 
 start-containers:
 	docker-compose -f deploy/docker-compose.yml up -d
@@ -6,10 +10,8 @@ start-containers:
 stop-containers:
 	docker-compose -f deploy/docker-compose.yml down
 
-run-client: 
-	#TODO:BROKEN, FIX LATER
-	#Removing already running instance if any
+spin-up-client-container:
 	-docker rm -f shobdo-client-instance
-	#Deploying the container
-	docker run -p 32779:80 -v $(PWD)/client/nginx.conf:/etc/nginx/nginx.conf -v $(PWD)/client/html/public/:/usr/share/nginx/html/ --name shobdo-client-instance -i -t nginx
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
+	docker run --net ${NETWORK_NAME} --ip ${CLIENT_IP} -p 32779:80 -v $(PWD)/client/nginx_local.conf:/etc/nginx/nginx.conf -v $(PWD)/client/html/public/:/usr/share/nginx/html/ --name shobdo-client-instance -i -t nginx
 

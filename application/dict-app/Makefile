@@ -1,13 +1,14 @@
 .PHONY : test spin-up-mongodb-container spin-up-redis-container
+SUBNET="172.10.0.0/16"
 NETWORK_NAME="shobdo_net"
 SHOBDO_PORT="9000"
-SHOBDO_IP="172.10.0.2"
-MONGO_HOST_IP="172.10.0.3"
-REDIS_HOST_IP="172.10.0.4"
+SHOBDO_IP="172.10.0.3"
+MONGO_HOST_IP="172.10.0.4"
+REDIS_HOST_IP="172.10.0.5"
 DOCKER_IMAGE_NAME="dict-app"
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_DIRECTOR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
+CURRENT_DIRECTORY := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 
 clean:
 	sbt clean
@@ -26,7 +27,7 @@ build-docker-image: build
 	docker build --no-cache=true -t ${DOCKER_IMAGE_NAME} .
 
 spin-up-dockerized-service: spin-up-mongodb-container spin-up-redis-container
-	-docker network create --subnet=172.10.0.0/16 ${NETWORK_NAME}
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
 	-docker rm -f shobdo-instance #cleanup existing instance
 	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
 		--env SHOBDO_MONGODB_HOSTNAME=${MONGO_HOST_IP} \
@@ -34,7 +35,7 @@ spin-up-dockerized-service: spin-up-mongodb-container spin-up-redis-container
 		-p ${SHOBDO_PORT}:9000 --name shobdo-instance -i -t ${DOCKER_IMAGE_NAME}
 
 spin-up-mongodb-container:
-	-docker network create --subnet=172.10.0.0/16 ${NETWORK_NAME}
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
 	-docker rm -f mongo-instance #cleanup existing instance
 	docker run --net ${NETWORK_NAME} --ip ${MONGO_HOST_IP} -p 27017:27017 \
 		-v $(PWD)/../../data/mongodump:/mongoshobdodump \
@@ -44,7 +45,7 @@ exec-mongodb-container-cli:
 	docker exec -it mongo-instance mongo
 
 spin-up-redis-container:
-	-docker network create --subnet=172.10.0.0/16 ${NETWORK_NAME}
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
 	-docker rm -f redis-instance #cleanup existing instance
 	docker run --net ${NETWORK_NAME} --ip ${REDIS_HOST_IP} -p 6379:6379 \
 		--name redis-instance -i -t -d redis
