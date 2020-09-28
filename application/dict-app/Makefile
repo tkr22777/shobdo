@@ -1,9 +1,9 @@
 .PHONY : test spin-up-mongodb-container spin-up-redis-container
 NETWORK_NAME="shobdo_net"
-SHOBDO_IP="172.10.0.2"
 SHOBDO_PORT="9000"
-MONGO_HOST_IP="172.10.0.2"
-REDIS_HOST_IP="172.10.0.3"
+SHOBDO_IP="172.10.0.2"
+MONGO_HOST_IP="172.10.0.3"
+REDIS_HOST_IP="172.10.0.4"
 DOCKER_IMAGE_NAME="dict-app"
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -25,7 +25,7 @@ build: spin-up-mongodb-container spin-up-redis-container
 build-docker-image: build
 	docker build --no-cache=true -t ${DOCKER_IMAGE_NAME} .
 
-spin-up-dockerized-service:
+spin-up-dockerized-service: spin-up-mongodb-container spin-up-redis-container
 	-docker network create --subnet=172.10.0.0/16 ${NETWORK_NAME}
 	-docker rm -f shobdo-instance #cleanup existing instance
 	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
