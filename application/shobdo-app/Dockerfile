@@ -5,17 +5,17 @@
 # docker directory
 #########################################
 
-FROM stupefied/centos-java8
+FROM centos-java
 
 MAINTAINER Tahsin Kabir
 
 #Copying binary to the deployable containers fs
-ADD  /target/universal/ /dict-app/bin
+ADD  /target/universal/ /shobdo-app/bin
 
-RUN unzip /dict-app/bin/dict-app-0.11-SNAPSHOT.zip -d /dict-app/bin/
+RUN unzip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip -d /shobdo-app/bin/
 
-RUN chmod +x /dict-app/bin/dict-app-0.11-SNAPSHOT/bin/dict-app
+RUN chmod +x /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT/bin/shobdo-app
 
 EXPOSE 9000
 
-CMD /dict-app/bin/dict-app-0.11-SNAPSHOT/bin/dict-app -Dplay.crypto.secret=testtahsin
+CMD /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT/bin/shobdo-app -Dplay.crypto.secret=testtahsin

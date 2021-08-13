@@ -5,7 +5,7 @@ SHOBDO_PORT="9000"
 SHOBDO_IP="172.10.0.3"
 MONGO_HOST_IP="172.10.0.4"
 REDIS_HOST_IP="172.10.0.5"
-DOCKER_IMAGE_NAME="dict-app"
+DOCKER_IMAGE_NAME="shobdo-app"
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIRECTORY := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))

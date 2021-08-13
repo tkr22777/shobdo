@@ -1,5 +1,5 @@
 .PHONY : 
-#The following vars are a copy of application/dict-app/Makefile
+#The following vars are a copy of application/shobdo-app/Makefile
 SUBNET="172.10.0.0/16"
 NETWORK_NAME="shobdo_net"
 CLIENT_IP="172.10.0.2"

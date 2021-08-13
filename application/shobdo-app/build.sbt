@@ -1,4 +1,4 @@
-name := """dict-app"""
+name := """shobdo-app"""
 
 version := "0.11-SNAPSHOT"
 

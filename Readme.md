@@ -8,11 +8,11 @@ Microservices can be found at the application directory.
 
 Current list of services:
 
-* dict-app:
+* shobdo-app:
 
-   The Public docker image for dict-app can be found at docker hub 'stupefied/shobdo' .
+   The Public docker image for shobdo-app can be found at docker hub 'stupefied/shobdo' .
 
-   To run dict-app locally:
+   To run shobdo-app locally:
 	1. Install docker and docker-compose
 	3. Run 'docker-compose up'
 

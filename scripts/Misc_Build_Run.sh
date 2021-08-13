@@ -11,10 +11,10 @@ rpm -ivh jdk-8u92-linux-x64.rpm
 #Build (requires activator and java)
 activator dist
 cd target/universal
-scp dict-app-1.0-SNAPSHOT.zip tahsin@www.shohay.org:~/path-to-dist
+scp shobdo-app-1.0-SNAPSHOT.zip tahsin@www.shohay.org:~/path-to-dist
 
 #Run (requires java)
-unzip dict-app-1.0-SNAPSHOT.zip
-cd dict-app-1.0-SNAPSHOT/bin
-chmod +x dict-app
-./dict-app -Dplay.crypto.secret=testtahsin
+unzip shobdo-app-1.0-SNAPSHOT.zip
+cd shobdo-app-1.0-SNAPSHOT/bin
+chmod +x shobdo-app
+./shobdo-app -Dplay.crypto.secret=testtahsin
