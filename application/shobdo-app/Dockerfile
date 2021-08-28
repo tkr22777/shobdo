@@ -5,14 +5,16 @@
 # docker directory
 #########################################
 
-FROM centos-java
+FROM openjdk:8-jre-alpine
 
 MAINTAINER Tahsin Kabir
 
 #Copying binary to the deployable containers fs
 ADD  /target/universal/ /shobdo-app/bin
 
-RUN unzip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip -d /shobdo-app/bin/
+RUN apk add unzip && \
+    apk add bash && \
+    unzip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip -d /shobdo-app/bin/
 
 RUN chmod +x /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT/bin/shobdo-app
 

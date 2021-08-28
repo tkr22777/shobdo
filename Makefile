@@ -4,10 +4,10 @@ SUBNET="172.10.0.0/16"
 NETWORK_NAME="shobdo_net"
 CLIENT_IP="172.10.0.2"
 
-start-containers:
+start-docker-compose:
 	docker-compose -f deploy/docker-compose.yml up -d
 
-stop-containers:
+stop-docker-compose:
 	docker-compose -f deploy/docker-compose.yml down
 
 spin-up-client-container:
