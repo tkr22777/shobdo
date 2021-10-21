@@ -3,7 +3,7 @@
 # Based on Centos
 ###########################################
 
-FROM centos
+FROM openjdk:8-jdk-alpine
 
 MAINTAINER Tahsin Kabir
 
@@ -28,9 +28,6 @@ WORKDIR /shobdo-app
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1 && \
     echo ". \$HOME/.asdf/asdf.sh" >> ~/.bashrc && \
     source ~/.bashrc && \
-    asdf plugin add java https://github.com/halcyon/asdf-java.git && \
-    asdf install java adoptopenjdk-8.0.302+8 && \
-    asdf global java adoptopenjdk-8.0.302+8 && \
     asdf plugin add sbt https://github.com/bram2000/asdf-sbt.git && \
     asdf install sbt 1.5.5 && \
     asdf global sbt 1.5.5

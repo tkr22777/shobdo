@@ -1,9 +1,6 @@
-########################################
-# Dockerfile to build the dictionary app
-# You need the centos-java image or 
-# build the centos-java image from the 
-# docker directory
-#########################################
+#######################################
+# Dockerfile to run the dictionary app
+#######################################
 
 FROM openjdk:8-jre-alpine
 

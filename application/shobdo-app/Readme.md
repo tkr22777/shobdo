@@ -17,12 +17,6 @@ If you want to import to IntelliJ and develop on IntelliJ:
 
 Some useful requests:
     
-    curl -H "Content-Type: application/json" -X POST -d '{"wordCount": "200" }' http://localhost:32779/api/v1/generate
-    
-    IP="localhost"
-    PORT="9000"
-    echo "curl sanity checks:"
-    
     echo "Testing GET home route:"
     curl -X GET http://localhost:9000/api/v1
     echo ""
