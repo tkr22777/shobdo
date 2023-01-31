@@ -2,6 +2,8 @@ package utilities;
 
 import java.lang.Integer;
 import java.lang.String;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class BanglaUtil {
 
@@ -21,6 +23,14 @@ public final class BanglaUtil {
             }
         }
         return sentenceBuilder.toString();
+    }
+
+    /* package private */ static Set<String> generateRandomWordStringSet(final int size, final int maxWordLength) {
+        Set<String> words = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            words.add(generateRandomWordString(maxWordLength));
+        }
+        return words;
     }
 
     /* package private */ static String generateRandomWordString(final int length) {

@@ -7,15 +7,14 @@ import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import utilities.*;
 import word.caches.WordCache;
-import word.objects.Antonym;
 import word.objects.Meaning;
-import word.objects.Synonym;
 import word.objects.Word;
 import word.stores.WordStore;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 public class WordLogic {
 
@@ -80,7 +79,9 @@ public class WordLogic {
         int numberOfTries = 10;
         for (int i = 0; i < numberOfTries; i++) {
             String wordId = generateWordId();
-            //To do, use distributed synchronization
+            //To do, use distributed synchronization;
+            // future response to above pendaticism: oh wow! you ain't got
+            // no user and these apis are on 99.99% read heavy immutable data
             synchronized (wordId.intern()) {
                 if (wordStore.getById(wordId) == null) {
                     word.setId(wordId);
@@ -164,8 +165,6 @@ public class WordLogic {
                 .id(currentWord.getId())
                 .meanings(currentWord.getMeanings())
                 .spelling(word.getSpelling())
-                .synonyms(word.getSynonyms())
-                .antonyms(word.getAntonyms())
                 .build();
             wordStore.update(updatedWord); //update the entry in DB
             wordCache.cacheBySpelling(updatedWord);
@@ -264,14 +263,13 @@ public class WordLogic {
     }
 
     public Meaning createMeaning(final String wordId, final Meaning meaning) {
-
         Lock wordLock = locks.get(wordId);
         try {
             wordLock.lock();
             validateCreateMeaningObject(wordId, meaning);
             meaning.setId(generateMeaningId());
             final Word currentWord = getWordById(wordId);
-            currentWord.addMeaningToWord(meaning);
+            currentWord.putMeaning(meaning);
             wordStore.update(currentWord);
             wordCache.cacheBySpelling(currentWord);
             return meaning;
@@ -282,8 +280,7 @@ public class WordLogic {
 
     /* GET meaning */
     public Meaning getMeaning(final String wordId, final String meaningId) {
-        final Word word = getWordById(wordId);
-        final Meaning meaning = word.getMeanings() == null ? null : word.getMeanings().get(meaningId);
+        final Meaning meaning = getWordById(wordId).getMeaning(meaningId);
         if (meaning == null) {
             throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(meaningId));
         }
@@ -320,7 +317,7 @@ public class WordLogic {
             wordLock.lock();
             validateUpdateMeaningObject(wordId, meaning);
             final Word word = getWordById(wordId);
-            word.getMeanings().put(meaning.getId(), meaning);
+            word.putMeaning(meaning);
             wordStore.update(word); //update the entry in DB
             wordCache.cacheBySpelling(word);
             return meaning;
@@ -329,14 +326,13 @@ public class WordLogic {
         }
     }
 
-
     /* DELETE meaning */
     public void deleteMeaning(final String wordId, final String meaningId) {
         Lock wordLock = locks.get(wordId);
         try {
             wordLock.lock();
             final Word word = getWordById(wordId);
-            if (word.getMeanings() == null || word.getMeanings().size() == 0) {
+            if (word.getMeanings().size() == 0) {
                 return;
             }
 
@@ -350,40 +346,22 @@ public class WordLogic {
         }
     }
 
-    /* LIST meaning TODO implement using WORD's interfaces */
-    public ArrayList<Meaning> listMeanings(String wordId) {
-        return new ArrayList<>();
+    public List<Meaning> listMeanings(String wordId) {
+        return getWordById(wordId).getMeanings().entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toList());
     }
 
-    /* ADD antonym */
-    public Antonym addAntonym(final String wordId, final JsonNode antonymJson) {
-        final Antonym antonym = (Antonym) JsonUtil.jNodeToObject(antonymJson, Antonym.class);
-        return addAntonym(wordId, antonym.getSpelling(), antonym.getStrength());
-    }
-
-    public Antonym addAntonym(final String wordId,
-                              final String antonymSpelling,
-                              final int strength) {
+    public String addAntonym(final String wordId, final String meaningId, final String antonym) {
         Lock wordLock = locks.get(wordId);
-        logger.info(wordLock.toString());
         try {
             wordLock.lock();
-            logger.info(wordLock.toString());
             final Word word = getWordById(wordId);
-            Word antonymWord = null;
-            try {
-                antonymWord = getWordBySpelling(antonymSpelling);
-            } catch (Exception ex) {
-                /* It's okay, there is no corresponding word for the antonym */
-            }
-
-            final Antonym antonym = Antonym.builder()
-                .spelling(antonymSpelling)
-                .targetWordId(antonymWord == null ? null : antonymWord.getId())
-                .strength(strength)
-                .build();
-
-            word.addAntonym(antonym);
+            final Meaning meaning = word.getMeanings().get(meaningId);
+            meaning.addAntonym(antonym);
+            word.putMeaning(meaning);
             wordStore.update(word);
             wordCache.cacheBySpelling(word);
             return antonym;
@@ -392,19 +370,14 @@ public class WordLogic {
         }
     }
 
-    /* REMOVE antonym */
-    public void removeAntonym(final String wordId, final JsonNode antonymJson) {
-        final Antonym antonym = (Antonym) JsonUtil.jNodeToObject(antonymJson, Antonym.class);
-        removeAntonym(wordId, antonym.getSpelling());
-    }
-
-    public void removeAntonym(final String wordId, final String antonymSpelling) {
-
+    public void removeAntonym(final String wordId, final String meaningId, final String antonym) {
         Lock wordLock = locks.get(wordId);
         try {
             wordLock.lock();
             final Word word = getWordById(wordId);
-            word.removeAntonym(Antonym.builder().spelling(antonymSpelling).build());
+            final Meaning meaning = word.getMeanings().get(meaningId);
+            meaning.removeAntonym(antonym);
+            word.putMeaning(meaning);
             wordStore.update(word);
             wordCache.cacheBySpelling(word);
         } finally {
@@ -412,34 +385,14 @@ public class WordLogic {
         }
     }
 
-    /* ADD synonym */
-    public Synonym addSynonym(final String wordId, final JsonNode synonymJson) {
-        final Synonym synonym = (Synonym) JsonUtil.jNodeToObject(synonymJson, Synonym.class);
-        return addSynonym(wordId, synonym.getSpelling(), synonym.getStrength());
-    }
-
-    public Synonym addSynonym(final String wordId,
-                              final String synonymSpelling,
-                              final int strength) {
-
+    public String addSynonym(final String wordId, final String meaningId, final String synonym) {
         Lock wordLock = locks.get(wordId);
         try {
             wordLock.lock();
             final Word word = getWordById(wordId);
-            Word synonymWord = null;
-            try {
-                synonymWord = getWordBySpelling(synonymSpelling);
-            } catch (EntityDoesNotExist entityDoesNotExistEx) {
-                //It is okay, could not find a corresponding word for the given spelling
-            }
-
-            final Synonym synonym = Synonym.builder()
-                .spelling(synonymSpelling)
-                .targetWordId(synonymWord == null ? null : synonymWord.getId())
-                .strength(strength)
-                .build();
-
-            word.addSynonym(synonym);
+            final Meaning meaning = word.getMeanings().get(meaningId);
+            meaning.addSynonym(synonym);
+            word.putMeaning(meaning);
             wordStore.update(word);
             wordCache.cacheBySpelling(word);
             return synonym;
@@ -448,19 +401,14 @@ public class WordLogic {
         }
     }
 
-    /* REMOVE synonym */
-    public void removeSynonym(final String wordId, final JsonNode synonymJson) {
-        final Synonym synonym = (Synonym) JsonUtil.jNodeToObject(synonymJson, Synonym.class);
-        removeSynonym(wordId, synonym.getSpelling());
-    }
-
-    private void removeSynonym(final String wordId, final String synonymSpelling) {
-
+    public void removeSynonym(final String wordId, final String meaningId, final String synonym) {
         Lock wordLock = locks.get(wordId);
         try {
             wordLock.lock();
             final Word word = getWordById(wordId);
-            word.removeSynonym(Synonym.builder().spelling(synonymSpelling).build());
+            final Meaning meaning = word.getMeanings().get(meaningId);
+            meaning.removeSynonym(synonym);
+            word.putMeaning(meaning);
             wordStore.update(word);
             wordCache.cacheBySpelling(word);
         } finally {

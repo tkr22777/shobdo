@@ -18,14 +18,18 @@ public class TestUtil {
     }
 
     private static Meaning generateMeaning(final String spelling) {
-        final String meaningString =  BanglaUtil.generateRandomSentence(3);
+        final String meaning =  BanglaUtil.generateRandomSentence(3);
         final String exampleSentence =  BanglaUtil.generateSentenceWithWord(spelling);
+        final Set<String> antonyms =  BanglaUtil.generateRandomWordStringSet(2, 4);
+        final Set<String> synonyms =  BanglaUtil.generateRandomWordStringSet(2, 4);
+
         return Meaning.builder()
-            .meaning(meaningString)
+            .meaning(meaning)
             .exampleSentence(exampleSentence)
+            .antonyms(antonyms)
+            .synonyms(synonyms)
             .build();
     }
-
 
     public static Set<Word> generateRandomWordSet(int count){
         final Set<Word> words = new HashSet<>();

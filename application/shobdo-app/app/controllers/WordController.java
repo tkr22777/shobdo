@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonObject;
 import common.stores.MongoStoreFactory;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -228,30 +229,49 @@ public class WordController extends Controller {
 
     /* Antonym related API */
     @BodyParser.Of(BodyParser.Json.class)
-    public Result addAntonym(final String wordId) {
+    public Result addAntonym(final String wordId, final String meaningId) {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final Map<String,String> parameters = new HashMap<>();
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "addAntonym", new HashMap<>(),
+        final JsonNode body = request().body().asJson();
+        parameters.put("requestBody", body.toString());
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "addAntonym", parameters,
             () -> {
-                return created(
-                    wordLogic.addAntonym(wordId, request().body().asJson())
-                        .jsonNode()
-                );
+                if (!body.has(Constants.KEY_ANTONYM)) {
+                    return badRequest();
+                }
+
+                final String antonym = body.get(Constants.KEY_ANTONYM).asText();
+                wordLogic.addAntonym(wordId,meaningId, antonym);
+
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty(Constants.KEY_ANTONYM, antonym);
+                return created(jsonObject.toString());
             }
         );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result removeAntonym(final String wordId) {
+    public Result removeAntonym(final String wordId, final String meaningId) {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final Map<String,String> parameters = new HashMap<>();
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeAntonym", new HashMap<>(),
+        final JsonNode body = request().body().asJson();
+        parameters.put("requestBody", body.toString());
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeAntonym", parameters,
             () -> {
-                wordLogic.removeAntonym(wordId, request().body().asJson());
+                if (!body.has(Constants.KEY_ANTONYM)) {
+                    return badRequest();
+                }
+
+                final String antonym = body.get(Constants.KEY_ANTONYM).asText();
+                wordLogic.removeAntonym(wordId, meaningId, antonym);
                 return ok();
             }
         );
@@ -259,33 +279,51 @@ public class WordController extends Controller {
 
     /* Synonym related API */
     @BodyParser.Of(BodyParser.Json.class)
-    public Result addSynonym(final String wordId) {
+    public Result addSynonym(final String wordId, final String meaningId) {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final Map<String,String> parameters = new HashMap<>();
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "addSynonym", new HashMap<>(),
+        final JsonNode body = request().body().asJson();
+        parameters.put("requestBody", body.toString());
+
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "addSynonym", parameters,
             () -> {
-                return created(
-                    wordLogic.addSynonym(wordId, request().body().asJson())
-                        .jsonNode()
-                );
+                if (!body.has(Constants.KEY_SYNONYM)) {
+                    return badRequest();
+                }
+
+                final String synonym = body.get(Constants.KEY_SYNONYM).asText();
+                wordLogic.addSynonym(wordId, meaningId, synonym);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty(Constants.KEY_SYNONYM, synonym);
+                return created(jsonObject.toString());
             }
         );
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public Result removeSynonym(final String wordId) {
+    public Result removeSynonym(final String wordId, final String meaningId) {
 
         final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
         final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final Map<String,String> parameters = new HashMap<>();
 
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeSynonym", new HashMap<>(),
+        final JsonNode body = request().body().asJson();
+        parameters.put("requestBody", body.toString());
+
+        return ControllerUtils.executeEndpoint(transactionId, requestId, "removeSynonym", parameters,
             () -> {
-                wordLogic.removeSynonym(wordId, request().body().asJson());
+                if (!body.has(Constants.KEY_SYNONYM)) {
+                    return badRequest();
+                }
+
+                final String synonym = body.get(Constants.KEY_SYNONYM).asText();
+                wordLogic.removeSynonym(wordId, meaningId, synonym);
                 return ok();
             }
         );
     }
-
 }

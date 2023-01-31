@@ -12,8 +12,9 @@ public final class Constants {
 
     //REST REQUEST FIELD NAMES
     public static final String KEY_SPELLING = "spelling";
-    public static final String KEY_STRENGTH = "strength";
     public static final String KEY_SEARCH_STRING = "searchString";
+    public static final String KEY_ANTONYM = "antonym";
+    public static final String KEY_SYNONYM = "synonym";
     public static final String KEY_WORD_COUNT = "wordCount";
 
     //Mongodb specific

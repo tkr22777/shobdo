@@ -72,20 +72,20 @@ GET     /api/v1/words/:wordId/meanings                   controllers.WordControl
 ###################################
 
 # 1. Add an antonym to a word
-POST    /api/v1/words/:wordId/antonym/add                controllers.WordController.addAntonym(wordId: String)
+POST    /api/v1/words/:wordId/meanings/:meaningId/antonym/add                controllers.WordController.addAntonym(wordId: String, meaningId: String)
 
 # 2. Remove an antonym from a word
-POST    /api/v1/words/:wordId/antonym/remove             controllers.WordController.removeAntonym(wordId: String)
+POST    /api/v1/words/:wordId/meanings/:meaningId/antonym/remove             controllers.WordController.removeAntonym(wordId: String, meaningId: String)
 
 ###################################
 # API for adding/removing synonyms:
 ###################################
 
 # 1. Add an antonym to a word
-POST    /api/v1/words/:wordId/synonym/add                controllers.WordController.addSynonym(wordId: String)
+POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/add                controllers.WordController.addSynonym(wordId: String, meaningId: String)
 
 # 2. Remove an antonym from a word
-POST    /api/v1/words/:wordId/synonym/remove             controllers.WordController.removeSynonym(wordId: String)
+POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/remove             controllers.WordController.removeSynonym(wordId: String, meaningId: String)
 
 ##############
 # Admin stuff:
