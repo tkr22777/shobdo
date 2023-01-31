@@ -205,7 +205,7 @@ public class UserRequestLogic {
         request.setStatus(EntityStatus.DELETED);
         request.setDeleterId(approverId);
         final String deletionDateString = (new DateTime(DateTimeZone.UTC)).toString();
-        request.setDeletedDate(deletionDateString);
+        request.setDeletionDate(deletionDateString);
         userRequestDao.update(request);
     }
 }

@@ -26,10 +26,11 @@ public abstract class MongoEntity {
     @JsonIgnore
     private String deleterId;
     @JsonIgnore
-    private String deletedDate;
+    private String deletionDate;
 
     public Document toDocument() {
         try {
+            // TODO: note how does the following object mapper config work?
             ObjectMapper mapper = new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
             return Document.parse(mapper.writeValueAsString(this));
         } catch (Exception ex) {

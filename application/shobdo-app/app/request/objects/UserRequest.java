@@ -21,6 +21,7 @@ public class UserRequest extends MongoEntity implements APIEntity {
     private String id; /* The id of the user request */
     private RequestOperation operation; /* the operation type of the request */
 
+    /* It might be better to create separate target specific UserRequest object, e.g. WordUserRequest */
     private Map<TargetType, String> targetIds; /* the ids on the rest object mutation path */
     private TargetType targetType; /* Target type is required for create operation */
     private JsonNode requestBody;

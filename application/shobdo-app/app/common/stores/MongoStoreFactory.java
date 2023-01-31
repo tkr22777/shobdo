@@ -1,6 +1,5 @@
 package common.stores;
 
-import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
@@ -26,7 +25,7 @@ public class MongoStoreFactory {
 
     /* MONGODB COLLECTIONS */
     private static final String COLLECTION_WORDS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
-    private static final String COLLECTION_RECORDS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
+    private static final String COLLECTION_REQUESTS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
 
     private static MongoCollection wordCollection;
     private static MongoCollection userRequestsCollection;
@@ -60,7 +59,7 @@ public class MongoStoreFactory {
 
     public static synchronized MongoCollection getUserRequestsCollection() {
         if (userRequestsCollection == null) {
-            userRequestsCollection = getDatabase().getCollection(COLLECTION_RECORDS);
+            userRequestsCollection = getDatabase().getCollection(COLLECTION_REQUESTS);
         }
         return userRequestsCollection;
     }
