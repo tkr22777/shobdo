@@ -7,11 +7,11 @@ function testTransliterate() {
 
     if (google.language != null) {
 
-        google.language.transliterate(["k"],"en","bn", function(result) {
+        google.language.transliterate(["k"], "en", "bn", function (result) {
             if (result.error) {
-              console.log("There was an errror transliterating!");
+                console.log("There was an errror transliterating!");
             } else {
-              console.log("There was no errror during transliterating!");
+                console.log("There was no errror during transliterating!");
             }
             console.log(JSON.stringify(result));
         });
@@ -47,20 +47,20 @@ function wordSearch(element) {
 
     if (searchQueryString.length > 0) {
 
-      console.log("Search string length: " + searchQueryString.length)
-      if(containsEng) { //event.keyCode == 13 && keyCode 13 is enter
-        var ridmikConverted = convertToRidmik(searchQueryString)
-        var containsEng = containsEnglishCharacters(ridmikConverted);
-        if(!containsEng) { //event.keyCode == 13 && keyCode 13 is enter
-          var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
-          var searchBody = JSON.stringify( {searchString : ridmikConverted} );
-          RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
+        console.log("Search string length: " + searchQueryString.length)
+        if (containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+            var ridmikConverted = convertToRidmik(searchQueryString)
+            var containsEng = containsEnglishCharacters(ridmikConverted);
+            if (!containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+                var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
+                var searchBody = JSON.stringify({ searchString: ridmikConverted });
+                RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
+            }
+        } else {
+            var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
+            var searchBody = JSON.stringify({ searchString: searchQueryString });
+            RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
         }
-      } else {
-        var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
-        var searchBody = JSON.stringify( { searchString : searchQueryString } );
-        RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
-      }
     }
 }
 
@@ -71,14 +71,14 @@ function handleTestGetResult(data, status, jqXHR) {
 function meaningSearch(textContent) {
 
     var meaningRoute = "http://127.0.0.1:32779/api/v1/words/postget"
-    var meaningBody = JSON.stringify( { spelling : textContent } );
-    console.log("Meaning route: "  + meaningRoute);
-    console.log("Meaning body: "  + meaningBody);
+    var meaningBody = JSON.stringify({ spelling: textContent });
+    console.log("Meaning route: " + meaningRoute);
+    console.log("Meaning body: " + meaningBody);
     RESTPostCall(meaningRoute, meaningBody, handleWordMeaningResult);
 }
 
 function RESTPostCall(route, postBodyString, onSuccessFunction) {
-   jQuery.ajax({
+    jQuery.ajax({
         type: "POST",
         url: route,
         contentType: "application/json; charset=utf-8",
@@ -92,7 +92,7 @@ function RESTPostCall(route, postBodyString, onSuccessFunction) {
 }
 
 function RESTGetCall(route, onSuccessFunction) {
-   jQuery.ajax({
+    jQuery.ajax({
         type: "GET",
         url: route,
         contentType: "application/json; charset=utf-8",
@@ -110,7 +110,7 @@ function handleWordSearchResult(data, status, jqXHR) {
 
     $('#wordList').empty();
 
-    $.each(data, function(i, item) {
+    $.each(data, function (i, item) {
         $('#wordList').append(
             listWordElement(item)
         );
@@ -119,7 +119,6 @@ function handleWordSearchResult(data, status, jqXHR) {
 }
 
 function handleWordMeaningResult(data, status, jqXHR) {
-
     var meaningHolder = document.getElementById("wordMeaning");
     meaningHolder.innerHTML = handleMeaningData(data);
 }
@@ -132,17 +131,18 @@ function setMeaningHolder() {
 }
 
 function handleMeaningData(data) {
-
     console.log(data);
     var meanings = data.meanings;
     var i = 0;
-    var returnString = "<h4>Word<u>" + data.spelling + "</u>";
-    for(var key in meanings) {
-        console.log(i + " Meaning:" + meanings[key].meaning);
+    var returnString = "<h4>" + data.spelling;
+    for (var key in meanings) {
+        console.log(i + " Meaning:" + meanings[key].text);
         console.log(i + " Example:" + meanings[key].exampleSentence);
-        returnString = returnString + "<br>" + i + " Meaning: " + meanings[key].meaning
-        returnString = returnString + "<br>" + i + " Example: " + meanings[key].exampleSentence
-        returnString = returnString + " \n";
+        returnString = returnString + "<br>"
+        returnString = returnString + "<br>" + " <u>অর্থ:</u>" + meanings[key].text
+        returnString = returnString + "<br>"
+        returnString = returnString + "<br>" + " <u>উদাহরণ:</u>" + meanings[key].exampleSentence
+        returnString = returnString + "<br> \n";
         i = i + 1;
     }
     returnString = returnString + "</h4>";
@@ -151,20 +151,18 @@ function handleMeaningData(data) {
 }
 
 
-function listWordElement( element ) {
-
+function listWordElement(element) {
     var linkedWordText = document.createElement("a");
     linkedWordText.textContent = element;
     linkedWordText.style.color = "white";
-    linkedWordText.onclick = function() { meaningSearch(linkedWordText.textContent); };
+    linkedWordText.onclick = function () { meaningSearch(linkedWordText.textContent); };
     var listItem = document.createElement('li')
     listItem.appendChild(linkedWordText);
     listItem.style.color = "white";
     return listItem;
 }
 
-function getCount () {
-
+function getCount() {
     console.log("In get count!");
     jQuery.ajax({
         type: "GET",
@@ -180,15 +178,7 @@ function getCount () {
     });
 }
 
-function logResult(data, status, jqXHR){
+function logResult(data, status, jqXHR) {
     console.log("Logging Result:");
     console.log(data);
-}
-
-function postTest() {
-
-    console.log("Post test!");
-    testRoute = "http://localhost:9000/posttest";
-    testBody = JSON.stringify( { name : "SIN" } );
-    RESTPostCall(testRoute, testBody,logResult)
 }

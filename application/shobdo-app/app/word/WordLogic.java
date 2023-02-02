@@ -247,7 +247,7 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.Messages.UserProvidedIdForbidden(meaning.getId()));
         }
 
-        if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
+        if (meaning.getText() == null || meaning.getText().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_MEANING_NULLOREMPTY);
         }
 
@@ -293,7 +293,7 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY);
         }
 
-        if (meaning.getMeaning() == null || meaning.getMeaning().trim().length() == 0) {
+        if (meaning.getText() == null || meaning.getText().trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_MEANING_NULLOREMPTY);
         }
 

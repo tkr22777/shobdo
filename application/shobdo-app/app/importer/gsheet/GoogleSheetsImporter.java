@@ -1,44 +1,99 @@
 package importer.gsheet;
 
+import common.stores.MongoStoreFactory;
+import exceptions.EntityDoesNotExist;
 import word.WordLogic;
+import word.caches.WordCache;
+import word.objects.Meaning;
 import word.objects.Word;
+import word.stores.WordStoreMongoImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static importer.gsheet.SheetsQuickstart.getWordsWithMeaning;
+
+/* this is no prod code, this is only for initial import */
 public class GoogleSheetsImporter {
 
-    /*
-     1. Leaving the work as work in progress for the moment. I found few issues with excel sheets: a. permission issue b. data-entry incomplete.
-     2. The next step is to figure out if there was any mistake in providing the links
-     3. We should moved the excel data to adopt with the service data. The service data might require some adoption.
-        a. Meanings should have synonyms
-        b. Words should not have synonyms
-     4. We should enable UI based update/deletion of words or should it be github based?
-     */
     private static WordLogic wordLogic;
 
-    public static void main(String[] args) {
-        String[] sheetIds = {};
+    public static void main(String[] args) throws IOException, GeneralSecurityException {
+        String[] sheetIds = {
+            // google-sheet ids
+        };
 
-        /*
-        List<Word> words = sheetIds.stream()
-            .map(GoogleSheetsImporter::getWords)
+        List<Word> words = getWords(Arrays.asList(sheetIds));
+        System.out.println("Total valid words found:" + words.size());
+
+        List<Meaning> meanings = words.stream()
+            .map( w -> {
+                Map<String, Meaning> meaningMap = w.getMeanings();
+                if (meaningMap == null) {
+                    meaningMap = new HashMap<>();
+                }
+                return meaningMap.values().stream().collect(Collectors.toList());
+            })
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
-        List<Word> createdWords = writeToDB(words);
-        */
+
+        System.out.println("Total valid meanings found:" + meanings.size());
+
+        WordStoreMongoImpl storeMongoDB = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        wordLogic = new WordLogic(storeMongoDB, WordCache.getCache());
+
+        for (Word word: words) {
+            if (word.getSpelling() == null || "".equalsIgnoreCase(word.getSpelling().trim())) {
+                continue;
+            }
+            Word newWord = Word.builder()
+                .spelling(word.getSpelling())
+                .build();
+
+            newWord = wordLogic.createWord(newWord);
+
+            Map<String, Meaning> meaningMap = word.getMeanings();
+            if (meaningMap != null) {
+                for (Map.Entry<String, Meaning> entry: meaningMap.entrySet()) {
+                    Meaning wordMeaning = entry.getValue();
+                    Meaning toAdd = Meaning.fromMeaning(wordMeaning);
+                    if (toAdd.getText() == null || "".equalsIgnoreCase(toAdd.getText().trim())) {
+                        continue;
+                    }
+                    toAdd.setId(null);
+                    wordLogic.createMeaning(newWord.getId(), toAdd);
+                }
+            }
+        }
     }
 
-    public static List<Word> writeToDB(List<Word> words) {
-        List<Word> createdWords = words.stream()
-            .map(word -> { return wordLogic.createWord(word); }
-            ).collect(Collectors.toList());
-        return createdWords;
+    private static List<Word> getWords(List<String> sheetIds) throws IOException, GeneralSecurityException {
+        Map<String, Word> wordMap = new HashMap<>();
+        for (String spreadsheetId: sheetIds) {
+            Map<String, Word> wordMapForSheet = getWordsWithMeaning(spreadsheetId);
+            for (Map.Entry<String, Word> e: wordMapForSheet.entrySet()) {
+                if (wordMap.containsKey(e.getKey())) {
+                    Word word = wordMap.get(e.getKey());
+                    Word mergedWord = mergeWords(word, e.getValue());
+                    wordMap.put(mergedWord.getSpelling(), mergedWord);
+                } else {
+                    wordMap.put(e.getKey(), e.getValue());
+                }
+            }
+        }
+
+        return new ArrayList<>(wordMap.values());
     }
 
-    public static List<Word> getWords(String googleSheetID) {
-        return new ArrayList<>();
+    private static Word mergeWords(Word w1, Word w2) throws EntityDoesNotExist {
+        HashMap<String, Meaning> w1MeaningsMap = w1.getMeanings() != null? w1.getMeanings(): new HashMap<>();
+        HashMap<String, Meaning> w2MeaningsMap = w2.getMeanings() != null? w2.getMeanings(): new HashMap<>();
+        w1MeaningsMap.putAll(w2MeaningsMap);
+        return Word.builder()
+            .spelling(w1.getSpelling())
+            .meanings(w1MeaningsMap)
+            .build();
     }
 }

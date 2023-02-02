@@ -309,7 +309,7 @@ public class WordControllerTests extends WithApplication {
 
             String jsonMeaningString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
+                "  \"text\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
                 "  \"strength\" : 0,\n" +
                 "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                 "  \"pronunciation\" : null,\n" +
@@ -338,7 +338,7 @@ public class WordControllerTests extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
             String jsonMeaningString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"meaning\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
+                "  \"text\" : \"ঢঙটধ ঙজখডঠ ঙচটঞন\",\n" +
                 "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                 "  \"strength\" : 0,\n" +
                 "  \"antonyms\" : null,\n" +
@@ -359,7 +359,7 @@ public class WordControllerTests extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
             String jsonMeaningString = "{\n" +
                 "  \"id\" : null,\n" +
-                "  \"meaning\" : \"\",\n" +
+                "  \"text\" : \"\",\n" +
                 "  \"partOfSpeech\" : \"অব্যয়\",\n" +
                 "  \"strength\" : 0,\n" +
                 "  \"antonyms\" : null,\n" +
@@ -414,7 +414,7 @@ public class WordControllerTests extends WithApplication {
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
-            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            meaningRequest.setText(meaningRequest.getText()  + "বিবর্তিত"); //updating the meaning
             JsonNode meaningRequestJNode = meaningRequest.jsonNode();
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
@@ -441,7 +441,7 @@ public class WordControllerTests extends WithApplication {
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
-            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            meaningRequest.setText(meaningRequest.getText()  + "বিবর্তিত"); //updating the meaning
             JsonNode meaningRequestJNode = meaningRequest.jsonNode();
 
             String route = "/api/v1/words/invalidWordId/meanings/" + meaningRequest.getId() ;
@@ -460,7 +460,7 @@ public class WordControllerTests extends WithApplication {
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
-            meaningRequest.setMeaning(meaningRequest.getMeaning()  + "বিবর্তিত"); //updating the meaning
+            meaningRequest.setText(meaningRequest.getText()  + "বিবর্তিত"); //updating the meaning
             meaningRequest.setId("invalidMeaningId");
             JsonNode meaningRequestJNode = meaningRequest.jsonNode();
 
@@ -480,7 +480,7 @@ public class WordControllerTests extends WithApplication {
             Meaning meaning = createdMeaningForWord.get(word.getId()).get(0);
 
             Meaning meaningRequest = Meaning.fromMeaning(meaning);
-            meaningRequest.setMeaning("");
+            meaningRequest.setText("");
             JsonNode meaningRequestJNode = meaningRequest.jsonNode();
 
             String route = "/api/v1/words/" + word.getId() + "/meanings/" + meaningRequest.getId() ;
