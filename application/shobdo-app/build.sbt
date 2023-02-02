@@ -10,7 +10,7 @@ libraryDependencies += "redis.clients" % "jedis" % "1.5.2"
 
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.5"
 
-libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.2.2"
+libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.12.11"
 
 libraryDependencies += "org.projectlombok" % "lombok" % "1.16.16"
 

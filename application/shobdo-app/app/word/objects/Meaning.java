@@ -9,14 +9,14 @@ import java.util.Set;
 @Data
 @Setter
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class Meaning implements APIEntity {
 
     private String id;
-    private String meaning;
+    private String text;
     private String exampleSentence;
     private String partOfSpeech;
     private Set<String> antonyms;

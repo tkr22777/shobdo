@@ -24,7 +24,7 @@ public class TestUtil {
         final Set<String> synonyms =  BanglaUtil.generateRandomWordStringSet(2, 4);
 
         return Meaning.builder()
-            .meaning(meaning)
+            .text(meaning)
             .exampleSentence(exampleSentence)
             .antonyms(antonyms)
             .synonyms(synonyms)
