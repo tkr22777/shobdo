@@ -133,21 +133,35 @@ function setMeaningHolder() {
 function handleMeaningData(data) {
     console.log(data);
     var meanings = data.meanings;
+    var totalMeanings = Object.keys(meanings).length;
     var i = 0;
     var returnString = "<h4>" + data.spelling;
     for (var key in meanings) {
         console.log(i + " Meaning:" + meanings[key].text);
         console.log(i + " Example:" + meanings[key].exampleSentence);
+        if (totalMeanings > 1) {
+            returnString = returnString + "<br>"
+            returnString = returnString + "<br> ( " + getBengaliDigit(i + 1) + " )"
+        }
         returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>অর্থ:</u>" + meanings[key].text
+        returnString = returnString + "<br>" + " <u>অর্থ:</u> " + meanings[key].text
         returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>উদাহরণ:</u>" + meanings[key].exampleSentence
+        returnString = returnString + "<br>" + " <u>সমার্থ:</u> " + meanings[key].synonyms
+        returnString = returnString + "<br>"
+        returnString = returnString + "<br>" + " <u>বিপরীতার্থ:</u> " + meanings[key].antonyms
+        returnString = returnString + "<br>"
+        returnString = returnString + "<br>" + " <u>উদাহরণ:</u> " + meanings[key].exampleSentence
         returnString = returnString + "<br> \n";
         i = i + 1;
     }
     returnString = returnString + "</h4>";
     console.log(returnString);
     return returnString;
+}
+
+function getBengaliDigit(digit) {
+    var charCodeForBengaliZero = "০".charCodeAt(0)
+    return String.fromCharCode(charCodeForBengaliZero + digit)
 }
 
 
