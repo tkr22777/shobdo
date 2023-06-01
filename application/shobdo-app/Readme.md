@@ -1,10 +1,9 @@
 Notice:
 =======
 
-The service is in dev mode. Things are (maybe) broken. 
-TODO: fix everything and update this readme.
+The service is in dev mode. Cool! If you want to contribute, follow along.
 
-Cool! If you a dev, follow along.
+Install Java8 SDK.
 
 Check the `Makefile` and use `make` commands to run/test/build.
 
