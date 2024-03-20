@@ -103,7 +103,7 @@ public class WordCache {
             log.error("@WC010 Error while retrieving cached search results");
         }
 
-        log.debug("@WC009 Search result not found on cache for spelling: \'" + searchString + "\'");
+        log.debug("@WC009 Search result not found on cache for spelling: '" + searchString + "'");
         return null;
     }
 

@@ -29,22 +29,20 @@ public class Meaning implements APIEntity {
         return (Meaning) JsonUtil.jNodeToObject(JsonUtil.objectToJNode(meaning), Meaning.class);
     }
 
-    public String addAntonym(final String antonym) {
+    public void addAntonym(final String antonym) {
         antonyms.add(antonym);
-        return antonym;
     };
 
-    public boolean removeAntonym(final String antonym) {
-        return antonyms.remove(antonym);
+    public void removeAntonym(final String antonym) {
+        antonyms.remove(antonym);
     };
 
-    public String addSynonym(final String synonym) {
+    public void addSynonym(final String synonym) {
         synonyms.add(synonym);
-        return synonym;
     };
 
-    public boolean removeSynonym(final String synonym) {
-        return synonyms.add(synonym);
+    public void removeSynonym(final String synonym) {
+        synonyms.add(synonym);
     };
 
     @Override

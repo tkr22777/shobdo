@@ -573,8 +573,8 @@ public class WordControllerTests extends WithApplication {
         log.info("Test searchWordsByPrefix, prefix: " + prefix);
 
         Set<String> spellingsWithPrefixes = createdWords.stream()
-            .filter(word -> word.getSpelling().startsWith(prefix))
-            .map(word-> word.getSpelling())
+            .map(Word::getSpelling)
+            .filter(wordSpelling -> wordSpelling.startsWith(prefix))
             .collect(Collectors.toSet());
 
         log.info("Spelling with prefixes:" + spellingsWithPrefixes);
