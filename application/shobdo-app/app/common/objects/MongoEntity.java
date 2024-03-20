@@ -8,6 +8,8 @@ import lombok.*;
 import org.bson.Document;
 import utilities.Constants;
 
+import java.util.Arrays;
+
 @Data
 @Setter
 @Getter
@@ -35,7 +37,7 @@ public abstract class MongoEntity {
             return Document.parse(mapper.writeValueAsString(this));
         } catch (Exception ex) {
             throw new IllegalArgumentException("objectToDocument error. Object["
-                + this.toString() + "][Ex:" + ex.getStackTrace().toString());
+                + this.toString() + "][Ex:" + Arrays.toString(ex.getStackTrace()));
         }
     }
 

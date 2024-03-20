@@ -20,7 +20,7 @@ public class WordStoreMongoImpl implements WordStore {
     private final MongoCollection<Document> wordCollection;
     private static final ShobdoLogger log = new ShobdoLogger(WordStoreMongoImpl.class);
 
-    public WordStoreMongoImpl(MongoCollection wordCollection) {
+    public WordStoreMongoImpl(MongoCollection<Document> wordCollection) {
         this.wordCollection = wordCollection;
     }
 

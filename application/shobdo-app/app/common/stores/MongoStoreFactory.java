@@ -6,6 +6,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
+import org.bson.Document;
 import utilities.ShobdoLogger;
 
 /* A central factory that returns word and request collection */
@@ -27,8 +28,8 @@ public class MongoStoreFactory {
     private static final String COLLECTION_WORDS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.words");
     private static final String COLLECTION_REQUESTS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests");
 
-    private static MongoCollection wordCollection;
-    private static MongoCollection userRequestsCollection;
+    private static MongoCollection<Document> wordCollection;
+    private static MongoCollection<Document> userRequestsCollection;
 
     private MongoStoreFactory() {
     }
@@ -50,14 +51,14 @@ public class MongoStoreFactory {
         return mongoDB;
     }
 
-    public static synchronized MongoCollection getWordCollection() {
+    public static synchronized MongoCollection<Document> getWordCollection() {
         if (wordCollection == null) {
             wordCollection = getDatabase().getCollection(COLLECTION_WORDS);
         }
         return wordCollection;
     }
 
-    public static synchronized MongoCollection getUserRequestsCollection() {
+    public static synchronized MongoCollection<Document> getUserRequestsCollection() {
         if (userRequestsCollection == null) {
             userRequestsCollection = getDatabase().getCollection(COLLECTION_REQUESTS);
         }

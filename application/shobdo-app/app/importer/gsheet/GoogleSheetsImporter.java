@@ -34,7 +34,7 @@ public class GoogleSheetsImporter {
                 if (meaningMap == null) {
                     meaningMap = new HashMap<>();
                 }
-                return meaningMap.values().stream().collect(Collectors.toList());
+                return new ArrayList<>(meaningMap.values());
             })
             .flatMap(Collection::stream)
             .collect(Collectors.toList());

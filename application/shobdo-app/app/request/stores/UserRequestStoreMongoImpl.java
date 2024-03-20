@@ -14,7 +14,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
     private static final ShobdoLogger log = new ShobdoLogger(WordStoreMongoImpl.class);
     private final MongoCollection<Document> userRequestCollection;
 
-    public UserRequestStoreMongoImpl(MongoCollection userRequestCollection) {
+    public UserRequestStoreMongoImpl(MongoCollection<Document> userRequestCollection) {
         this.userRequestCollection = userRequestCollection;
     }
 
