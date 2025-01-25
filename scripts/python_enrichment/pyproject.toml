@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "python-enrichment"
+version = "0.1.0"
+description = ""
+authors = ["Tahsin Kabir <tahsinkabir@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic-settings = "^2.7.1"
+google-generativeai = "^0.8.4"
+google-auth = "^2.38.0"
+google-auth-oauthlib = "^1.2.1"
+gspread = "^6.1.4"
+pandas = "^2.2.3"
+google-api-python-client = "^2.159.0"
+openai = "^1.60.1"
+
+[tool.poetry.scripts]
+start = "python_enrichment.src:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
