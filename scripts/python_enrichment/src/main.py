@@ -1,6 +1,8 @@
 from util import generate_with_gemini, get_enrichment_prompt, read_google_sheet,  generate_with_deepseek
 from logger import logger
 import json
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 
 def df_to_json_entries(df):
@@ -28,7 +30,10 @@ def df_to_json_entries(df):
 
 if __name__ == "__main__":
     # The sheet_key is the long string from your Google Sheets URL 
-    sheet_key = "1OUwV-WrVAEMTOVUNzGcrF3MGZGVIzMmj87bbLyicnvM"
+    sheet_keys = [
+        "1OUwV-WrVAEMTOVUNzGcrF3MGZGVIzMmj87bbLyicnvM",
+    ]
+    
     df = read_google_sheet(sheet_key)
     
     # Convert DataFrame to JSON entries

@@ -28,7 +28,6 @@ def generate_with_gemini(prompt: str) -> str:
     # logger.info("Successfully generated response")
     return response.text
 
-
 def generate_with_deepseek(prompt: str) -> str:
     client = OpenAI(api_key="sk-04492f533946493a915c766fd8c7cf0a", base_url="https://api.deepseek.com")
 
@@ -43,6 +42,15 @@ def generate_with_deepseek(prompt: str) -> str:
     # logger.info(response.choices[0].message.content)
     return response.choices[0].message.content
 
+# in future, we can add:
+# pronunciation
+# etymology
+# usage_notes
+# word_forms
+# idiomatic_expressions
+# transliteration
+# derived_words
+# etc.
 
 def get_enrichment_prompt(input_data):
     return f"""
@@ -70,10 +78,13 @@ Your task:
   multiple meanings. Only one of the meaning is used under the `meaning`
   field and the rest are ignored as they are processed seperately. if none of the
   meaning from the refernce field is parsed on the meaning field, then you
-  can create multiple json response each for a different meaning.
-- In some cases, the word and the meaning might not be parsed, please use your knowledge
-  to fill in the missing fields. If multiple meanings are possible, then create so.
-- Return the output in a structured JSON array format based on the example below.
+  can create multiple JSON responses (each as an object in an array) for different 
+  meanings.
+- In some cases, the word and the meaning might not be parsed, then use your knowledge
+  to populate the fields. If meaning is not properly parsed or created, then you can
+  create the meaning from the reference field. In that case, if you think multiple meanings
+  are possible, then create each corresponding to a single meaning.
+- Return the output in a structured JSON array format
 
 Here is an example:
 
@@ -89,16 +100,18 @@ Input:
 }}
 
 Output:
-{{
-  "word": "দৌড়",
-  "meaning": "দ্রুত পায়ে চলার প্রক্রিয়া, যা প্রায়শই শরীরচর্চা বা প্রতিযোগিতার জন্য করা হয়।",
-  "example_sentence": "সে সকালে পার্কে দৌড় দিয়ে শরীরচর্চা করে।",
-  "synonyms": ["ছোটা", "দ্রুতগমন", "অগ্রসরতা"],
-  "antonyms": ["স্থিরতা", "বিরতি", "থেমে যাওয়া"]
-  "part_of_speech": "ক্রিয়া"
-}}
+[
+  {{
+    "word": "দৌড়",
+    "meaning": "দ্রুত পায়ে চলার প্রক্রিয়া, যা প্রায়শই শরীরচর্চা বা প্রতিযোগিতার জন্য করা হয়।",
+    "example_sentence": "সে সকালে পার্কে দৌড় দিয়ে শরীরচর্চা করে।",
+    "synonyms": ["ছোটা", "দ্রুতগমন", "অগ্রসরতা"],
+    "antonyms": ["স্থিরতা", "বিরতি", "থেমে যাওয়া"],
+    "part_of_speech": "ক্রিয়া"
+  }},
+]
 
-Now process the following input and return the improved JSON:
+Now process the following input and return the improved version of the input data:
 
 Input:
 {input_data}
