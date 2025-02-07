@@ -34,7 +34,7 @@ import java.util.function.Supplier;
                                           final Map<String, String> parameters,
                                           final Throwable throwable) {
 
-        log.debug(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
+        log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
             + "[Exception Message=%s]", transactionId, parentRequestId, endpoint, parameters, throwable.getMessage()));
 
         if (throwable instanceof EntityDoesNotExist) {

@@ -55,45 +55,4 @@ public class ApplicationTest extends WithServer {
             ConfigFactory.load().getString("shobdo.mongodb.database.collection.userrequests"));
     }
 
-    @Test @Ignore //Ignore because it is not a functionality test
-    public void testGuava() throws IOException {
-
-        List<Word> words = new ArrayList<>( TestUtil.generateRandomWordSet(2) );
-
-        Word theWord = words.get(0);
-        String spelling = theWord.getSpelling();
-
-        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
-        WordLogic logic = new WordLogic(storeMongo, WordCache.getCache());
-
-        logic.createWord(theWord);
-        LoadingCache<String, Word> wordLoadingCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(20, TimeUnit.MILLISECONDS)
-                .expireAfterWrite(20, TimeUnit.MILLISECONDS)
-                .build(new CacheLoader<String, Word>() {
-                    @Override
-                    public Word load(String key) throws Exception {
-                        WordLogic logic = new WordLogic(storeMongo, WordCache.getCache());
-                        return logic.getWordBySpelling(spelling);
-                    }
-                });
-
-        for(int i = 0 ; i < 10 ; i++) {
-
-            long start = System.currentTimeMillis();
-            Word wordFromCache = logic.getWordBySpelling(spelling);
-            log.info("Word From Cache, Spelling: " + wordFromCache.getSpelling());
-            log.info("Word From Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
-
-            start = System.currentTimeMillis();
-            try {
-                Word wordFromOtherCache = wordLoadingCache.get(spelling);
-                log.info("Word From Guava Cache, Spelling: " + wordFromOtherCache.getSpelling());
-                log.info("Word From Guava Cache Time Taken:" + (System.currentTimeMillis() - start) + "ms");
-            } catch (Exception ex) {
-                log.info("Error getting object from guava cache");
-            }
-        }
-    }
-
 }

@@ -23,15 +23,13 @@ POST    /api/v1/words/postget                            controllers.WordControl
 # 4. Update word:
 PUT     /api/v1/words/:id                                controllers.WordController.updateWord(id: String)
 
-# 5. Update word user request:
-
-# 6. Delete word:
+# 5. Delete word:
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)
 
-# 7. List words
+# 6. List words
 GET     /api/v1/words                                    controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 
-# 8. Search words by spelling:
+# 7. Search words by spelling:
 #    requestBody contains "searchString"
 POST    /api/v1/words/search                             controllers.WordController.searchWordsBySpelling()
 
@@ -91,10 +89,6 @@ POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/remove             con
 # Admin stuff:
 ##############
 # CRUDL for users GENERAL, REVIEWER, ADMIN
-
-# 8. Generate random dictionary, requestBody contains wordCount:
-POST    /api/v1/generate                                controllers.AdminController.createRandomDictionary()
-
 # 9. To clear/flush redis cache:
 GET     /api/v1/admin/flushcache                        controllers.AdminController.flushCache()
 

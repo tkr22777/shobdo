@@ -20,8 +20,6 @@ public class WordLogic {
 
     private final WordStore wordStore;
     private final WordCache wordCache;
-    /* TODO use distributed lock */
-    private final Striped<Lock> locks;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
@@ -29,7 +27,6 @@ public class WordLogic {
                      final WordCache wordCache) {
         this.wordStore = wordStore;
         this.wordCache = wordCache;
-        this.locks = Striped.lock(500);
     }
 
     private String generateWordId() {
@@ -79,9 +76,6 @@ public class WordLogic {
         int numberOfTries = 10;
         for (int i = 0; i < numberOfTries; i++) {
             String wordId = generateWordId();
-            //To do, use distributed synchronization;
-            // future response to above pendaticism: oh wow! you ain't got
-            // no user and these apis are on 99.99% read heavy immutable data
             synchronized (wordId.intern()) {
                 if (wordStore.getById(wordId) == null) {
                     word.setId(wordId);
@@ -91,7 +85,7 @@ public class WordLogic {
                 }
             }
         }
-        throw new RuntimeException(String.format("Exhausted %s tries creating word", numberOfTries));
+        throw new IllegalStateException(String.format("Failed to generate unique word ID after %s attempts", numberOfTries));
     }
 
     /* GET word by id */
@@ -157,35 +151,23 @@ public class WordLogic {
      */
     public Word updateWord(final Word word) {
         validateUpdateWordObject(word);
-        Lock wordLock = locks.get(word.getId());
-        try {
-            wordLock.lock();
-            final Word currentWord = getWordById(word.getId());
-            final Word updatedWord = Word.builder()
-                .id(currentWord.getId())
-                .meanings(currentWord.getMeanings())
-                .spelling(word.getSpelling())
-                .build();
-            wordStore.update(updatedWord); //update the entry in DB
-            wordCache.cacheBySpelling(updatedWord);
-            return updatedWord;
-        } finally {
-            wordLock.unlock();
-        }
+        final Word currentWord = getWordById(word.getId());
+        final Word updatedWord = Word.builder()
+            .id(currentWord.getId())
+            .meanings(currentWord.getMeanings())
+            .spelling(word.getSpelling())
+            .build();
+        wordStore.update(updatedWord); //update the entry in DB
+        wordCache.cacheBySpelling(updatedWord);
+        return updatedWord;
     }
 
     /* Delete Word */
     public void deleteWord(final String wordId) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            word.setStatus(EntityStatus.DELETED);
-            wordStore.update(word);
-            wordCache.invalidateBySpelling(word);
-        } finally {
-            wordLock.unlock();
-        }
+        final Word word = getWordById(wordId);
+        word.setStatus(EntityStatus.DELETED);
+        wordStore.update(word);
+        wordCache.invalidateBySpelling(word);
     }
 
     /* LIST words todo */
@@ -198,6 +180,7 @@ public class WordLogic {
      Check if there is are ways to search by string on the indexed string, it should be very basic!
      ** You may return a smart object that specifies each close words and also suggestion if it didn't match
      How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
+     Embeddings of characters in a word?
      */
     public Set<String> searchWords(final String searchString) {
 
@@ -263,19 +246,13 @@ public class WordLogic {
     }
 
     public Meaning createMeaning(final String wordId, final Meaning meaning) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            validateCreateMeaningObject(wordId, meaning);
-            meaning.setId(generateMeaningId());
-            final Word currentWord = getWordById(wordId);
-            currentWord.putMeaning(meaning);
-            wordStore.update(currentWord);
-            wordCache.cacheBySpelling(currentWord);
-            return meaning;
-        } finally {
-            wordLock.unlock();
-        }
+        validateCreateMeaningObject(wordId, meaning);
+        meaning.setId(generateMeaningId());
+        final Word currentWord = getWordById(wordId);
+        currentWord.putMeaning(meaning);
+        wordStore.update(currentWord);
+        wordCache.cacheBySpelling(currentWord);
+        return meaning;
     }
 
     /* GET meaning */
@@ -312,37 +289,25 @@ public class WordLogic {
     }
 
     private Meaning updateMeaning(final String wordId, final Meaning meaning) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            validateUpdateMeaningObject(wordId, meaning);
-            final Word word = getWordById(wordId);
-            word.putMeaning(meaning);
-            wordStore.update(word); //update the entry in DB
-            wordCache.cacheBySpelling(word);
-            return meaning;
-        } finally {
-          wordLock.unlock();
-        }
+        validateUpdateMeaningObject(wordId, meaning);
+        final Word word = getWordById(wordId);
+        word.putMeaning(meaning);
+        wordStore.update(word); //update the entry in DB
+        wordCache.cacheBySpelling(word);
+        return meaning;
     }
 
     /* DELETE meaning */
     public void deleteMeaning(final String wordId, final String meaningId) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            if (word.getMeanings().size() == 0) {
-                return;
-            }
+        final Word word = getWordById(wordId);
+        if (word.getMeanings().size() == 0) {
+            return;
+        }
 
-            if (word.getMeanings().get(meaningId) != null) {
-                word.getMeanings().remove(meaningId);
-                wordStore.update(word); //update the entry in DB
-                wordCache.cacheBySpelling(word);
-            }
-        } finally {
-            wordLock.unlock();
+        if (word.getMeanings().get(meaningId) != null) {
+            word.getMeanings().remove(meaningId);
+            wordStore.update(word); //update the entry in DB
+            wordCache.cacheBySpelling(word);
         }
     }
 
@@ -355,64 +320,40 @@ public class WordLogic {
     }
 
     public String addAntonym(final String wordId, final String meaningId, final String antonym) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            final Meaning meaning = word.getMeanings().get(meaningId);
-            meaning.addAntonym(antonym);
-            word.putMeaning(meaning);
-            wordStore.update(word);
-            wordCache.cacheBySpelling(word);
-            return antonym;
-        } finally {
-            wordLock.unlock();
-        }
+        final Word word = getWordById(wordId);
+        final Meaning meaning = word.getMeanings().get(meaningId);
+        meaning.addAntonym(antonym);
+        word.putMeaning(meaning);
+        wordStore.update(word);
+        wordCache.cacheBySpelling(word);
+        return antonym;
     }
 
     public void removeAntonym(final String wordId, final String meaningId, final String antonym) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            final Meaning meaning = word.getMeanings().get(meaningId);
-            meaning.removeAntonym(antonym);
-            word.putMeaning(meaning);
-            wordStore.update(word);
-            wordCache.cacheBySpelling(word);
-        } finally {
-            wordLock.unlock();
-        }
+        final Word word = getWordById(wordId);
+        final Meaning meaning = word.getMeanings().get(meaningId);
+        meaning.removeAntonym(antonym);
+        word.putMeaning(meaning);
+        wordStore.update(word);
+        wordCache.cacheBySpelling(word);
     }
 
     public String addSynonym(final String wordId, final String meaningId, final String synonym) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            final Meaning meaning = word.getMeanings().get(meaningId);
-            meaning.addSynonym(synonym);
-            word.putMeaning(meaning);
-            wordStore.update(word);
-            wordCache.cacheBySpelling(word);
-            return synonym;
-        } finally {
-            wordLock.unlock();
-        }
+        final Word word = getWordById(wordId);
+        final Meaning meaning = word.getMeanings().get(meaningId);
+        meaning.addSynonym(synonym);
+        word.putMeaning(meaning);
+        wordStore.update(word);
+        wordCache.cacheBySpelling(word);
+        return synonym;
     }
 
     public void removeSynonym(final String wordId, final String meaningId, final String synonym) {
-        Lock wordLock = locks.get(wordId);
-        try {
-            wordLock.lock();
-            final Word word = getWordById(wordId);
-            final Meaning meaning = word.getMeanings().get(meaningId);
-            meaning.removeSynonym(synonym);
-            word.putMeaning(meaning);
-            wordStore.update(word);
-            wordCache.cacheBySpelling(word);
-        } finally {
-            wordLock.unlock();
-        }
+        final Word word = getWordById(wordId);
+        final Meaning meaning = word.getMeanings().get(meaningId);
+        meaning.removeSynonym(synonym);
+        word.putMeaning(meaning);
+        wordStore.update(word);
+        wordCache.cacheBySpelling(word);
     }
 }

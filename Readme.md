@@ -21,4 +21,3 @@ Current list of services:
 * [Play Java Framework](https://www.playframework.com/) - Web Framework For Java and Scala
 * [MongoDB](https://www.mongodb.com/) - Used as the primary datastore for words
 * [Redis](https://redis.io/) - Used for caching word search results and definitions
-

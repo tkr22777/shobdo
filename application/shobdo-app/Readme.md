@@ -1,7 +1,7 @@
 Notice:
 =======
 
-The service is in dev mode. Cool! If you want to contribute, follow along.
+The service is now beta. Cool! If you want to contribute, follow along.
 
 Install Java8 SDK.
 
@@ -48,25 +48,10 @@ Application Logic:
 
 Caches:
 =======
-
 - WordCache.java:
-
   Uses redis to words and search results
   
 Data Access Objects (DAOs):
 ===========================
-
 - WordDao.java:
   Interface to data layer for word object's CRUDL and search operations
-
-Objects:
-========
-
-- Filters.java:
-
-  Creates the list of HTTP filters used by your application.
-
-- ExampleFilter.java
-
-  A simple filter that adds a header to every response.
---->

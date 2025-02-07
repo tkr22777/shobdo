@@ -13,7 +13,6 @@ import word.caches.WordCache;
 import word.WordLogic;
 import word.stores.WordStoreMongoImpl;
 import word.objects.Meaning;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +33,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createWord() {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode wordJson = request().body().asJson();
@@ -52,8 +51,8 @@ public class WordController extends Controller {
     //READ
     public Result getWordByWordId(final String wordId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getWordById", parameters,
@@ -67,8 +66,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result getWordBySpellingPost() {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body =  request().body().asJson();
@@ -92,8 +91,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateWord(final String wordId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -109,8 +108,8 @@ public class WordController extends Controller {
 
     public Result deleteWord(final String wordId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         parameters.put("wordId", wordId);
@@ -126,8 +125,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result searchWordsBySpelling() {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -154,8 +153,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createMeaning(final String wordId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -171,8 +170,8 @@ public class WordController extends Controller {
 
     public Result getMeaning(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "getMeaning" , new HashMap<>(),
             () -> {
@@ -186,8 +185,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateMeaning(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "updateMeaning", new HashMap<>(),
             () -> {
@@ -201,8 +200,8 @@ public class WordController extends Controller {
 
     public Result deleteMeaning(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "deleteMeaning", new HashMap<>(),
             () -> {
@@ -215,8 +214,8 @@ public class WordController extends Controller {
 
     public Result listMeanings(final String wordId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
 
         return ControllerUtils.executeEndpoint(transactionId, requestId, "listMeanings", new HashMap<>(),
             () -> {
@@ -231,8 +230,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result addAntonym(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -257,8 +256,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result removeAntonym(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -281,8 +280,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result addSynonym(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();
@@ -307,8 +306,8 @@ public class WordController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result removeSynonym(final String wordId, final String meaningId) {
 
-        final String transactionId = request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = request().getHeader(Headers.X_REQUEST_ID);
+        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
+        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
         final Map<String,String> parameters = new HashMap<>();
 
         final JsonNode body = request().body().asJson();

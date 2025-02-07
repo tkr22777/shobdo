@@ -4,8 +4,6 @@
 
 FROM openjdk:8-jre-alpine
 
-MAINTAINER Tahsin Kabir
-
 #Copying binary to the deployable containers fs
 ADD  /target/universal/ /shobdo-app/bin
 

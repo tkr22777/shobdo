@@ -43,11 +43,6 @@ public class WordLogicTest {
     }
 
     //Create word
-    @Ignore @Test
-    public void generateWordId_wordIdExists_throwsRuntimeException() {
-        //TODO
-    }
-
     @Test
     public void createWord_wordIdIsNotSet_createWordDaoCalled() {
         when(mockWordStore.create(any())).thenReturn(theWord);
@@ -83,24 +78,5 @@ public class WordLogicTest {
         wordLogic.getWordBySpelling(spelling);
         verify(mockWordStore, times(1) ).getBySpelling(spelling);
         verify(mockWordCache, times(1) ).cacheBySpelling(theWord);
-    }
-
-    @Test (expected = IllegalArgumentException.class) @Ignore
-    public void updateWord_nullWordId_throwsIllegalArgumentException() {
-
-    }
-
-    @Test (expected = IllegalArgumentException.class) @Ignore
-    public void updateWord_illegalWordId_throwsIllegalArgumentException() {
-
-    }
-
-    @Test (expected = IllegalArgumentException.class) @Ignore
-    public void updateWord_wordIdsDoNotMatch_throwsIllegalArgumentException() {
-
-    }
-
-    @Test @Ignore
-    public void updateWord_wordIdSetWordsIdNotSet_addsWordCurrently() {
     }
 }

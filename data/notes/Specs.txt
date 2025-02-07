@@ -25,7 +25,7 @@ System requirements:
 -------------------
 User Specification:
 -------------------
-	- P0 Bangla to Bangla dictionary 
+	- P0 Bangla to Bangla dictionary
 	- P0 User login and history with Facebook
 	- P1 Bangla synonyms
 	- P2 English to Bangla dictionary
@@ -38,14 +38,14 @@ User stories:
 2. As a super user I want to update a word (spelling, antonym, synonym without any meaning)
 3. As a super user I want to delete a word (deletes spelling, antonym, synonym and meanings)
 4. As a super user I want to add a meaning to an existing word
-5. As a super user I want to update a meaning of an existing word 
-6. As a super user I want to delete a meaning of an existing word 
+5. As a super user I want to update a meaning of an existing word
+6. As a super user I want to delete a meaning of an existing word
 7. As a user I want to create a request to create a word (spelling, antonym, synonym without any meaning)
 8. As a user I want to create a request to update a word (spelling, antonym, synonym without any meaning)
 9. As a user I want to create a request to delete a word (to delete spelling, antonym, synonym and meanings)
 10. As a user I want to create a request to add meaning it an existing word
-11. As a user I want to create a request to update a meaning of an existing word 
-12. As a user I want to create a request to delete a meaning of an existing word 
+11. As a user I want to create a request to update a meaning of an existing word
+12. As a user I want to create a request to delete a meaning of an existing word
 13. As a super user I want to list the change requests for words and meaning
 14. As a super user I want to accept a change requests, log the user and award points to him
-15. As a super user I want to reject a change requests, send the requested creator that the request was rejected 
+15. As a super user I want to reject a change requests, send the requested creator that the request was rejected
