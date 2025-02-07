@@ -10,7 +10,7 @@
 
 <title>Samsada Bangala abhidhana</title>
 
-<META NAME ="description" CONTENT ="Online version of Sailendra Biswas's 'Samsada Bangala abhidhana. 7th ed.' 
+<META NAME ="description" CONTENT ="Online version of Sailendra Biswas's 'Samsada Bangala abhidhana. 7th ed.'
 from the Digital Dictionaries of South Asia">
 <META NAME ="keywords" CONTENT ="Bengali Dictionary, Online Bengali Dictionary, Bengali Online Dictionary">
 
@@ -115,6 +115,6 @@ from the Digital Dictionaries of South Asia">
 
 <div align ="center" class ="bitblue">
 <a href="http://dsal.uchicago.edu/dictionaries/biswas-bangala/">Back to the Search Page </a>&nbsp; | &nbsp;
-<a href="http://dsal.uchicago.edu/dictionaries/">Back to 
+<a href="http://dsal.uchicago.edu/dictionaries/">Back to
 the DDSA Page</a><br><br>
 </div>

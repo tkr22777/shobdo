@@ -1,63 +1,66 @@
+import copy
 import json
 import sys
+from collections import defaultdict
+import time
+from openai import OpenAI
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from config import settings
 from logger import logger
-from util import get_enrichment_prompt, read_google_sheet
+
 
 sys.stdout.reconfigure(encoding="utf-8")
 
+class ReferenceEntries:
+    def __init__(self, filename):
+        """Initialize tracker with a filename, loading existing dict if available.
+        
+        Args:
+            filename (str): Path to the file storing the processed items
+        """
+        self.filename = filename
+        self.processed_items = {}  # Changed from set to dict
+        self.word_entries = defaultdict(list)
+        
+        try:
+            with open(filename, encoding='utf-8') as f:
+                self.processed_items = json.load(f)  # Now loading as dict
+        except FileNotFoundError:
+            pass
 
-def df_to_json_entries(df):
-    """Convert DataFrame rows to list of JSON objects with field mapping."""
-    # Define field mappings (old_name: new_name)
-    field_mappings = {
-        "Reference (Do not cut)": "reference",
-        "শব্দ সমূহ": "word",
-        "সহজ উদাহরণ": "meaning",
-        "বাক্য রচনা": "example_sentence",
-        "সমার্থক শব্দ": "synonyms",
-        "বিপরীতার্থক শব্দ": "antonyms",
-        "পদ": "part_of_speech",
-    }
+        for reference, entries in self.processed_items.items():
+            for entry in entries:
+                # logger.info(f"Reference: {reference}, Entry: {entry['word']}")
+                self.word_entries[entry['word']].append(entry)
+            
+    def print_entry_count(self):
+        """Print the current number of entries in the processed items."""
+        count = 0
+        for reference, entries in self.processed_items.items():
+            count += len(entries)
+        logger.info(f"Total entries: {count}")
 
-    json_entries = []
-    for _, row in df.iterrows():
-        # Create new dict with mapped fields
-        entry = {}
-        for old_field, new_field in field_mappings.items():
-            if old_field in row:
-                entry[new_field] = row[old_field]
-        json_entries.append(entry)
-    return json_entries
+        logger.info(f"Word entries: {len(self.word_entries)}")
+
+        entry_count_frequency = defaultdict(int)
+        for word, entries in self.word_entries.items():
+            entry_count_frequency[len(entries)] += 1
+            if len(entries) == 72:
+                for entry in entries:
+                    logger.info(f"Word: {word}, Entry: {entry}")
+
+        for entry_count, frequency in entry_count_frequency.items():
+            logger.info(f"Entry count: {entry_count}, Frequency: {frequency}")
+
+        for word, entries in self.word_entries.items():
+            if len(entries) == 0:
+                logger.info(f"found word with no entries: {word}")
+
 
 
 if __name__ == "__main__":
-    # The sheet_key is the long string from your Google Sheets URL
-    sheet_keys = [
-        "1OUwV-WrVAEMTOVUNzGcrF3MGZGVIzMmj87bbLyicnvM",
-    ]
+    references = ReferenceEntries("completed_references.json")
+    references.print_entry_count()
 
-    df = read_google_sheet(sheet_keys[0])
-
-    # Convert DataFrame to JSON entries
-    json_entries = df_to_json_entries(df)
-
-    # # Example usage
-    # sample_data = {
-    #     "word": "লাফ",
-    #     "meaning": "উচ্চতায় বা দূরত্বে উপরে ওঠা বা সামনে যাওয়া।",
-    #     "example_sentence": "বিড়ালটি টেবিল থেকে লাফ দিল।",
-    #     "synonyms": ["উঠান", "ঝাঁপ", "উঁচুতে ওঠা"],
-    #     "antonyms": ["পড়ে যাওয়া", "থেমে যাওয়া"]
-    # }
-
-    for entry in json_entries[:20]:
-        logger.info(
-            f"Provided entry: {json.dumps(entry, ensure_ascii=False, indent=2)}"
-        )
-        prompt = get_enrichment_prompt(entry)
-        logger.info(f"Prompt: {prompt}")
-    #    response = generate_with_gemini(prompt)
-    #    logger.info(f"Gemini response: {response}")
-    #    response = generate_with_deepseek(prompt)
-    #    logger.info(f"Deepseek response: {response}")
