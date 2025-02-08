@@ -36,37 +36,40 @@ function containsEnglishCharacters(searchTerm) {
     }
 }
 
-function wordSearch(element) {
-    var searchQueryString = $('#wordSearchBox').val().trim();
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const debouncedWordSearch = debounce(function(element) {
+    const searchQueryString = $('#wordSearchBox').val().trim();
     console.log("WordSearch searchQueryString: " + searchQueryString);
-    var containsEng = containsEnglishCharacters(searchQueryString);
 
     if (searchQueryString.length > 0) {
-        if (containsEng) {
-            var ridmikConverted = convertToRidmik(searchQueryString)
-            var containsEng = containsEnglishCharacters(ridmikConverted);
-            if (!containsEng) {
-                var searchRoute = "/api/v1/words/search";
-                var searchBody = JSON.stringify({ searchString: ridmikConverted });
-                RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
-            }
-        } else {
-            var searchRoute = "/api/v1/words/search";
-            var searchBody = JSON.stringify({ searchString: searchQueryString });
+        const searchRoute = "/api/v1/words/search";
+        const searchString = containsEnglishCharacters(searchQueryString) 
+            ? convertToRidmik(searchQueryString)
+            : searchQueryString;
+            
+        if (!containsEnglishCharacters(searchString)) {
+            const searchBody = JSON.stringify({ searchString });
             RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
         }
     }
-}
-
-function handleTestGetResult(data, status, jqXHR) {
-    console.log("The data:" + data);
-}
+}, 300);
 
 function meaningSearch(textContent) {
     var meaningRoute = "/api/v1/words/postget"
     var meaningBody = JSON.stringify({ spelling: textContent });
-    console.log("Meaning route: " + meaningRoute);
-    console.log("Meaning body: " + meaningBody);
+    // console.log("Meaning route: " + meaningRoute);
+    // console.log("Meaning body: " + meaningBody);
     RESTPostCall(meaningRoute, meaningBody, handleWordMeaningResult);
 }
 
@@ -99,10 +102,8 @@ function RESTGetCall(route, onSuccessFunction) {
 
 function handleWordSearchResult(data, status, jqXHR) {
 
-    console.log("Data:" + data);
-
+    // console.log("Data:" + data);
     $('#wordList').empty();
-
     $.each(data, function (i, item) {
         $('#wordList').append(
             listWordElement(item)
@@ -116,50 +117,32 @@ function handleWordMeaningResult(data, status, jqXHR) {
     meaningHolder.innerHTML = handleMeaningData(data);
 }
 
-
-function clearMeaningHolder() {
-}
-
-function setMeaningHolder() {
-}
-
 function handleMeaningData(data) {
-    console.log(data);
-    var meanings = data.meanings;
-    var totalMeanings = Object.keys(meanings).length;
-    var i = 0;
-    var returnString = "<div class='word-title'>" + data.spelling + "</div>";
+    // console.log(data);
+    const meanings = data.meanings;
+    const totalMeanings = Object.keys(meanings).length;
     
-    for (var key in meanings) {
-        console.log(i + " Meaning:" + meanings[key].text);
-        console.log(i + " Example:" + meanings[key].exampleSentence);
+    const meaningSections = Object.entries(meanings).map(([key, meaning], index) => {
+        // console.log("Synonyms:", meaning.synonyms, "Type:", typeof meaning.synonyms);
+        // console.log("Antonyms:", meaning.antonyms, "Type:", typeof meaning.antonyms);
         
-        returnString += "<div class='meaning-section'>";
-        
-        if (totalMeanings > 1) {
-            returnString += "<div class='meaning-number'>( " + getBengaliDigit(i + 1) + " )</div>";
-        }
-        
-        returnString += "<div><u>অর্থ:</u> " + meanings[key].text + "</div>";
-        
-        if (meanings[key].synonyms) {
-            returnString += "<div><u>সমার্থ:</u> " + meanings[key].synonyms + "</div>";
-        }
-        
-        if (meanings[key].antonyms) {
-            returnString += "<div><u>বিপরীতার্থ:</u> " + meanings[key].antonyms + "</div>";
-        }
-        
-        if (meanings[key].exampleSentence) {
-            returnString += "<div><u>উদাহরণ:</u> " + meanings[key].exampleSentence + "</div>";
-        }
-        
-        returnString += "</div>";
-        i = i + 1;
-    }
-    
-    console.log(returnString);
-    return returnString;
+        const sections = [
+            totalMeanings > 1 
+                ? `<div class='meaning-number'>( ${getBengaliDigit(index + 1)} )</div>`: '',
+            `<div><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
+            Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
+                ? `<div><u>সমার্থকগুলো:</u> ${meaning.synonyms}</div>`: '',
+            Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
+                ? `<div><u>বিপরীতার্থগুলো:</u> ${meaning.antonyms}</div>`: '',
+            meaning.exampleSentence
+                ? `<div><u>উদাহরণ বাক্য:</u> ${meaning.exampleSentence}</div>`: ''
+        ].filter(Boolean).join('');
+
+        return `<div class='meaning-section'>${sections}</div>`;
+    }).join('');
+
+    // console.log(returnString);
+    return `<div class='word-title'>${data.spelling}</div>${meaningSections}`;
 }
 
 function getBengaliDigit(digit) {
