@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>shobdo 0.7</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -35,24 +37,26 @@
 
 <body>
     <div class="jumbotron text-center">
-        <h1>shobdo 0.8</h1>
-        <input type="text" name="Search Box" id="wordSearchBox" onkeyup="wordSearch(this)"><br>
+        <h1>শব্দ খোঁজ</h1>
+        <div class="search-container">
+            <input type="text" 
+                   name="Search Box" 
+                   id="wordSearchBox" 
+                   onkeyup="wordSearch(this)"
+                   placeholder="শব্দ খুঁজুন..."
+                   autocomplete="off">
+        </div>
     </div>
 
     <div class="container">
         <div class="row">
             <div class="col-sm-4">
                 <nav>
-                    <h4>
-                        <ul id="wordList"> </ul>
-                    </h4>
+                    <ul id="wordList"></ul>
                 </nav>
             </div>
             <div class="col-sm-8">
-                <h2>
-                    <div id="wordMeaning" style="color:white">
-                    </div>
-                </h2>
+                <div id="wordMeaning"></div>
             </div>
         </div>
     </div>

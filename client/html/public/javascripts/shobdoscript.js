@@ -128,26 +128,36 @@ function handleMeaningData(data) {
     var meanings = data.meanings;
     var totalMeanings = Object.keys(meanings).length;
     var i = 0;
-    var returnString = "<h4>" + data.spelling;
+    var returnString = "<div class='word-title'>" + data.spelling + "</div>";
+    
     for (var key in meanings) {
         console.log(i + " Meaning:" + meanings[key].text);
         console.log(i + " Example:" + meanings[key].exampleSentence);
+        
+        returnString += "<div class='meaning-section'>";
+        
         if (totalMeanings > 1) {
-            returnString = returnString + "<br>"
-            returnString = returnString + "<br> ( " + getBengaliDigit(i + 1) + " )"
+            returnString += "<div class='meaning-number'>( " + getBengaliDigit(i + 1) + " )</div>";
         }
-        returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>অর্থ:</u> " + meanings[key].text
-        returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>সমার্থ:</u> " + meanings[key].synonyms
-        returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>বিপরীতার্থ:</u> " + meanings[key].antonyms
-        returnString = returnString + "<br>"
-        returnString = returnString + "<br>" + " <u>উদাহরণ:</u> " + meanings[key].exampleSentence
-        returnString = returnString + "<br> \n";
+        
+        returnString += "<div><u>অর্থ:</u> " + meanings[key].text + "</div>";
+        
+        if (meanings[key].synonyms) {
+            returnString += "<div><u>সমার্থ:</u> " + meanings[key].synonyms + "</div>";
+        }
+        
+        if (meanings[key].antonyms) {
+            returnString += "<div><u>বিপরীতার্থ:</u> " + meanings[key].antonyms + "</div>";
+        }
+        
+        if (meanings[key].exampleSentence) {
+            returnString += "<div><u>উদাহরণ:</u> " + meanings[key].exampleSentence + "</div>";
+        }
+        
+        returnString += "</div>";
         i = i + 1;
     }
-    returnString = returnString + "</h4>";
+    
     console.log(returnString);
     return returnString;
 }
