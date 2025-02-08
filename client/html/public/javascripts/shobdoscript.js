@@ -140,11 +140,11 @@ function handleMeaningData(data) {
         const sections = [
             totalMeanings > 1 
                 ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>`: '',
-            `<div><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
+            `<div class="meaning-text"><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
             Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
-                ? `<div><u>সমার্থকগুলো:</u> ${meaning.synonyms.join(', ')}</div>`: '',
+                ? `<div><u>সমার্থক শব্দ:</u> ${meaning.synonyms.join(', ')}</div>`: '',
             Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
-                ? `<div><u>বিপরীতার্থগুলো:</u> ${meaning.antonyms.join(', ')}</div>`: '',
+                ? `<div><u>বিপরীতার্থ শব্দ:</u> ${meaning.antonyms.join(', ')}</div>`: '',
             meaning.exampleSentence
                 ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>`: ''
         ].filter(Boolean).join('');

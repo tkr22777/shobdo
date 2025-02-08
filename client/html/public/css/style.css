@@ -191,20 +191,19 @@ nav ul::-webkit-scrollbar-thumb {
 }
 
 #wordMeaning u::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--accent-color);
-    opacity: 0.4;
+    display: none;
 }
 
 #wordMeaning .meaning-section div {
     margin-bottom: 0rem;
     line-height: 1.6;
     padding: 0.25rem 0;
+    font-size: 1.5rem;
+}
+
+#wordMeaning .meaning-section div.meaning-text {
+    font-size: 1.6rem;  /* Larger size for the meaning text */
+    margin-bottom: 0.5rem;  /* Add some space after the meaning */
 }
 
 #wordMeaning .meaning-section div:last-child {
@@ -217,12 +216,9 @@ nav ul::-webkit-scrollbar-thumb {
 }
 
 #wordMeaning .highlighted-word {
-    background-color: rgba(93, 162, 113, 0.2);
+    text-decoration: underline;
     color: inherit;
-    padding: 0 4px;
-    border-radius: 3px;
     font-weight: 500;
-    border: 1px solid rgba(93, 162, 113, 0.3);
 }
 
 /* Responsive adjustments */
