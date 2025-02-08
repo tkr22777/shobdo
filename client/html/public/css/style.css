@@ -82,6 +82,7 @@ nav ul::-webkit-scrollbar-thumb {
     border-radius: 6px;
     transition: all 0.2s ease;
     background-color: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
 }
 
 #wordList li:hover {
@@ -98,6 +99,7 @@ nav ul::-webkit-scrollbar-thumb {
     transition: all 0.2s;
     font-family: 'Noto Sans Bengali', sans-serif;
     letter-spacing: 0.02em;
+    pointer-events: none;
 }
 
 #wordList a:hover {

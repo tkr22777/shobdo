@@ -154,7 +154,10 @@ function getBengaliDigit(digit) {
 function listWordElement(element) {
     var linkedWordText = document.createElement("a");
     linkedWordText.textContent = element;
-    linkedWordText.onclick = function () { 
+    var listItem = document.createElement('li');
+    
+    // Move the click handler to the li element
+    listItem.onclick = function () { 
         // Remove active class from all links and list items
         document.querySelectorAll('#wordList a').forEach(a => a.classList.remove('active'));
         document.querySelectorAll('#wordList li').forEach(li => li.classList.remove('active'));
@@ -165,7 +168,7 @@ function listWordElement(element) {
         
         meaningSearch(linkedWordText.textContent); 
     };
-    var listItem = document.createElement('li')
+    
     listItem.appendChild(linkedWordText);
     return listItem;
 }
