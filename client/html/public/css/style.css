@@ -94,7 +94,7 @@ nav ul::-webkit-scrollbar-thumb {
     color: var(--text-light);
     text-decoration: none;
     display: block;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 500;
     transition: all 0.2s;
     font-family: 'Noto Sans Bengali', sans-serif;

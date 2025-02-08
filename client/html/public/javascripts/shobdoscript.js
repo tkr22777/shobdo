@@ -58,6 +58,7 @@ const debouncedWordSearch = debounce(function(element) {
             ? convertToRidmik(searchQueryString)
             : searchQueryString;
             
+        console.log("WordSearch searchQueryString: " + searchQueryString + " searchString: " + searchString);
         if (!containsEnglishCharacters(searchString)) {
             const searchBody = JSON.stringify({ searchString });
             RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
