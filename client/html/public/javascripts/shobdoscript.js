@@ -3,30 +3,6 @@ function convertToRidmik(englishString) {
     return parser.toBangla(englishString);
 }
 
-function testTransliterate() {
-
-    if (google.language != null) {
-
-        google.language.transliterate(["k"], "en", "bn", function (result) {
-            if (result.error) {
-                console.log("There was an errror transliterating!");
-            } else {
-                console.log("There was no errror during transliterating!");
-            }
-            console.log(JSON.stringify(result));
-        });
-
-    } else {
-        if (google == null) {
-            console.log("google is null");
-        }
-
-        if (google.language == null) {
-            console.log("google.language is null");
-        }
-    }
-}
-
 function containsEnglishCharacters(searchTerm) {
 
     if (searchTerm.match(/[a-z]/i)) {
