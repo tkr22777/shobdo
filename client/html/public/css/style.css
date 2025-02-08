@@ -123,25 +123,47 @@ nav ul::-webkit-scrollbar-thumb {
 #wordMeaning {
     background-color: var(--primary-color);
     color: var(--text-light);
-    padding: 2rem;
+    padding: 0; /* Remove padding from container */
     border-radius: 8px;
     box-shadow: var(--shadow);
     height: calc(100vh - 300px);
     min-height: 300px;
+    overflow-y: hidden; /* Change to hidden to prevent double scrollbars */
+    display: flex;
+    flex-direction: column;
+}
+
+#wordMeaning .word-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-align: center;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    padding: 2rem 2rem 1rem;
+    background-color: var(--primary-color);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Create a scrollable container for meanings */
+#wordMeaning .meanings-container {
+    flex: 1;
     overflow-y: auto;
+    padding: 2rem;
     scrollbar-width: thin;
     scrollbar-color: var(--accent-color) var(--primary-color);
 }
 
-#wordMeaning::-webkit-scrollbar {
+#wordMeaning .meanings-container::-webkit-scrollbar {
     width: 8px;
 }
 
-#wordMeaning::-webkit-scrollbar-track {
+#wordMeaning .meanings-container::-webkit-scrollbar-track {
     background: var(--primary-color);
 }
 
-#wordMeaning::-webkit-scrollbar-thumb {
+#wordMeaning .meanings-container::-webkit-scrollbar-thumb {
     background-color: var(--accent-color);
     border-radius: 4px;
 }
@@ -150,16 +172,6 @@ nav ul::-webkit-scrollbar-thumb {
     line-height: 1.8;
     margin: 0;
     font-size: 1.1rem;
-}
-
-#wordMeaning .word-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
-    color: var(--accent-color);
-    text-align: center;
-    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
-    padding-bottom: 1rem;
 }
 
 #wordMeaning .meaning-section {

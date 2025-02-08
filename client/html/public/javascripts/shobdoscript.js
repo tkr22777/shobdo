@@ -131,7 +131,7 @@ function handleMeaningData(data) {
             return sentence.split(/(\s+|[।,!?])/g).map(part => {
                 // If the part contains our word (for derived forms)
                 if (part.includes(word)) {
-                    return `<span class="highlighted-word">${part}</span>`;
+                    return ` <span class="highlighted-word"> ${part} </span> `;
                 }
                 return part;
             }).join('');
@@ -152,7 +152,10 @@ function handleMeaningData(data) {
         return `<div class='meaning-section'>${sections}</div>`;
     }).join('');
 
-    return `<div class='word-title'>${data.spelling}</div>${meaningSections}`;
+    return `
+        <div class='word-title'>${data.spelling}</div>
+        <div class='meanings-container'>${meaningSections}</div>
+    `;
 }
 
 function getBengaliDigit(digit) {
