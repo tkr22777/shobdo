@@ -104,6 +104,19 @@ nav ul::-webkit-scrollbar-thumb {
     color: var(--accent-color);
 }
 
+#wordList a.active {
+    color: var(--accent-color);
+    font-weight: 700;
+    background-color: rgba(52, 152, 219, 0.2);
+    display: block;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+#wordList li.active {
+    transform: translateX(5px);
+}
+
 /* Word meaning section */
 #wordMeaning {
     background-color: var(--primary-color);

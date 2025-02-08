@@ -154,31 +154,18 @@ function getBengaliDigit(digit) {
 function listWordElement(element) {
     var linkedWordText = document.createElement("a");
     linkedWordText.textContent = element;
-    linkedWordText.style.color = "white";
-    linkedWordText.onclick = function () { meaningSearch(linkedWordText.textContent); };
+    linkedWordText.onclick = function () { 
+        // Remove active class from all links and list items
+        document.querySelectorAll('#wordList a').forEach(a => a.classList.remove('active'));
+        document.querySelectorAll('#wordList li').forEach(li => li.classList.remove('active'));
+        
+        // Add active class to clicked elements
+        linkedWordText.classList.add('active');
+        listItem.classList.add('active');
+        
+        meaningSearch(linkedWordText.textContent); 
+    };
     var listItem = document.createElement('li')
     listItem.appendChild(linkedWordText);
-    listItem.style.color = "white";
     return listItem;
-}
-
-function getCount() {
-    console.log("In get count!");
-    jQuery.ajax({
-        type: "GET",
-        url: "http://localhost:9000/count",
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (data, status, jqXHR) {
-            console.log("success: " + data);
-        },
-        error: function (jqXHR, status) {
-            console.log("Get count fail");
-        }
-    });
-}
-
-function logResult(data, status, jqXHR) {
-    // console.log("Logging Result:");
-    // console.log(data);
 }
