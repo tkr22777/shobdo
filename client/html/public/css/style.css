@@ -177,8 +177,8 @@ nav ul::-webkit-scrollbar-thumb {
 #wordMeaning .meaning-number {
     font-size: 1.5rem;
     color: var(--accent-color);
-    opacity: 0.8;
-    margin-bottom: 0.5rem;
+    opacity: 0.7;
+    margin-bottom: 0.1rem;
 }
 
 #wordMeaning u {
@@ -202,8 +202,8 @@ nav ul::-webkit-scrollbar-thumb {
 }
 
 #wordMeaning .meaning-section div.meaning-text {
-    font-size: 1.6rem;  /* Larger size for the meaning text */
-    margin-bottom: 0.5rem;  /* Add some space after the meaning */
+    font-size: 1.5rem;  /* Larger size for the meaning text */
+    margin-bottom: 0.2rem;  /* Add some space after the meaning */
 }
 
 #wordMeaning .meaning-section div:last-child {

@@ -140,11 +140,11 @@ function handleMeaningData(data) {
         const sections = [
             totalMeanings > 1 
                 ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>`: '',
-            `<div class="meaning-text"><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
+            `<div class="meaning-text"><u>অর্থ:</u> ${meaning.text}</div>`,
             Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
-                ? `<div><u>সমার্থক শব্দ:</u> ${meaning.synonyms.join(', ')}</div>`: '',
+                ? `<div><u>সমার্থসমূহ:</u> ${meaning.synonyms.join(', ')}</div>`: '',
             Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
-                ? `<div><u>বিপরীতার্থ শব্দ:</u> ${meaning.antonyms.join(', ')}</div>`: '',
+                ? `<div><u>বিপরীতার্থসমূহ:</u> ${meaning.antonyms.join(', ')}</div>`: '',
             meaning.exampleSentence
                 ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>`: ''
         ].filter(Boolean).join('');
@@ -181,6 +181,9 @@ function listWordElement(element) {
         // Add active class to clicked elements
         linkedWordText.classList.add('active');
         listItem.classList.add('active');
+        
+        // Scroll word meaning pane to top before loading new content
+        document.getElementById('wordMeaning').scrollTop = 0;
         
         meaningSearch(linkedWordText.textContent); 
     };
