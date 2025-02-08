@@ -1,11 +1,53 @@
 .jumbotron {
-    background-color: rgb(0, 0, 0);
-    color: #FFFFFF;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+}
+
+body {
+    background-color: #34495e !important;
 }
 
 input[type="text"], textarea {
-  background-color : #d1d1d1;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border: 1px solid #bdc3c7;
+    padding: 8px;
+    border-radius: 4px;
 }
 
-nav ul{height:298px; width:100%;}
-nav ul{overflow:hidden; overflow-y:scroll; overflow-x:scroll;}
+nav ul {
+    height: 298px;
+    width: 100%;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+nav ul {
+    overflow: hidden;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/* Style for word list items */
+#wordList li {
+    padding: 5px 0;
+}
+
+#wordList a {
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#wordList a:hover {
+    color: #3498db;
+}
+
+/* Style for word meaning section */
+#wordMeaning {
+    color: #ecf0f1;
+    background-color: #2c3e50;
+    padding: 20px;
+    border-radius: 4px;
+}

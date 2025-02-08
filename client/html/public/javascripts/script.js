@@ -1,4 +1,3 @@
-
 function insertAtCareto(el, dele, value) {
 
 	if (el.selectionStart || el.selectionStart == "0") {
@@ -29,8 +28,7 @@ function setCaretPositiono(ctrl, pos) {
 	}
 }
 
-//$(document).ready(function(){
-
+$(document).ready(function() {
 	var parser = new RidmikParser();
 	var writing = "";
 	var phLen = 0;
@@ -84,4 +82,4 @@ function setCaretPositiono(ctrl, pos) {
 			phLen = 0;
 		}
 	}
-//});
+});

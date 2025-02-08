@@ -37,27 +37,21 @@ function containsEnglishCharacters(searchTerm) {
 }
 
 function wordSearch(element) {
-
     var searchQueryString = $('#wordSearchBox').val().trim();
-
     console.log("WordSearch searchQueryString: " + searchQueryString);
     var containsEng = containsEnglishCharacters(searchQueryString);
 
-    console.log("Ridmik Conversion: " + convertToRidmik(searchQueryString))
-
     if (searchQueryString.length > 0) {
-
-        console.log("Search string length: " + searchQueryString.length)
-        if (containsEng) { //event.keyCode == 13 && keyCode 13 is enter
+        if (containsEng) {
             var ridmikConverted = convertToRidmik(searchQueryString)
             var containsEng = containsEnglishCharacters(ridmikConverted);
-            if (!containsEng) { //event.keyCode == 13 && keyCode 13 is enter
-                var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
+            if (!containsEng) {
+                var searchRoute = "/api/v1/words/search";
                 var searchBody = JSON.stringify({ searchString: ridmikConverted });
                 RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
             }
         } else {
-            var searchRoute = "http://127.0.0.1:32779/api/v1/words/search";
+            var searchRoute = "/api/v1/words/search";
             var searchBody = JSON.stringify({ searchString: searchQueryString });
             RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
         }
@@ -69,8 +63,7 @@ function handleTestGetResult(data, status, jqXHR) {
 }
 
 function meaningSearch(textContent) {
-
-    var meaningRoute = "http://127.0.0.1:32779/api/v1/words/postget"
+    var meaningRoute = "/api/v1/words/postget"
     var meaningBody = JSON.stringify({ spelling: textContent });
     console.log("Meaning route: " + meaningRoute);
     console.log("Meaning body: " + meaningBody);
