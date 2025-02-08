@@ -194,3 +194,21 @@ function listWordElement(element) {
     listItem.appendChild(linkedWordText);
     return listItem;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle about link click
+    document.getElementById('aboutLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        const aboutContent = `
+            <div class='word-title'>পরিচিতি</div>
+            <div class='meanings-container'>
+                <div class='meaning-section'>
+                    <div class="meaning-text">
+                        <p>শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('wordMeaning').innerHTML = aboutContent;
+    });
+});

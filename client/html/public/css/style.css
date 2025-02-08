@@ -233,6 +233,49 @@ nav ul::-webkit-scrollbar-thumb {
     font-weight: 500;
 }
 
+/* Footer styling */
+.footer {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.footer-content {
+    text-align: center;
+}
+
+.footer p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.footer .version {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+}
+
+.footer-links {
+    margin-top: 1rem;
+}
+
+.footer-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 0 0.5rem;
+}
+
+.footer-links a:hover {
+    color: var(--accent-color);
+}
+
+.footer .separator {
+    color: var(--accent-color);
+    margin: 0 0.5rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .jumbotron h1 {
@@ -266,6 +309,15 @@ nav ul::-webkit-scrollbar-thumb {
 
     #wordMeaning .meaning-section div {
         font-size: 1.2rem;
+    }
+
+    .footer {
+        margin-top: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .footer p {
+        font-size: 0.9rem;
     }
 }
 
