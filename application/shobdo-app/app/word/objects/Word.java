@@ -32,16 +32,16 @@ public class Word extends MongoEntity implements APIEntity {
         }
 
         // Check for duplicate meaning texts for the same meaning id
-        getMeanings().values().stream()
-            .filter(existing -> existing.getText().equals(meaning.getText()))
-            .filter(existing -> !existing.getId().equals(meaning.getId()))
-            .findFirst()
-            .ifPresent(duplicate -> {
-                throw new IllegalArgumentException(String.format(
-                    "A meaning with text '%s' already exists with a different ID. Existing meaning ID: '%s', New meaning ID: '%s'",
-                    meaning.getText(), duplicate.getId(), meaning.getId()
-                ));
-            });
+        // getMeanings().values().stream()
+        //     .filter(existing -> existing.getText().equals(meaning.getText()))
+        //     .filter(existing -> !existing.getId().equals(meaning.getId()))
+        //     .findFirst()
+        //     .ifPresent(duplicate -> {
+        //         throw new IllegalArgumentException(String.format(
+        //             "A meaning with text '%s' already exists with a different ID. Existing meaning ID: '%s', New meaning ID: '%s'",
+        //             meaning.getText(), duplicate.getId(), meaning.getId()
+        //         ));
+        //     });
 
         getMeanings().put(meaning.getId(), meaning);
     }

@@ -6,6 +6,7 @@ The service is now beta. Cool! If you want to contribute, follow along.
 Install Java8 SDK.
 
 Check the `Makefile` and use `make` commands to run/test/build.
+Warning: Some makefile changes recreaetes MongoDB and Redis containers
 
 If you want to import to IntelliJ and develop on IntelliJ:
 - Use java 8 when importing to IntelliJ. 
@@ -34,24 +35,3 @@ Some useful requests:
     echo "Testing get word POST:"
     curl -H "Content-Type: application/json" -X POST -d '{"wordSpelling":"ঙ"}' http://localhost:9000/api/v1/words/postget
     echo ""
-
-
-<!---
-The Shobdo webservice:
-==============================
-
-Controllers:
-============
-
-Application Logic:
-==================
-
-Caches:
-=======
-- WordCache.java:
-  Uses redis to words and search results
-  
-Data Access Objects (DAOs):
-===========================
-- WordDao.java:
-  Interface to data layer for word object's CRUDL and search operations

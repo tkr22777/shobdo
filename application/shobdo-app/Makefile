@@ -26,7 +26,18 @@ build: spin-up-mongodb-container spin-up-redis-container
 build-docker-image: build
 	docker build --no-cache=true -t ${DOCKER_IMAGE_NAME} .
 
-spin-up-dockerized-service: spin-up-mongodb-container spin-up-redis-container
+exec-shobdo-container-cli:
+	docker exec -it shobdo-instance /bin/bash
+
+spin-up-dockerized-service-only:
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
+	-docker rm -f shobdo-instance #cleanup existing instance
+	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
+		--env SHOBDO_MONGODB_HOSTNAME=${MONGO_HOST_IP} \
+		--env SHOBDO_REDIS_HOSTNAME=${REDIS_HOST_IP} \
+		-p ${SHOBDO_PORT}:9000 --name shobdo-instance -i -t ${DOCKER_IMAGE_NAME}
+
+spin-up-dockerized-service-clean-slate: spin-up-mongodb-container spin-up-redis-container
 	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
 	-docker rm -f shobdo-instance #cleanup existing instance
 	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
@@ -42,7 +53,7 @@ spin-up-mongodb-container:
 		--name mongo-instance -i -t -d mongo
 
 exec-mongodb-container-cli:
-	docker exec -it mongo-instance mongo
+	docker exec -it mongo-instance /bin/bash
 
 spin-up-redis-container:
 	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
