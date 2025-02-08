@@ -1,11 +1,11 @@
 /* Modern color scheme and base styles */
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #34495e;
-    --accent-color: #3498db;
-    --text-light: #ecf0f1;
-    --text-dark: #2c3e50;
-    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --primary-color: #0e2f19;    /* Darker green */
+    --secondary-color: #2a623d;  /* Dark green */
+    --accent-color: #5da271;     /* Light green for accents */
+    --text-light: #e8f5e9;       /* Light green tinted white */
+    --text-dark: #1a472a;        /* Same as primary for consistency */
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -214,6 +214,15 @@ nav ul::-webkit-scrollbar-thumb {
 #wordMeaning .meaning-section div:last-child u + * {
     font-style: italic;
     opacity: 0.9;
+}
+
+#wordMeaning .highlighted-word {
+    background-color: rgba(93, 162, 113, 0.2);
+    color: inherit;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 500;
+    border: 1px solid rgba(93, 162, 113, 0.3);
 }
 
 /* Responsive adjustments */

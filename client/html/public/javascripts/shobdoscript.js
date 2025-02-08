@@ -118,14 +118,24 @@ function handleWordMeaningResult(data, status, jqXHR) {
 }
 
 function handleMeaningData(data) {
-    // console.log(data);
     const meanings = data.meanings;
     const totalMeanings = Object.keys(meanings).length;
     
     const meaningSections = Object.entries(meanings).map(([key, meaning], index) => {
-        // console.log("Synonyms:", meaning.synonyms, "Type:", typeof meaning.synonyms);
-        // console.log("Antonyms:", meaning.antonyms, "Type:", typeof meaning.antonyms);
-        
+        // Create a function to highlight exact and derived word matches
+        // the following styling logic is better pre-computed and set in the backend
+        const highlightWord = (sentence, word) => {
+            if (!sentence) return '';
+            // Split sentence into words and preserve whitespace/punctuation
+            return sentence.split(/(\s+|[।,!?])/g).map(part => {
+                // If the part contains our word (for derived forms)
+                if (part.includes(word)) {
+                    return `<span class="highlighted-word">${part}</span>`;
+                }
+                return part;
+            }).join('');
+        };
+
         const sections = [
             totalMeanings > 1 
                 ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>`: '',
@@ -135,13 +145,12 @@ function handleMeaningData(data) {
             Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
                 ? `<div><u>বিপরীতার্থগুলো:</u> ${meaning.antonyms.join(', ')}</div>`: '',
             meaning.exampleSentence
-                ? `<div><u>উদাহরণ বাক্য:</u> ${meaning.exampleSentence}</div>`: ''
+                ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>`: ''
         ].filter(Boolean).join('');
 
         return `<div class='meaning-section'>${sections}</div>`;
     }).join('');
 
-    // console.log(returnString);
     return `<div class='word-title'>${data.spelling}</div>${meaningSections}`;
 }
 
