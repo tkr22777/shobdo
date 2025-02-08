@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>shobdo 0.7</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -22,40 +24,57 @@
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
 
-    <script src='javascripts/ridmikmap.js'></script>
-    <script src='javascripts/StringBuilder.js'></script>
-    <script src='javascripts/ridmikparser.js'></script>
+    <script src='javascripts/bangla-conversion/ridmikmap.js'></script>
+    <script src='javascripts/bangla-conversion/StringBuilder.js'></script>
+    <script src='javascripts/bangla-conversion/ridmikparser.js'></script>
 
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="javascripts/gtransliteration.js"></script>
     <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
-<body style="background-color:black;">
+<body>
     <div class="jumbotron text-center">
-        <h1>shobdo 0.7</h1>
-        <input type="text" name="Search Box" id="wordSearchBox" onkeyup="wordSearch(this)"><br>
+        <h1>শব্দ</h1>
+        <div class="search-container">
+            <input type="text" 
+                   name="Search Box" 
+                   id="wordSearchBox" 
+                   onkeyup="debouncedWordSearch(this)"
+                   placeholder="শব্দ খুঁজুন..."
+                   autocomplete="off">
+        </div>
     </div>
 
     <div class="container">
         <div class="row">
-            <div class="col-sm-4" style="background-color:black;">
+            <div class="col-sm-4">
                 <nav>
-                    <h4>
-                        <ul id="wordList"> </ul>
-                    </h4>
+                    <ul id="wordList"></ul>
                 </nav>
             </div>
-            <div class="col-sm-8" style="background-color:black;">
-                <h2>
-                    <div id="wordMeaning" style="color:white">
-                    </div>
-                </h2>
+            <div class="col-sm-8">
+                <div id="wordMeaning"></div>
             </div>
         </div>
     </div>
+
+    <!-- Add footer here -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© ২০২৫ শব্দ</p>
+                <p class="version">সংস্করণ ০.৮</p>
+                <div class="footer-links">
+                    <a href="https://github.com/tkr22777/shobdo" target="_blank">গিটহাব</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="aboutLink">পরিচিতি</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="themeToggle">ভা-ব</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
