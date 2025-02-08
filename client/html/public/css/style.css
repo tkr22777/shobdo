@@ -153,20 +153,32 @@ nav ul::-webkit-scrollbar-thumb {
 }
 
 #wordMeaning .word-title {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
     color: var(--accent-color);
+    text-align: center;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    padding-bottom: 1rem;
 }
 
 #wordMeaning .meaning-section {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.03);
+    transition: background-color 0.2s ease;
 }
 
-#wordMeaning .meaning-section:last-child {
-    border-bottom: none;
+#wordMeaning .meaning-section:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#wordMeaning .meaning-number {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
 }
 
 #wordMeaning u {
@@ -174,7 +186,34 @@ nav ul::-webkit-scrollbar-thumb {
     text-decoration: none;
     font-weight: 500;
     display: inline-block;
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
+    position: relative;
+}
+
+#wordMeaning u::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--accent-color);
+    opacity: 0.4;
+}
+
+#wordMeaning .meaning-section div {
+    margin-bottom: 0rem;
+    line-height: 1.6;
+    padding: 0.25rem 0;
+}
+
+#wordMeaning .meaning-section div:last-child {
+    margin-bottom: 0;
+}
+
+#wordMeaning .meaning-section div:last-child u + * {
+    font-style: italic;
+    opacity: 0.9;
 }
 
 /* Responsive adjustments */

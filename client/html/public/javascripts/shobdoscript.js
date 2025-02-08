@@ -128,7 +128,7 @@ function handleMeaningData(data) {
         
         const sections = [
             totalMeanings > 1 
-                ? `<div class='meaning-number'>( ${getBengaliDigit(index + 1)} )</div>`: '',
+                ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>`: '',
             `<div><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
             Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
                 ? `<div><u>সমার্থকগুলো:</u> ${meaning.synonyms.join(', ')}</div>`: '',
@@ -146,8 +146,14 @@ function handleMeaningData(data) {
 }
 
 function getBengaliDigit(digit) {
-    var charCodeForBengaliZero = "০".charCodeAt(0)
-    return String.fromCharCode(charCodeForBengaliZero + digit)
+    var charCodeForBengaliZero = "০".charCodeAt(0);
+    // Convert number to string to handle each digit
+    const digitString = digit.toString();
+    // Convert each digit and join them together
+    return digitString
+        .split('')
+        .map(d => String.fromCharCode(charCodeForBengaliZero + parseInt(d)))
+        .join('');
 }
 
 
