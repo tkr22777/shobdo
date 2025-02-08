@@ -248,16 +248,16 @@ nav ul::-webkit-scrollbar-thumb {
 
 .footer p {
     margin: 0.5rem 0;
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .footer .version {
     color: var(--accent-color);
-    font-size: 0.9rem;
+    font-size: 1.2rem;
 }
 
 .footer-links {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .footer-links a {
