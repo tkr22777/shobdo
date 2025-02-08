@@ -38,7 +38,7 @@ $(document).ready(function() {
 
 	elem.onkeypress = function(e){
 		var x = (window.event) ? e.keyCode : e.which;
-		console.log("pressed");
+		// console.log("pressed");
 
 		if(ctrlPressed || !banglaMode)
 			x = -1;

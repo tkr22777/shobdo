@@ -50,7 +50,7 @@ function debounce(func, wait) {
 
 const debouncedWordSearch = debounce(function(element) {
     const searchQueryString = $('#wordSearchBox').val().trim();
-    console.log("WordSearch searchQueryString: " + searchQueryString);
+    // console.log("WordSearch searchQueryString: " + searchQueryString);
 
     if (searchQueryString.length > 0) {
         const searchRoute = "/api/v1/words/search";
@@ -63,7 +63,7 @@ const debouncedWordSearch = debounce(function(element) {
             RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
         }
     }
-}, 300);
+}, 100);
 
 function meaningSearch(textContent) {
     var meaningRoute = "/api/v1/words/postget"
@@ -131,9 +131,9 @@ function handleMeaningData(data) {
                 ? `<div class='meaning-number'>( ${getBengaliDigit(index + 1)} )</div>`: '',
             `<div><u>শব্দের অর্থ:</u> ${meaning.text}</div>`,
             Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
-                ? `<div><u>সমার্থকগুলো:</u> ${meaning.synonyms}</div>`: '',
+                ? `<div><u>সমার্থকগুলো:</u> ${meaning.synonyms.join(', ')}</div>`: '',
             Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
-                ? `<div><u>বিপরীতার্থগুলো:</u> ${meaning.antonyms}</div>`: '',
+                ? `<div><u>বিপরীতার্থগুলো:</u> ${meaning.antonyms.join(', ')}</div>`: '',
             meaning.exampleSentence
                 ? `<div><u>উদাহরণ বাক্য:</u> ${meaning.exampleSentence}</div>`: ''
         ].filter(Boolean).join('');
@@ -179,6 +179,6 @@ function getCount() {
 }
 
 function logResult(data, status, jqXHR) {
-    console.log("Logging Result:");
-    console.log(data);
+    // console.log("Logging Result:");
+    // console.log(data);
 }
