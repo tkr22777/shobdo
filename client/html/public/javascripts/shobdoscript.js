@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Theme handling
-    const themes = ['green', 'blue', 'dark', 'light'];
+    const themes = ['green', 'dark', 'blue', 'light'];
     let currentThemeIndex = 0;
     
     // Check for saved theme

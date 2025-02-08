@@ -35,14 +35,14 @@
 }
 
 [data-theme="light"] {
-    --primary-color: #7b7f84;      /* Very light gray background */
-    --secondary-color: #c0c1c3;    /* Light gray for contrast */
-    --accent-color: #daded9;       /* Darker slate gray accent for better contrast */
+    --primary-color: #838b93;      /* Very light gray background */
+    --secondary-color: #bfc4ce;    /* Light gray for contrast */
+    --accent-color: #bbc4cc;       /* Darker slate gray accent for better contrast */
     --text-light: #ffffff;         /* White text */
-    --text-dark: #1e293b;          /* Dark slate text */
-    --surface-color: #484b4d;      /* Slightly darker than primary for UI elements */
-    --hover-color: rgba(71, 85, 105, 0.1);   /* Adjusted hover state */
-    --border-color: rgba(71, 85, 105, 0.2);  /* Adjusted borders */
+    --text-dark: #4b535e;          /* Dark slate text */
+    --surface-color: #4c4e4f;      /* Slightly darker than primary for UI elements */
+    --hover-color: rgba(44, 52, 63, 0.1);   /* Adjusted hover state */
+    --border-color: rgba(41, 46, 53, 0.2);  /* Adjusted borders */
 }
 
 body {
