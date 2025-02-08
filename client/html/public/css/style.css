@@ -60,6 +60,7 @@ nav ul {
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--accent-color) var(--primary-color);
+    list-style: none;
 }
 
 nav ul::-webkit-scrollbar {
