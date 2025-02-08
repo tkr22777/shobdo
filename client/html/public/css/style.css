@@ -244,13 +244,39 @@ nav ul::-webkit-scrollbar-thumb {
     }
     
     nav ul {
-        height: 250px;
-        margin-bottom: 1.5rem;
+        height: 200px;
+        min-height: 200px;
+        margin-bottom: 1rem;
     }
     
     #wordMeaning {
-        height: 350px;
+        height: calc(100vh - 500px);
+        min-height: 400px;
+        margin-bottom: 1rem;
+    }
+
+    #wordList a {
+        font-size: 1.2rem;
+    }
+
+    #wordMeaning .word-title {
+        font-size: 2rem;
+        padding: 1rem 1rem 0.5rem;
+    }
+
+    #wordMeaning .meaning-section div {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    nav ul {
+        height: 150px;
+        min-height: 150px;
+    }
+    
+    #wordMeaning {
+        height: calc(100vh - 450px);
         min-height: 350px;
-        margin-bottom: 2rem;
     }
 }
