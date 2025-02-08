@@ -1,11 +1,48 @@
 /* Modern color scheme and base styles */
 :root {
-    --primary-color: #0e2f19;    /* Darker green */
-    --secondary-color: #2a623d;  /* Dark green */
-    --accent-color: #5da271;     /* Light green for accents */
-    --text-light: #e8f5e9;       /* Light green tinted white */
-    --text-dark: #1a472a;        /* Same as primary for consistency */
-    --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Default theme (darker refined green theme with red accent) */
+    --primary-color: #0a1f16;      /* Even darker forest green */
+    --secondary-color: #153626;    /* Even darker medium green */
+    --accent-color: #769f82;       /* Dark red accent */
+    --text-light: #f1f8f4;         /* Kept light for readability */
+    --text-dark: #050f0b;          /* Deeper forest green */
+    --surface-color: #112a1f;      /* Darker UI elements */
+    --hover-color: rgba(139, 30, 63, 0.2);   /* Adjusted hover state to match new accent */
+    --border-color: rgba(139, 30, 63, 0.3);  /* Adjusted borders to match new accent */
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="blue"] {
+    --primary-color: #0a1b30;      /* Even darker ocean blue */
+    --secondary-color: #132c45;    /* Even darker navy */
+    --accent-color: #63b3ed;       /* Elegant sky blue accent */
+    --text-light: #f0f5fa;         /* Kept light for readability */
+    --text-dark: #060f17;          /* Darker navy */
+    --surface-color: #0f2339;      /* Darker UI elements */
+    --hover-color: rgba(99, 179, 237, 0.2);   /* Adjusted hover state */
+    --border-color: rgba(99, 179, 237, 0.3);  /* Adjusted borders */
+}
+
+[data-theme="dark"] {
+    --primary-color: #111827;      /* Darker gray */
+    --secondary-color: #1f2937;    /* Darker medium gray */
+    --accent-color: #059669;       /* Darker emerald green */
+    --text-light: #f9fafb;         /* Kept light for readability */
+    --text-dark: #030712;          /* Darker near black */
+    --surface-color: #1a2433;      /* New: For UI elements */
+    --hover-color: rgba(5, 150, 105, 0.2);   /* New: For hover states */
+    --border-color: rgba(5, 150, 105, 0.3);  /* New: For borders and dividers */
+}
+
+[data-theme="light"] {
+    --primary-color: #7b7f84;      /* Very light gray background */
+    --secondary-color: #c0c1c3;    /* Light gray for contrast */
+    --accent-color: #daded9;       /* Darker slate gray accent for better contrast */
+    --text-light: #ffffff;         /* White text */
+    --text-dark: #1e293b;          /* Dark slate text */
+    --surface-color: #484b4d;      /* Slightly darker than primary for UI elements */
+    --hover-color: rgba(71, 85, 105, 0.1);   /* Adjusted hover state */
+    --border-color: rgba(71, 85, 105, 0.2);  /* Adjusted borders */
 }
 
 body {
@@ -81,12 +118,12 @@ nav ul::-webkit-scrollbar-thumb {
     margin: 8px 0;
     border-radius: 6px;
     transition: all 0.2s ease;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--surface-color);
     cursor: pointer;
 }
 
 #wordList li:hover {
-    background-color: rgba(52, 152, 219, 0.2);
+    background-color: var(--hover-color);
     transform: translateX(5px);
 }
 
@@ -138,7 +175,7 @@ nav ul::-webkit-scrollbar-thumb {
     font-weight: 600;
     color: var(--accent-color);
     text-align: center;
-    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    border-bottom: 2px solid var(--border-color);
     padding: 2rem 2rem 1rem;
     background-color: var(--primary-color);
     position: sticky;
@@ -178,12 +215,12 @@ nav ul::-webkit-scrollbar-thumb {
     margin-bottom: 2rem;
     padding: 1.5rem;
     border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--surface-color);
     transition: background-color 0.2s ease;
 }
 
 #wordMeaning .meaning-section:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--hover-color);
 }
 
 #wordMeaning .meaning-number {
@@ -331,4 +368,9 @@ nav ul::-webkit-scrollbar-thumb {
         height: calc(100vh - 450px);
         min-height: 350px;
     }
+}
+
+/* Add this near the top of your CSS file */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }

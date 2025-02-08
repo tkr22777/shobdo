@@ -187,4 +187,29 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.getElementById('wordMeaning').innerHTML = aboutContent;
     });
+
+    // Theme handling
+    const themes = ['green', 'blue', 'dark', 'light'];
+    let currentThemeIndex = 0;
+    
+    // Check for saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        currentThemeIndex = themes.indexOf(savedTheme);
+    }
+    
+    document.getElementById('themeToggle').addEventListener('click', function(e) {
+        e.preventDefault();
+        currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+        const newTheme = themes[currentThemeIndex];
+        
+        if (newTheme === 'green') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+        
+        localStorage.setItem('theme', newTheme);
+    });
 });
