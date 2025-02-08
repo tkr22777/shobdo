@@ -1,63 +1,157 @@
+import copy
 import json
 import sys
+from collections import defaultdict
+import time
+from openai import OpenAI
+import requests
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from config import settings
 from logger import logger
-from util import get_enrichment_prompt, read_google_sheet
+
 
 sys.stdout.reconfigure(encoding="utf-8")
 
+class ReferenceEntries:
+    def __init__(self, filename):
+        """Initialize tracker with a filename, loading existing dict if available.
+        
+        Args:
+            filename (str): Path to the file storing the processed items
+        """
+        self.filename = filename
+        processed_items = {}  # Changed from set to dict
+        
+        try:
+            with open(filename, encoding='utf-8') as f:
+                processed_items = json.load(f)  # Now loading as dict
+        except FileNotFoundError:
+            pass
 
-def df_to_json_entries(df):
-    """Convert DataFrame rows to list of JSON objects with field mapping."""
-    # Define field mappings (old_name: new_name)
-    field_mappings = {
-        "Reference (Do not cut)": "reference",
-        "শব্দ সমূহ": "word",
-        "সহজ উদাহরণ": "meaning",
-        "বাক্য রচনা": "example_sentence",
-        "সমার্থক শব্দ": "synonyms",
-        "বিপরীতার্থক শব্দ": "antonyms",
-        "পদ": "part_of_speech",
-    }
+        self.word_meanings = defaultdict(list)
+        for _, entries in processed_items.items():
+            for entry in entries:
+                self.word_meanings[entry['word']].append(entry)
+ 
+        logger.info(f"Total words: {len(self.word_meanings)}")
+           
+    def print_entry_count(self):
+        """Print the current number of entries in the processed items."""
+        count = 0
+        entry_count_frequency = defaultdict(int)
+        for _, entries in self.word_meanings.items():
+            entry_count_frequency[len(entries)] += 1
+            count += len(entries)
 
-    json_entries = []
-    for _, row in df.iterrows():
-        # Create new dict with mapped fields
-        entry = {}
-        for old_field, new_field in field_mappings.items():
-            if old_field in row:
-                entry[new_field] = row[old_field]
-        json_entries.append(entry)
-    return json_entries
+        logger.info(f"Total meanings: {count}")
 
+        # for entry_count, frequency in entry_count_frequency.items():
+        #     logger.info(f"Entry count: {entry_count}, Frequency: {frequency}")
+
+def create_or_fetch_word(word):
+    """Create a new word or fetch existing one from the API.
+    
+    Args:
+        word (str): The word to create or fetch
+        
+    Returns:
+        int|None: The word ID if successful, None otherwise
+    """
+    try:
+        payload = {
+            "spelling": word,
+        }
+
+        # logger.info(f"Attempting to create word: '{word}'")
+        response = requests.post(
+            "http://localhost:9000/api/v1/words",
+            json=payload
+        )
+        
+        response.raise_for_status()
+        response_data = response.json()
+        id = response_data["id"]
+        # logger.info(f"Successfully created word id:{id}, response: {response_data}")
+        return id
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to create word '{word}': {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error while creating word '{word}': {str(e)}")
+
+    # If creation failed, try fetching existing word
+    try:
+        # logger.info(f"Attempting to fetch word by spelling: '{word}'")
+        response = requests.post(
+            "http://localhost:9000/api/v1/words/postget",
+            json={"spelling": word}
+        )
+        response.raise_for_status()
+        response_data = response.json()
+        id = response_data["id"]
+        # logger.info(f"Successfully fetched word id:{id}, response: {response_data}")
+        return id
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch word '{word}': {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error while fetching word '{word}': {str(e)}")
+    
+    return None
 
 if __name__ == "__main__":
-    # The sheet_key is the long string from your Google Sheets URL
-    sheet_keys = [
-        "1OUwV-WrVAEMTOVUNzGcrF3MGZGVIzMmj87bbLyicnvM",
-    ]
+    references = ReferenceEntries("data/completed_references.json")
+    references.print_entry_count()
+    work_meanings_list = list(references.word_meanings.items())
+    work_meanings_list = sorted(work_meanings_list, key=lambda x: len(x[1]), reverse=True)
 
-    df = read_google_sheet(sheet_keys[0])
+    # TO_CREATE = 1000
+    total_meanings = 0
+    for i, (word, meanings) in enumerate(work_meanings_list):
+        # if i > TO_CREATE - 1:
+        #     break
 
-    # Convert DataFrame to JSON entries
-    json_entries = df_to_json_entries(df)
+        break
 
-    # # Example usage
-    # sample_data = {
-    #     "word": "লাফ",
-    #     "meaning": "উচ্চতায় বা দূরত্বে উপরে ওঠা বা সামনে যাওয়া।",
-    #     "example_sentence": "বিড়ালটি টেবিল থেকে লাফ দিল।",
-    #     "synonyms": ["উঠান", "ঝাঁপ", "উঁচুতে ওঠা"],
-    #     "antonyms": ["পড়ে যাওয়া", "থেমে যাওয়া"]
-    # }
+        word = word.strip()
+        id = create_or_fetch_word(word)
+        if id is None:
+            logger.error(f"Failed to create or fetch word '{word}'")
+            continue
 
-    for entry in json_entries[:20]:
-        logger.info(
-            f"Provided entry: {json.dumps(entry, ensure_ascii=False, indent=2)}"
-        )
-        prompt = get_enrichment_prompt(entry)
-        logger.info(f"Prompt: {prompt}")
-    #    response = generate_with_gemini(prompt)
-    #    logger.info(f"Gemini response: {response}")
-    #    response = generate_with_deepseek(prompt)
-    #    logger.info(f"Deepseek response: {response}")
+        # logger.info(f"Word: '{word}', id: {id}")
+
+        for j, meaning in enumerate(meanings):
+            # create meaning using api for the word
+            payload = {
+                "id": None,
+                "text": meaning["meaning"].strip(),
+                "partOfSpeech": meaning["part_of_speech"],
+                "strength": 0,
+                "antonyms": meaning["antonyms"],
+                "synonyms": meaning["synonyms"],
+                "exampleSentence": meaning["example_sentence"].strip(),
+            }
+
+            try:
+                response = requests.post(
+                    f"http://localhost:9000/api/v1/words/{id}/meanings",
+                    json=payload
+                )
+                response.raise_for_status()
+                response_data = response.json()
+                # if i > 0:
+                    # logger.info(f"Added multiple meanings for word '{word}'")
+                # logger.info(f"Successfully added meaning {i+1}: {response_data}")
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Failed to add meaning {j+1} for word '{word}': {str(e)}. Continuing to next meaning.")
+                continue
+            except Exception as e:
+                logger.error(f"Unexpected error while adding meaning {j+1} for word '{word}': {str(e)}. Continuing to next meaning.")
+                continue
+
+        total_meanings += len(meanings)
+
+        if i % 1000 == 0:
+            logger.info(f"Processed {i + 1} words, total meanings: {total_meanings}")
