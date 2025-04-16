@@ -1,15 +1,8 @@
-import copy
 import json
 import sys
 from collections import defaultdict
-import time
-from openai import OpenAI
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from config import settings
 from logger import logger
-
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -22,7 +15,6 @@ class ReferenceEntries:
         """
         self.filename = filename
         self.processed_items = {}  # Changed from set to dict
-        self.word_entries = defaultdict(list)
         
         try:
             with open(filename, encoding='utf-8') as f:
@@ -30,6 +22,7 @@ class ReferenceEntries:
         except FileNotFoundError:
             pass
 
+        self.word_entries = defaultdict(list)
         for reference, entries in self.processed_items.items():
             for entry in entries:
                 # logger.info(f"Reference: {reference}, Entry: {entry['word']}")

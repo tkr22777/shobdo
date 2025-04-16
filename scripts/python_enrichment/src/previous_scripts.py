@@ -1,17 +1,17 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from openai import OpenAI
-from config import settings
-from collections import defaultdict
 import copy
 import json
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from config import settings
 from logger import logger
 from main import ProgressTracker
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from openai import OpenAI
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 from utils_context import (
     WORD_MEANING_ENTRIES_PROMT,
     get_enrichment_prompt,
 )
-
 
 
 class ProgressTracker:
