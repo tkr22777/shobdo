@@ -45,6 +45,7 @@ public class MongoStoreFactory {
                 MongoClient client = new MongoClient(new ServerAddress(HOSTNAME, PORT), options);
                 mongoDB = client.getDatabase(DB_NAME);
             } catch (Exception ex) {
+                log.error(String.format("@MM002 Failed to connect to MongoDB at host: %s, port: %d", HOSTNAME, PORT), ex);
                 throw new RuntimeException(
                     String.format("Failed to connect to MongoDB at host: %s, port: %d", HOSTNAME, PORT)
                 );

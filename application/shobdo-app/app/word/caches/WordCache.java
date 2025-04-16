@@ -29,7 +29,7 @@ public class WordCache {
                 log.info("@WC001 Connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].");
                 jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
             } catch (Exception ex) {
-                log.error("@WC002 Error while connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].");
+                log.error("@WC002 Error while connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].", ex);
             }
         }
 
@@ -52,7 +52,7 @@ public class WordCache {
                 return (Word) JsonUtil.jStringToObject(wordJsonString, Word.class);
             }
         } catch (Exception ex) {
-            log.error("@WC005 Error while getting word by spelling from cache");
+            log.error("@WC005 Error while getting word by spelling from cache", ex);
         }
         log.error("@WC005 Could not retrieve word by spelling from cache");
         return null;
@@ -71,7 +71,7 @@ public class WordCache {
             }
             log.debug("@WC004 Word [" + word.getSpelling() + "] stored in cache.");
         } catch (Exception ex) {
-            log.error("@WC005 Error while caching word by spelling");
+            log.error("@WC005 Error while caching word by spelling", ex);
         }
     }
 
@@ -84,7 +84,7 @@ public class WordCache {
             jedis.del(getKeyForSpelling(word.getSpelling()));
             log.debug("@WC006 Word [" + word.getSpelling() + "] cleared from cache.");
         } catch (Exception ex) {
-            log.error("@WC007 Error while invalidating cached word");
+            log.error("@WC007 Error while invalidating cached word", ex);
         }
     }
 
@@ -100,7 +100,7 @@ public class WordCache {
                 return  (Set<String>) JsonUtil.jStringToObject(result, Set.class);
             }
         } catch (Exception ex) {
-            log.error("@WC010 Error while retrieving cached search results");
+            log.error("@WC010 Error while retrieving cached search results", ex);
         }
 
         log.debug("@WC009 Search result not found on cache for spelling: '" + searchString + "'");
@@ -120,7 +120,7 @@ public class WordCache {
             }
             log.info("@WC011 Storing search results on cache. Count: " + spellings.size() + ".");
         } catch (Exception ex) {
-            log.error("@WC012 Error while caching search results");
+            log.error("@WC012 Error while caching search results", ex);
         }
     }
 
@@ -137,6 +137,7 @@ public class WordCache {
             try {
                 jedis.flushAll();
             } catch (Exception ex) {
+                log.error("@WC013 Error while flushing cache", ex);
             }
         }
     }

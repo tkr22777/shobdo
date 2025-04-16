@@ -34,15 +34,14 @@ import java.util.function.Supplier;
                                           final Map<String, String> parameters,
                                           final Throwable throwable) {
 
-        log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]"
-            + "[Exception Message=%s]", transactionId, parentRequestId, endpoint, parameters, throwable.getMessage()));
+        log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+            transactionId, parentRequestId, endpoint, parameters), throwable);
 
         if (throwable instanceof EntityDoesNotExist) {
             return Results.notFound(throwable.getMessage());
         } else if (throwable instanceof IllegalArgumentException) {
             return Results.badRequest(throwable.getMessage());
         } else {
-            throwable.printStackTrace();
             return Results.internalServerError(throwable.getMessage());
         }
     }

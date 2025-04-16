@@ -6,6 +6,8 @@ services:
       - "27017:27017"
     volumes:
       - "../data/mongodump:/mongoshobdodump"
+    # command: ["bash", "/mongoshobdodump/restore.sh"]
+
   redis:
     image: "redis:latest"
     ports:

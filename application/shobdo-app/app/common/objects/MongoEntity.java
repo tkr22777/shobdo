@@ -7,6 +7,7 @@ import com.mongodb.BasicDBObject;
 import lombok.*;
 import org.bson.Document;
 import utilities.Constants;
+import utilities.ShobdoLogger;
 
 import java.util.Arrays;
 
@@ -17,6 +18,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public abstract class MongoEntity {
 
+    private static final ShobdoLogger log = new ShobdoLogger(MongoEntity.class);
+    
     @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;
 
@@ -36,8 +39,9 @@ public abstract class MongoEntity {
             ObjectMapper mapper = new ObjectMapper().configure(MapperFeature.USE_ANNOTATIONS, false);
             return Document.parse(mapper.writeValueAsString(this));
         } catch (Exception ex) {
+            log.error("@ME001 objectToDocument error for entity", ex);
             throw new IllegalArgumentException("objectToDocument error. Object["
-                + this.toString() + "][Ex:" + Arrays.toString(ex.getStackTrace()));
+                + this.toString() + "]");
         }
     }
 

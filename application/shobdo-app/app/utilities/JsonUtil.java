@@ -20,7 +20,7 @@ public class JsonUtil {
         try {
             return objectMapper.readValue(jsonString, class_type);
         } catch (Exception ex) {
-            log.info("@JU001: Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+            log.error("@JU001: Error converting jsonString to Object.", ex);
             throw new IllegalArgumentException("JsonString to Object conversion failed:" + jsonString + " class type:" + class_type );
         }
     }
@@ -29,7 +29,7 @@ public class JsonUtil {
         try {
             return objectMapper.readTree(jsonString);
         } catch (Exception ex) {
-            log.info("@JU003: Error converting jsonString to Object. Exception:" + ex.getStackTrace().toString());
+            log.error("@JU003: Error converting jsonString to Object.", ex);
             throw new IllegalArgumentException("Invalid jsonString:" + jsonString);
         }
     }
@@ -38,7 +38,7 @@ public class JsonUtil {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (Exception ex) {
-            log.info("@JU002: Error converting object to json string. Exception: " + ex.getStackTrace().toString());
+            log.error("@JU002: Error converting object to json string.", ex);
             throw new IllegalArgumentException("Object to JsonString conversion failed:" + object );
         }
     }
@@ -47,7 +47,7 @@ public class JsonUtil {
         try {
             return objectMapper.convertValue(object, JsonNode.class);
         } catch (Exception ex) {
-            log.info("@JU004: Error converting Object to JsonNode. Exception:" + ex.getStackTrace().toString());
+            log.error("@JU004: Error converting Object to JsonNode.", ex);
             throw new IllegalArgumentException("Invalid Object:" + object);
         }
     }
@@ -56,8 +56,7 @@ public class JsonUtil {
         try {
             return objectMapper.treeToValue(jsonNode, class_type);
         } catch (Exception ex)  {
-            log.info("@JU005 exception while converting [JsonNode:" + jsonNode + "] to [ClassType:" + class_type
-                + "][Ex:" + ex.getMessage() + "]");
+            log.error("@JU005 exception while converting [JsonNode:" + jsonNode + "] to [ClassType:" + class_type + "]", ex);
             throw new IllegalArgumentException("Invalid JsonNode:" + jsonNode + " for ClassType:" + class_type);
         }
     }
