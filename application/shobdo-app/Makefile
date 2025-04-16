@@ -23,7 +23,12 @@ build: spin-up-mongodb-container spin-up-redis-container
 	rm -rf target/universal/*
 	sbt clean test dist
 
-build-docker-image: build
+build-docker-image:
+	# Build from pre-built zip file
+	docker build --no-cache=true --build-arg BUILD_FROM_SOURCE=false -t ${DOCKER_IMAGE_NAME} .
+
+build-docker-image-from-source:
+	# Build from source
 	docker build --no-cache=true -t ${DOCKER_IMAGE_NAME} .
 
 exec-shobdo-container-cli:
