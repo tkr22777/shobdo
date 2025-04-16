@@ -16,7 +16,10 @@ pandas = "^2.2.3"
 google-api-python-client = "^2.159.0"
 openai = "^1.60.1"
 tenacity = "^8.2.3"
+<<<<<<< HEAD
 colorlog = "^6.9.0"
+=======
+>>>>>>> data_enrichment_branch
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"

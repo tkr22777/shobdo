@@ -36,9 +36,9 @@ local.properties
 .classpath
 
 # Python
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 *.so
 .Python
 build/

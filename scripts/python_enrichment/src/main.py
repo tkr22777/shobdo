@@ -1,14 +1,8 @@
-import copy
 import json
 import sys
 from collections import defaultdict
-import time
-from openai import OpenAI
 import requests
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from config import settings
 from logger import logger
 
 
@@ -22,30 +16,42 @@ class ReferenceEntries:
             filename (str): Path to the file storing the processed items
         """
         self.filename = filename
-        processed_items = {}  # Changed from set to dict
+        self.processed_items = {}  # Changed from set to dict
         
         try:
             with open(filename, encoding='utf-8') as f:
-                processed_items = json.load(f)  # Now loading as dict
+                self.processed_items = json.load(f)  # Now loading as dict
         except FileNotFoundError:
             pass
 
-        self.word_meanings = defaultdict(list)
-        for _, entries in processed_items.items():
+        self.word_entries = defaultdict(list)
+        for reference, entries in self.processed_items.items():
             for entry in entries:
-                self.word_meanings[entry['word']].append(entry)
- 
-        logger.info(f"Total words: {len(self.word_meanings)}")
-           
+                # logger.info(f"Reference: {reference}, Entry: {entry['word']}")
+                self.word_entries[entry['word']].append(entry)
+            
     def print_entry_count(self):
         """Print the current number of entries in the processed items."""
         count = 0
-        entry_count_frequency = defaultdict(int)
-        for _, entries in self.word_meanings.items():
-            entry_count_frequency[len(entries)] += 1
+        for reference, entries in self.processed_items.items():
             count += len(entries)
+        logger.info(f"Total entries: {count}")
 
-        logger.info(f"Total meanings: {count}")
+        logger.info(f"Word entries: {len(self.word_entries)}")
+
+        entry_count_frequency = defaultdict(int)
+        for word, entries in self.word_entries.items():
+            entry_count_frequency[len(entries)] += 1
+            if len(entries) == 72:
+                for entry in entries:
+                    logger.info(f"Word: {word}, Entry: {entry}")
+
+        for entry_count, frequency in entry_count_frequency.items():
+            logger.info(f"Entry count: {entry_count}, Frequency: {frequency}")
+
+        for word, entries in self.word_entries.items():
+            if len(entries) == 0:
+                logger.info(f"found word with no entries: {word}")
 
         # for entry_count, frequency in entry_count_frequency.items():
         #     logger.info(f"Entry count: {entry_count}, Frequency: {frequency}")
@@ -111,8 +117,6 @@ if __name__ == "__main__":
     for i, (word, meanings) in enumerate(work_meanings_list):
         # if i > TO_CREATE - 1:
         #     break
-
-        break
 
         word = word.strip()
         id = create_or_fetch_word(word)
