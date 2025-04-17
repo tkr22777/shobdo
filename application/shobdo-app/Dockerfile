@@ -46,23 +46,11 @@ ARG BUILD_FROM_SOURCE
 # Create directory for the application
 RUN mkdir -p /shobdo-app/bin/
 
-# Copy the application zip file based on build mode
-COPY target/universal/shobdo-app-0.11-SNAPSHOT.zip /shobdo-app/prebuilt.zip
-COPY --from=build /app/target/universal/shobdo-app-0.11-SNAPSHOT.zip /shobdo-app/built.zip
-
-# Use shell script to select the appropriate ZIP file
-RUN if [ -f /shobdo-app/built.zip ] && [ "$BUILD_FROM_SOURCE" = "true" ]; then \
-        cp /shobdo-app/built.zip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip; \
-    elif [ -f /shobdo-app/prebuilt.zip ]; then \
-        cp /shobdo-app/prebuilt.zip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip; \
-    else \
-        echo "Error: No application ZIP file found!"; \
-        exit 1; \
-    fi && \
-    rm -f /shobdo-app/built.zip /shobdo-app/prebuilt.zip
+# Only copy the prebuilt zip if NOT building from source
+COPY --from=build /app/target/universal/shobdo-app-0.11-SNAPSHOT.zip /shobdo-app/shobdo-app.zip
 
 # Unzip the application
-RUN unzip /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT.zip -d /shobdo-app/bin/ && \
+RUN unzip /shobdo-app/shobdo-app.zip -d /shobdo-app/bin/ && \
     chmod +x /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT/bin/shobdo-app
 
 EXPOSE 9000
