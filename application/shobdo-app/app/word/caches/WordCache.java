@@ -54,7 +54,7 @@ public class WordCache {
         } catch (Exception ex) {
             log.error("@WC005 Error while getting word by spelling from cache", ex);
         }
-        log.error("@WC005 Could not retrieve word by spelling from cache");
+        log.error("@WC005 Could not find word by spelling in cache");
         return null;
     }
 
