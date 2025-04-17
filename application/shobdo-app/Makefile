@@ -5,7 +5,6 @@ SHOBDO_PORT="9000"
 SHOBDO_IP="172.10.0.3"
 MONGO_HOST_IP="172.10.0.4"
 REDIS_HOST_IP="172.10.0.5"
-MONGO_CONNECTION_STRING="mongodb://172.10.0.4:27017/Dictionary"
 DOCKER_IMAGE_NAME="shobdo-app"
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -18,7 +17,7 @@ test: spin-up-mongodb-container spin-up-redis-container
 	sbt clean test
 
 run: spin-up-mongodb-container spin-up-redis-container
-	MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING} sbt clean run
+	sbt clean run
 
 build: spin-up-mongodb-container spin-up-redis-container
 	rm -rf target/universal/*
@@ -64,10 +63,12 @@ exec-mongodb-container-cli:
 	docker exec -it mongo-instance /bin/bash
 
 spin-up-redis-container:
-	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
-	-docker rm -f redis-instance #cleanup existing instance
-	docker run --net ${NETWORK_NAME} --ip ${REDIS_HOST_IP} -p 6379:6379 \
-		--name redis-instance -i -t -d redis
+	echo "Redis is disabled for now"
+	# -docker network create --subnet=${SUBNET} ${NETWORK_NAME}
+	# -docker rm -f redis-instance #cleanup existing instance
+	# docker run --net ${NETWORK_NAME} --ip ${REDIS_HOST_IP} -p 6379:6379 \
+	# 	--name redis-instance -i -t -d redis
 
 exec-redis-container-cli:
-	docker exec -it redis-instance redis-cli --raw
+	echo "Redis is disabled for now"
+	# docker exec -it redis-instance redis-cli --raw

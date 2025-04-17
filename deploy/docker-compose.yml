@@ -8,21 +8,22 @@ services:
       - "../data/mongodump:/mongoshobdodump"
     # command: ["bash", "/mongoshobdodump/restore.sh"]
 
-  redis:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
-    depends_on:
-      - "mongo"
+  # redis:
+  #   image: "redis:latest"
+  #   ports:
+  #     - "6379:6379"
+  #   depends_on:
+  #     - "mongo"
   shobdo:
     image: "shobdo-app"
     ports:
       - "9000:9000"
     environment:
+      - "SHOBDO_MONGODB_CONNECTION_STRING=mongodb://mongo:27017/Dictionary"
       - "SHOBDO_MONGODB_HOSTNAME=mongo"
-      - "SHOBDO_REDIS_HOSTNAME=redis"
+      # - "SHOBDO_REDIS_HOSTNAME=redis"
     depends_on:
-      - "redis"
+      # - "redis"
       - "mongo"
   client:
     image: "nginx"
