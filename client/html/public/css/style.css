@@ -65,6 +65,22 @@ body {
     margin-bottom: 1.5rem;
 }
 
+/* Search container */
+.search-container {
+    position: relative;
+    margin-bottom: 50px; /* Increased to account for the fixed transliteration space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Search box wrapper */
+.search-box-wrapper {
+    width: 80%;
+    max-width: 500px;
+}
+
 /* Search input styling */
 #wordSearchBox {
     background-color: var(--text-light);
@@ -72,17 +88,48 @@ body {
     border: none;
     padding: 12px 20px;
     border-radius: 25px;
-    width: 80%;
-    max-width: 500px;
-    font-size: 1.1rem;
+    width: 100%;
+    font-size: 1.5rem;
     transition: all 0.3s ease;
     box-shadow: var(--shadow);
+    line-height: 1.5;
 }
 
 #wordSearchBox:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-    width: 85%;
+}
+
+/* Transliteration container */
+.transliteration-container {
+    width: 80%;
+    max-width: 500px;
+    height: 50px; /* Fixed height to reserve space */
+    position: absolute;
+    top: calc(100% + 10px); /* Position below the search box with some space */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Transliterated text label */
+.transliterated-label {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    font-family: 'Noto Sans Bengali', sans-serif;
+    text-align: left;
+    transition: all 0.3s ease;
+    opacity: 1;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
 }
 
 /* Word list styling */

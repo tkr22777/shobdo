@@ -4,7 +4,6 @@ function convertToRidmik(englishString) {
 }
 
 function containsEnglishCharacters(searchTerm) {
-
     if (searchTerm.match(/[a-z]/i)) {
         return true;
     } else {
@@ -26,19 +25,44 @@ function debounce(func, wait) {
 
 const debouncedWordSearch = debounce(function(element) {
     const searchQueryString = $('#wordSearchBox').val().trim();
-    // console.log("WordSearch searchQueryString: " + searchQueryString);
-
-    if (searchQueryString.length > 0) {
-        const searchRoute = "/api/v1/words/search";
-        const searchString = containsEnglishCharacters(searchQueryString) 
-            ? convertToRidmik(searchQueryString)
-            : searchQueryString;
-            
-        console.log("WordSearch searchQueryString: " + searchQueryString + " searchString: " + searchString);
-        if (!containsEnglishCharacters(searchString)) {
-            const searchBody = JSON.stringify({ searchString });
-            RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
-        }
+    
+    // Clear text when input is empty
+    if (searchQueryString.length === 0) {
+        $('#transliteratedText').text("").css({
+            'opacity': '0',
+            'visibility': 'hidden'
+        });
+        $('#wordList').empty();
+        return;
+    }
+    
+    const searchRoute = "/api/v1/words/search";
+    const isEnglish = containsEnglishCharacters(searchQueryString);
+    const searchString = isEnglish 
+        ? convertToRidmik(searchQueryString)
+        : searchQueryString;
+        
+    // console.log("WordSearch searchQueryString: " + searchQueryString + " searchString: " + searchString);
+    
+    // Always show transliterated text for English input
+    if (isEnglish) {
+        // Use opacity instead of show/hide to prevent layout shifts
+        $('#transliteratedText').text("অনুসন্ধানকৃত শব্দ: " + searchString).css({
+            'opacity': '1',
+            'visibility': 'visible'
+        });
+    } else {
+        // Hide without affecting layout
+        $('#transliteratedText').text("").css({
+            'opacity': '0',
+            'visibility': 'hidden'
+        });
+    }
+    
+    // Only search if we have Bengali text (either directly typed or transliterated)
+    if (!containsEnglishCharacters(searchString)) {
+        const searchBody = JSON.stringify({ searchString });
+        RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
     }
 }, 100);
 
@@ -78,7 +102,6 @@ function RESTGetCall(route, onSuccessFunction) {
 }
 
 function handleWordSearchResult(data, status, jqXHR) {
-
     // console.log("Data:" + data);
     $('#wordList').empty();
     $.each(data, function (i, item) {
@@ -172,6 +195,12 @@ function listWordElement(element) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize transliterated text element
+    $('#transliteratedText').css({
+        'opacity': '0',
+        'visibility': 'hidden'
+    });
+    
     // Handle about link click
     document.getElementById('aboutLink').addEventListener('click', function(e) {
         e.preventDefault();

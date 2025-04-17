@@ -37,12 +37,17 @@
     <div class="jumbotron text-center">
         <h1>শব্দ</h1>
         <div class="search-container">
-            <input type="text" 
-                   name="Search Box" 
-                   id="wordSearchBox" 
-                   onkeyup="debouncedWordSearch(this)"
-                   placeholder="শব্দ খুঁজুন..."
-                   autocomplete="off">
+            <div class="search-box-wrapper">
+                <input type="text" 
+                       name="Search Box" 
+                       id="wordSearchBox" 
+                       onkeyup="debouncedWordSearch(this)"
+                       placeholder="শব্দ খুঁজুন..."
+                       autocomplete="off">
+            </div>
+            <div class="transliteration-container">
+                <span id="transliteratedText" class="transliterated-label"></span>
+            </div>
         </div>
     </div>
 
