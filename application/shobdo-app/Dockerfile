@@ -45,6 +45,8 @@ ARG BUILD_FROM_SOURCE
 
 # Create directory for the application
 RUN mkdir -p /shobdo-app/bin/
+# Create logs directory explicitly with proper permissions
+RUN mkdir -p /shobdo-app/logs && chmod 777 /shobdo-app/logs
 
 # Only copy the prebuilt zip if NOT building from source
 COPY --from=build /app/target/universal/shobdo-app-0.11-SNAPSHOT.zip /shobdo-app/shobdo-app.zip
@@ -55,4 +57,14 @@ RUN unzip /shobdo-app/shobdo-app.zip -d /shobdo-app/bin/ && \
 
 EXPOSE 9000
 
+# Set working directory to ensure relative paths for logs work correctly
+WORKDIR /shobdo-app
+
+# Create volume for logs to persist outside container
+VOLUME ["/shobdo-app/logs"]
+
+# Set environment variables for logging
+ENV LOG4J_FORMAT_MSG_NO_LOOKUPS=true
+
+# Run with the correct configuration for Play framework
 CMD /shobdo-app/bin/shobdo-app-0.11-SNAPSHOT/bin/shobdo-app -Dplay.crypto.secret=testtahsin

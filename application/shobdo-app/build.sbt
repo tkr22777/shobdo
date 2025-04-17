@@ -8,7 +8,12 @@ scalaVersion := "2.11.7"
 
 libraryDependencies += "redis.clients" % "jedis" % "1.5.2"
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.5"
+// Removed log4j dependencies since we're using Logback
+// Add proper SLF4J bridge to ensure all logging goes through Logback
+libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25"
+libraryDependencies += "org.slf4j" % "jcl-over-slf4j" % "1.7.25"
+libraryDependencies += "org.slf4j" % "jul-to-slf4j" % "1.7.25"
+libraryDependencies += "org.slf4j" % "log4j-over-slf4j" % "1.7.25"
 
 libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.12.11"
 

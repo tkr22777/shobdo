@@ -1,41 +1,109 @@
-<!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
-<configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
 
+  <contextName>shobdo-app</contextName>
+  
+  <!-- Custom conversion rules -->
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
+  <conversionRule conversionWord="msgpassthru" converterClass="net.logstash.logback.encoder.org.apache.commons.lang3.StringEscapeUtils" />
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${application.home:-.}/logs/application.log</file>
+  <!-- Properties for configuration -->
+  <property name="LOG_HOME" value="${application.home:-.}/logs" />
+  <property name="LOG_ARCHIVE" value="${LOG_HOME}/archive" />
+  <property name="CONSOLE_LOG_PATTERN" value="%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n" />
+  <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n" />
+
+  <!-- Console appender -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <!-- File appender with rolling policy -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/application.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_ARCHIVE}/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
     </encoder>
   </appender>
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <!-- Separate error log file for easier troubleshooting -->
+  <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/error.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_ARCHIVE}/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>500MB</totalSizeCap>
+    </rollingPolicy>
     <encoder>
-      <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
     </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
   </appender>
-
-  <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">
+  
+  <!-- Async appenders for better performance -->
+  <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <appender-ref ref="CONSOLE" />
+  </appender>
+  
+  <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <discardingThreshold>0</discardingThreshold>
     <appender-ref ref="FILE" />
   </appender>
-
-  <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
-    <appender-ref ref="STDOUT" />
+  
+  <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>128</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <appender-ref ref="ERROR_FILE" />
   </appender>
 
+  <!-- Application Loggers -->
+  <logger name="controllers" level="DEBUG" />
+  <logger name="word" level="DEBUG" />
+  <logger name="utilities" level="DEBUG" />
+  <logger name="request" level="DEBUG" />
+  <logger name="common" level="DEBUG" />
+  
+  <!-- Framework Loggers -->
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
-
-  <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
-  <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
-  <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
-  <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
-  <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
-
-  <root level="WARN">
-    <appender-ref ref="ASYNCFILE" />
-    <appender-ref ref="ASYNCSTDOUT" />
+  
+  <!-- Third-party Loggers -->
+  <logger name="org.jboss.logging" level="INFO" />
+  <logger name="org.mongodb" level="INFO" />
+  <logger name="com.mongodb" level="INFO" />
+  <logger name="redis.clients" level="INFO" />
+  <logger name="com.google" level="INFO" />
+  
+  <!-- Reduce noise -->
+  <logger name="com.zaxxer.hikari" level="WARN" />
+  <logger name="org.hibernate" level="WARN" />
+  <logger name="com.avaje.ebean" level="WARN" />
+  
+  <!-- Root Logger -->
+  <root level="INFO">
+    <appender-ref ref="ASYNC_CONSOLE" />
+    <appender-ref ref="ASYNC_FILE" />
+    <appender-ref ref="ASYNC_ERROR_FILE" />
   </root>
 
-</configuration>
+</configuration> 
