@@ -1,106 +1,85 @@
 package word.caches;
 
-import com.typesafe.config.ConfigFactory;
-import redis.clients.jedis.Jedis;
 import utilities.*;
 import word.objects.Word;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WordCache {
 
-    /* Redis expire time */
-    private static final boolean USE_REDIS_EXPIRATION_TIME = true;
-    private static final int REDIS_EXPIRE_TIME_SECONDS= 6 * 60 * 60; //six hours
-
     private static final ShobdoLogger log = new ShobdoLogger(WordCache.class);
 
-    /* the following are singletons */
-    private static Jedis jedis;
+    /* In-memory caches */
+    private final Map<String, Word> wordsBySpelling;
+    private final Map<String, Set<String>> searchResults;
+    
+    /* Singleton instance */
     private static WordCache instance;
 
     private WordCache() {
+        this.wordsBySpelling = new ConcurrentHashMap<>();
+        this.searchResults = new ConcurrentHashMap<>();
     }
 
     public synchronized static WordCache getCache() {
-        if (jedis == null) {
-            final String DEFAULT_REDIS_HOSTNAME = ConfigFactory.load().getString("shobdo.redis.hostname");
-            try {
-                log.info("@WC001 Connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].");
-                jedis = new Jedis(DEFAULT_REDIS_HOSTNAME);
-            } catch (Exception ex) {
-                log.error("@WC002 Error while connecting to redis [host:" + DEFAULT_REDIS_HOSTNAME + "][port:6379].", ex);
-            }
-        }
-
         if (instance == null) {
             instance = new WordCache();
+            log.info("@WC001 Initialized in-memory word cache");
         }
-
         return instance;
     }
 
     public Word getBySpelling(final String spelling) {
-        if (spelling == null || jedis == null) {
+        if (spelling == null) {
             return null;
         }
 
-        try {
-            final String wordJsonString = jedis.get(getKeyForSpelling(spelling));
-            if (wordJsonString != null) {
-                log.debug("@WC003 Word [" + spelling + "] found in cache and returning");
-                return (Word) JsonUtil.jStringToObject(wordJsonString, Word.class);
-            }
-        } catch (Exception ex) {
-            log.error("@WC005 Error while getting word by spelling from cache", ex);
+        String key = getKeyForSpelling(spelling);
+        Word word = wordsBySpelling.get(key);
+        
+        if (word != null) {
+            log.debug("@WC003 Word [" + spelling + "] found in cache and returning");
+            return word;
         }
-        log.error("@WC005 Could not find word by spelling in cache");
+        
+        log.debug("@WC005 Could not find word by spelling in cache");
         return null;
     }
 
     public void cacheBySpelling(final Word word) {
-        if (word == null || jedis == null) {
+        if (word == null) {
             return;
         }
 
         final String key = getKeyForSpelling(word.getSpelling());
-        try {
-            jedis.set(key, word.toString());
-            if (USE_REDIS_EXPIRATION_TIME) {
-                jedis.expire(key, REDIS_EXPIRE_TIME_SECONDS);
-            }
-            log.debug("@WC004 Word [" + word.getSpelling() + "] stored in cache.");
-        } catch (Exception ex) {
-            log.error("@WC005 Error while caching word by spelling", ex);
-        }
+        wordsBySpelling.put(key, word);
+        log.debug("@WC004 Word [" + word.getSpelling() + "] stored in cache.");
     }
 
     public void invalidateBySpelling(final Word word) {
-        if (word == null || jedis == null) {
+        if (word == null) {
             return;
         }
 
-        try {
-            jedis.del(getKeyForSpelling(word.getSpelling()));
-            log.debug("@WC006 Word [" + word.getSpelling() + "] cleared from cache.");
-        } catch (Exception ex) {
-            log.error("@WC007 Error while invalidating cached word", ex);
-        }
+        final String key = getKeyForSpelling(word.getSpelling());
+        wordsBySpelling.remove(key);
+        log.debug("@WC006 Word [" + word.getSpelling() + "] cleared from cache.");
     }
 
-    public Set<String> getWordsForSearchString(final String searchString){
-        if (searchString == null || jedis == null) {
+    public Set<String> getWordsForSearchString(final String searchString) {
+        if (searchString == null) {
             return null;
         }
 
-        try {
-            final String result = jedis.get(getKeyForSearchString(searchString));
-            if (result != null) {
-                log.debug("@WC008 Search result found and returning from cache.");
-                return  (Set<String>) JsonUtil.jStringToObject(result, Set.class);
-            }
-        } catch (Exception ex) {
-            log.error("@WC010 Error while retrieving cached search results", ex);
+        final String key = getKeyForSearchString(searchString);
+        Set<String> results = searchResults.get(key);
+        
+        if (results != null) {
+            log.debug("@WC008 Search result found and returning from cache.");
+            return results;
         }
 
         log.debug("@WC009 Search result not found on cache for spelling: '" + searchString + "'");
@@ -108,20 +87,13 @@ public class WordCache {
     }
 
     public void cacheWordsForSearchString(final String searchString, final Set<String> spellings) {
-        if (searchString == null || spellings == null || jedis == null) {
+        if (searchString == null || spellings == null) {
             return;
         }
 
         final String key = getKeyForSearchString(searchString);
-        try {
-            jedis.set(key, JsonUtil.objectToJString(spellings));
-            if (USE_REDIS_EXPIRATION_TIME) {
-                jedis.expire(key, REDIS_EXPIRE_TIME_SECONDS);
-            }
-            log.info("@WC011 Storing search results on cache. Count: " + spellings.size() + ".");
-        } catch (Exception ex) {
-            log.error("@WC012 Error while caching search results", ex);
-        }
+        searchResults.put(key, spellings);
+        log.info("@WC011 Storing search results on cache. Count: " + spellings.size() + ".");
     }
 
     private String getKeyForSpelling(String spelling) {
@@ -132,13 +104,9 @@ public class WordCache {
         return String.format("SS_%s", searchString);
     }
 
-    public void flushCache(){
-        if (jedis != null) {
-            try {
-                jedis.flushAll();
-            } catch (Exception ex) {
-                log.error("@WC013 Error while flushing cache", ex);
-            }
-        }
+    public void flushCache() {
+        wordsBySpelling.clear();
+        searchResults.clear();
+        log.info("@WC013 Cache flushed");
     }
 }
