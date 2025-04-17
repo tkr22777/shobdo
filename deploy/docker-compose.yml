@@ -8,6 +8,7 @@ services:
       - "../data/mongodump:/mongoshobdodump"
     # command: ["bash", "/mongoshobdodump/restore.sh"]
 
+  # Redis has been disabled for now
   # redis:
   #   image: "redis:latest"
   #   ports:
@@ -19,12 +20,12 @@ services:
     ports:
       - "9000:9000"
     environment:
-      - "SHOBDO_MONGODB_CONNECTION_STRING=mongodb://mongo:27017/Dictionary"
       - "SHOBDO_MONGODB_HOSTNAME=mongo"
+      # - "SHOBDO_MONGODB_CONNECTION_STRING=mongodb://localhost:27017/Dictionary"
       # - "SHOBDO_REDIS_HOSTNAME=redis"
     depends_on:
-      # - "redis"
       - "mongo"
+      # - "redis"
   client:
     image: "nginx"
     ports:

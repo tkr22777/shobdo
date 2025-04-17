@@ -10,7 +10,12 @@ start-docker-compose:
 stop-docker-compose:
 	docker-compose -f deploy/docker-compose.yml down
 
-spin-up-client-container:
+spin-up-client-container-for-local:
 	-docker rm -f shobdo-client-instance
 	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
 	docker run --net ${NETWORK_NAME} --ip ${CLIENT_IP} -p 32779:80 -v $(PWD)/client/nginx_local.conf:/etc/nginx/nginx.conf -v $(PWD)/client/html/public/:/usr/share/nginx/html/ --name shobdo-client-instance -i -t nginx
+
+spin-up-client-container-for-render:
+	-docker rm -f shobdo-client-instance
+	-docker network create --subnet=${SUBNET} ${NETWORK_NAME}
+	docker run --net ${NETWORK_NAME} --ip ${CLIENT_IP} -p 32779:80 -v $(PWD)/client/nginx_render.conf:/etc/nginx/nginx.conf -v $(PWD)/client/html/public/:/usr/share/nginx/html/ --name shobdo-client-instance -i -t nginx
