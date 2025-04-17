@@ -47,29 +47,21 @@ public class MongoStoreFactory {
         if (mongoDB == null) {
             try {
                 if (USE_CONNECTION_STRING) {
-                    // Use connection string URI
                     log.info("@MM001 Connecting to mongodb using connection string");
-                    
-                    // Create ServerApi instance with version V1
+
                     ServerApi serverApi = ServerApi.builder()
                             .version(ServerApiVersion.V1)
                             .build();
                     
-                    // Build the client settings using the connection string and ServerApi
                     MongoClientSettings settings = MongoClientSettings.builder()
                             .applyConnectionString(new ConnectionString(CONNECTION_STRING))
                             .serverApi(serverApi)
                             .build();
                     
-                    // Create the new client using MongoClients factory method
                     mongoClient = MongoClients.create(settings);
-                    
-                    // Get database name either from connection string or default DB_NAME
                     mongoDB = mongoClient.getDatabase(DB_NAME);
-                    
-                    // Test the connection with a ping
                     mongoDB.runCommand(new Document("ping", 1));
-                    log.info("Successfully connected to MongoDB Atlas cluster");
+                    log.info("Successfully connected to MongoDB cluster");
                 } else {
                     // Fallback to host/port connection using the new driver approach
                     log.info("@MM001 Connecting to mongodb [host:" + HOSTNAME + "][port:" + PORT + "]");
