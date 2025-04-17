@@ -84,7 +84,7 @@ public class WordStoreMongoImpl implements WordStore {
     @Override
     public long count() {
         //TODO implement/verify
-        return wordCollection.count();
+        return wordCollection.countDocuments();
     }
 
     public void deleteAll() {

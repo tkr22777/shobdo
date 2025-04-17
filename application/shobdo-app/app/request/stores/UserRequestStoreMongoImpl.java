@@ -51,7 +51,7 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
     @Override
     public long count() {
         //TODO implement
-        return 0;
+        return userRequestCollection.countDocuments();
     }
 
     @Override

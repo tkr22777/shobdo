@@ -5,6 +5,7 @@ SHOBDO_PORT="9000"
 SHOBDO_IP="172.10.0.3"
 MONGO_HOST_IP="172.10.0.4"
 REDIS_HOST_IP="172.10.0.5"
+MONGO_CONNECTION_STRING="mongodb://172.10.0.4:27017/Dictionary"
 DOCKER_IMAGE_NAME="shobdo-app"
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -17,7 +18,7 @@ test: spin-up-mongodb-container spin-up-redis-container
 	sbt clean test
 
 run: spin-up-mongodb-container spin-up-redis-container
-	sbt clean run
+	MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING} sbt clean run
 
 build: spin-up-mongodb-container spin-up-redis-container
 	rm -rf target/universal/*
@@ -40,6 +41,7 @@ spin-up-dockerized-service-only:
 	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
 		--env SHOBDO_MONGODB_HOSTNAME=${MONGO_HOST_IP} \
 		--env SHOBDO_REDIS_HOSTNAME=${REDIS_HOST_IP} \
+		--env SHOBDO_MONGODB_CONNECTION_STRING=${MONGO_CONNECTION_STRING} \
 		-p ${SHOBDO_PORT}:9000 --name shobdo-instance -i -t ${DOCKER_IMAGE_NAME}
 
 spin-up-dockerized-service-clean-slate: spin-up-mongodb-container spin-up-redis-container
@@ -48,6 +50,7 @@ spin-up-dockerized-service-clean-slate: spin-up-mongodb-container spin-up-redis-
 	docker run --net ${NETWORK_NAME} --ip ${SHOBDO_IP} \
 		--env SHOBDO_MONGODB_HOSTNAME=${MONGO_HOST_IP} \
 		--env SHOBDO_REDIS_HOSTNAME=${REDIS_HOST_IP} \
+		--env SHOBDO_MONGODB_CONNECTION_STRING=${MONGO_CONNECTION_STRING} \
 		-p ${SHOBDO_PORT}:9000 --name shobdo-instance -i -t ${DOCKER_IMAGE_NAME}
 
 spin-up-mongodb-container:
