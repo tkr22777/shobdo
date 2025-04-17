@@ -13,6 +13,11 @@ libraryDependencies += "org.slf4j" % "jcl-over-slf4j" % "1.7.25"
 libraryDependencies += "org.slf4j" % "jul-to-slf4j" % "1.7.25"
 libraryDependencies += "org.slf4j" % "log4j-over-slf4j" % "1.7.25"
 
+// Add explicit Logback dependencies
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11"
+libraryDependencies += "ch.qos.logback" % "logback-core" % "1.2.11"
+libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.2" // For msgpassthru converter
+
 libraryDependencies += "org.mongodb" % "mongodb-driver-sync" % "4.10.2"
 
 libraryDependencies += "org.projectlombok" % "lombok" % "1.16.16"
