@@ -24,7 +24,8 @@ libraryDependencies += "org.projectlombok" % "lombok" % "1.16.16"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.5.0"
 
-libraryDependencies += "com.google.guava" % "guava" % "21.0"
+// Update Guava to the resolved version
+libraryDependencies += "com.google.guava" % "guava" % "31.1-jre"
 
 // following libs are to migrate from google sheets
 libraryDependencies += "com.google.api-client" % "google-api-client" % "2.0.0"
@@ -38,3 +39,6 @@ libraryDependencies ++= Seq(
   cache,
   javaWs
 )
+
+// Add dependency overrides to ensure consistent versions
+dependencyOverrides += "com.google.guava" % "guava" % "31.1-jre"
