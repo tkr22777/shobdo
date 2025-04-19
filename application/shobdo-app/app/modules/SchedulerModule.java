@@ -61,7 +61,7 @@ public class SchedulerModule extends AbstractModule {
             // Run task every 10 seconds
             actorSystem.scheduler().schedule(
                 Duration.create(10, TimeUnit.SECONDS),    // Start after 10 seconds
-                Duration.create(10, TimeUnit.MINUTES),    // Run every 10 minutes
+                Duration.create(10, TimeUnit.SECONDS),    // Run every 10 seconds
                 () -> {
                     pingUrl("https://shobdo.onrender.com");
                     pingUrl("https://shobdo-1.onrender.com");
