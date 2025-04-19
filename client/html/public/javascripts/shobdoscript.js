@@ -23,9 +23,9 @@ function debounce(func, wait) {
     };
 }
 
-const debouncedWordSearch = debounce(function(element) {
+const debouncedWordSearch = debounce(function (element) {
     const searchQueryString = $('#wordSearchBox').val().trim();
-    
+
     // Clear text when input is empty
     if (searchQueryString.length === 0) {
         $('#transliteratedText').text("").css({
@@ -35,15 +35,15 @@ const debouncedWordSearch = debounce(function(element) {
         $('#wordList').empty();
         return;
     }
-    
+
     const searchRoute = "/api/v1/words/search";
     const isEnglish = containsEnglishCharacters(searchQueryString);
-    const searchString = isEnglish 
+    const searchString = isEnglish
         ? convertToRidmik(searchQueryString)
         : searchQueryString;
-        
+
     // console.log("WordSearch searchQueryString: " + searchQueryString + " searchString: " + searchString);
-    
+
     // Always show transliterated text for English input
     if (isEnglish) {
         // Use opacity instead of show/hide to prevent layout shifts
@@ -58,7 +58,7 @@ const debouncedWordSearch = debounce(function(element) {
             'visibility': 'hidden'
         });
     }
-    
+
     // Only search if we have Bengali text (either directly typed or transliterated)
     if (!containsEnglishCharacters(searchString)) {
         const searchBody = JSON.stringify({ searchString });
@@ -88,15 +88,16 @@ function RESTPostCall(route, postBodyString, onSuccessFunction) {
     });
 }
 
-function RESTGetCall(route, onSuccessFunction) {
+function RESTGetCall(route, onSuccessFunction, onErrorFunction) {
     jQuery.ajax({
         type: "GET",
         url: route,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        async: true, // Explicitly set to async (this is the default anyway)
         success: onSuccessFunction,
-        error: function (jqXHR, status) {
-            console.log("GET failed!");
+        error: onErrorFunction || function (jqXHR, status, error) {
+            console.log(`GET failed! ${route}: ${error}`);
         }
     });
 }
@@ -120,7 +121,7 @@ function handleWordMeaningResult(data, status, jqXHR) {
 function handleMeaningData(data) {
     const meanings = data.meanings;
     const totalMeanings = Object.keys(meanings).length;
-    
+
     const meaningSections = Object.entries(meanings).map(([key, meaning], index) => {
         // Create a function to highlight exact and derived word matches
         // the following styling logic is better pre-computed and set in the backend
@@ -137,15 +138,15 @@ function handleMeaningData(data) {
         };
 
         const sections = [
-            totalMeanings > 1 
-                ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>`: '',
+            totalMeanings > 1
+                ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>` : '',
             `<div class="meaning-text"><u>অর্থ:</u> ${meaning.text}</div>`,
             Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
-                ? `<div><u>সমার্থসমূহ:</u> ${meaning.synonyms.join(', ')}</div>`: '',
+                ? `<div><u>সমার্থসমূহ:</u> ${meaning.synonyms.join(', ')}</div>` : '',
             Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
-                ? `<div><u>বিপরীতার্থসমূহ:</u> ${meaning.antonyms.join(', ')}</div>`: '',
+                ? `<div><u>বিপরীতার্থসমূহ:</u> ${meaning.antonyms.join(', ')}</div>` : '',
             meaning.exampleSentence
-                ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>`: ''
+                ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>` : ''
         ].filter(Boolean).join('');
 
         return `<div class='meaning-section'>${sections}</div>`;
@@ -173,36 +174,36 @@ function listWordElement(element) {
     var linkedWordText = document.createElement("a");
     linkedWordText.textContent = element;
     var listItem = document.createElement('li');
-    
+
     // Move the click handler to the li element
-    listItem.onclick = function () { 
+    listItem.onclick = function () {
         // Remove active class from all links and list items
         document.querySelectorAll('#wordList a').forEach(a => a.classList.remove('active'));
         document.querySelectorAll('#wordList li').forEach(li => li.classList.remove('active'));
-        
+
         // Add active class to clicked elements
         linkedWordText.classList.add('active');
         listItem.classList.add('active');
-        
+
         // Scroll word meaning pane to top before loading new content
         document.getElementById('wordMeaning').scrollTop = 0;
-        
-        meaningSearch(linkedWordText.textContent); 
+
+        meaningSearch(linkedWordText.textContent);
     };
-    
+
     listItem.appendChild(linkedWordText);
     return listItem;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize transliterated text element
     $('#transliteratedText').css({
         'opacity': '0',
         'visibility': 'hidden'
     });
-    
+
     // Handle about link click
-    document.getElementById('aboutLink').addEventListener('click', function(e) {
+    document.getElementById('aboutLink').addEventListener('click', function (e) {
         e.preventDefault();
         const aboutContent = `
             <div class='word-title'>পরিচিতি</div>
@@ -220,25 +221,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Theme handling
     const themes = ['green', 'dark', 'blue', 'light'];
     let currentThemeIndex = 0;
-    
+
     // Check for saved theme
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
         currentThemeIndex = themes.indexOf(savedTheme);
     }
-    
-    document.getElementById('themeToggle').addEventListener('click', function(e) {
+
+    document.getElementById('themeToggle').addEventListener('click', function (e) {
         e.preventDefault();
         currentThemeIndex = (currentThemeIndex + 1) % themes.length;
         const newTheme = themes[currentThemeIndex];
-        
+
         if (newTheme === 'green') {
             document.documentElement.removeAttribute('data-theme');
         } else {
             document.documentElement.setAttribute('data-theme', newTheme);
         }
-        
+
         localStorage.setItem('theme', newTheme);
     });
 });

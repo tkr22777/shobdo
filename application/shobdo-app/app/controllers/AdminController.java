@@ -23,4 +23,8 @@ public class AdminController extends Controller {
         wordLogic.flushCache();
         return ok();
     }
+
+    public Result health() {
+        return ok("OK");
+    }
 }

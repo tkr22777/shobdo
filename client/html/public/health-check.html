@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Health Check - শব্দ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/health-check.css">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body class="health-page health-check">
+    <div class="container">
+        <h1>বাংলা অভিধান - Backend হেলথ চেক</h1>
+
+        <div class="status">
+            <span class="status-indicator loading"></span>
+            <span id="status-text">চেকিং...</span>
+        </div>
+
+        <div id="details" class="details" style="display: none;"></div>
+
+        <div class="home-link">
+            <a href="index.html">← হোম পেজে ফিরে যান</a>
+        </div>
+    </div>
+
+    <script>
+        // Function to check the backend health
+        function checkBackendHealth() {
+            const healthCheckRoute = "/api/v1/health";
+
+            $.ajax({
+                type: "GET",
+                url: healthCheckRoute,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                timeout: 5000, // 5 second timeout
+                success: function (data, status, jqXHR) {
+                    console.log("Backend health check successful:", data);
+
+                    // Update status indicator and text
+                    $('.status-indicator').removeClass('loading').addClass('healthy');
+                    $('#status-text').text('Backend সচল আছে');
+
+                    // Display details if available
+                    if (data) {
+                        let detailsHtml = '<h3>বিস্তারিত তথ্য:</h3>';
+
+                        if (typeof data === 'object') {
+                            detailsHtml += '<ul>';
+                            for (const [key, value] of Object.entries(data)) {
+                                detailsHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+                            }
+                            detailsHtml += '</ul>';
+                        } else {
+                            detailsHtml += `<p>${data}</p>`;
+                        }
+
+                        $('#details').html(detailsHtml).show();
+                    }
+                },
+                error: function (jqXHR, status, error) {
+                    console.log("Backend health check failed:", error);
+
+                    // Update status indicator and text
+                    $('.status-indicator').removeClass('loading').addClass('unhealthy');
+                    $('#status-text').text('Backend সচল নেই');
+
+                    // Display error details
+                    let errorDetails = '<h3>ত্রুটির বিবরণ:</h3>';
+                    errorDetails += `<p>স্ট্যাটাস: ${jqXHR.status} ${jqXHR.statusText}</p>`;
+                    if (error) {
+                        errorDetails += `<p>ত্রুটি: ${error}</p>`;
+                    }
+
+                    $('#details').html(errorDetails).show();
+                }
+            });
+        }
+
+        // Run the health check when the page loads
+        $(document).ready(function () {
+            // Slight delay to show the loading state
+            setTimeout(checkBackendHealth, 500);
+
+            // Add a refresh button functionality
+            $('.container').append('<button id="refresh-btn" class="button" style="margin-top: 1rem;">রিফ্রেশ</button>');
+            $('#refresh-btn').click(function () {
+                // Reset status to loading
+                $('.status-indicator').removeClass('healthy unhealthy').addClass('loading');
+                $('#status-text').text('চেকিং...');
+                $('#details').hide();
+
+                // Run the health check again
+                setTimeout(checkBackendHealth, 500);
+            });
+        });
+    </script>
+</body>
+
+</html>
