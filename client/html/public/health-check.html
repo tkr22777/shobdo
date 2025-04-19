@@ -39,7 +39,7 @@
                 url: healthCheckRoute,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                timeout: 5000, // 5 second timeout
+                timeout: 1000, // 1 second timeout
                 success: function (data, status, jqXHR) {
                     console.log("Backend health check successful:", data);
 

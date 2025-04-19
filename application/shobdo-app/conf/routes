@@ -6,6 +6,7 @@
 # 0. Splash dictionary message and test routes:
 ###############################################
 GET     /                                                controllers.WordController.index()
+GET     /api/v1                                          controllers.WordController.index()
 GET     /api/v1/health                                   controllers.AdminController.health()
 
 ################################

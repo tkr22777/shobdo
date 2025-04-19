@@ -24,7 +24,17 @@ RUN if [ "$BUILD_FROM_SOURCE" = "true" ] ; then \
 # Set working directory
 WORKDIR /app
 
-# Copy project files if building from source
+# First, copy only the dependency-related files
+# This creates a separate layer that will be cached unless these files change
+COPY build.sbt /app/
+COPY project /app/project/
+
+# Pre-fetch dependencies if building from source
+RUN if [ "$BUILD_FROM_SOURCE" = "true" ] ; then \
+        sbt update ; \
+    fi
+
+# Now copy the rest of the project files
 COPY . /app/
 
 # Run SBT clean and dist if building from source

@@ -25,6 +25,6 @@ public class AdminController extends Controller {
     }
 
     public Result health() {
-        return ok("OK");
+        return ok("{ \"status\": \"OK\" }");
     }
 }
