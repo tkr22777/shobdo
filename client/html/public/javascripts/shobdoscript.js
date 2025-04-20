@@ -33,6 +33,13 @@ const debouncedWordSearch = debounce(function (element) {
             'visibility': 'hidden'
         });
         $('#wordList').empty();
+
+        // Clear the word parameter from URL but keep other parameters
+        if (!window.isInitialLoad) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('word');
+            window.history.replaceState({}, '', url.toString());
+        }
         return;
     }
 
@@ -63,6 +70,15 @@ const debouncedWordSearch = debounce(function (element) {
     if (!containsEnglishCharacters(searchString)) {
         const searchBody = JSON.stringify({ searchString });
         RESTPostCall(searchRoute, searchBody, handleWordSearchResult);
+
+        // Update the URL with the search term
+        if (!window.isInitialLoad) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('q', searchQueryString);
+            // Remove the word parameter since we're doing a new search
+            url.searchParams.delete('word');
+            window.history.replaceState({}, '', url.toString());
+        }
     }
 }, 100);
 
@@ -72,6 +88,13 @@ function meaningSearch(textContent) {
     // console.log("Meaning route: " + meaningRoute);
     // console.log("Meaning body: " + meaningBody);
     RESTPostCall(meaningRoute, meaningBody, handleWordMeaningResult);
+
+    // Update the URL to reflect the currently viewed word
+    // Only update if this wasn't triggered from a URL parameter load
+    if (!window.isInitialLoad) {
+        const shareableUrl = window.getShareableUrl(textContent);
+        window.history.replaceState({}, '', shareableUrl);
+    }
 }
 
 function RESTPostCall(route, postBodyString, onSuccessFunction) {
@@ -152,8 +175,14 @@ function handleMeaningData(data) {
         return `<div class='meaning-section'>${sections}</div>`;
     }).join('');
 
+    // Add a share button to the title section
     return `
-        <div class='word-title'>${data.spelling}</div>
+        <div class='word-title-container'>
+            <div class='word-title'>${data.spelling}</div>
+            <button id="meaningShareButton" class="meaning-share-btn" title="শেয়ার করুন" onclick="copyMeaningUrl('${data.spelling}')">
+                <span class="glyphicon glyphicon-share"></span>
+            </button>
+        </div>
         <div class='meanings-container'>${meaningSections}</div>
     `;
 }
@@ -188,6 +217,7 @@ function listWordElement(element) {
         // Scroll word meaning pane to top before loading new content
         document.getElementById('wordMeaning').scrollTop = 0;
 
+        // Load the meaning for the selected word
         meaningSearch(linkedWordText.textContent);
     };
 
@@ -196,11 +226,40 @@ function listWordElement(element) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Set a flag to prevent URL updates during initial page load
+    window.isInitialLoad = true;
+
     // Initialize transliterated text element
     $('#transliteratedText').css({
         'opacity': '0',
         'visibility': 'hidden'
     });
+
+    // Check for parameters in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTerm = urlParams.get('q');
+    const specificWord = urlParams.get('word');
+
+    // If a specific word is provided, load its meaning directly
+    if (specificWord) {
+        meaningSearch(specificWord);
+
+        // If there's also a search term, populate the search box and run the search
+        if (searchTerm) {
+            $('#wordSearchBox').val(searchTerm);
+            debouncedWordSearch();
+        }
+    }
+    // Otherwise just handle the search term if present
+    else if (searchTerm) {
+        $('#wordSearchBox').val(searchTerm);
+        debouncedWordSearch();
+    }
+
+    // Clear the initial load flag after a short delay
+    setTimeout(() => {
+        window.isInitialLoad = false;
+    }, 1000);
 
     // Handle about link click
     document.getElementById('aboutLink').addEventListener('click', function (e) {
@@ -216,6 +275,11 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
         document.getElementById('wordMeaning').innerHTML = aboutContent;
+
+        // Clear URL parameters when showing about page
+        if (!window.isInitialLoad) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
     });
 
     // Theme handling
@@ -242,4 +306,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
         localStorage.setItem('theme', newTheme);
     });
+
+    // Function to get shareable URL with current search term
+    window.getShareableUrl = function (specificWord) {
+        const searchTerm = $('#wordSearchBox').val().trim();
+        const url = new URL(window.location.href);
+
+        // Remove existing parameters
+        url.search = '';
+
+        // Add search term if present
+        if (searchTerm) {
+            url.searchParams.set('q', searchTerm);
+        }
+
+        // Add specific word if provided
+        if (specificWord) {
+            url.searchParams.set('word', specificWord);
+        }
+
+        return url.toString();
+    };
 });
+
+// Function to copy meaning URL to clipboard
+function copyMeaningUrl(word) {
+    const shareableUrl = window.getShareableUrl(word);
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareableUrl)
+        .then(() => {
+            // Show a temporary tooltip or change the button temporarily
+            const shareButton = document.getElementById('meaningShareButton');
+            const originalHTML = shareButton.innerHTML;
+            shareButton.innerHTML = '<span class="glyphicon glyphicon-ok"></span>';
+            setTimeout(() => {
+                shareButton.innerHTML = originalHTML;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy: ', err);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = shareableUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            const shareButton = document.getElementById('meaningShareButton');
+            const originalHTML = shareButton.innerHTML;
+            shareButton.innerHTML = '<span class="glyphicon glyphicon-ok"></span>';
+            setTimeout(() => {
+                shareButton.innerHTML = originalHTML;
+            }, 2000);
+        });
+}

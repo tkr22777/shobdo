@@ -1,48 +1,80 @@
 /* Modern color scheme and base styles */
 :root {
     /* Default theme (darker refined green theme with red accent) */
-    --primary-color: #0a1f16;      /* Even darker forest green */
-    --secondary-color: #153626;    /* Even darker medium green */
-    --accent-color: #769f82;       /* Dark red accent */
-    --text-light: #f1f8f4;         /* Kept light for readability */
-    --text-dark: #050f0b;          /* Deeper forest green */
-    --surface-color: #112a1f;      /* Darker UI elements */
-    --hover-color: rgba(139, 30, 63, 0.2);   /* Adjusted hover state to match new accent */
-    --border-color: rgba(139, 30, 63, 0.3);  /* Adjusted borders to match new accent */
+    --primary-color: #0a1f16;
+    /* Even darker forest green */
+    --secondary-color: #153626;
+    /* Even darker medium green */
+    --accent-color: #769f82;
+    /* Dark red accent */
+    --text-light: #f1f8f4;
+    /* Kept light for readability */
+    --text-dark: #050f0b;
+    /* Deeper forest green */
+    --surface-color: #112a1f;
+    /* Darker UI elements */
+    --hover-color: rgba(139, 30, 63, 0.2);
+    /* Adjusted hover state to match new accent */
+    --border-color: rgba(139, 30, 63, 0.3);
+    /* Adjusted borders to match new accent */
     --shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 [data-theme="blue"] {
-    --primary-color: #0a1b30;      /* Even darker ocean blue */
-    --secondary-color: #132c45;    /* Even darker navy */
-    --accent-color: #63b3ed;       /* Elegant sky blue accent */
-    --text-light: #f0f5fa;         /* Kept light for readability */
-    --text-dark: #060f17;          /* Darker navy */
-    --surface-color: #0f2339;      /* Darker UI elements */
-    --hover-color: rgba(99, 179, 237, 0.2);   /* Adjusted hover state */
-    --border-color: rgba(99, 179, 237, 0.3);  /* Adjusted borders */
+    --primary-color: #0a1b30;
+    /* Even darker ocean blue */
+    --secondary-color: #132c45;
+    /* Even darker navy */
+    --accent-color: #63b3ed;
+    /* Elegant sky blue accent */
+    --text-light: #f0f5fa;
+    /* Kept light for readability */
+    --text-dark: #060f17;
+    /* Darker navy */
+    --surface-color: #0f2339;
+    /* Darker UI elements */
+    --hover-color: rgba(99, 179, 237, 0.2);
+    /* Adjusted hover state */
+    --border-color: rgba(99, 179, 237, 0.3);
+    /* Adjusted borders */
 }
 
 [data-theme="dark"] {
-    --primary-color: #111827;      /* Darker gray */
-    --secondary-color: #1f2937;    /* Darker medium gray */
-    --accent-color: #059669;       /* Darker emerald green */
-    --text-light: #f9fafb;         /* Kept light for readability */
-    --text-dark: #030712;          /* Darker near black */
-    --surface-color: #1a2433;      /* New: For UI elements */
-    --hover-color: rgba(5, 150, 105, 0.2);   /* New: For hover states */
-    --border-color: rgba(5, 150, 105, 0.3);  /* New: For borders and dividers */
+    --primary-color: #111827;
+    /* Darker gray */
+    --secondary-color: #1f2937;
+    /* Darker medium gray */
+    --accent-color: #059669;
+    /* Darker emerald green */
+    --text-light: #f9fafb;
+    /* Kept light for readability */
+    --text-dark: #030712;
+    /* Darker near black */
+    --surface-color: #1a2433;
+    /* New: For UI elements */
+    --hover-color: rgba(5, 150, 105, 0.2);
+    /* New: For hover states */
+    --border-color: rgba(5, 150, 105, 0.3);
+    /* New: For borders and dividers */
 }
 
 [data-theme="light"] {
-    --primary-color: #838b93;      /* Very light gray background */
-    --secondary-color: #bfc4ce;    /* Light gray for contrast */
-    --accent-color: #bbc4cc;       /* Darker slate gray accent for better contrast */
-    --text-light: #ffffff;         /* White text */
-    --text-dark: #4b535e;          /* Dark slate text */
-    --surface-color: #4c4e4f;      /* Slightly darker than primary for UI elements */
-    --hover-color: rgba(44, 52, 63, 0.1);   /* Adjusted hover state */
-    --border-color: rgba(41, 46, 53, 0.2);  /* Adjusted borders */
+    --primary-color: #838b93;
+    /* Very light gray background */
+    --secondary-color: #bfc4ce;
+    /* Light gray for contrast */
+    --accent-color: #bbc4cc;
+    /* Darker slate gray accent for better contrast */
+    --text-light: #ffffff;
+    /* White text */
+    --text-dark: #4b535e;
+    /* Dark slate text */
+    --surface-color: #4c4e4f;
+    /* Slightly darker than primary for UI elements */
+    --hover-color: rgba(44, 52, 63, 0.1);
+    /* Adjusted hover state */
+    --border-color: rgba(41, 46, 53, 0.2);
+    /* Adjusted borders */
 }
 
 body {
@@ -68,7 +100,8 @@ body {
 /* Search container */
 .search-container {
     position: relative;
-    margin-bottom: 50px; /* Increased to account for the fixed transliteration space */
+    margin-bottom: 50px;
+    /* Increased to account for the fixed transliteration space */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -79,6 +112,27 @@ body {
 .search-box-wrapper {
     width: 80%;
     max-width: 500px;
+    position: relative;
+}
+
+/* Share button styles */
+.share-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+    color: var(--accent-color);
 }
 
 /* Search input styling */
@@ -104,9 +158,11 @@ body {
 .transliteration-container {
     width: 80%;
     max-width: 500px;
-    height: 50px; /* Fixed height to reserve space */
+    height: 50px;
+    /* Fixed height to reserve space */
     position: absolute;
-    top: calc(100% + 10px); /* Position below the search box with some space */
+    top: calc(100% + 10px);
+    /* Position below the search box with some space */
     left: 50%;
     transform: translateX(-50%);
 }
@@ -207,14 +263,29 @@ nav ul::-webkit-scrollbar-thumb {
 #wordMeaning {
     background-color: var(--primary-color);
     color: var(--text-light);
-    padding: 0; /* Remove padding from container */
+    padding: 0;
+    /* Remove padding from container */
     border-radius: 8px;
     box-shadow: var(--shadow);
     height: calc(100vh - 300px);
     min-height: 300px;
-    overflow-y: hidden; /* Change to hidden to prevent double scrollbars */
+    overflow-y: hidden;
+    /* Change to hidden to prevent double scrollbars */
     display: flex;
     flex-direction: column;
+}
+
+/* Word title container */
+.word-title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding: 2rem 2rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 #wordMeaning .word-title {
@@ -222,12 +293,11 @@ nav ul::-webkit-scrollbar-thumb {
     font-weight: 600;
     color: var(--accent-color);
     text-align: center;
-    border-bottom: 2px solid var(--border-color);
-    padding: 2rem 2rem 1rem;
-    background-color: var(--primary-color);
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    padding: 0;
+    border-bottom: none;
+    background-color: transparent;
+    position: static;
+    margin: 0 10px;
 }
 
 /* Create a scrollable container for meanings */
@@ -298,15 +368,17 @@ nav ul::-webkit-scrollbar-thumb {
 }
 
 #wordMeaning .meaning-section div.meaning-text {
-    font-size: 1.5rem;  /* Larger size for the meaning text */
-    margin-bottom: 0.2rem;  /* Add some space after the meaning */
+    font-size: 1.5rem;
+    /* Larger size for the meaning text */
+    margin-bottom: 0.2rem;
+    /* Add some space after the meaning */
 }
 
 #wordMeaning .meaning-section div:last-child {
     margin-bottom: 0;
 }
 
-#wordMeaning .meaning-section div:last-child u + * {
+#wordMeaning .meaning-section div:last-child u+* {
     font-style: italic;
     opacity: 0.9;
 }
@@ -365,17 +437,17 @@ nav ul::-webkit-scrollbar-thumb {
     .jumbotron h1 {
         font-size: 2rem;
     }
-    
+
     #wordSearchBox {
         width: 90%;
     }
-    
+
     nav ul {
         height: 200px;
         min-height: 200px;
         margin-bottom: 1rem;
     }
-    
+
     #wordMeaning {
         height: calc(100vh - 500px);
         min-height: 400px;
@@ -399,7 +471,7 @@ nav ul::-webkit-scrollbar-thumb {
         margin-top: 1rem;
         padding: 1rem 0;
     }
-    
+
     .footer p {
         font-size: 0.9rem;
     }
@@ -410,7 +482,7 @@ nav ul::-webkit-scrollbar-thumb {
         height: 150px;
         min-height: 150px;
     }
-    
+
     #wordMeaning {
         height: calc(100vh - 450px);
         min-height: 350px;
@@ -420,4 +492,20 @@ nav ul::-webkit-scrollbar-thumb {
 /* Add this near the top of your CSS file */
 * {
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.meaning-share-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.2rem;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.meaning-share-btn:hover {
+    color: var(--accent-color);
+    opacity: 1;
 }
