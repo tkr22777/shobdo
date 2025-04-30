@@ -1,10 +1,12 @@
 package utilities;
 
 import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DictUtil {
 
-    private static final ShobdoLogger log = new ShobdoLogger(DictUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(DictUtil.class);
 
     private DictUtil() {
     }

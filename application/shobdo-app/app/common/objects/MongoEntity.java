@@ -7,7 +7,8 @@ import com.mongodb.BasicDBObject;
 import lombok.*;
 import org.bson.Document;
 import utilities.Constants;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -18,7 +19,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 public abstract class MongoEntity {
 
-    private static final ShobdoLogger log = new ShobdoLogger(MongoEntity.class);
+    private static final Logger log = LoggerFactory.getLogger(MongoEntity.class);
     
     @JsonIgnore
     @NonNull private EntityStatus status = EntityStatus.ACTIVE;

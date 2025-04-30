@@ -6,7 +6,8 @@ import com.google.inject.Inject;
 import play.inject.ApplicationLifecycle;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SchedulerModule extends AbstractModule {
 
-    private static final ShobdoLogger log = new ShobdoLogger(SchedulerModule.class);
+    private static final Logger log = LoggerFactory.getLogger(SchedulerModule.class);
 
     @Override
     protected void configure() {

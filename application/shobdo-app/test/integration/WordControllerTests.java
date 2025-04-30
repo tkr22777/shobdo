@@ -13,7 +13,8 @@ import play.test.Helpers;
 import play.test.WithApplication;
 import utilities.Constants;
 import utilities.JsonUtil;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utilities.TestUtil;
 import word.caches.WordCache;
 import word.WordLogic;
@@ -29,13 +30,13 @@ import static play.test.Helpers.contentAsString;
 
 public class WordControllerTests extends WithApplication {
 
-    private final ShobdoLogger log;
+    private final Logger log;
     private final WordLogic wordLogic;
     private final ArrayList<Word> createdWords;
     private final Map<String, List<Meaning>> createdMeaningForWord;
 
     public WordControllerTests() {
-        log = new ShobdoLogger(WordControllerTests.class);
+        log = LoggerFactory.getLogger(WordControllerTests.class);
         WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
         wordLogic = new WordLogic(storeMongo, WordCache.getCache());
         createdWords = new ArrayList<>();

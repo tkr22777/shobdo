@@ -7,7 +7,8 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import utilities.Constants;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import word.objects.Word;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
 public class WordStoreMongoImpl implements WordStore {
 
     private final MongoCollection<Document> wordCollection;
-    private static final ShobdoLogger log = new ShobdoLogger(WordStoreMongoImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WordStoreMongoImpl.class);
 
     public WordStoreMongoImpl(MongoCollection<Document> wordCollection) {
         this.wordCollection = wordCollection;

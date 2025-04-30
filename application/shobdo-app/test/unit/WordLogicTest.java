@@ -7,7 +7,8 @@ import word.objects.Word;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 public class WordLogicTest {
 
-    public ShobdoLogger log = new ShobdoLogger(WordLogicTest.class);
+    public Logger log = LoggerFactory.getLogger(WordLogicTest.class);
 
     private WordLogic wordLogic;
     private WordStore mockWordStore;

@@ -2,6 +2,8 @@ package word.caches;
 
 import utilities.*;
 import word.objects.Word;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WordCache {
 
-    private static final ShobdoLogger log = new ShobdoLogger(WordCache.class);
+    private static final Logger log = LoggerFactory.getLogger(WordCache.class);
 
     /* In-memory caches */
     private final Map<String, Word> wordsBySpelling;

@@ -12,7 +12,8 @@ import org.junit.Test;
 import play.mvc.Result;
 import play.test.Helpers;
 import play.test.WithServer;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utilities.TestUtil;
 import word.caches.WordCache;
 import word.WordLogic;
@@ -26,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ApplicationTest extends WithServer {
 
-    ShobdoLogger log;
+    Logger log;
 
     @Before
     public void setup() {
-        log = new ShobdoLogger(ApplicationTest.class);
+        log = LoggerFactory.getLogger(ApplicationTest.class);
     }
 
     @Test

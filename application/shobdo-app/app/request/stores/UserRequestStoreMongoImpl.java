@@ -4,14 +4,15 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import request.objects.UserRequest;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import word.stores.WordStoreMongoImpl;
 
 import java.util.ArrayList;
 
 public class UserRequestStoreMongoImpl implements UserRequestStore {
 
-    private static final ShobdoLogger log = new ShobdoLogger(WordStoreMongoImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WordStoreMongoImpl.class);
     private final MongoCollection<Document> userRequestCollection;
 
     public UserRequestStoreMongoImpl(MongoCollection<Document> userRequestCollection) {

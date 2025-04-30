@@ -3,7 +3,8 @@ package controllers;
 import common.stores.MongoStoreFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import word.WordLogic;
 import word.caches.WordCache;
 import word.stores.WordStoreMongoImpl;
@@ -11,7 +12,7 @@ import word.stores.WordStoreMongoImpl;
 public class AdminController extends Controller {
 
     private static WordLogic wordLogic;
-    private static final ShobdoLogger logger = new ShobdoLogger(AdminController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     public AdminController() {
         WordStoreMongoImpl wordStoreMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());

@@ -8,7 +8,8 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.Constants;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import word.caches.WordCache;
 import word.WordLogic;
 import word.stores.WordStoreMongoImpl;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 public class WordController extends Controller {
     private static WordLogic wordLogic;
-    private static final ShobdoLogger logger = new ShobdoLogger(WordController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WordController.class);
 
     public Result index() {
         return ok("বাংলা অভিধান এ স্বাগতম!");

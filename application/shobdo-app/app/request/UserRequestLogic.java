@@ -11,7 +11,8 @@ import request.objects.UserRequest;
 import request.stores.UserRequestStore;
 import utilities.Constants;
 import utilities.JsonUtil;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import word.objects.Meaning;
 import word.objects.Word;
 import word.WordLogic;
@@ -25,7 +26,7 @@ public class UserRequestLogic {
     private final WordLogic wordLogic;
     private final UserRequestStore userRequestDao;
 
-    private static final ShobdoLogger logger = new ShobdoLogger(UserRequestLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserRequestLogic.class);
 
     public UserRequestLogic(final WordLogic wordLogic,
                             final UserRequestStore userRequestDao) {

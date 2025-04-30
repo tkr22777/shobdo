@@ -4,6 +4,8 @@ import com.typesafe.config.ConfigFactory;
 import redis.clients.jedis.Jedis;
 import utilities.*;
 import word.objects.Word;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -13,7 +15,7 @@ public class WordCacheRedis {
     private static final boolean USE_REDIS_EXPIRATION_TIME = true;
     private static final int REDIS_EXPIRE_TIME_SECONDS= 6 * 60 * 60; //six hours
 
-    private static final ShobdoLogger log = new ShobdoLogger(WordCacheRedis.class);
+    private static final Logger log = LoggerFactory.getLogger(WordCacheRedis.class);
 
     /* the following are singletons */
     private static Jedis jedis;

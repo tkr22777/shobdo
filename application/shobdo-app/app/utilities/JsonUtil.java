@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 public class JsonUtil {
 
-    private final static ShobdoLogger log = new ShobdoLogger(JsonUtil.class);
+    private final static Logger log = LoggerFactory.getLogger(JsonUtil.class);
     private final static ObjectMapper objectMapper = new ObjectMapper()
         .configure(MapperFeature.USE_ANNOTATIONS, false);
 

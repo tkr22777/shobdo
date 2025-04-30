@@ -3,14 +3,15 @@ package controllers;
 import exceptions.EntityDoesNotExist;
 import play.mvc.Result;
 import play.mvc.Results;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 /* package private */ class ControllerUtils {
 
-    private static ShobdoLogger log = new ShobdoLogger(ControllerUtils.class);
+    private static Logger log = LoggerFactory.getLogger(ControllerUtils.class);
 
     /* package private */ static Result executeEndpoint(final String transactionId,
                                          final String parentRequestId,

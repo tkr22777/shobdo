@@ -10,6 +10,8 @@ import word.caches.WordCache;
 import word.objects.Meaning;
 import word.objects.Word;
 import word.stores.WordStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -21,7 +23,7 @@ public class WordLogic {
     private final WordStore wordStore;
     private final WordCache wordCache;
 
-    private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(WordLogic.class);
 
     public WordLogic(final WordStore wordStore,
                      final WordCache wordCache) {

@@ -10,12 +10,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.typesafe.config.ConfigFactory;
 import org.bson.Document;
-import utilities.ShobdoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /* A central factory that returns word and request collection */
 public class MongoStoreFactory {
 
-    private static final ShobdoLogger log = new ShobdoLogger(MongoStoreFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(MongoStoreFactory.class);
 
     /* MONGODB CONNECTION INFO */
     private static final boolean USE_CONNECTION_STRING = ConfigFactory.load().hasPath("shobdo.mongodb.connectionString");
