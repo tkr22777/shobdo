@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /health-check.html
+
+Sitemap: https://www.shobdobaaz.com/sitemap.xml 

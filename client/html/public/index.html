@@ -1,49 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>shobdo 0.7</title>
+    <title>শব্দ - বাংলা শব্দকোষ এবং অভিধান | Shobdo - Bengali Dictionary</title>
+    <meta name="description"
+        content="শব্দ - সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান। বাংলা শব্দ খুঁজুন, অর্থ জানুন এবং ব্যবহার শিখুন।">
+    <meta name="keywords" content="বাংলা অভিধান, বাংলা শব্দকোষ, বাংলা ডিকশনারি, bengali dictionary, bangla dictionary">
+    <meta name="author" content="শব্দ টিম">
     <meta name="theme-color" content="#2c3e50">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.shobdobaaz.com/">
+    <meta property="og:title" content="শব্দ - বাংলা শব্দকোষ এবং অভিধান">
+    <meta property="og:description"
+        content="সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান। বাংলা শব্দ খুঁজুন, অর্থ জানুন এবং ব্যবহার শিখুন।">
+    <meta property="og:image" content="https://www.shobdobaaz.com/images/shobdo-og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.shobdobaaz.com/">
+    <meta property="twitter:title" content="শব্দ - বাংলা শব্দকোষ এবং অভিধান">
+    <meta property="twitter:description"
+        content="সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান। বাংলা শব্দ খুঁজুন, অর্থ জানুন এবং ব্যবহার শিখুন।">
+    <meta property="twitter:image" content="https://www.shobdobaaz.com/images/shobdo-og-image.jpg">
+
+    <!-- Favicon -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="canonical" href="https://www.shobdobaaz.com/">
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
         rel="stylesheet">
 
-    <!-- Latest compiled and minified CSS -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
         integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-
-    <script src='javascripts/bangla-conversion/ridmikmap.js'></script>
-    <script src='javascripts/bangla-conversion/StringBuilder.js'></script>
-    <script src='javascripts/bangla-conversion/ridmikparser.js'></script>
-
-    <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
-
+    <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <!-- JSON-LD for structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "শব্দ",
+      "url": "https://www.shobdobaaz.com/",
+      "description": "সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান",
+      "applicationCategory": "Dictionary",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0"
+      }
+    }
+    </script>
 </head>
 
 <body>
-    <div class="jumbotron text-center">
+    <header class="jumbotron text-center">
         <h1>শব্দ</h1>
         <div class="search-container">
             <div class="search-box-wrapper">
+                <label for="wordSearchBox" class="sr-only">শব্দ খুঁজুন</label>
                 <input type="text" name="Search Box" id="wordSearchBox" onkeyup="debouncedWordSearch(this)"
                     placeholder="শব্দ খুঁজুন..." autocomplete="off">
-                <button id="shareButton" class="btn share-btn" title="শেয়ার করুন">
+                <button id="shareButton" class="btn share-btn" title="শেয়ার করুন" aria-label="শেয়ার করুন">
                     <span class="glyphicon glyphicon-share"></span>
                 </button>
             </div>
@@ -51,29 +81,28 @@
                 <span id="transliteratedText" class="transliterated-label"></span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
+    <main class="container">
         <div class="row">
-            <div class="col-sm-4">
-                <nav>
+            <aside class="col-sm-4">
+                <nav aria-label="শব্দের তালিকা">
                     <ul id="wordList"></ul>
                 </nav>
-            </div>
-            <div class="col-sm-8">
-                <div id="wordMeaning"></div>
-            </div>
+            </aside>
+            <section class="col-sm-8">
+                <article id="wordMeaning"></article>
+            </section>
         </div>
-    </div>
+    </main>
 
-    <!-- Add footer here -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <p class="copyright">© ২০২৫ শব্দ</p>
                 <p class="version">সংস্করণ ০.৮</p>
                 <div class="footer-links">
-                    <a href="https://github.com/tkr22777/shobdo" target="_blank">গিটহাব</a>
+                    <a href="https://github.com/tkr22777/shobdo" target="_blank" rel="noopener">গিটহাব</a>
                     <span class="separator">•</span>
                     <a href="#" id="aboutLink">পরিচিতি</a>
                     <span class="separator">•</span>
@@ -84,6 +113,19 @@
             </div>
         </div>
     </footer>
+
+    <!-- Scripts at the end for better performance -->
+    <!-- jQuery and Bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+    <!-- App scripts -->
+    <script src='javascripts/bangla-conversion/ridmikmap.js'></script>
+    <script src='javascripts/bangla-conversion/StringBuilder.js'></script>
+    <script src='javascripts/bangla-conversion/ridmikparser.js'></script>
+    <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
 </body>
 
 </html>
