@@ -182,34 +182,6 @@ public class WordCacheRedis {
             info.append(String.format("Expiration time: %s (%d seconds)\n", 
                 USE_REDIS_EXPIRATION_TIME ? "enabled" : "disabled",
                 REDIS_EXPIRE_TIME_SECONDS));
-            
-            // Sample some keys if there are any
-            if (totalKeys > 0) {
-                Set<String> sampleKeys = jedis.keys("SP_*");
-                info.append(String.format("\nWord cache keys count: %d\n", sampleKeys.size()));
-                
-                if (!sampleKeys.isEmpty()) {
-                    info.append("Word cache keys (sample, max 10):\n");
-                    int count = 0;
-                    for (String key : sampleKeys) {
-                        if (count++ >= 10) break;
-                        info.append(String.format("  - %s\n", key));
-                    }
-                }
-                
-                Set<String> searchKeys = jedis.keys("SS_*");
-                info.append(String.format("\nSearch cache keys count: %d\n", searchKeys.size()));
-                
-                if (!searchKeys.isEmpty()) {
-                    info.append("Search cache keys (sample, max 10):\n");
-                    int count = 0;
-                    for (String key : searchKeys) {
-                        if (count++ >= 10) break;
-                        info.append(String.format("  - %s\n", key));
-                    }
-                }
-            }
-            
             info.append("=========================================\n");
             log.info("@WC015 " + info.toString());
         } catch (Exception ex) {

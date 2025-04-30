@@ -116,26 +116,6 @@ public class WordCache {
         info.append("\n===== IN-MEMORY WORD CACHE INFORMATION =====\n");
         info.append(String.format("Total cached words: %d\n", wordCount));
         info.append(String.format("Total cached search results: %d\n", searchCount));
-        
-        if (wordCount > 0) {
-            info.append("\nWord cache keys (sample, max 10):\n");
-            int count = 0;
-            for (String key : wordsBySpelling.keySet()) {
-                if (count++ >= 10) break;
-                info.append(String.format("  - %s\n", key));
-            }
-        }
-        
-        if (searchCount > 0) {
-            info.append("\nSearch cache keys (sample, max 10):\n");
-            int count = 0;
-            for (String key : searchResults.keySet()) {
-                if (count++ >= 10) break;
-                Set<String> results = searchResults.get(key);
-                info.append(String.format("  - %s (results: %d)\n", key, results.size()));
-            }
-        }
-        
         info.append("==========================================\n");
         log.info("@WC014 " + info.toString());
     }
