@@ -7,6 +7,7 @@ import play.inject.ApplicationLifecycle;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import utilities.ShobdoLogger;
+import word.caches.WordCache;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -65,6 +66,7 @@ public class SchedulerModule extends AbstractModule {
                 () -> {
                     pingUrl("https://shobdo.onrender.com");
                     pingUrl("https://shobdo-1.onrender.com");
+                    WordCache.getCache().printCacheInfo();
                 },
                 executionContext
             );

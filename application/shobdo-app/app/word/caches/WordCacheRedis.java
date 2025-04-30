@@ -132,6 +132,91 @@ public class WordCacheRedis {
         return String.format("SS_%s", searchString);
     }
 
+    /**
+     * Prints detailed information about the current state of the Redis cache.
+     * This includes connection status, key counts and database size information.
+     */
+    public void printCacheInfo() {
+        if (jedis == null) {
+            log.info("@WC014 Redis cache is not initialized or connected.");
+            return;
+        }
+
+        try {
+            StringBuilder info = new StringBuilder();
+            info.append("\n===== REDIS WORD CACHE INFORMATION =====\n");
+            
+            // Get server info
+            String redisInfo = jedis.info();
+            String[] infoLines = redisInfo.split("\n");
+            String version = "unknown";
+            String connectedClients = "unknown";
+            String usedMemory = "unknown";
+            String uptime = "unknown";
+            
+            for (String line : infoLines) {
+                if (line.startsWith("redis_version:")) {
+                    version = line.split(":")[1].trim();
+                } else if (line.startsWith("connected_clients:")) {
+                    connectedClients = line.split(":")[1].trim();
+                } else if (line.startsWith("used_memory_human:")) {
+                    usedMemory = line.split(":")[1].trim();
+                } else if (line.startsWith("uptime_in_seconds:")) {
+                    int uptimeSeconds = Integer.parseInt(line.split(":")[1].trim());
+                    uptime = String.format("%d days, %d hours, %d minutes", 
+                        uptimeSeconds / 86400,
+                        (uptimeSeconds % 86400) / 3600,
+                        (uptimeSeconds % 3600) / 60);
+                }
+            }
+            
+            // Get information about key counts
+            long totalKeys = jedis.dbSize();
+            
+            // Print cached info
+            info.append(String.format("Redis version: %s\n", version));
+            info.append(String.format("Connected clients: %s\n", connectedClients));
+            info.append(String.format("Used memory: %s\n", usedMemory));
+            info.append(String.format("Uptime: %s\n", uptime));
+            info.append(String.format("Total keys: %d\n", totalKeys));
+            info.append(String.format("Expiration time: %s (%d seconds)\n", 
+                USE_REDIS_EXPIRATION_TIME ? "enabled" : "disabled",
+                REDIS_EXPIRE_TIME_SECONDS));
+            
+            // Sample some keys if there are any
+            if (totalKeys > 0) {
+                Set<String> sampleKeys = jedis.keys("SP_*");
+                info.append(String.format("\nWord cache keys count: %d\n", sampleKeys.size()));
+                
+                if (!sampleKeys.isEmpty()) {
+                    info.append("Word cache keys (sample, max 10):\n");
+                    int count = 0;
+                    for (String key : sampleKeys) {
+                        if (count++ >= 10) break;
+                        info.append(String.format("  - %s\n", key));
+                    }
+                }
+                
+                Set<String> searchKeys = jedis.keys("SS_*");
+                info.append(String.format("\nSearch cache keys count: %d\n", searchKeys.size()));
+                
+                if (!searchKeys.isEmpty()) {
+                    info.append("Search cache keys (sample, max 10):\n");
+                    int count = 0;
+                    for (String key : searchKeys) {
+                        if (count++ >= 10) break;
+                        info.append(String.format("  - %s\n", key));
+                    }
+                }
+            }
+            
+            info.append("=========================================\n");
+            log.info("@WC015 " + info.toString());
+        } catch (Exception ex) {
+            log.error("@WC016 Error while gathering Redis cache information", ex);
+        }
+    }
+
     public void flushCache(){
         if (jedis != null) {
             try {
