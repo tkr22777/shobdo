@@ -1,0 +1,514 @@
+/* Auth theme styles for Shobdo */
+
+/* Base theme variables */
+:root {
+    /* Default theme (darker refined green theme with red accent) */
+    --primary-color: #0a1f16;    /* Even darker forest green */
+    --primary-hover: #153626;    /* Even darker medium green */
+    --accent-color: #769f82;     /* Dark red accent */
+    --text-light: #f1f8f4;       /* Kept light for readability */
+    --text-dark: #050f0b;        /* Deeper forest green */
+    --surface-color: #112a1f;    /* Darker UI elements */
+    --hover-color: rgba(139, 30, 63, 0.2); /* Adjusted hover state to match new accent */
+    --border-color: rgba(139, 30, 63, 0.3); /* Adjusted borders to match new accent */
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    
+    /* Derived variables for auth system */
+    --text-color: var(--text-dark);
+    --background-color: var(--surface-color);
+    --spinner-bg: var(--primary-color);
+    --spinner-accent: var(--accent-color);
+    
+    /* Notification colors */
+    --notification-info-bg: #d1ecf1;
+    --notification-info-text: #0c5460;
+    --notification-error-bg: #f8d7da;
+    --notification-error-text: #721c24;
+    --notification-success-bg: #d4edda;
+    --notification-success-text: #155724;
+    --notification-loading-bg: #e2e3e5;
+    --notification-loading-text: #383d41;
+    
+    /* Dark mode notification variants */
+    --notification-info-bg-dark: #3498db;
+    --notification-info-text-dark: #f0f5fa;
+    --notification-error-bg-dark: #e74c3c;
+    --notification-error-text-dark: #f0f5fa;
+    --notification-success-bg-dark: #00bc8c;
+    --notification-success-text-dark: #f0f5fa;
+    --notification-loading-bg-dark: #444;
+    --notification-loading-text-dark: #f0f5fa;
+}
+
+/* Blue theme */
+html[data-theme="blue"] {
+    --primary-color: #0a1b30;      /* Even darker ocean blue */
+    --primary-hover: #132c45;      /* Even darker navy */
+    --accent-color: #63b3ed;       /* Elegant sky blue accent */
+    --text-light: #f0f5fa;         /* Kept light for readability */
+    --text-dark: #060f17;          /* Darker navy */
+    --surface-color: #0f2339;      /* Darker UI elements */
+    --hover-color: rgba(99, 179, 237, 0.2); /* Adjusted hover state */
+    --border-color: rgba(99, 179, 237, 0.3); /* Adjusted borders */
+    
+    /* Derived variables */
+    --text-color: var(--text-dark);
+    --background-color: var(--surface-color);
+    --spinner-bg: var(--primary-color);
+    --spinner-accent: var(--accent-color);
+}
+
+/* Dark theme */
+html[data-theme="dark"] {
+    --primary-color: #111827;     /* Darker gray */
+    --primary-hover: #1f2937;     /* Darker medium gray */
+    --accent-color: #059669;      /* Darker emerald green */
+    --text-light: #f9fafb;        /* Kept light for readability */
+    --text-dark: #030712;         /* Darker near black */
+    --surface-color: #1a2433;     /* For UI elements */
+    --hover-color: rgba(5, 150, 105, 0.2); /* For hover states */
+    --border-color: rgba(5, 150, 105, 0.3); /* For borders and dividers */
+    
+    /* Derived variables */
+    --text-color: var(--text-light);
+    --background-color: var(--surface-color);
+    --spinner-bg: var(--primary-color);
+    --spinner-accent: var(--accent-color);
+}
+
+/* Light theme */
+html[data-theme="light"] {
+    --primary-color: #838b93;     /* Very light gray background */
+    --primary-hover: #bfc4ce;     /* Light gray for contrast */
+    --accent-color: #bbc4cc;      /* Darker slate gray accent for better contrast */
+    --text-light: #ffffff;        /* White text */
+    --text-dark: #4b535e;         /* Dark slate text */
+    --surface-color: #4c4e4f;     /* Slightly darker than primary for UI elements */
+    --hover-color: rgba(44, 52, 63, 0.1); /* Adjusted hover state */
+    --border-color: rgba(41, 46, 53, 0.2); /* Adjusted borders */
+    
+    /* Derived variables */
+    --text-color: var(--text-dark);
+    --background-color: var(--primary-color);
+    --spinner-bg: var(--text-light);
+    --spinner-accent: var(--accent-color);
+}
+
+/* 
+ * ======================================
+ * BUTTON STYLING - CENTRALIZED
+ * ======================================
+ * All button styling should be defined here and nowhere else
+ */
+
+/* Bootstrap button overrides to match theme */
+.btn {
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+/* Custom button class for themed buttons */
+.button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: var(--accent-color);
+    color: var(--text-light);
+    text-decoration: none;
+    border-radius: 4px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button:hover {
+    background-color: var(--accent-color);
+    opacity: 0.85;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Primary action buttons */
+.btn-primary, 
+.auth-action-btn {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-light);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover, 
+.btn-primary:focus {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    opacity: 0.85;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:active {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-default {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-default:hover,
+.btn-default:focus {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Theme-specific button adjustments */
+html[data-theme="dark"] .btn-default {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border-color: var(--border-color);
+}
+
+html[data-theme="dark"] .btn-default:hover,
+html[data-theme="dark"] .btn-default:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--accent-color);
+}
+
+html[data-theme="light"] .btn-default {
+    color: #2c3e50;
+    border-color: rgba(44, 62, 80, 0.2);
+}
+
+html[data-theme="light"] .btn-primary {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Login button theming - enhanced with higher specificity and !important */
+#loginBtn.btn,
+.auth-container #loginBtn.btn,
+button#loginBtn.btn {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+#loginBtn.btn:hover, 
+#loginBtn.btn:focus,
+.auth-container #loginBtn.btn:hover,
+.auth-container #loginBtn.btn:focus {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    opacity: 0.85;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#loginBtn.btn:active,
+.auth-container #loginBtn.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Explicit theme-specific styles for login button */
+html[data-theme="blue"] #loginBtn.btn {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+html[data-theme="dark"] #loginBtn.btn {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+html[data-theme="light"] #loginBtn.btn {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Logout button styling with more specificity */
+#logoutBtn.btn,
+.auth-container #logoutBtn.btn,
+button#logoutBtn.btn {
+    background-color: transparent;
+    color: var(--text-color);
+    border-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#logoutBtn.btn:hover, 
+#logoutBtn.btn:focus,
+.auth-container #logoutBtn.btn:hover,
+.auth-container #logoutBtn.btn:focus {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+}
+
+.dropdown-menu > li > a {
+    padding: 8px 20px;
+    transition: background-color 0.2s ease;
+    color: var(--text-color);
+}
+
+.dropdown-menu > li > a:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="dark"] .dropdown-menu > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Auth container positioning */
+.auth-container {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+/* Auth notification positioning - already defined in the file but let's make sure we have all styles */
+#authNotification {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: none;
+}
+
+/* Profile button */
+#userProfile {
+    font-weight: 500;
+}
+
+/* Spinner and Loading Indicators */
+.auth-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+    margin-left: 5px;
+}
+
+.auth-loader {
+    margin: 20px auto;
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--spinner-bg);
+    border-top: 5px solid var(--spinner-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Page specific styles */
+.back-link {
+    margin-bottom: 20px;
+    display: inline-block;
+    color: var(--primary-color);
+}
+
+.config-section, .profile-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.check-title, .profile-name {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.version-info {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+/* Form controls */
+.form-control {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+}
+
+html[data-theme="dark"] .form-control {
+    background-color: #333;
+}
+
+/* Profile specific styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+    object-fit: cover;
+}
+
+.profile-email {
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 0;
+}
+
+.preference-item {
+    margin-bottom: 15px;
+}
+
+.preference-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.not-authenticated {
+    text-align: center;
+    padding: 30px;
+}
+
+/* Dark theme adjustments for Bootstrap components */
+html[data-theme="dark"] .list-group-item {
+    background-color: #333;
+    border-color: #444;
+    color: #eee;
+}
+
+html[data-theme="dark"] .list-group-item-success {
+    background-color: #00bc8c;
+    color: #fff;
+}
+
+html[data-theme="dark"] .list-group-item-danger {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+html[data-theme="dark"] .alert-success {
+    background-color: #00bc8c;
+    border-color: #00a379;
+    color: #fff;
+}
+
+html[data-theme="dark"] .alert-warning {
+    background-color: #f39c12;
+    border-color: #d28c0e;
+    color: #fff;
+}
+
+/* Animation for the notification */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 
+
+/* Modal dialog theming */
+.modal-content {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--border-color);
+}
+
+.modal-header .close {
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+.modal-header .close:hover {
+    opacity: 0.8;
+}
+
+/* Home link in callback page */
+#homeLink {
+    display: block;
+    margin-top: 20px;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+#homeLink:hover {
+    text-decoration: underline;
+}
+
+/* Theme selector and spacing utilities */
+.theme-selector {
+    margin-top: 15px;
+}
+
+.theme-selector select {
+    max-width: 200px;
+    margin: 10px 0;
+}
+
+.mt-3 {
+    margin-top: 15px;
+}
+
+/* Auth component display handling */
+.auth-dropdown {
+    display: inline-block;
+}
+
+/* Initially hidden elements */
+.auth-hidden {
+    display: none;
+}
+
+/* Ensure all themed buttons follow the centralized approach */
+[class*="btn-theme"],
+.themed-button,
+.auth-button {
+    composes: button;
+} 

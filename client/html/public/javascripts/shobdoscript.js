@@ -98,6 +98,16 @@ function meaningSearch(textContent) {
 }
 
 function RESTPostCall(route, postBodyString, onSuccessFunction) {
+    // Check if endpoint needs authentication
+    const needsAuth = route.includes('/secure/') || route.startsWith('/api/v1/secure/');
+    
+    // If authentication is needed but user is not logged in
+    if (needsAuth && (!isAuthenticated || typeof isAuthenticated === 'undefined')) {
+        // Redirect to login or show a message
+        showAuthRequiredMessage();
+        return;
+    }
+    
     jQuery.ajax({
         type: "POST",
         url: route,
@@ -106,12 +116,26 @@ function RESTPostCall(route, postBodyString, onSuccessFunction) {
         data: postBodyString,
         success: onSuccessFunction,
         error: function (jqXHR, status) {
-            console.log("Post failed!");
+            if (jqXHR.status === 401) {
+                showAuthRequiredMessage();
+            } else {
+                console.log("Post failed!");
+            }
         }
     });
 }
 
 function RESTGetCall(route, onSuccessFunction, onErrorFunction) {
+    // Check if endpoint needs authentication
+    const needsAuth = route.includes('/secure/') || route.startsWith('/api/v1/secure/');
+    
+    // If authentication is needed but user is not logged in
+    if (needsAuth && (!isAuthenticated || typeof isAuthenticated === 'undefined')) {
+        // Redirect to login or show a message
+        showAuthRequiredMessage();
+        return;
+    }
+    
     jQuery.ajax({
         type: "GET",
         url: route,
@@ -120,7 +144,11 @@ function RESTGetCall(route, onSuccessFunction, onErrorFunction) {
         async: true, // Explicitly set to async (this is the default anyway)
         success: onSuccessFunction,
         error: onErrorFunction || function (jqXHR, status, error) {
-            console.log(`GET failed! ${route}: ${error}`);
+            if (jqXHR.status === 401) {
+                showAuthRequiredMessage();
+            } else {
+                console.log(`GET failed! ${route}: ${error}`);
+            }
         }
     });
 }
@@ -282,31 +310,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Theme handling
-    const themes = ['green', 'dark', 'blue', 'light'];
-    let currentThemeIndex = 0;
-
-    // Check for saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        currentThemeIndex = themes.indexOf(savedTheme);
-    }
-
-    document.getElementById('themeToggle').addEventListener('click', function (e) {
-        e.preventDefault();
-        currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-        const newTheme = themes[currentThemeIndex];
-
-        if (newTheme === 'green') {
-            document.documentElement.removeAttribute('data-theme');
-        } else {
-            document.documentElement.setAttribute('data-theme', newTheme);
-        }
-
-        localStorage.setItem('theme', newTheme);
-    });
-
     // Function to get shareable URL with current search term
     window.getShareableUrl = function (specificWord) {
         const searchTerm = $('#wordSearchBox').val().trim();
@@ -361,4 +364,43 @@ function copyMeaningUrl(word) {
                 shareButton.innerHTML = originalHTML;
             }, 2000);
         });
+}
+
+// Function to show login required message
+function showAuthRequiredMessage() {
+    // Create a modal if it doesn't exist
+    if ($('#auth-required-modal').length === 0) {
+        $('body').append(`
+            <div class="modal fade" id="auth-required-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">অনুমতি প্রয়োজন</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>এই অ্যাকশন সম্পূর্ণ করতে লগইন প্রয়োজন। আপনি কি লগইন করতে চান?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">না</button>
+                            <button type="button" class="btn btn-primary" id="login-confirm-btn">হ্যাঁ, লগইন করুন</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        // Set up the login button event
+        $('#login-confirm-btn').click(function() {
+            $('#auth-required-modal').modal('hide');
+            if (typeof login === 'function') {
+                login();
+            }
+        });
+    }
+    
+    // Show the modal
+    $('#auth-required-modal').modal('show');
 }

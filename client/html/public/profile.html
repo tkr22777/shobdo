@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile - শব্দ</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/auth-theme.css">
+    
+    <!-- Theme management -->
+    <script type="text/javascript" src="javascripts/theme.js"></script>
+    
+    <!-- Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script type="text/javascript" src="javascripts/config.js"></script>
+    <script type="text/javascript" src="javascripts/auth.js"></script>
+    
+    <style>
+        .profile-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-email {
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        .preference-item {
+            margin-bottom: 15px;
+        }
+        
+        .preference-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .back-link {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .not-authenticated {
+            text-align: center;
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="jumbotron text-center">
+        <h1>শব্দ</h1>
+        <div class="auth-container">
+            <button id="loginBtn" class="button">লগইন</button>
+            <div class="dropdown auth-dropdown">
+                <button id="logoutBtn" class="btn btn-default dropdown-toggle auth-hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span id="userProfile" class="auth-hidden"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="profile.html">প্রোফাইল</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" id="logoutAction">লগআউট</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Add auth notification area -->
+        <div id="authNotification"></div>
+    </div>
+
+    <div class="container">
+        <a href="/" class="back-link"><span class="glyphicon glyphicon-chevron-left"></span> হোম পেজে ফিরে যান</a>
+        
+        <div id="profileContent">
+            <!-- Content will be loaded dynamically based on authentication status -->
+            <div class="loading-spinner text-center">
+                <p>লোড হচ্ছে...</p>
+                <div class="auth-loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add footer here -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© ২০২৫ শব্দ</p>
+                <p class="version">সংস্করণ ০.৮</p>
+                <div class="footer-links">
+                    <a href="https://github.com/tkr22777/shobdo" target="_blank">গিটহাব</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="aboutLink">পরিচিতি</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="themeToggle">ভা-ব</a>
+                    <span class="separator">•</span>
+                    <a href="health-check.html">স্টেটাস</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Function to update theme-dependent UI elements
+        function updateThemeUI(theme) {
+            // Update notification styling if visible
+            if (typeof updateAuthNotificationTheme === 'function' && $('#authNotification').is(':visible')) {
+                updateAuthNotificationTheme();
+            }
+        }
+    
+        $(document).ready(function() {
+            // Listen for auth state changes
+            addAuthStateListener(updateProfileUI);
+            
+            // Set up reference to the about link
+            document.getElementById('aboutLink').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.href = '/';
+            });
+            
+            // Set up theme toggle using the centralized theme.js
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    cycleTheme();
+                });
+            }
+            
+            // Listen for theme changes to update UI
+            document.addEventListener('themechange', function(e) {
+                updateThemeUI(e.detail.theme);
+            });
+        });
+        
+        // Update the profile UI based on auth state
+        function updateProfileUI(authState) {
+            const profileContent = document.getElementById('profileContent');
+            
+            if (authState.isLoading) {
+                // Show loading spinner
+                return;
+            }
+            
+            if (authState.isAuthenticated && authState.userProfile) {
+                // User is authenticated, show profile
+                const profile = authState.userProfile;
+                
+                // Get user preferences from API (example - this will be implemented in backend)
+                const userPreferencesHtml = `
+                    <div class="profile-section">
+                        <h3>ব্যবহারকারী পছন্দসমূহ</h3>
+                        
+                        <div id="preferences-form">
+                            <div class="preference-item">
+                                <label class="preference-label" for="darkMode">থিম সেটিং:</label>
+                                <select id="darkMode" class="form-control">
+                                    <option value="light">লাইট</option>
+                                    <option value="dark">ডার্ক</option>
+                                    <option value="blue">নীল</option>
+                                    <option value="green">সবুজ</option>
+                                </select>
+                            </div>
+                            
+                            <div class="preference-item">
+                                <label class="preference-label" for="emailNotifications">ইমেইল বিজ্ঞপ্তি:</label>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="emailNotifications"> ইমেইল বিজ্ঞপ্তি সক্রিয় করুন
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button id="savePreferences" class="btn btn-primary">সেটিংস সংরক্ষণ করুন</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Create the profile HTML
+                profileContent.innerHTML = `
+                    <div class="profile-section">
+                        <div class="profile-header">
+                            <img src="${profile.picture || 'https://via.placeholder.com/80'}" alt="Profile" class="profile-avatar">
+                            <div>
+                                <h2 class="profile-name">${profile.name || profile.nickname || 'ব্যবহারকারী'}</h2>
+                                <p class="profile-email">${profile.email || ''}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details">
+                            <p><strong>ইমেইল যাচাইকৃত:</strong> ${profile.email_verified ? 'হ্যাঁ' : 'না'}</p>
+                            <p><strong>অ্যাকাউন্ট আইডি:</strong> ${profile.sub}</p>
+                            <p><strong>সর্বশেষ লগইন:</strong> ${new Date().toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    ${userPreferencesHtml}
+                `;
+                
+                // Set up preferences form
+                $('#savePreferences').click(function() {
+                    const preferences = {
+                        theme: $('#darkMode').val(),
+                        emailNotifications: $('#emailNotifications').is(':checked')
+                    };
+                    
+                    // This would call your backend API
+                    alert('ব্যবহারকারী পছন্দসমূহ সংরক্ষণ করা হয়েছে');
+                    console.log('Saving preferences:', preferences);
+                    
+                    // Use the full centralized theme approach instead of direct localStorage and applyTheme
+                    // This ensures all theme selectors stay in sync
+                    if (typeof cycleTheme === 'function' && typeof updateThemeSelectors === 'function') {
+                        // Apply the theme using the centralized system
+                        applyTheme(preferences.theme);
+                        localStorage.setItem('theme', preferences.theme);
+                        updateThemeSelectors(preferences.theme);
+                    } else {
+                        // Fallback in case the centralized functions aren't available
+                        localStorage.setItem('theme', preferences.theme);
+                        applyTheme(preferences.theme);
+                    }
+                });
+                
+                // Pre-select current theme
+                const currentTheme = localStorage.getItem('theme') || 'green';
+                $('#darkMode').val(currentTheme);
+                
+            } else {
+                // User is not authenticated, show login prompt
+                profileContent.innerHTML = `
+                    <div class="profile-section not-authenticated">
+                        <h3>অনুমতি প্রয়োজন</h3>
+                        <p>আপনার প্রোফাইল দেখতে লগইন করুন</p>
+                        <button id="profileLoginBtn" class="button">লগইন করুন</button>
+                    </div>
+                `;
+                
+                // Set up login button
+                $('#profileLoginBtn').click(function() {
+                    if (typeof login === 'function') {
+                        login();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html> 

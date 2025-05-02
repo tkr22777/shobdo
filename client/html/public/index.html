@@ -46,6 +46,15 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/auth-theme.css">
+    
+    <!-- Theme management -->
+    <script type="text/javascript" src="javascripts/theme.js"></script>
+    
+    <!-- Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script type="text/javascript" src="javascripts/config.js"></script>
+    <script type="text/javascript" src="javascripts/auth.js"></script>
 
     <!-- JSON-LD for structured data -->
     <script type="application/ld+json">
@@ -68,6 +77,21 @@
 <body>
     <header class="jumbotron text-center">
         <h1>শব্দ</h1>
+        <div class="auth-container">
+            <button id="loginBtn" class="button">লগইন</button>
+            <div class="dropdown auth-dropdown">
+                <button id="logoutBtn" class="btn btn-default dropdown-toggle auth-hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span id="userProfile" class="auth-hidden"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="profile.html">প্রোফাইল</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" id="logoutAction">লগআউট</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="authNotification"></div>
         <div class="search-container">
             <div class="search-box-wrapper">
                 <label for="wordSearchBox" class="sr-only">শব্দ খুঁজুন</label>

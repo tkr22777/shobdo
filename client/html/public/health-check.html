@@ -7,10 +7,14 @@
     <title>Backend Health Check - শব্দ</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
         rel="stylesheet">
-    <!-- External CSS -->
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="css/auth-theme.css">
+    <!-- Health Check CSS -->
     <link rel="stylesheet" href="css/health-check.css">
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Theme JS - This must be loaded before any other scripts that use theming -->
+    <script type="text/javascript" src="javascripts/theme.js"></script>
 </head>
 
 <body class="health-page health-check">
@@ -22,11 +26,38 @@
             <span id="status-text">চেকিং...</span>
         </div>
 
-        <div id="details" class="details" style="display: none;"></div>
+        <div id="details" class="details auth-hidden"></div>
 
         <div class="home-link">
             <a href="index.html">← হোম পেজে ফিরে যান</a>
         </div>
+
+        <button id="refresh-btn" class="button mt-3">রিফ্রেশ</button>
+
+        <div class="theme-selector">
+            <p>থিম পরিবর্তন করুন:</p>
+            <select id="themeSelector" class="form-control">
+                <option value="green">সবুজ (ডিফল্ট)</option>
+                <option value="dark">ডার্ক</option>
+                <option value="blue">নীল</option>
+                <option value="light">লাইট</option>
+            </select>
+        </div>
+        
+        <!-- Add footer similar to other pages -->
+        <footer class="footer mt-3">
+            <div class="footer-content">
+                <p class="copyright">© ২০২৫ শব্দ</p>
+                <p class="version">সংস্করণ ০.৮</p>
+                <div class="footer-links">
+                    <a href="https://github.com/tkr22777/shobdo" target="_blank">গিটহাব</a>
+                    <span class="separator">•</span>
+                    <a href="/" id="aboutLink">পরিচিতি</a>
+                    <span class="separator">•</span>
+                    <a href="#" id="themeToggle">ভা-ব</a>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -61,7 +92,7 @@
                             detailsHtml += `<p>${data}</p>`;
                         }
 
-                        $('#details').html(detailsHtml).show();
+                        $('#details').html(detailsHtml).removeClass('auth-hidden');
                     }
                 },
                 error: function (jqXHR, status, error) {
@@ -78,7 +109,7 @@
                         errorDetails += `<p>ত্রুটি: ${error}</p>`;
                     }
 
-                    $('#details').html(errorDetails).show();
+                    $('#details').html(errorDetails).removeClass('auth-hidden');
                 }
             });
         }
@@ -88,17 +119,19 @@
             // Slight delay to show the loading state
             setTimeout(checkBackendHealth, 500);
 
-            // Add a refresh button functionality
-            $('.container').append('<button id="refresh-btn" class="button" style="margin-top: 1rem;">রিফ্রেশ</button>');
+            // Set up refresh button
             $('#refresh-btn').click(function () {
                 // Reset status to loading
                 $('.status-indicator').removeClass('healthy unhealthy').addClass('loading');
                 $('#status-text').text('চেকিং...');
-                $('#details').hide();
+                $('#details').addClass('auth-hidden');
 
                 // Run the health check again
                 setTimeout(checkBackendHealth, 500);
             });
+            
+            // Theme management is now handled entirely by theme.js
+            // No duplicate event handlers needed here
         });
     </script>
 </body>

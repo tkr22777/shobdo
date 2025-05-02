@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auth0 Configuration Check - শব্দ</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/auth-theme.css">
+    
+    <!-- Theme management -->
+    <script type="text/javascript" src="javascripts/theme.js"></script>
+    
+    <!-- Auth0 config scripts -->
+    <script type="text/javascript" src="javascripts/config.js"></script>
+    <script type="text/javascript" src="javascripts/auth-check.js"></script>
+    
+    <style>
+        .mt-3 {
+            margin-top: 15px;
+        }
+        
+        .config-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .check-title {
+            margin-bottom: 20px;
+        }
+        
+        .version-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="jumbotron text-center">
+        <h1>শব্দ</h1>
+    </div>
+
+    <div class="container">
+        <a href="/" class="back-link"><span class="glyphicon glyphicon-chevron-left"></span> হোম পেজে ফিরে যান</a>
+        
+        <div class="config-section">
+            <h2 class="check-title">Auth0 Configuration Check</h2>
+            <p>This tool checks if your Auth0 configuration is properly set up.</p>
+            
+            <div id="auth-config-results">
+                <div class="text-center">
+                    <p>Checking configuration...</p>
+                    <div class="auth-loader"></div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <h3>Next Steps</h3>
+                <p>Once your configuration is correct:</p>
+                <ol>
+                    <li>Try the <a href="/">main application</a> and click the login button</li>
+                    <li>You should be redirected to the Auth0 login page</li>
+                    <li>After login, you should be redirected back to the application</li>
+                    <li>Your user profile should be visible in the top right corner</li>
+                </ol>
+            </div>
+            
+            <div class="version-info">
+                Environment: <span id="environment-info"></span>
+                <script>document.getElementById('environment-info').textContent = getEnvironment();</script>
+            </div>
+            
+            <div class="theme-selector mt-3">
+                <h4>Theme Preview</h4>
+                <p>Try different themes to see how the authentication UI will look:</p>
+                <select id="themeSelector" class="form-control">
+                    <option value="green">Green (Default)</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add footer here -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© ২০২৫ শব্দ</p>
+                <p class="version">সংস্করণ ০.৮</p>
+                <div class="footer-links">
+                    <a href="https://github.com/tkr22777/shobdo" target="_blank">গিটহাব</a>
+                    <span class="separator">•</span>
+                    <a href="/">পরিচিতি</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html> 

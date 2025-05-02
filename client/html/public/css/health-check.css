@@ -1,10 +1,11 @@
-/* Styles for health check page */
+/* Styles for health check page using theme system */
 
 /* Base styles */
 body.health-page {
     font-family: 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Health check page layout */
@@ -14,22 +15,29 @@ body.health-check {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f5f5f5;
+    background-color: var(--primary-color);
 }
 
 .container {
     text-align: center;
-    background-color: white;
+    background-color: var(--background-color);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     max-width: 80%;
+    border: 1px solid var(--border-color);
+    position: relative;
 }
 
 /* Typography */
 h1 {
     margin-top: 0;
-    color: #2c3e50;
+    color: var(--text-color);
+}
+
+/* Improve text contrast for heading in green theme (default) */
+h1, #status-text {
+    color: var(--text-light);
 }
 
 /* Status indicators */
@@ -47,25 +55,90 @@ h1 {
     margin-right: 8px;
 }
 
+/* Fixed colors for status indicators regardless of theme */
 .loading {
-    background-color: #f39c12;
+    background-color: #f39c12; /* Fixed yellow color */
 }
 
 .healthy {
-    background-color: #2ecc71;
+    background-color: #2ecc71; /* Fixed green color */
 }
 
 .unhealthy {
-    background-color: #e74c3c;
+    background-color: #e74c3c; /* Fixed red color */
 }
+
+/* Remove theme-specific overrides for status indicators */
+/* These sections are commented out because we want fixed colors
+html[data-theme="dark"] .loading {
+    background-color: var(--notification-loading-bg-dark);
+}
+
+html[data-theme="dark"] .healthy {
+    background-color: var(--notification-success-bg-dark);
+}
+
+html[data-theme="dark"] .unhealthy {
+    background-color: var(--notification-error-bg-dark);
+}
+*/
 
 /* Content containers */
 .details {
-    background-color: #f9f9f9;
+    background-color: rgba(249, 249, 249, 0.1);
     padding: 1rem;
     border-radius: 4px;
     margin-top: 1rem;
     text-align: left;
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+}
+
+.details h3, 
+.details li, 
+.details strong,
+.details p {
+    color: var(--text-light);
+}
+
+/* Blue theme text contrast improvements */
+html[data-theme="blue"] h1,
+html[data-theme="blue"] #status-text,
+html[data-theme="blue"] .theme-selector p,
+html[data-theme="blue"] .copyright,
+html[data-theme="blue"] .version,
+html[data-theme="blue"] .separator {
+    color: var(--text-light);
+}
+
+/* Dark theme text contrast - keeping existing rules for consistency */
+html[data-theme="dark"] .details {
+    color: var(--text-light);
+}
+
+html[data-theme="dark"] .details h3 {
+    color: var(--text-light);
+}
+
+html[data-theme="dark"] .details li,
+html[data-theme="dark"] .details strong,
+html[data-theme="dark"] .details p {
+    color: var(--text-light);
+}
+
+html[data-theme="dark"] #status-text {
+    color: var(--text-light);
+}
+
+/* Light theme needs darker text to maintain contrast */
+html[data-theme="light"] .details,
+html[data-theme="light"] .details h3,
+html[data-theme="light"] .details li,
+html[data-theme="light"] .details strong,
+html[data-theme="light"] .details p,
+html[data-theme="light"] h1,
+html[data-theme="light"] #status-text {
+    color: #2c3e50; /* Much darker text for light theme */
 }
 
 /* Health readme layout */
@@ -77,14 +150,15 @@ body.health-readme {
 
 /* Code blocks */
 pre {
-    background-color: #f5f5f5;
+    background-color: rgba(245, 245, 245, 0.1);
     padding: 10px;
     border-radius: 5px;
     overflow-x: auto;
+    border: 1px solid var(--border-color);
 }
 
 code {
-    background-color: #f5f5f5;
+    background-color: rgba(245, 245, 245, 0.1);
     padding: 2px 4px;
     border-radius: 3px;
 }
@@ -92,7 +166,7 @@ code {
 /* Method sections */
 .method {
     margin-bottom: 30px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
 }
 
@@ -102,7 +176,7 @@ code {
 }
 
 .home-link a {
-    color: #3498db;
+    color: var(--accent-color);
     text-decoration: none;
 }
 
@@ -110,17 +184,85 @@ code {
     text-decoration: underline;
 }
 
-.button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #3498db;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+/* Button styling moved to auth-theme.css for centralized theme management */
+/* See auth-theme.css for all button styling including .button, .btn, .btn-primary, .btn-default */
+
+/* Theme selector */
+.theme-selector {
+    margin-top: 15px;
 }
 
-.button:hover {
-    background-color: #2980b9;
+.theme-selector p {
+    color: var(--text-light);
+}
+
+.theme-selector select {
+    max-width: 200px;
+    margin: 10px 0;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+/* Light theme needs darker text for theme selector label */
+html[data-theme="light"] .theme-selector p {
+    color: #2c3e50; /* Much darker text for light theme */
+}
+
+/* Footer styles */
+.footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.copyright, .version {
+    margin: 5px 0;
+    color: var(--text-light);
+    opacity: 0.8;
+}
+
+/* Light theme footer text needs darker color */
+html[data-theme="light"] .copyright, 
+html[data-theme="light"] .version {
+    color: #2c3e50; /* Much darker text for light theme */
+}
+
+.footer-links {
+    margin-top: 5px;
+}
+
+.footer-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.separator {
+    color: var(--text-light);
+    opacity: 0.5;
+}
+
+/* Light theme separator needs darker color */
+html[data-theme="light"] .separator {
+    color: #2c3e50; /* Much darker text for light theme */
+    opacity: 0.7; /* Increased opacity for better visibility */
+}
+
+/* Utility classes */
+.mt-3 {
+    margin-top: 15px;
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - শব্দ</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    
+    <!-- Theme management -->
+    <script type="text/javascript" src="javascripts/theme.js"></script>
+    
+    <!-- Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script type="text/javascript" src="javascripts/config.js"></script>
+    <script type="text/javascript" src="javascripts/auth.js"></script>
+    
+    <!-- Theme support -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/auth-theme.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Bengali', Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="authNotification"></div>
+    <h2>প্রবেশ করা হচ্ছে...</h2>
+    <div class="auth-loader"></div>
+    <p>আপনাকে স্বয়ংক্রিয়ভাবে পুনঃনির্দেশিত করা হবে</p>
+    
+    <script>
+        // This page is just a loading page while Auth0 callback is processed
+        // The auth.js script will handle the redirect and take the user back to the main page
+        $(document).ready(function() {
+            // If we're stuck on this page for some reason, provide a link back
+            setTimeout(function() {
+                if (document.getElementById('homeLink')) return;
+                
+                const link = document.createElement('a');
+                link.id = 'homeLink';
+                link.href = '/';
+                link.textContent = 'হোম পেজে ফিরে যান';
+                
+                document.body.appendChild(link);
+            }, 5000);
+        });
+    </script>
+</body>
+</html> 
