@@ -37,6 +37,7 @@ public class SchedulerModule extends AbstractModule {
 
         private final ActorSystem actorSystem;
         private final ExecutionContext executionContext;
+        private static final String DISABLE_PING_ENV = "DISABLE_PERIODIC_PING";
 
         @Inject
         public TaskScheduler(ActorSystem actorSystem,
@@ -45,8 +46,15 @@ public class SchedulerModule extends AbstractModule {
             this.actorSystem = actorSystem;
             this.executionContext = executionContext;
 
-            // Schedule the periodic task
-            this.schedulePeriodicTask();
+            // Check if pinging is disabled via environment variable
+            boolean pingDisabled = Boolean.parseBoolean(System.getenv(DISABLE_PING_ENV));
+            
+            if (pingDisabled) {
+                log.info("Periodic ping task is disabled via " + DISABLE_PING_ENV + " environment variable");
+            } else {
+                // Schedule the periodic task only if not disabled
+                this.schedulePeriodicTask();
+            }
             
             // Graceful shutdown
             lifecycle.addStopHook(() -> {
