@@ -13,8 +13,7 @@ import utilities.ShobdoLogger;
 import word.objects.Word;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class WordStoreMongoImpl implements WordStore {
@@ -65,21 +64,25 @@ public class WordStoreMongoImpl implements WordStore {
     }
 
     @Override
-    public Set<String> searchSpellingsBySpelling(final String spellingQuery, final int limit) {
+    public List<Word> searchWords(final String spellingQuery, final int limit) {
         final BasicDBObject query = Word.getActiveObjectQuery();
         query.put(Constants.KEY_SPELLING, Pattern.compile("^" + spellingQuery + ".*"));
 
-        final MongoCursor<Document> words = wordCollection.find(query)
-            .projection(Projections.include(Constants.KEY_SPELLING))
+        final MongoCursor<Document> cursor = wordCollection.find(query)
+            .projection(Projections.include(Constants.MONGO_DOC_KEY_ID, Constants.KEY_SPELLING))
             .limit(limit)
             .batchSize(100)
             .iterator();
 
-        final Set<String> result = new HashSet<>();
-        while (words.hasNext()) {
-            result.add(words.tryNext().get(Constants.KEY_SPELLING).toString());
+        final List<Word> result = new ArrayList<>();
+        while (cursor.hasNext()) {
+            final Document doc = cursor.next();
+            result.add(Word.builder()
+                .id(doc.getString(Constants.MONGO_DOC_KEY_ID))
+                .spelling(doc.getString(Constants.KEY_SPELLING))
+                .build());
         }
-        log.debug("@WDMI006 searching words by spelling: " + spellingQuery);
+        log.debug("@WDMI006 searching words by spelling: " + spellingQuery + " results: " + result.size());
         return result;
     }
 

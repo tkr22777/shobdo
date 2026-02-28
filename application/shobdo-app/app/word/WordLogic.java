@@ -191,26 +191,26 @@ public class WordLogic {
      How to find closest neighbour of a BanglaUtil word? you may be able to do that locally?
      Embeddings of characters in a word?
      */
-    public Set<String> searchWords(final String searchString) {
+    public List<Word> searchWords(final String searchString) {
 
         if (searchString == null || searchString.trim().length() == 0) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
 
-        Set<String> words = wordCache.getWordsForSearchString(searchString);
+        List<Word> words = wordCache.getWordsForSearchString(searchString);
         if (words != null && words.size() > 0) {
             return words;
         }
 
-        words = wordStore.searchSpellingsBySpelling(searchString, Constants.SEARCH_SPELLING_LIMIT);
-        if (words != null && words.size() > 0 ) {
+        words = wordStore.searchWords(searchString, Constants.SEARCH_SPELLING_LIMIT);
+        if (words != null && words.size() > 0) {
             logger.info("@WL002 search result [size:" + words.size() + "] for spelling:\"" + searchString + "\" found in database and returning");
             wordCache.cacheWordsForSearchString(searchString, words);
             return words;
         }
 
         logger.info("@WL003 search result for spelling:\"" + searchString + "\" not found in database");
-        return new HashSet<>();
+        return new ArrayList<>();
     }
 
     public long totalWordCount(){

@@ -91,6 +91,21 @@ POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/add                con
 POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/remove             controllers.WordController.removeSynonym(wordId: String, meaningId: String)
 
 ##############
+# Auth APIs:
+##############
+POST    /api/v1/auth/google                    controllers.AuthController.googleSignIn()
+POST    /api/v1/auth/logout                    controllers.AuthController.logout()
+GET     /api/v1/auth/me                        controllers.AuthController.me()
+
+##############
+# Like APIs:
+##############
+POST    /api/v1/likes                          controllers.LikeController.likeWord()
+GET     /api/v1/likes/count/:wordId            controllers.LikeController.getLikeCount(wordId: String)
+DELETE  /api/v1/likes/:wordId                  controllers.LikeController.unlikeWord(wordId: String)
+GET     /api/v1/likes                          controllers.LikeController.getLikedWords()
+
+##############
 # Admin stuff:
 ##############
 # CRUDL for users GENERAL, REVIEWER, ADMIN

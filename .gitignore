@@ -108,4 +108,11 @@ Thumbs.db
 # Build output
 target/
 dist/
-build/ 
+build/
+
+# Environment files with secrets (copy from *.template and fill in values)
+deploy/local.env
+deploy/render.env
+
+# Generated frontend env config (produced by `make generate-client-env`)
+client/html/public/env.js

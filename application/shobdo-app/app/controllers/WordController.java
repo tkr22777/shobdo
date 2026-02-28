@@ -145,7 +145,11 @@ public class WordController extends Controller {
                     return badRequest();
                 }
                 final String searchString = body.get(Constants.KEY_SEARCH_STRING).asText();
-                return ok(Json.toJson(wordLogic.searchWords(searchString)));
+                return ok(Json.toJson(
+                    wordLogic.searchWords(searchString).stream()
+                        .map(w -> { java.util.Map<String,String> m = new java.util.LinkedHashMap<>(); m.put("id", w.getId()); m.put("spelling", w.getSpelling()); return m; })
+                        .collect(java.util.stream.Collectors.toList())
+                ));
             }
         );
     }

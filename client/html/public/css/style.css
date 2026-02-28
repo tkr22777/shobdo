@@ -785,3 +785,86 @@ ul { list-style: none; }
   .article { max-width: 100%; }
   .pull-quote { font-size: 0.95rem; }
 }
+
+/* ============================================================
+   AUTH SLOT
+============================================================ */
+.auth-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.auth-name {
+  font-size: .75rem;
+  color: var(--muted);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sign-in-btn {
+  font-size: .75rem;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sign-in-btn:hover { background: var(--subtle); }
+
+/* ============================================================
+   LIKE BUTTON
+============================================================ */
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 2px 4px;
+  font-size: .9rem;
+  transition: color .15s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.like-btn:hover,
+.like-btn.liked { color: #e05; }
+
+.like-count {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* Make word cards flex so like button aligns right */
+.word-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.word-card .like-btn {
+  flex-shrink: 0;
+  margin-left: 8px;
+}

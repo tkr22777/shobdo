@@ -136,8 +136,9 @@ function handleWordSearchResult(data, status, jqXHR) {
         );
         return;
     }
-    $.each(data, function (i, item) {
-        $('#wordList').append(listWordElement(item));
+    // data is now [{id, spelling}, ...]
+    $.each(data, function (i, word) {
+        $('#wordList').append(listWordElement(word));
     });
 }
 
@@ -224,12 +225,14 @@ function handleMeaningData(data) {
         <div class="article">
             <h1 class="article-headline">${data.spelling}</h1>
             ${deckText ? `<div class="article-deck">${deckText}</div>` : ''}
-            <div class="article-byline">
+            <div class="article-byline" data-word-id="${data.id}">
                 <span>বাংলা</span>
                 <button id="meaningShareButton" class="meaning-share-btn"
                     title="শেয়ার করুন" onclick="copyMeaningUrl('${data.spelling}')">
                     ${SHARE_SVG} শেয়ার
                 </button>
+                <button class="like-btn" data-word-id="${data.id}">♡</button>
+                <span class="like-count" data-word-id="${data.id}"></span>
             </div>
             <div class="article-body">${bodyParagraphs}</div>
             ${footerHTML}
@@ -249,13 +252,14 @@ function getBengaliDigit(digit) {
 }
 
 
-function listWordElement(element) {
+// word: {id, spelling}
+function listWordElement(word) {
     var card = document.createElement('li');
     card.className = 'word-card';
 
     var wordDiv = document.createElement('div');
     wordDiv.className = 'wc-word';
-    wordDiv.textContent = element;
+    wordDiv.textContent = word.spelling;
 
     card.onclick = function () {
         // Remove active from all cards
@@ -265,10 +269,16 @@ function listWordElement(element) {
         // Scroll word meaning pane to top before loading new content
         document.getElementById('wordMeaning').scrollTop = 0;
 
-        meaningSearch(element);
+        meaningSearch(word.spelling);
     };
 
+    const likeBtn = document.createElement('button');
+    likeBtn.className = 'like-btn';
+    likeBtn.dataset.wordId = word.id;
+    likeBtn.textContent = '♡';
+
     card.appendChild(wordDiv);
+    card.appendChild(likeBtn);
     return card;
 }
 

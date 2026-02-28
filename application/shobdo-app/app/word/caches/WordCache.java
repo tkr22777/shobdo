@@ -4,8 +4,8 @@ import utilities.*;
 import word.objects.Word;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WordCache {
@@ -14,7 +14,7 @@ public class WordCache {
 
     /* In-memory caches */
     private final Map<String, Word> wordsBySpelling;
-    private final Map<String, Set<String>> searchResults;
+    private final Map<String, List<Word>> searchResults;
     
     /* Singleton instance */
     private static WordCache instance;
@@ -69,14 +69,14 @@ public class WordCache {
         log.debug("@WC006 Word [" + word.getSpelling() + "] cleared from cache.");
     }
 
-    public Set<String> getWordsForSearchString(final String searchString) {
+    public List<Word> getWordsForSearchString(final String searchString) {
         if (searchString == null) {
             return null;
         }
 
         final String key = getKeyForSearchString(searchString);
-        Set<String> results = searchResults.get(key);
-        
+        List<Word> results = searchResults.get(key);
+
         if (results != null) {
             log.debug("@WC008 Search result found and returning from cache.");
             return results;
@@ -86,14 +86,14 @@ public class WordCache {
         return null;
     }
 
-    public void cacheWordsForSearchString(final String searchString, final Set<String> spellings) {
-        if (searchString == null || spellings == null) {
+    public void cacheWordsForSearchString(final String searchString, final List<Word> words) {
+        if (searchString == null || words == null) {
             return;
         }
 
         final String key = getKeyForSearchString(searchString);
-        searchResults.put(key, spellings);
-        log.info("@WC011 Storing search results on cache. Count: " + spellings.size() + ".");
+        searchResults.put(key, words);
+        log.info("@WC011 Storing search results on cache. Count: " + words.size() + ".");
     }
 
     private String getKeyForSpelling(String spelling) {

@@ -3,11 +3,11 @@ package word.stores;
 import word.objects.Word;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 
 public interface WordStore {
-     /* returns the spelling of the words that matches the query */
-     Set<String> searchSpellingsBySpelling(String spellingQuery, int limit);
+     /* returns words (id + spelling only) matching the query prefix */
+     List<Word> searchWords(String spellingQuery, int limit);
 
      /* CRUDL */
      Word create(Word word);

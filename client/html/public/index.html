@@ -43,6 +43,11 @@
     <!-- App CSS -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
 
+    <!-- Env config — generated from deploy/local.env by `make generate-client-env` -->
+    <script src="env.js"></script>
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <!-- JSON-LD for structured data -->
     <script type="application/ld+json">
     {
@@ -78,6 +83,7 @@
                     <div class="mast-subtitle">বাংলা শব্দকোষ · Bengali Dictionary</div>
                 </div>
                 <div class="mast-right">
+                    <div id="authSlot" class="auth-slot"></div>
                     <span id="mastDate"></span><br>
                     বাংলা · বাংলাদেশ
                 </div>
@@ -193,6 +199,8 @@
     <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
     <script type="text/javascript" src="javascripts/shortcuts.js"></script>
     <script type="text/javascript" src="javascripts/wotd.js"></script>
+    <script type="text/javascript" src="javascripts/auth.js"></script>
+    <script type="text/javascript" src="javascripts/likes.js"></script>
 
 </body>
 
