@@ -485,22 +485,24 @@ ul { list-style: none; }
 }
 
 .def-graf {
-  font-size: 0.95rem;
-  line-height: 1.85;
-  margin-bottom: 16px;
+  font-size: 1.05rem;
+  line-height: 1.9;
+  margin-bottom: 18px;
   break-inside: avoid;
   color: var(--text);
   transition: color 0.2s ease;
 }
 
-.dropcap::first-letter {
+/* Dropcap via explicit span — avoids ::first-letter picking up meaning numbers */
+.dropcap-letter {
   font-family: 'Playfair Display', serif;
-  font-size: 3.6em;
+  font-size: 3em;
   font-weight: 900;
   float: left;
-  line-height: 0.8;
-  margin-right: 8px;
-  margin-top: 6px;
+  line-height: 0.82;
+  margin-right: 7px;
+  margin-top: 8px;
+  margin-bottom: 2px;
   color: var(--accent);
   transition: color 0.2s ease;
 }
