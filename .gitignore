@@ -116,3 +116,8 @@ deploy/render.env
 
 # Generated frontend env config (produced by `make generate-client-env`)
 client/html/public/env.js
+
+# React build output and local env (produced by `make build-react` / `make generate-react-env`)
+client/react/dist/
+client/react/.env.local
+client/react/node_modules/

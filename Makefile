@@ -16,7 +16,24 @@ generate-client-env:
 	@echo "window.GOOGLE_CLIENT_ID = '$(GOOGLE_CLIENT_ID)';" > client/html/public/env.js
 	@echo "Generated client/html/public/env.js"
 
-start-docker-compose: generate-client-env
+# Generate client/react/.env.local from deploy/local.env.
+# Consumed by Vite as import.meta.env.VITE_GOOGLE_CLIENT_ID.
+generate-react-env:
+	@if [ ! -f deploy/local.env ]; then \
+		echo "ERROR: deploy/local.env not found."; \
+		echo "       Copy deploy/local.env.template to deploy/local.env and fill in your values."; \
+		exit 1; \
+	fi
+	$(eval GOOGLE_CLIENT_ID=$(shell grep --color=never '^SHOBDO_GOOGLE_CLIENT_ID=' deploy/local.env | cut -d'=' -f2-))
+	@echo "VITE_GOOGLE_CLIENT_ID=$(GOOGLE_CLIENT_ID)" > client/react/.env.local
+	@echo "Generated client/react/.env.local"
+
+# Install React dependencies and build the production bundle into client/react/dist/
+build-react: generate-react-env
+	npm --prefix client/react install
+	npm --prefix client/react run build
+
+start-docker-compose: build-react
 	docker-compose -f deploy/docker-compose.yml up -d
 
 stop-docker-compose:
