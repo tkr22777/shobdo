@@ -112,10 +112,10 @@
         var wordList = document.getElementById('wordList');
 
         if (wordMeaning) {
-            meaningObserver.observe(wordMeaning, { childList: true, subtree: true });
+            meaningObserver.observe(wordMeaning, { childList: true });
         }
         if (wordList) {
-            listObserver.observe(wordList, { childList: true, subtree: true });
+            listObserver.observe(wordList, { childList: true });
         }
 
         document.addEventListener('userSignedIn', function () {
