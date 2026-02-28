@@ -123,8 +123,7 @@ ul { list-style: none; }
 }
 
 .mast-outer {
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
   padding: 0 28px;
 }
 

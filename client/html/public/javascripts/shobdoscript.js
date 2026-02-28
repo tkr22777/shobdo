@@ -182,7 +182,9 @@ function handleMeaningData(data) {
         }
         paraContent += meaning.text;
 
-        const defGraf = `<p class="def-graf${isFirst ? ' dropcap' : ''}">${paraContent}</p>`;
+        // Only apply dropcap on single-meaning words; with multiple meanings the
+        // meaning-number span appears first and ::first-letter would grab the digit.
+        const defGraf = `<p class="def-graf${isFirst && totalMeanings === 1 ? ' dropcap' : ''}">${paraContent}</p>`;
 
         // Relations (synonyms / antonyms) inline after first def
         let relationsHTML = '';
@@ -270,6 +272,14 @@ function listWordElement(element) {
 document.addEventListener('DOMContentLoaded', function () {
     // Set a flag to prevent URL updates during initial page load
     window.isInitialLoad = true;
+
+    // Populate current date in masthead
+    const mastDate = document.getElementById('mastDate');
+    if (mastDate) {
+        mastDate.textContent = new Date().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    }
 
     // Initialize transliterated text element
     $('#transliteratedText').css({
