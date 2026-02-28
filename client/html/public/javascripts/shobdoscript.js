@@ -226,7 +226,6 @@ function handleMeaningData(data) {
 
     return `
         <div class="article">
-            <div class="article-kicker">বাংলা অভিধান</div>
             <h1 class="article-headline">${data.spelling}</h1>
             ${deckText ? `<div class="article-deck">${deckText}</div>` : ''}
             <div class="article-byline">
