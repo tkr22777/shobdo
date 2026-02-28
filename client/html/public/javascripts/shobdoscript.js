@@ -342,6 +342,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Panel resize
+    const wordListPanel = document.querySelector('.word-list-panel');
+    const resizeHandle = document.querySelector('.panel-resize-handle');
+    if (wordListPanel && resizeHandle) {
+        let isResizing = false;
+        resizeHandle.addEventListener('mousedown', function (e) {
+            isResizing = true;
+            resizeHandle.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', function (e) {
+            if (!isResizing) return;
+            const newWidth = e.clientX - wordListPanel.getBoundingClientRect().left;
+            if (newWidth >= 160 && newWidth <= 520) {
+                wordListPanel.style.width = newWidth + 'px';
+            }
+        });
+        document.addEventListener('mouseup', function () {
+            if (!isResizing) return;
+            isResizing = false;
+            resizeHandle.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+    }
+
     // Theme handling
     const themes = ['green', 'dark', 'blue', 'light'];
     let currentThemeIndex = 0;
