@@ -121,3 +121,6 @@ client/html/public/env.js
 client/react/dist/
 client/react/.env.local
 client/react/node_modules/
+
+# Un-ignore React source lib (excluded above by the generic Python `lib/` rule)
+!client/react/src/lib/
