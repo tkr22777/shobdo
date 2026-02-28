@@ -126,13 +126,18 @@ function RESTGetCall(route, onSuccessFunction, onErrorFunction) {
 }
 
 function handleWordSearchResult(data, status, jqXHR) {
-    // console.log("Data:" + data);
     $('#wordList').empty();
-    $.each(data, function (i, item) {
+    if (!data || data.length === 0) {
+        const query = $('#wordSearchBox').val().trim();
         $('#wordList').append(
-            listWordElement(item)
+            '<li class="no-results"><strong>কোনো ফলাফল নেই</strong>' +
+            (query ? '\u201c' + query + '\u201d \u2014 ' : '') +
+            'এই শব্দটি অভিধানে পাওয়া যায়নি।</li>'
         );
-        //$('#' + item).on("click", function(){ console.log("Clicked list item") } );
+        return;
+    }
+    $.each(data, function (i, item) {
+        $('#wordList').append(listWordElement(item));
     });
 }
 

@@ -350,6 +350,25 @@ ul { list-style: none; }
 
 #wordList { padding: 6px 0; }
 
+.no-results {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  font-family: 'Source Serif 4', serif;
+  line-height: 1.6;
+}
+
+.no-results strong {
+  display: block;
+  font-style: normal;
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  color: var(--text-soft);
+}
+
 .word-card {
   padding: 13px 20px;
   border-bottom: 1px solid var(--border);
