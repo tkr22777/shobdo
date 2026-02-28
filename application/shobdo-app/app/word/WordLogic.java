@@ -88,6 +88,15 @@ public class WordLogic {
         throw new IllegalStateException(String.format("Failed to generate unique word ID after %s attempts", numberOfTries));
     }
 
+    /* GET a random word */
+    public Word getRandomWord() {
+        final Word word = wordStore.getRandomWord();
+        if (word == null) {
+            throw new EntityDoesNotExist("No words available in the dictionary");
+        }
+        return word;
+    }
+
     /* GET word by id */
     public Word getWordById(@NotNull final String wordId) {
         if (wordId == null || wordId.trim().length() == 0) {

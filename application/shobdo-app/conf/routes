@@ -16,7 +16,10 @@ GET     /api/v1/health                                   controllers.AdminContro
 # 1. Create word:
 POST    /api/v1/words                                    controllers.WordController.createWord()
 
-# 2. Get word:
+# 2. Get random word (must be before /:id to avoid being matched as id):
+GET     /api/v1/words/random                             controllers.WordController.getRandomWord()
+
+# 3. Get word by id:
 GET     /api/v1/words/:id                                controllers.WordController.getWordByWordId(id: String)
 
 # 3. POST Get word by spelling: body contains "spelling" key and query value as Bengali unicode chars breaks route :(

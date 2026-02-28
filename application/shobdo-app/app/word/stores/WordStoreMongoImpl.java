@@ -3,9 +3,11 @@ package word.stores;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
+import java.util.Arrays;
 import utilities.Constants;
 import utilities.ShobdoLogger;
 import word.objects.Word;
@@ -79,6 +81,15 @@ public class WordStoreMongoImpl implements WordStore {
         }
         log.debug("@WDMI006 searching words by spelling: " + spellingQuery);
         return result;
+    }
+
+    @Override
+    public Word getRandomWord() {
+        final Document matchStage = new Document("$match", Word.getActiveObjectQuery());
+        final Document sampleStage = new Document("$sample", new Document("size", 1));
+        final Document wordDoc = wordCollection.aggregate(Arrays.asList(matchStage, sampleStage)).first();
+        log.debug("getRandomWord result: " + wordDoc);
+        return wordDoc == null ? null : Word.fromBsonDoc(wordDoc);
     }
 
     @Override

@@ -13,6 +13,7 @@ public interface WordStore {
      Word create(Word word);
      Word getById(String wordId);
      Word getBySpelling(String spelling);
+     Word getRandomWord();
      Word update(Word word);
      void delete(String wordId);
      ArrayList<Word> list(String startWordId, int limit);

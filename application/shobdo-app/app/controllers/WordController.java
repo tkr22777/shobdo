@@ -48,6 +48,13 @@ public class WordController extends Controller {
         );
     }
 
+    //READ random
+    public Result getRandomWord() {
+        return ControllerUtils.executeEndpoint("", "", "getRandomWord", new HashMap<>(),
+            () -> ok(wordLogic.getRandomWord().jsonNode())
+        );
+    }
+
     //READ
     public Result getWordByWordId(final String wordId) {
 

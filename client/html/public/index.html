@@ -84,6 +84,13 @@
             </div>
             <div class="mast-rule mast-rule--thin"></div>
             <div class="mast-rule mast-rule--thick"></div>
+            <div class="wotd-strip">
+                <span class="wotd-label">আজকের শব্দ</span>
+                <span class="wotd-sep">&middot;</span>
+                <span id="wotdWord" class="wotd-word"></span>
+                <span class="wotd-sep">&middot;</span>
+                <span id="wotdDef" class="wotd-def"></span>
+            </div>
         </div>
     </header>
 
@@ -104,6 +111,16 @@
             <input type="text" name="Search Box" id="wordSearchBox"
                 onkeyup="debouncedWordSearch(this)"
                 placeholder="শব্দ খুঁজুন..." autocomplete="off">
+
+            <!-- Surprise me button -->
+            <button id="surpriseBtn" class="share-btn surprise-btn" title="এলোমেলো শব্দ" aria-label="এলোমেলো শব্দ" style="right:46px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                    <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                </svg>
+            </button>
 
             <!-- Share / copy URL button -->
             <button id="shareButton" class="share-btn" title="শেয়ার করুন" aria-label="শেয়ার করুন">
@@ -175,6 +192,7 @@
     <script src='javascripts/bangla-conversion/ridmikparser.js'></script>
     <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
     <script type="text/javascript" src="javascripts/shortcuts.js"></script>
+    <script type="text/javascript" src="javascripts/wotd.js"></script>
 
 </body>
 
