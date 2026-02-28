@@ -567,6 +567,11 @@ ul { list-style: none; }
   text-decoration-color: var(--accent);
   text-underline-offset: 2px;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.highlighted-word:hover {
+  color: var(--accent);
 }
 
 .article-footer {
@@ -601,7 +606,7 @@ ul { list-style: none; }
   border-radius: 100px;
   color: var(--text-soft);
   font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
-  cursor: default;
+  cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 

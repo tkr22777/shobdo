@@ -342,6 +342,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Click on highlighted words or synonym tags to navigate to that word
+    document.getElementById('wordMeaning').addEventListener('click', function (e) {
+        const el = e.target;
+        if (el.classList.contains('highlighted-word') || el.classList.contains('word-tag')) {
+            const word = el.textContent.trim();
+            if (!word) return;
+            $('#wordSearchBox').val(word);
+            RESTPostCall('/api/v1/words/search', JSON.stringify({ searchString: word }), handleWordSearchResult);
+            meaningSearch(word);
+        }
+    });
+
     // Panel resize
     const wordListPanel = document.querySelector('.word-list-panel');
     const resizeHandle = document.querySelector('.panel-resize-handle');
