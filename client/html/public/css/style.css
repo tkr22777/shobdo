@@ -605,19 +605,6 @@ ul { list-style: none; }
   transition: color 0.2s ease;
 }
 
-/* Dropcap via explicit span — avoids ::first-letter picking up meaning numbers */
-.dropcap-letter {
-  font-family: 'Playfair Display', serif;
-  font-size: 3em;
-  font-weight: 900;
-  float: left;
-  line-height: 0.82;
-  margin-right: 7px;
-  margin-top: 8px;
-  margin-bottom: 2px;
-  color: var(--accent);
-  transition: color 0.2s ease;
-}
 
 .pull-quote {
   border-top: 2px solid var(--text);

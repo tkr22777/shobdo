@@ -186,16 +186,7 @@ function handleMeaningData(data) {
             paraContent += `<span class="meaning-number">${getBengaliDigit(index + 1)}.</span> `;
         }
 
-        // For the first meaning, wrap its first character in .dropcap-letter so the
-        // large initial applies consistently for both single and multiple meanings,
-        // without ::first-letter accidentally grabbing the meaning-number digit.
-        if (isFirst && meaning.text.length > 0) {
-            const firstChar = [...meaning.text][0]; // unicode-safe first character
-            const rest = meaning.text.slice(firstChar.length);
-            paraContent += `<span class="dropcap-letter">${firstChar}</span>${rest}`;
-        } else {
-            paraContent += meaning.text;
-        }
+        paraContent += meaning.text;
 
         const defGraf = `<p class="def-graf">${paraContent}</p>`;
 
