@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ember — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FAFAF8;
+      --surface: #FFFFFF;
+      --text: #1A1A1A;
+      --muted: #6B6B6B;
+      --subtle: #F0EFED;
+      --border: #E8E6E3;
+      --accent: #E8854A;
+      --accent-light: #FEF0E8;
+      --accent-dark: #C0612A;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    /* HERO / SEARCH */
+    .hero {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
+    .search-wrap {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #search:focus { border-color: var(--accent); }
+
+    /* LANG FILTER */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 20px 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lang-pill {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .lang-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .lang-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+    /* LAYOUT */
+    .main-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* WORD LIST */
+    .word-list-panel {
+      width: 340px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      background: var(--surface);
+    }
+
+    .list-header {
+      padding: 16px 20px 12px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #count { color: var(--accent); }
+
+    .word-card {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .word-card:hover {
+      background: var(--bg);
+      border-left-color: var(--accent);
+    }
+
+    .word-card.active {
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+    }
+
+    .wc-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .wc-word {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .wc-lang {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .wc-def {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wc-pos {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-style: italic;
+      color: var(--accent);
+      margin-right: 6px;
+    }
+
+    /* DETAIL PANEL */
+    .detail-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--muted);
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-state .big-icon {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+
+    .empty-state p { font-size: 0.9rem; }
+
+    .detail-content {
+      max-width: 640px;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .detail-flag {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .detail-lang-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      margin-bottom: 12px;
+    }
+
+    .detail-word {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .detail-pron {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .detail-pos {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .section-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .definition-item {
+      margin-bottom: 16px;
+      padding-left: 16px;
+      border-left: 3px solid var(--accent-light);
+    }
+
+    .def-meaning {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    .def-example {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .def-example::before { content: '"'; }
+    .def-example::after { content: '"'; }
+
+    .etymology-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--subtle);
+      color: var(--muted);
+    }
+
+    /* NO RESULTS */
+    .no-results {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+      .main-layout { flex-direction: column; }
+      .word-list-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; }
+      .detail-panel { padding: 24px 20px; }
+      nav { padding: 12px 20px; }
+      .filter-row { padding: 14px 16px; }
+      .hero { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Lexicon <span>Ember</span></div>
+  <a href="index.html" class="back-link">← Gallery</a>
+</nav>
+
+<div class="hero">
+  <h1>Words of the <em>World</em></h1>
+  <p class="hero-sub">Discover beautiful words across 15+ languages</p>
+  <div class="search-wrap">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search words, languages…" autocomplete="off">
+  </div>
+</div>
+
+<div class="filter-row" id="filterRow"></div>
+
+<div class="main-layout">
+  <div class="word-list-panel">
+    <div class="list-header">
+      <span>Words</span>
+      <span id="count">—</span>
+    </div>
+    <div id="wordList"></div>
+  </div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="empty-state">
+      <span class="big-icon">📖</span>
+      <p>Select a word to see its full definition</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: ["happy accident", "fortunate"] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: ["transience", "impermanence"] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home or place you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska", "nostalgia"] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (ko, tree) + 漏れ (more, leaking/filtering) + 日 (bi, sun/light). A compound noun describing a precise visual phenomenon.", synonyms: [], antonyms: [], relatedWords: ["wabi-sabi", "mono no aware"] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on accepting transience and imperfection; finding beauty in the imperfect, impermanent, and incomplete.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi in its most perfect form." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (the beauty of age and wear). A central concept in Japanese aesthetics rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: ["komorebi", "mono no aware", "kintsugi"] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something or someone loved and lost, or perhaps never possessed.", example: "The fado music filled the room with an aching saudade that brought tears to his eyes." }], etymology: "From Latin 'solitas' (solitude). A defining concept of Portuguese and Brazilian culture, closely tied to the musical genre of fado.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: ["hiraeth", "toska", "desiderio"] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "A deep sadness and weariness about the state of the world; a feeling that reality can never satisfy the soul's ideal.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "From German 'Welt' (world) + 'Schmerz' (pain, grief). Coined by Jean Paul in his 1827 novel 'Selina'.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism", "joie de vivre"], relatedWords: ["Fernweh", "Sehnsucht"] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; a strong longing for distant, far-off places. The opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that same night." }], etymology: "From German 'fern' (far) + 'Weh' (pain, ache). The opposite of 'Heimweh' (homesickness, literally 'home-ache').", synonyms: ["wanderlust", "travel longing"], antonyms: ["Heimweh", "homesickness"], relatedWords: ["wanderlust", "Weltschmerz"] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when abroad or in an unfamiliar environment; the feeling of being a stranger in a foreign land.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "From French 'dé-' (un-) + 'pays' (country) + '-ment'. The sense of being 'un-countried' or removed from one's native land.", synonyms: ["disorientation", "estrangement", "alienation"], antonyms: ["belonging", "familiarity"], relatedWords: ["wanderlust", "exile"] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal has ended, engaged in conversation, drink, and relaxation.", example: "The sobremesa stretched into the afternoon as the family swapped stories and finished the wine." }], etymology: "From Spanish 'sobre' (over/on) + 'mesa' (table). Literally meaning 'over the table', reflecting the Mediterranean culture of unhurried post-meal socializing.", synonyms: ["lingering", "after-dinner conversation"], antonyms: [], relatedWords: ["convivialité", "dolce far niente"] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight. A fundamental concept in Bengali and Sanskrit philosophy.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss, joy). A concept central to Hindu and Buddhist philosophy, representing the highest state of happiness.", synonyms: ["joy", "bliss", "delight", "happiness"], antonyms: ["দুঃখ (grief)", "বিষাদ (sorrow)"], relatedWords: ["সুখ", "আহ্লাদ"] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Carries connotations of boundless freedom and infinite space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' meaning 'sky' or 'ether', one of the five classical elements (Panchabhutas). Represents space and openness.", synonyms: ["sky", "heaven", "expanse", "firmament"], antonyms: [], relatedWords: ["মেঘ (cloud)", "তারা (star)"] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A flexible, frugal innovation; a creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi, meaning a workaround or hack. Popularized internationally through business literature as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround", "innovation"], antonyms: [], relatedWords: ["innovation", "frugality", "resourcefulness"] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness you feel after eating a big meal; a post-lunch or post-dinner sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the whole family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off). The word perfectly captures the particular quality of food-induced sleepiness.", synonyms: ["drowsiness", "food coma", "lethargy"], antonyms: [], relatedWords: ["sobremesa", "siesta", "riposo"] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something that both desire but neither wants to start.", example: "Across the crowded room, their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego, an indigenous language of South America. Considered one of the most succinct words in the world. The language is now critically endangered.", synonyms: [], antonyms: [], relatedWords: ["longing", "hesitation", "mutual desire"] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a dull ache of the soul, a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog, heavy and formless." }], etymology: "From Russian тоска. Vladimir Nabokov described it as 'a sensation of great spiritual anguish, often without specific cause'. A core element of the Russian literary soul.", synonyms: ["melancholy", "ennui", "longing", "languor"], antonyms: [], relatedWords: ["saudade", "hiraeth", "Weltschmerz"] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief experienced when a story is so convincing you forget it is not real; the transporting quality of great storytelling.", example: "The novelist's prose was so vivid it created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in Urdu poetry and literary criticism to describe the almost magical power of great narrative to make one believe the impossible.", synonyms: ["immersion", "suspension of disbelief"], antonyms: ["skepticism"], relatedWords: ["narrative", "storytelling", "fiction"] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table or surface by a wet glass or cup.", example: "The old wooden bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom, tail). The word refers specifically to the circular impression left by the base of a moist vessel. Pleasantly specific.", synonyms: ["ring", "watermark", "stain"], antonyms: [], relatedWords: ["patina", "trace"] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming, euphoric feeling at the beginning of falling in love; the intoxicating rush of new romantic feelings.", example: "She was in the full grip of forelsket — the world had turned golden and everything seemed possible." }], etymology: "From Norwegian/Danish, related to 'forelsket seg' (to fall in love). Captures the specifically intoxicating, slightly dizzying quality of new love.", synonyms: ["infatuation", "love rush", "euphoria"], antonyms: ["heartbreak"], relatedWords: ["falling in love", "lovesickness"] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so poorly told, or so unfunny, that it paradoxically becomes funny; a humor of badness.", example: "His timing was so terrible and the punchline so weak that the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang, widely used in Indonesian youth culture and social media. Describes the peculiar humor of jokes that fail so completely they succeed.", synonyms: ["so-bad-it's-good", "cringe humor"], antonyms: [], relatedWords: ["corny", "dad joke"] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+let currentWord = null;
+
+function init() {
+  const filterRow = document.getElementById('filterRow');
+  langs.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-pill' + (l === 'All' ? ' active' : '');
+    btn.textContent = l;
+    btn.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    });
+    filterRow.appendChild(btn);
+  });
+
+  document.getElementById('search').addEventListener('input', renderList);
+  renderList();
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q) || w.definitions[0].meaning.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  const container = document.getElementById('wordList');
+  container.innerHTML = '';
+  document.getElementById('count').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="no-results">No words found</div>';
+    return;
+  }
+
+  filtered.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'word-card' + (currentWord && currentWord.word === w.word ? ' active' : '');
+    card.innerHTML = `
+      <div class="wc-top">
+        <span class="wc-word">${w.flag} ${w.word}</span>
+        <span class="wc-lang">${w.language}</span>
+      </div>
+      <div class="wc-def"><span class="wc-pos">${w.partOfSpeech}</span>${w.definitions[0].meaning.substring(0, 60)}…</div>
+    `;
+    card.addEventListener('click', () => showDetail(w));
+    container.appendChild(card);
+  });
+}
+
+function showDetail(w) {
+  currentWord = w;
+  document.querySelectorAll('.word-card').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  const panel = document.getElementById('detailPanel');
+  const syns = w.synonyms.length ? `<div class="tags-row">${w.synonyms.map(s => `<span class="tag">${s}</span>`).join('')}</div>` : '<p style="color:var(--muted);font-size:.85rem">—</p>';
+  const ants = w.antonyms.length ? `<div class="tags-row">${w.antonyms.map(s => `<span class="tag">${s}</span>`).join('')}</div>` : '<p style="color:var(--muted);font-size:.85rem">—</p>';
+  const defs = w.definitions.map(d => `
+    <div class="definition-item">
+      <div class="def-meaning">${d.meaning}</div>
+      ${d.example ? `<div class="def-example">${d.example}</div>` : ''}
+    </div>
+  `).join('');
+
+  panel.innerHTML = `
+    <div class="detail-content">
+      <span class="detail-flag">${w.flag}</span>
+      <span class="detail-lang-badge">${w.language}</span>
+      <div class="detail-word">${w.word}</div>
+      <div class="detail-pron">${w.pronunciation}</div>
+      <div class="detail-pos">${w.partOfSpeech}</div>
+      <div class="divider"></div>
+      <div class="section-title">Definitions</div>
+      ${defs}
+      <div class="divider"></div>
+      <div class="section-title">Etymology</div>
+      <div class="etymology-box">${w.etymology}</div>
+      <div class="divider"></div>
+      <div class="section-title">Synonyms</div>
+      ${syns}
+      <div class="divider"></div>
+      <div class="section-title">Antonyms</div>
+      ${ants}
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictionary Design Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FAFAF7;
+      --text: #1C1C1E;
+      --muted: #6B6B6B;
+      --border: #E5E5E5;
+      --accent: #4A6CF7;
+      --card-bg: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 80px 24px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lab-badge {
+      display: inline-block;
+      background: #EEF2FF;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
+    header p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* GRID */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    }
+
+    .card-accent {
+      height: 6px;
+    }
+
+    .card-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .card-tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-tagline {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+      border: 1.5px solid currentColor;
+      align-self: flex-start;
+    }
+
+    .card-link:hover {
+      color: white !important;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* Card theme colors */
+    .c1 .card-accent { background: linear-gradient(90deg, #E8854A, #F5A97A); }
+    .c1 .card-tag { background: #FEF0E8; color: #E8854A; }
+    .c1 .card-link { color: #E8854A; }
+    .c1 .card-link:hover { background: #E8854A; border-color: #E8854A; }
+
+    .c2 .card-accent { background: linear-gradient(90deg, #C9952A, #E4B85A); }
+    .c2 .card-tag { background: #FDF7E8; color: #C9952A; }
+    .c2 .card-link { color: #C9952A; }
+    .c2 .card-link:hover { background: #C9952A; border-color: #C9952A; }
+
+    .c3 .card-accent { background: linear-gradient(90deg, #9B72CF, #C4A3E8); }
+    .c3 .card-tag { background: #F5F0FF; color: #9B72CF; }
+    .c3 .card-link { color: #9B72CF; }
+    .c3 .card-link:hover { background: #9B72CF; border-color: #9B72CF; }
+
+    .c4 .card-accent { background: linear-gradient(90deg, #8B6914, #C9952A); }
+    .c4 .card-tag { background: #FDF5E0; color: #8B6914; }
+    .c4 .card-link { color: #8B6914; }
+    .c4 .card-link:hover { background: #8B6914; border-color: #8B6914; }
+
+    .c5 .card-accent { background: linear-gradient(90deg, #2D6A4F, #52B788); }
+    .c5 .card-tag { background: #E8F5EE; color: #2D6A4F; }
+    .c5 .card-link { color: #2D6A4F; }
+    .c5 .card-link:hover { background: #2D6A4F; border-color: #2D6A4F; }
+
+    .c6 .card-accent { background: linear-gradient(90deg, #00FF41, #00CC34); }
+    .c6 .card-tag { background: #E8FFF0; color: #00AA2A; }
+    .c6 .card-link { color: #00AA2A; }
+    .c6 .card-link:hover { background: #00AA2A; border-color: #00AA2A; }
+
+    .c7 .card-accent { background: linear-gradient(90deg, #4A90D9, #E74C3C, #9B59B6, #27AE60); }
+    .c7 .card-tag { background: #EEF4FF; color: #4A90D9; }
+    .c7 .card-link { color: #4A90D9; }
+    .c7 .card-link:hover { background: #4A90D9; border-color: #4A90D9; }
+
+    .c8 .card-accent { background: #1C1C1E; }
+    .c8 .card-tag { background: #F0F0F0; color: #1C1C1E; }
+    .c8 .card-link { color: #1C1C1E; }
+    .c8 .card-link:hover { background: #1C1C1E; border-color: #1C1C1E; }
+
+    .c9 .card-accent { background: linear-gradient(90deg, #8B6914, #D4AA70); }
+    .c9 .card-tag { background: #FDF5E0; color: #6B4C10; }
+    .c9 .card-link { color: #6B4C10; }
+    .c9 .card-link:hover { background: #6B4C10; border-color: #6B4C10; }
+
+    .c10 .card-accent { background: linear-gradient(90deg, #C0392B, #1A237E); }
+    .c10 .card-tag { background: #FDECEA; color: #C0392B; }
+    .c10 .card-link { color: #C0392B; }
+    .c10 .card-link:hover { background: #C0392B; border-color: #C0392B; }
+
+    @media (max-width: 640px) {
+      header { padding: 50px 20px 40px; }
+      .stats-row { gap: 24px; }
+      main { padding: 40px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="lab-badge">Design Exploration</div>
+  <h1>Dictionary <span>Design Lab</span></h1>
+  <p>Ten distinct visual identities for a global multi-language dictionary — each a fully interactive prototype.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-value">10</span>
+      <span class="stat-label">Designs</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">20</span>
+      <span class="stat-label">Languages</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">100%</span>
+      <span class="stat-label">Interactive</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="section-label">All Designs</div>
+  <div class="grid">
+
+    <div class="card c1">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">01</span>
+          <span class="card-tag">Minimalist</span>
+        </div>
+        <h2>Ember</h2>
+        <div class="card-tagline">Contemporary warmth</div>
+        <p>Warm whites, amber accents, and Inter typeface. Two-column layout with a smooth detail panel and left-border word cards.</p>
+        <a href="01-ember.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c2">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">02</span>
+          <span class="card-tag">Editorial</span>
+        </div>
+        <h2>Folio</h2>
+        <div class="card-tagline">Literary magazine</div>
+        <p>Playfair Display serif, editorial masthead layout, gold accents, and a word-of-the-day banner with columnar definitions.</p>
+        <a href="02-folio.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c3">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">03</span>
+          <span class="card-tag">Glassmorphism</span>
+        </div>
+        <h2>Dusk</h2>
+        <div class="card-tagline">Frosted glass dreams</div>
+        <p>Animated gradient mesh background with frosted glass cards, backdrop-filter blur, and soft translucent UI elements.</p>
+        <a href="03-dusk.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c4">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">04</span>
+          <span class="card-tag">Scholarly</span>
+        </div>
+        <h2>Parchment</h2>
+        <div class="card-tagline">Dark academia</div>
+        <p>Aged parchment tones, CSS paper-grain texture, EB Garamond serif, decorative drop-caps, and pen-stroke dividers.</p>
+        <a href="04-parchment.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c5">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">05</span>
+          <span class="card-tag">Organic</span>
+        </div>
+        <h2>Grove</h2>
+        <div class="card-tagline">Nature's dictionary</div>
+        <p>Earthy sage and forest green palette, botanical SVG decorations, rounded organic shapes, and DM Serif typography.</p>
+        <a href="05-grove.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c6">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">06</span>
+          <span class="card-tag">Hacker</span>
+        </div>
+        <h2>Terminal</h2>
+        <div class="card-tagline">Command-line lexicon</div>
+        <p>Phosphor green on true black, JetBrains Mono, blinking cursor, ls-style word list, and man-page definition format.</p>
+        <a href="06-terminal.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c7">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">07</span>
+          <span class="card-tag">Vibrant</span>
+        </div>
+        <h2>Prism</h2>
+        <div class="card-tagline">Language festival</div>
+        <p>Each language gets its own color identity. Colorful filter pills, per-language card accents, and vibrant Poppins typography.</p>
+        <a href="07-prism.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c8">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">08</span>
+          <span class="card-tag">Zen</span>
+        </div>
+        <h2>Void</h2>
+        <div class="card-tagline">Pure minimalism</div>
+        <p>Maximum whitespace, Cormorant Garamond in ultra-thin weight, one word at a time, underline-only inputs, gentle fades.</p>
+        <a href="08-void.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c9">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">09</span>
+          <span class="card-tag">Vintage</span>
+        </div>
+        <h2>Kodak</h2>
+        <div class="card-tagline">Typewriter era</div>
+        <p>Aged cream paper, Special Elite typewriter font, CSS double-border frames, stamp decorations, and rubber-stamp badges.</p>
+        <a href="09-kodak.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card c10">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">10</span>
+          <span class="card-tag">Explorer</span>
+        </div>
+        <h2>Atlas</h2>
+        <div class="card-tagline">World dictionary</div>
+        <p>Geographic world-region tabs, compass rose SVG decoration, explorer red and navy palette, Bebas Neue bold headings.</p>
+        <a href="10-atlas.html" class="card-link">Open &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <p>Dictionary Design Lab &mdash; 10 interactive prototypes &mdash; <a href="/">Shobdo</a></p>
+</footer>
+
+</body>
+</html>

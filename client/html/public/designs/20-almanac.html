@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almanac — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #EDE0CC;
+      --surface: #F5ECD8;
+      --text: #2A1A0A;
+      --muted: #6A4A2A;
+      --border: #C4A878;
+      --accent: #4A3728;
+      --accent2: #8B4513;
+      --cream: #FBF5E8;
+      --mono: #3D2B1A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Spectral', serif;
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='0' x2='10' y2='10' stroke='%234A3728' stroke-width='0.4' opacity='0.1'/%3E%3Cline x1='10' y1='0' x2='0' y2='10' stroke='%234A3728' stroke-width='0.4' opacity='0.1'/%3E%3C/svg%3E");
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--accent);
+      border-bottom: 3px solid var(--accent2);
+      padding: 0 20px;
+      height: 50px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .nav-logo {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      color: var(--cream);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      flex: 1;
+    }
+    .nav-logo span {
+      font-size: 10px; font-weight: 400;
+      opacity: 0.6; letter-spacing: 1px;
+      display: block;
+    }
+    .nav-back {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; color: #C4A878;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--cream); }
+    .nav-btn {
+      background: rgba(251,245,232,0.1);
+      border: 1px solid rgba(251,245,232,0.2);
+      color: var(--cream);
+      width: 30px; height: 30px;
+      border-radius: 2px;
+      cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover { background: rgba(251,245,232,0.2); }
+    .avatar-wrap { position: relative; }
+    .avatar {
+      width: 30px; height: 30px;
+      background: var(--accent2);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      color: var(--cream);
+      cursor: pointer;
+      border: 1px solid rgba(251,245,232,0.2);
+      transition: background 0.2s;
+    }
+    .avatar:hover { background: #A0522D; }
+    .liked-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; color: #C4A878;
+      cursor: pointer; white-space: nowrap;
+    }
+    .liked-count:hover { color: var(--cream); }
+
+    /* DROPDOWN */
+    .avatar-dropdown {
+      position: absolute; top: 38px; right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      box-shadow: 0 6px 20px rgba(42,26,10,0.25);
+      min-width: 200px;
+      z-index: 200; display: none; overflow: hidden;
+    }
+    .avatar-dropdown.open { display: block; }
+    .dropdown-header { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); }
+    .dropdown-name { font-family: 'Spectral', serif; font-size: 14px; font-weight: 600; color: var(--text); }
+    .dropdown-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .dropdown-streak { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+    .streak-badge { background: linear-gradient(135deg, #FF6B35, #FF4500); color: white; border-radius: 2px; padding: 2px 7px; font-size: 11px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+    .dropdown-item { padding: 9px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text); cursor: pointer; transition: background 0.15s; }
+    .dropdown-item:hover { background: rgba(139,69,19,0.1); color: var(--accent2); }
+
+    /* PANELS */
+    .panel-overlay { position: fixed; inset: 0; background: rgba(42,26,10,0.45); z-index: 140; display: none; }
+    .panel-overlay.open { display: block; }
+    .prefs-panel {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 300px;
+      background: var(--surface);
+      border-right: 2px solid var(--border);
+      box-shadow: 4px 0 16px rgba(42,26,10,0.2);
+      z-index: 150;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .prefs-panel.open { transform: translateX(0); }
+    .panel-header {
+      padding: 16px;
+      background: var(--accent);
+      color: var(--cream);
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--accent2);
+    }
+    .panel-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .panel-close { background: none; border: none; color: var(--cream); font-size: 16px; cursor: pointer; }
+    .panel-body { padding: 18px; overflow-y: auto; flex: 1; }
+    .pref-section { margin-bottom: 20px; }
+    .pref-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+    .pref-radio-group { display: flex; flex-direction: column; gap: 8px; }
+    .pref-radio { display: flex; align-items: center; gap: 8px; cursor: pointer; font-family: 'Spectral', serif; font-size: 14px; color: var(--text); }
+    .pref-radio input { accent-color: var(--accent2); }
+    .lang-checks { display: flex; flex-direction: column; gap: 7px; max-height: 230px; overflow-y: auto; }
+    .lang-check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text); }
+    .lang-check input { accent-color: var(--accent2); }
+
+    .collection-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+      background: var(--surface);
+      border-left: 2px solid var(--border);
+      box-shadow: -4px 0 16px rgba(42,26,10,0.2);
+      z-index: 150;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .collection-panel.open { transform: translateX(0); }
+    .collection-empty { padding: 36px 16px; text-align: center; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.8; }
+    .collection-item { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.15s; }
+    .collection-item:hover { background: rgba(139,69,19,0.08); }
+    .collection-word { font-family: 'Spectral', serif; font-size: 15px; font-weight: 600; color: var(--text); }
+    .collection-lang { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .collection-remove { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 3px; transition: color 0.2s; }
+    .collection-remove:hover { color: var(--accent2); }
+
+    /* ALMANAC HEADER */
+    .almanac-header { position: relative; overflow: hidden; }
+    .woodcut-banner {
+      position: relative;
+      background: var(--accent);
+      padding: 28px 40px;
+      text-align: center;
+    }
+    .woodcut-banner::before, .woodcut-banner::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: repeating-linear-gradient(90deg, var(--cream) 0px, var(--cream) 6px, transparent 6px, transparent 10px);
+      opacity: 0.3;
+    }
+    .woodcut-banner::before { margin-bottom: 16px; }
+    .woodcut-banner::after { margin-top: 16px; }
+    .banner-vol {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: #C4A878;
+      margin-bottom: 8px;
+    }
+    .banner-title {
+      font-family: 'Spectral', serif;
+      font-size: 36px; font-weight: 600;
+      color: var(--cream);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .banner-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: #C4A878;
+      letter-spacing: 2px;
+      margin-top: 6px;
+    }
+    .banner-ornament {
+      position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+      opacity: 0.25;
+    }
+    .banner-ornament-right {
+      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      opacity: 0.25;
+    }
+    .almanac-meta-bar {
+      background: var(--surface);
+      border-top: 2px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .meta-item {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: var(--muted);
+    }
+    .meta-item strong { color: var(--accent2); }
+
+    /* SEARCH */
+    .search-bar {
+      padding: 10px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .search-wrap { position: relative; max-width: 560px; margin: 0 auto; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+    .search-input {
+      width: 100%;
+      padding: 7px 12px 7px 32px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: var(--cream);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent2); }
+    .search-input::placeholder { color: var(--muted); font-style: italic; }
+
+    /* MAIN */
+    .main-layout { display: flex; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 220px); }
+
+    /* WORD LIST */
+    .word-list-panel {
+      width: 360px; flex-shrink: 0;
+      border-right: 2px solid var(--border);
+      background: var(--surface);
+    }
+    .list-header {
+      padding: 10px 14px;
+      background: var(--accent);
+      border-bottom: 2px solid var(--accent2);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .list-header-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--cream);
+    }
+    .list-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: #C4A878;
+    }
+
+    /* LANG TABS */
+    .lang-tabs {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--surface);
+    }
+    .lang-tab {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 3px 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lang-tab:hover { background: var(--border); color: var(--accent); }
+    .lang-tab.active { background: var(--accent2); color: var(--cream); border-color: var(--accent2); }
+
+    .word-list { overflow-y: auto; max-height: calc(100vh - 340px); }
+
+    /* WORD ENTRY (dense index format) */
+    .word-entry {
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(196,168,120,0.4);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .word-entry:hover { background: rgba(139,69,19,0.07); }
+    .word-entry.active { background: rgba(139,69,19,0.1); border-left: 3px solid var(--accent2); }
+    .entry-top { display: flex; align-items: baseline; gap: 6px; }
+    .entry-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: var(--muted);
+      min-width: 22px; flex-shrink: 0;
+    }
+    .entry-word {
+      font-family: 'Spectral', serif;
+      font-size: 15px; font-weight: 600;
+      color: var(--text);
+      flex: 1; min-width: 0;
+    }
+    .entry-lang-code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600;
+      color: var(--accent2);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .entry-pos {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: var(--muted);
+      font-style: italic;
+    }
+    .entry-dot { color: var(--border); font-size: 10px; }
+    .entry-def {
+      font-family: 'Spectral', serif;
+      font-size: 12px; color: var(--muted);
+      margin-top: 2px;
+      padding-left: 28px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .entry-heart {
+      display: none;
+    }
+    .word-entry:hover .entry-heart { display: inline-block; }
+    .heart-btn {
+      background: none; border: none;
+      font-size: 14px; cursor: pointer;
+      color: var(--muted);
+      transition: color 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .heart-btn:hover { transform: scale(1.2); }
+    .heart-btn.liked { color: #C62828; display: inline-block !important; }
+    @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.4)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
+    .heart-btn.pop { animation: heartPop 0.3s ease; }
+
+    /* DETAIL */
+    .detail-panel {
+      flex: 1; overflow-y: auto;
+      max-height: calc(100vh - 220px);
+      background: var(--bg);
+    }
+    .detail-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 60%; padding: 40px; text-align: center;
+    }
+    .detail-empty-woodcut { margin-bottom: 20px; opacity: 0.2; }
+    .detail-empty-text { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); line-height: 2; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ALMANAC ENTRY FORMAT */
+    .almanac-entry { padding: 28px 36px; max-width: 800px; }
+    .entry-header {
+      background: var(--accent);
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .entry-header-left {}
+    .entry-no {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: #C4A878;
+      margin-bottom: 4px;
+    }
+    .detail-word {
+      font-family: 'Spectral', serif;
+      font-size: 42px; font-weight: 600;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .detail-pronun-box {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; color: #C4A878;
+      margin-top: 6px;
+    }
+    .detail-heart {
+      background: none; border: none;
+      font-size: 26px; cursor: pointer;
+      color: rgba(251,245,232,0.4);
+      transition: all 0.2s;
+    }
+    .detail-heart:hover { color: #FDA4AF; transform: scale(1.15); }
+    .detail-heart.liked { color: #EF4444; }
+    .detail-heart.pop { animation: heartPop 0.3s ease; }
+
+    .entry-classification {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .class-flag { font-size: 18px; }
+    .class-lang {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--accent2);
+      background: rgba(139,69,19,0.12);
+      padding: 3px 8px; border-radius: 2px;
+    }
+    .class-pos {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      font-style: italic;
+      border: 1px solid var(--border);
+      padding: 3px 8px; border-radius: 2px;
+    }
+
+    .star-row { display: flex; gap: 4px; margin: 10px 0 18px; }
+    .star-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--border); transition: color 0.15s, transform 0.15s; }
+    .star-btn:hover { transform: scale(1.15); color: var(--accent2); }
+    .star-btn.filled { color: var(--accent2); }
+
+    .almanac-rule {
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--border) 0px, var(--border) 4px, transparent 4px, transparent 8px);
+      margin: 16px 0;
+      opacity: 0.6;
+    }
+    .section-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 5px;
+    }
+    .detail-def { margin-bottom: 14px; }
+    .detail-def-text {
+      font-family: 'Spectral', serif;
+      font-size: 16px; color: var(--text);
+      line-height: 1.75;
+    }
+    .detail-example {
+      font-family: 'Spectral', serif;
+      font-size: 14px; font-style: italic;
+      color: var(--muted); margin-top: 6px;
+      padding-left: 14px;
+      border-left: 2px solid var(--border);
+    }
+    .detail-example::before { content: '"'; }
+    .detail-example::after { content: '"'; }
+    .detail-etym {
+      font-family: 'Spectral', serif;
+      font-size: 14px; color: var(--muted);
+      line-height: 1.7;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+    }
+    .cross-ref {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      margin-top: 8px;
+    }
+    .cross-ref strong { color: var(--accent2); }
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      padding: 3px 9px; border-radius: 2px;
+      transition: all 0.15s;
+      cursor: default;
+    }
+    .tag:hover { background: rgba(139,69,19,0.1); border-color: var(--accent2); color: var(--accent2); }
+    .tag.antonym { border-style: dashed; }
+
+    /* FOOTER */
+    .almanac-footer {
+      text-align: center; padding: 14px;
+      background: var(--accent);
+      border-top: 3px solid var(--accent2);
+    }
+    .footer-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: #C4A878;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 640px) {
+      .main-layout { flex-direction: column; }
+      .word-list-panel { width: 100%; border-right: none; border-bottom: 2px solid var(--border); }
+      .word-list { max-height: 45vh; }
+      .almanac-entry { padding: 16px; }
+      .detail-word { font-size: 30px; }
+      .banner-title { font-size: 24px; }
+      .prefs-panel, .collection-panel { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    Almanac
+    <span>VOL. XIV &middot; ANNO 2024</span>
+  </div>
+  <a href="index.html" class="nav-back">&#8592; Designs</a>
+  <button class="nav-btn" onclick="togglePrefs()" title="Preferences">&#9881;</button>
+  <div class="avatar-wrap">
+    <div class="avatar" onclick="toggleDropdown()">AC</div>
+    <div class="avatar-dropdown" id="avatarDropdown">
+      <div class="dropdown-header">
+        <div class="dropdown-name">Alex Chen</div>
+        <div class="dropdown-sub">member_since: march_2024</div>
+      </div>
+      <div class="dropdown-streak">
+        <span class="streak-badge">&#128293; 7</span>
+        <span>day streak</span>
+      </div>
+      <div class="dropdown-item" onclick="toggleCollection()">Collection [<span id="collectionCount">0</span> words]</div>
+      <div class="dropdown-item" onclick="alert('Signed out!')">Sign Out</div>
+    </div>
+  </div>
+  <span class="liked-count" onclick="toggleCollection()">&#9829; <span id="likedCount">0</span></span>
+</nav>
+
+<div class="panel-overlay" id="panelOverlay" onclick="closePanels()"></div>
+
+<div class="prefs-panel" id="prefsPanel">
+  <div class="panel-header">
+    <span class="panel-title">Preferences</span>
+    <button class="panel-close" onclick="togglePrefs()">&#10005;</button>
+  </div>
+  <div class="panel-body">
+    <div class="pref-section">
+      <div class="pref-label">Sort Order</div>
+      <div class="pref-radio-group">
+        <label class="pref-radio"><input type="radio" name="sort" value="az" onchange="onPrefChange()"> Alphabetical (A–Z)</label>
+        <label class="pref-radio"><input type="radio" name="sort" value="language" onchange="onPrefChange()"> By Language</label>
+        <label class="pref-radio"><input type="radio" name="sort" value="recent" onchange="onPrefChange()"> Recent First</label>
+      </div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-label">Min. Definitions</div>
+      <div class="pref-radio-group">
+        <label class="pref-radio"><input type="radio" name="minDefs" value="any" onchange="onPrefChange()"> Any</label>
+        <label class="pref-radio"><input type="radio" name="minDefs" value="1" onchange="onPrefChange()"> 1+</label>
+        <label class="pref-radio"><input type="radio" name="minDefs" value="2" onchange="onPrefChange()"> 2+</label>
+      </div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-label">Languages</div>
+      <div class="lang-checks" id="langChecks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="collection-panel" id="collectionPanel">
+  <div class="panel-header">
+    <span class="panel-title">My Collection</span>
+    <button class="panel-close" onclick="toggleCollection()">&#10005;</button>
+  </div>
+  <div id="collectionList" style="overflow-y:auto;flex:1;"></div>
+</div>
+
+<!-- ALMANAC HEADER -->
+<header class="almanac-header">
+  <div class="woodcut-banner">
+    <div class="banner-ornament">
+      <svg width="40" height="60" viewBox="0 0 40 60">
+        <rect x="2" y="2" width="36" height="56" fill="none" stroke="#FBF5E8" stroke-width="1.5"/>
+        <rect x="6" y="6" width="28" height="48" fill="none" stroke="#FBF5E8" stroke-width="0.5"/>
+        <line x1="20" y1="10" x2="20" y2="50" stroke="#FBF5E8" stroke-width="0.5" opacity="0.5"/>
+        <line x1="10" y1="30" x2="30" y2="30" stroke="#FBF5E8" stroke-width="0.5" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="banner-ornament-right">
+      <svg width="40" height="60" viewBox="0 0 40 60">
+        <rect x="2" y="2" width="36" height="56" fill="none" stroke="#FBF5E8" stroke-width="1.5"/>
+        <rect x="6" y="6" width="28" height="48" fill="none" stroke="#FBF5E8" stroke-width="0.5"/>
+        <line x1="20" y1="10" x2="20" y2="50" stroke="#FBF5E8" stroke-width="0.5" opacity="0.5"/>
+        <line x1="10" y1="30" x2="30" y2="30" stroke="#FBF5E8" stroke-width="0.5" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="banner-vol">The Lexicographic Society &middot; Compiled 2024</div>
+    <div class="banner-title">Almanac of Living Words</div>
+    <div class="banner-subtitle">Volume XIV &nbsp;&middot;&nbsp; Anno 2024 &nbsp;&middot;&nbsp; Twenty Languages of the World</div>
+  </div>
+  <div class="almanac-meta-bar">
+    <div class="meta-item"><strong>ENTRIES:</strong> 20 words</div>
+    <div class="meta-item"><strong>LANGUAGES:</strong> 14 tongues</div>
+    <div class="meta-item"><strong>EDITION:</strong> Vol. XIV, 2024</div>
+    <div class="meta-item"><strong>COMPILER:</strong> Lexicographic Society</div>
+  </div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="search" class="search-input" placeholder="Search entries, languages, definitions…" oninput="renderList()">
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+  <aside class="word-list-panel">
+    <div class="list-header">
+      <span class="list-header-title">&#9632; Index of Entries</span>
+      <span class="list-count" id="listCount">0 entries</span>
+    </div>
+    <div class="lang-tabs" id="langTabs"></div>
+    <div class="word-list" id="wordList"></div>
+  </aside>
+  <main class="detail-panel" id="detailPanel">
+    <div class="detail-empty" id="detailEmpty">
+      <div class="detail-empty-woodcut">
+        <svg width="100" height="50" viewBox="0 0 300 50">
+          <rect x="0" y="0" width="300" height="50" fill="#4A3728" rx="0"/>
+          <rect x="4" y="4" width="292" height="42" fill="none" stroke="#EDE0CC" stroke-width="1.5"/>
+          <rect x="8" y="8" width="284" height="34" fill="none" stroke="#EDE0CC" stroke-width="0.5"/>
+          <polygon points="145,15 150,10 155,15 150,20" fill="#EDE0CC"/>
+          <polygon points="145,35 150,30 155,35 150,40" fill="#EDE0CC"/>
+          <rect x="15" y="20" width="100" height="2" fill="#EDE0CC" opacity="0.7"/>
+          <rect x="185" y="20" width="100" height="2" fill="#EDE0CC" opacity="0.7"/>
+          <rect x="15" y="28" width="100" height="2" fill="#EDE0CC" opacity="0.4"/>
+          <rect x="185" y="28" width="100" height="2" fill="#EDE0CC" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="detail-empty-text">Select an entry<br>from the index<br>to begin reading</div>
+    </div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="almanac-footer">
+  <div class="footer-text">Prepared by the Lexicographic Society &middot; 2024 &middot; Almanac of Living Words &middot; Vol. XIV</div>
+</footer>
+
+<script>
+const USER = { name: "Alex Chen", initials: "AC", joined: "March 2024", streak: 7 };
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: ["happy accident", "fortunate"] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: ["transience", "impermanence"] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home or place you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska", "nostalgia"] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (ko, tree) + 漏れ (more, leaking/filtering) + 日 (bi, sun/light). A compound noun describing a precise visual phenomenon.", synonyms: [], antonyms: [], relatedWords: ["wabi-sabi", "mono no aware"] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on accepting transience and imperfection; finding beauty in the imperfect, impermanent, and incomplete.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi in its most perfect form." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (the beauty of age and wear). A central concept in Japanese aesthetics rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: ["komorebi", "mono no aware", "kintsugi"] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something or someone loved and lost, or perhaps never possessed.", example: "The fado music filled the room with an aching saudade that brought tears to his eyes." }], etymology: "From Latin 'solitas' (solitude). A defining concept of Portuguese and Brazilian culture, closely tied to the musical genre of fado.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: ["hiraeth", "toska", "desiderio"] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "A deep sadness and weariness about the state of the world; a feeling that reality can never satisfy the soul's ideal.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "From German 'Welt' (world) + 'Schmerz' (pain, grief). Coined by Jean Paul in his 1827 novel 'Selina'.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism", "joie de vivre"], relatedWords: ["Fernweh", "Sehnsucht"] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; a strong longing for distant, far-off places. The opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that same night." }], etymology: "From German 'fern' (far) + 'Weh' (pain, ache). The opposite of 'Heimweh' (homesickness, literally 'home-ache').", synonyms: ["wanderlust", "travel longing"], antonyms: ["Heimweh", "homesickness"], relatedWords: ["wanderlust", "Weltschmerz"] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when abroad or in an unfamiliar environment; the feeling of being a stranger in a foreign land.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "From French 'dé-' (un-) + 'pays' (country) + '-ment'. The sense of being 'un-countried' or removed from one's native land.", synonyms: ["disorientation", "estrangement", "alienation"], antonyms: ["belonging", "familiarity"], relatedWords: ["wanderlust", "exile"] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal has ended, engaged in conversation, drink, and relaxation.", example: "The sobremesa stretched into the afternoon as the family swapped stories and finished the wine." }], etymology: "From Spanish 'sobre' (over/on) + 'mesa' (table). Literally meaning 'over the table', reflecting the Mediterranean culture of unhurried post-meal socializing.", synonyms: ["lingering", "after-dinner conversation"], antonyms: [], relatedWords: ["convivialité", "dolce far niente"] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight. A fundamental concept in Bengali and Sanskrit philosophy.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss, joy). A concept central to Hindu and Buddhist philosophy, representing the highest state of happiness.", synonyms: ["joy", "bliss", "delight", "happiness"], antonyms: ["দুঃখ (grief)", "বিষাদ (sorrow)"], relatedWords: ["সুখ", "আহ্লাদ"] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Carries connotations of boundless freedom and infinite space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' meaning 'sky' or 'ether', one of the five classical elements (Panchabhutas). Represents space and openness.", synonyms: ["sky", "heaven", "expanse", "firmament"], antonyms: [], relatedWords: ["মেঘ (cloud)", "তারা (star)"] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A flexible, frugal innovation; a creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi, meaning a workaround or hack. Popularized internationally through business literature as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround", "innovation"], antonyms: [], relatedWords: ["innovation", "frugality", "resourcefulness"] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness you feel after eating a big meal; a post-lunch or post-dinner sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the whole family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off). The word perfectly captures the particular quality of food-induced sleepiness.", synonyms: ["drowsiness", "food coma", "lethargy"], antonyms: [], relatedWords: ["sobremesa", "siesta", "riposo"] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something that both desire but neither wants to start.", example: "Across the crowded room, their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego, an indigenous language of South America. Considered one of the most succinct words in the world. The language is now critically endangered.", synonyms: [], antonyms: [], relatedWords: ["longing", "hesitation", "mutual desire"] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a dull ache of the soul, a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog, heavy and formless." }], etymology: "From Russian тоска. Vladimir Nabokov described it as 'a sensation of great spiritual anguish, often without specific cause'. A core element of the Russian literary soul.", synonyms: ["melancholy", "ennui", "longing", "languor"], antonyms: [], relatedWords: ["saudade", "hiraeth", "Weltschmerz"] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief experienced when a story is so convincing you forget it is not real; the transporting quality of great storytelling.", example: "The novelist's prose was so vivid it created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in Urdu poetry and literary criticism to describe the almost magical power of great narrative to make one believe the impossible.", synonyms: ["immersion", "suspension of disbelief"], antonyms: ["skepticism"], relatedWords: ["narrative", "storytelling", "fiction"] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table or surface by a wet glass or cup.", example: "The old wooden bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom, tail). The word refers specifically to the circular impression left by the base of a moist vessel. Pleasantly specific.", synonyms: ["ring", "watermark", "stain"], antonyms: [], relatedWords: ["patina", "trace"] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming, euphoric feeling at the beginning of falling in love; the intoxicating rush of new romantic feelings.", example: "She was in the full grip of forelsket — the world had turned golden and everything seemed possible." }], etymology: "From Norwegian/Danish, related to 'forelsket seg' (to fall in love). Captures the specifically intoxicating, slightly dizzying quality of new love.", synonyms: ["infatuation", "love rush", "euphoria"], antonyms: ["heartbreak"], relatedWords: ["falling in love", "lovesickness"] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so poorly told, or so unfunny, that it paradoxically becomes funny; a humor of badness.", example: "His timing was so terrible and the punchline so weak that the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang, widely used in Indonesian youth culture and social media. Describes the peculiar humor of jokes that fail so completely they succeed.", synonyms: ["so-bad-it's-good", "cringe humor"], antonyms: [], relatedWords: ["corny", "dad joke"] }
+];
+
+let currentWord = null;
+let activeTab = 'ALL';
+
+function getLiked() { return JSON.parse(localStorage.getItem('dd_liked') || '[]'); }
+function isLiked(word) { return getLiked().includes(word); }
+function toggleLike(word) {
+  const liked = getLiked();
+  const idx = liked.indexOf(word);
+  if (idx >= 0) liked.splice(idx, 1); else liked.push(word);
+  localStorage.setItem('dd_liked', JSON.stringify(liked));
+  updateNavCount(); renderList();
+  if (currentWord && currentWord.word === word) renderDetailHearts();
+  const cp = document.getElementById('collectionPanel');
+  if (cp.classList.contains('open')) renderCollection();
+}
+function getRating(word) { return (JSON.parse(localStorage.getItem('dd_ratings') || '{}'))[word] || 0; }
+function rateWord(word, stars) {
+  const ratings = JSON.parse(localStorage.getItem('dd_ratings') || '{}');
+  ratings[word] = stars;
+  localStorage.setItem('dd_ratings', JSON.stringify(ratings));
+  renderStars(word);
+}
+function getPrefs() {
+  const allLangs = [...new Set(WORDS.map(w => w.language))];
+  return JSON.parse(sessionStorage.getItem('dd_prefs') || JSON.stringify({ sort: 'az', minDefs: 'any', langs: allLangs }));
+}
+function savePrefs(prefs) { sessionStorage.setItem('dd_prefs', JSON.stringify(prefs)); }
+function updateNavCount() {
+  const n = getLiked().length;
+  document.getElementById('likedCount').textContent = n;
+  document.getElementById('collectionCount').textContent = n;
+}
+function toggleDropdown() { document.getElementById('avatarDropdown').classList.toggle('open'); }
+function togglePrefs() {
+  const pp = document.getElementById('prefsPanel'), ov = document.getElementById('panelOverlay');
+  pp.classList.toggle('open'); ov.classList.toggle('open');
+  document.getElementById('collectionPanel').classList.remove('open');
+}
+function toggleCollection() {
+  const cp = document.getElementById('collectionPanel'), ov = document.getElementById('panelOverlay');
+  cp.classList.toggle('open'); ov.classList.toggle('open');
+  document.getElementById('prefsPanel').classList.remove('open');
+  document.getElementById('avatarDropdown').classList.remove('open');
+  if (cp.classList.contains('open')) renderCollection();
+}
+function closePanels() {
+  document.getElementById('prefsPanel').classList.remove('open');
+  document.getElementById('collectionPanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+function buildPrefsUI() {
+  const prefs = getPrefs();
+  document.querySelectorAll('input[name="sort"]').forEach(r => { r.checked = r.value === prefs.sort; });
+  document.querySelectorAll('input[name="minDefs"]').forEach(r => { r.checked = r.value === prefs.minDefs; });
+  const langs = [...new Set(WORDS.map(w => w.language))];
+  document.getElementById('langChecks').innerHTML = langs.map(l => `
+    <label class="lang-check">
+      <input type="checkbox" value="${l}" ${prefs.langs.includes(l) ? 'checked' : ''} onchange="onPrefChange()"> ${l}
+    </label>`).join('');
+}
+function buildLangTabs() {
+  const langs = ['ALL', ...new Set(WORDS.map(w => w.language))];
+  document.getElementById('langTabs').innerHTML = langs.map(l => `
+    <button class="lang-tab ${l === activeTab ? 'active' : ''}"
+      onclick="setTab('${l}')">${l === 'ALL' ? 'ALL' : l.toUpperCase().slice(0,3)}</button>`
+  ).join('');
+}
+function setTab(lang) {
+  activeTab = lang;
+  buildLangTabs();
+  renderList();
+}
+function onPrefChange() {
+  const prefs = getPrefs();
+  const sortEl = document.querySelector('input[name="sort"]:checked');
+  const minDefsEl = document.querySelector('input[name="minDefs"]:checked');
+  if (sortEl) prefs.sort = sortEl.value;
+  if (minDefsEl) prefs.minDefs = minDefsEl.value;
+  prefs.langs = [...document.querySelectorAll('#langChecks input:checked')].map(c => c.value);
+  savePrefs(prefs); renderList();
+}
+function renderList() {
+  const prefs = getPrefs();
+  const q = document.getElementById('search').value.toLowerCase();
+  let filtered = WORDS.filter(w => {
+    const matchSearch = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q) || w.definitions[0].meaning.toLowerCase().includes(q);
+    const matchLang = prefs.langs.includes(w.language);
+    const matchTab = activeTab === 'ALL' || w.language === activeTab;
+    const matchDefs = prefs.minDefs === 'any' ? true : prefs.minDefs === '1' ? w.definitions.length >= 1 : w.definitions.length >= 2;
+    return matchSearch && matchLang && matchTab && matchDefs;
+  });
+  if (prefs.sort === 'az') filtered.sort((a, b) => a.word.localeCompare(b.word));
+  else if (prefs.sort === 'language') filtered.sort((a, b) => a.language.localeCompare(b.language));
+  else if (prefs.sort === 'recent') filtered.reverse();
+  const container = document.getElementById('wordList');
+  document.getElementById('listCount').textContent = `${filtered.length} entr${filtered.length !== 1 ? 'ies' : 'y'}`;
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-family:IBM Plex Mono,monospace;font-size:11px;">NO ENTRIES FOUND</div>';
+    return;
+  }
+  container.innerHTML = filtered.map((w, i) => {
+    const globalIdx = WORDS.indexOf(w) + 1;
+    return `
+      <div class="word-entry ${currentWord && currentWord.word === w.word ? 'active' : ''}" onclick="showDetail('${w.word}')">
+        <div class="entry-top">
+          <span class="entry-num">${String(globalIdx).padStart(2, '0')}.</span>
+          <span class="entry-word">${w.word}</span>
+          <span class="entry-lang-code">${w.languageCode.toUpperCase()}</span>
+          <span class="entry-dot">·</span>
+          <span class="entry-pos">${w.partOfSpeech}</span>
+          <button class="heart-btn ${isLiked(w.word) ? 'liked' : ''}" style="margin-left:6px;"
+            onclick="event.stopPropagation(); handleHeartClick(this, '${w.word}')">
+            ${isLiked(w.word) ? '♥' : '♡'}
+          </button>
+        </div>
+        <div class="entry-def">${w.definitions[0].meaning}</div>
+      </div>
+    `;
+  }).join('');
+}
+function handleHeartClick(btn, word) {
+  btn.classList.add('pop');
+  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+  toggleLike(word);
+}
+function showDetail(wordName) {
+  const w = WORDS.find(x => x.word === wordName);
+  if (!w) return;
+  currentWord = w;
+  renderList();
+  renderDetailContent(w);
+}
+function renderDetailHearts() {
+  if (!currentWord) return;
+  const liked = isLiked(currentWord.word);
+  const dh = document.getElementById('detailHeart');
+  if (dh) { dh.textContent = liked ? '♥' : '♡'; dh.className = 'detail-heart' + (liked ? ' liked' : ''); }
+}
+function renderStars(wordName) {
+  const rating = getRating(wordName);
+  const container = document.getElementById('starRow');
+  if (!container) return;
+  container.querySelectorAll('.star-btn').forEach((s, i) => {
+    s.classList.toggle('filled', i < rating);
+    s.textContent = i < rating ? '★' : '☆';
+  });
+}
+function renderDetailContent(w) {
+  const liked = isLiked(w.word);
+  const entryNo = String(WORDS.indexOf(w) + 1).padStart(3, '0');
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="almanac-entry">
+      <div class="entry-header">
+        <div class="entry-header-left">
+          <div class="entry-no">Entry No. ${entryNo} &nbsp;|&nbsp; Vol. XIV, 2024</div>
+          <div class="detail-word">${w.word}</div>
+          <div class="detail-pronun-box">${w.pronunciation}</div>
+        </div>
+        <button id="detailHeart" class="detail-heart ${liked ? 'liked' : ''}" onclick="handleDetailHeart(this, '${w.word}')">
+          ${liked ? '♥' : '♡'}
+        </button>
+      </div>
+      <div class="entry-classification">
+        <span class="class-flag">${w.flag}</span>
+        <span class="class-lang">${w.language} [${w.languageCode.toUpperCase()}]</span>
+        <span class="class-pos">${w.partOfSpeech}</span>
+      </div>
+      <div class="star-row" id="starRow">
+        ${[1,2,3,4,5].map(i => `<button class="star-btn" onclick="rateWord('${w.word}', ${i})">☆</button>`).join('')}
+      </div>
+      <div class="almanac-rule"></div>
+      <div class="section-title">Definition</div>
+      ${w.definitions.map(d => `
+        <div class="detail-def">
+          <div class="detail-def-text">${d.meaning}</div>
+          ${d.example ? `<div class="detail-example">${d.example}</div>` : ''}
+        </div>`).join('')}
+      ${w.etymology ? `
+        <div class="almanac-rule"></div>
+        <div class="section-title">Etymology &amp; Origin</div>
+        <div class="detail-etym">${w.etymology}</div>
+      ` : ''}
+      ${w.synonyms.length ? `
+        <div class="almanac-rule"></div>
+        <div class="section-title">Synonyms</div>
+        <div class="tags-wrap">${w.synonyms.map(s => `<span class="tag">${s}</span>`).join('')}</div>
+      ` : ''}
+      ${w.antonyms.length ? `
+        <div style="margin-top:12px;">
+          <div class="section-title">Antonyms</div>
+          <div class="tags-wrap">${w.antonyms.map(a => `<span class="tag antonym">${a}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+      ${w.relatedWords.length ? `
+        <div class="almanac-rule"></div>
+        <div class="cross-ref"><strong>See also:</strong> ${w.relatedWords.join(' &nbsp;·&nbsp; ')}</div>
+      ` : ''}
+    </div>
+  `;
+  renderStars(w.word);
+}
+function handleDetailHeart(btn, word) {
+  btn.classList.add('pop');
+  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+  toggleLike(word);
+}
+function renderCollection() {
+  const liked = getLiked();
+  const container = document.getElementById('collectionList');
+  if (liked.length === 0) {
+    container.innerHTML = '<div class="collection-empty">[ COLLECTION EMPTY ]\n\nNo words saved yet.\nClick ♡ on any entry\nto add to your collection.</div>';
+    return;
+  }
+  container.innerHTML = liked.map(wordName => {
+    const w = WORDS.find(x => x.word === wordName);
+    if (!w) return '';
+    const idx = String(WORDS.indexOf(w) + 1).padStart(2, '0');
+    return `
+      <div class="collection-item" onclick="showDetail('${w.word}'); toggleCollection();">
+        <div>
+          <div class="collection-word">${idx}. ${w.word}</div>
+          <div class="collection-lang">${w.flag} ${w.language} [${w.languageCode.toUpperCase()}]</div>
+        </div>
+        <button class="collection-remove" onclick="event.stopPropagation(); toggleLike('${w.word}');">&#10005;</button>
+      </div>`;
+  }).join('');
+}
+function init() {
+  buildPrefsUI();
+  buildLangTabs();
+  renderList();
+  updateNavCount();
+}
+document.addEventListener('click', e => {
+  const dd = document.getElementById('avatarDropdown');
+  if (dd.classList.contains('open') && !e.target.closest('.avatar-wrap')) dd.classList.remove('open');
+});
+init();
+</script>
+</body>
+</html>

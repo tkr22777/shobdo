@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parchment — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --parchment: #F5E6C8;
+      --parchment-dark: #EDD9A3;
+      --ink: #2C1810;
+      --ink-light: #5C3A28;
+      --ink-muted: #8B6E5A;
+      --red: #8B2020;
+      --gold: #8B6914;
+      --border: #C4A882;
+    }
+
+    body {
+      font-family: 'EB Garamond', Georgia, serif;
+      background: var(--parchment);
+      color: var(--ink);
+      min-height: 100vh;
+      /* Paper grain via CSS noise */
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    }
+
+    /* HEADER */
+    .tome-header {
+      border-bottom: 4px double var(--border);
+      padding: 24px 48px;
+      text-align: center;
+      position: relative;
+    }
+
+    .tome-header::before {
+      content: '❦';
+      display: block;
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .tome-title {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .tome-subtitle {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+    }
+
+    .tome-rule {
+      margin: 12px auto;
+      width: 200px;
+      border: none;
+      border-top: 1px solid var(--border);
+      position: relative;
+    }
+
+    .tome-rule::after {
+      content: '✦';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--parchment);
+      padding: 0 8px;
+      font-size: 0.6rem;
+      color: var(--gold);
+    }
+
+    .header-nav {
+      position: absolute;
+      top: 24px;
+      right: 48px;
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--ink-muted);
+    }
+
+    .header-nav a { color: var(--red); text-decoration: none; }
+    .header-nav a:hover { text-decoration: underline; }
+
+    /* SEARCH */
+    .search-row {
+      padding: 20px 48px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-row label {
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    #search {
+      flex: 1;
+      font-family: 'EB Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink);
+      outline: none;
+      padding: 4px 0;
+      max-width: 400px;
+    }
+
+    #search:focus { border-bottom-color: var(--red); }
+
+    /* LANG FILTER */
+    .filter-row {
+      padding: 12px 48px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+      background: rgba(196,168,130,0.15);
+    }
+
+    .lang-btn {
+      padding: 6px 14px;
+      font-family: 'EB Garamond', serif;
+      font-size: 0.82rem;
+      font-style: italic;
+      border: none;
+      background: none;
+      color: var(--ink-muted);
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+
+    .lang-btn:last-child { border-right: none; }
+    .lang-btn:hover { color: var(--red); }
+    .lang-btn.active { color: var(--red); font-weight: 600; }
+
+    /* MAIN LAYOUT */
+    .codex-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 220px);
+    }
+
+    /* INDEX */
+    .codex-index {
+      border-right: 2px solid var(--border);
+      background: rgba(196,168,130,0.1);
+      overflow-y: auto;
+    }
+
+    .codex-index-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #count { color: var(--red); font-style: normal; }
+
+    .codex-entry {
+      display: flex;
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(196,168,130,0.4);
+      cursor: pointer;
+      align-items: baseline;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+
+    .codex-entry:hover { background: rgba(196,168,130,0.25); }
+    .codex-entry.active { background: rgba(139,32,32,0.08); border-left: 3px solid var(--red); padding-left: 17px; }
+
+    .entry-word {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .entry-lang {
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+    }
+
+    .no-results {
+      padding: 30px 20px;
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    /* FOLIO PANEL */
+    .codex-folio {
+      overflow-y: auto;
+      padding: 48px;
+    }
+
+    .folio-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: var(--ink-muted);
+    }
+
+    .folio-empty-ornament {
+      font-size: 4rem;
+      opacity: 0.2;
+      margin-bottom: 16px;
+    }
+
+    .folio-empty p { font-style: italic; font-size: 1rem; }
+
+    /* FOLIO CONTENT */
+    .folio-content {
+      max-width: 580px;
+      animation: pageFlip 0.35s ease;
+    }
+
+    @keyframes pageFlip {
+      from { opacity: 0; transform: rotateY(-5deg); }
+      to { opacity: 1; transform: rotateY(0); }
+    }
+
+    .folio-kicker {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .folio-headword {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Decorative drop cap in definition */
+    .folio-pron {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      margin-bottom: 4px;
+    }
+
+    .folio-pos {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--red);
+      border-bottom: 1px solid var(--red);
+      padding-bottom: 2px;
+      margin-bottom: 20px;
+    }
+
+    .pen-rule {
+      border: none;
+      border-bottom: 1px solid var(--border);
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .pen-rule.ornate::before {
+      content: '— ✦ —';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--parchment);
+      padding-right: 12px;
+      font-size: 0.65rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+    }
+
+    .folio-section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 12px;
+    }
+
+    .folio-def {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--ink);
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    .folio-def::first-letter {
+      font-size: 3.2em;
+      font-weight: 700;
+      float: left;
+      line-height: 0.75;
+      margin-right: 8px;
+      margin-top: 8px;
+      color: var(--red);
+    }
+
+    .folio-example {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--ink-light);
+      padding: 12px 20px;
+      border-left: 2px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .folio-etym {
+      background: rgba(196,168,130,0.2);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      font-size: 0.875rem;
+      color: var(--ink-light);
+      line-height: 1.7;
+    }
+
+    .footnote-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .fn-tag {
+      font-size: 0.78rem;
+      font-style: italic;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      color: var(--ink-light);
+    }
+
+    @media (max-width: 900px) {
+      .codex-layout { grid-template-columns: 1fr; }
+      .codex-index { max-height: 35vh; }
+      .codex-folio { padding: 28px 24px; }
+      .tome-header { padding: 20px 24px; }
+      .header-nav { position: static; text-align: center; margin-top: 10px; }
+      .search-row, .filter-row { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tome-header">
+  <div class="header-nav"><a href="index.html">← Gallery</a></div>
+  <div class="tome-title">Lexicon Parchment</div>
+  <div class="tome-subtitle">A Scholarly Dictionary of World Languages</div>
+  <hr class="tome-rule">
+  <div style="font-size:.72rem;font-style:italic;color:var(--ink-muted)">Being a Comprehensive Compendium of Beautiful Words from Every Tongue</div>
+</div>
+
+<div class="search-row">
+  <label>Seek a word:</label>
+  <input type="text" id="search" placeholder="Enter a word, language, or concept…" autocomplete="off">
+  <span style="font-size:.75rem;font-style:italic;color:var(--ink-muted)" id="count"></span>
+</div>
+
+<div class="filter-row" id="filterRow"></div>
+
+<div class="codex-layout">
+  <div class="codex-index">
+    <div class="codex-index-header">
+      <span>Index Verborum</span>
+    </div>
+    <div id="wordList"></div>
+  </div>
+  <div class="codex-folio" id="folioPanel">
+    <div class="folio-empty">
+      <div class="folio-empty-ornament">☙</div>
+      <p>Select an entry from the Index to read its folio</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: [] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: [] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska"] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (tree) + 漏れ (leaking) + 日 (sun). A compound noun.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on finding beauty in imperfection, impermanence, and incompleteness.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi perfectly." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (beauty of age). Rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: [] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something loved and lost.", example: "The fado music filled the room with an aching saudade." }], etymology: "From Latin 'solitas' (solitude). Defining concept of Portuguese culture.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: [] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "Deep sadness about the state of the world; feeling that reality can never satisfy the soul's ideal.", example: "After reading the news, an overwhelming Weltschmerz settled over him." }], etymology: "German 'Welt' (world) + 'Schmerz' (pain). Coined by Jean Paul in 1827.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism"], relatedWords: [] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; longing for distant, far-off places. Opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that night." }], etymology: "German 'fern' (far) + 'Weh' (ache). Opposite of 'Heimweh'.", synonyms: ["wanderlust"], antonyms: ["Heimweh"], relatedWords: [] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when in an unfamiliar environment abroad.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "French 'dé-' (un-) + 'pays' (country). Being 'un-countried'.", synonyms: ["disorientation", "estrangement"], antonyms: ["belonging"], relatedWords: [] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal, in conversation and relaxation.", example: "The sobremesa stretched into the afternoon as the family finished the wine." }], etymology: "Spanish 'sobre' (over) + 'mesa' (table).", synonyms: ["lingering"], antonyms: [], relatedWords: [] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss). Central to Hindu and Buddhist philosophy.", synonyms: ["joy", "bliss", "delight"], antonyms: ["grief"], relatedWords: [] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Boundless freedom and space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' — one of the five classical elements.", synonyms: ["sky", "heaven", "expanse"], antonyms: [], relatedWords: [] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A frugal, creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi. Known internationally as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround"], antonyms: [], relatedWords: [] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness felt after eating a large meal; post-lunch sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off).", synonyms: ["drowsiness", "food coma"], antonyms: [], relatedWords: [] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look between two people, each wishing the other would initiate something both desire.", example: "Their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego. Critically endangered.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog." }], etymology: "Russian тоска. Nabokov: 'spiritual anguish, often without specific cause'.", synonyms: ["melancholy", "ennui", "longing"], antonyms: [], relatedWords: [] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "Suspension of disbelief when a story is so convincing you forget it's not real.", example: "The novelist's prose created complete goya — the reader forgot the world entirely." }], etymology: "Urdu گویا. Describes the power of great narrative in poetry.", synonyms: ["immersion", "suspension of disbelief"], antonyms: [], relatedWords: [] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table by a wet glass or cup.", example: "The old bar was covered in culaccini from decades of evenings well spent." }], etymology: "Italian 'culo' (bottom). The circular impression of a moist vessel's base.", synonyms: ["ring", "watermark"], antonyms: [], relatedWords: [] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming euphoric feeling at the beginning of falling in love.", example: "She was in the full grip of forelsket — the world had turned golden." }], etymology: "Norwegian, related to 'forelske seg' (to fall in love).", synonyms: ["infatuation", "euphoria"], antonyms: ["heartbreak"], relatedWords: [] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so unfunny that it paradoxically becomes funny.", example: "His timing was so terrible the whole room dissolved into laughter — pure jayus." }], etymology: "Indonesian slang. Humor of jokes that fail so completely they succeed.", synonyms: ["cringe humor"], antonyms: [], relatedWords: [] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+let activeWord = null;
+
+function init() {
+  const filterRow = document.getElementById('filterRow');
+  langs.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-btn' + (l === 'All' ? ' active' : '');
+    btn.textContent = l;
+    btn.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    });
+    filterRow.appendChild(btn);
+  });
+  document.getElementById('search').addEventListener('input', renderList);
+  renderList();
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  const container = document.getElementById('wordList');
+  container.innerHTML = '';
+  document.getElementById('count').textContent = `${filtered.length} entries found`;
+
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">No entries found in this compendium.</div>'; return; }
+
+  filtered.forEach(w => {
+    const item = document.createElement('div');
+    item.className = 'codex-entry' + (activeWord === w.word ? ' active' : '');
+    item.innerHTML = `<span class="entry-word">${w.flag} ${w.word}</span><span class="entry-lang">${w.language}</span>`;
+    item.addEventListener('click', () => { activeWord = w.word; showFolio(w, item); });
+    container.appendChild(item);
+  });
+}
+
+function showFolio(w, el) {
+  document.querySelectorAll('.codex-entry').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+
+  const syns = w.synonyms.length ? w.synonyms.map(s => `<span class="fn-tag">${s}</span>`).join('') : '<em style="color:var(--ink-muted)">none recorded</em>';
+  const ants = w.antonyms.length ? w.antonyms.map(s => `<span class="fn-tag">${s}</span>`).join('') : '<em style="color:var(--ink-muted)">none recorded</em>';
+
+  document.getElementById('folioPanel').innerHTML = `
+    <div class="folio-content">
+      <div class="folio-kicker">${w.flag} &nbsp; ${w.language} &nbsp;&bull;&nbsp; ${w.partOfSpeech}</div>
+      <div class="folio-headword">${w.word}</div>
+      <div class="folio-pron">${w.pronunciation}</div>
+      <div class="folio-pos">${w.partOfSpeech}</div>
+      <hr class="pen-rule ornate">
+      <div class="folio-section-label">Definition</div>
+      <div class="folio-def">${w.definitions[0].meaning}</div>
+      ${w.definitions[0].example ? `<div class="folio-example">"${w.definitions[0].example}"</div>` : ''}
+      <hr class="pen-rule">
+      <div class="folio-section-label">Etymology &amp; Notes</div>
+      <div class="folio-etym">${w.etymology}</div>
+      <hr class="pen-rule">
+      <div class="folio-section-label">Synonyms</div>
+      <div class="footnote-tags" style="margin-bottom:16px">${syns}</div>
+      <div class="folio-section-label">Antonyms</div>
+      <div class="footnote-tags">${ants}</div>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

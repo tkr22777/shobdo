@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caramel — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFBF5;
+      --surface: #FFFFFF;
+      --text: #1C140A;
+      --muted: #8B6A3A;
+      --border: #E8D5B4;
+      --accent: #C68642;
+      --accent-light: #FFF5E5;
+      --accent-dark: #8B5A1A;
+      --warm-mid: #E8B870;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 2L45 2L60 27L45 52L15 52L0 27Z' stroke='%23C68642' stroke-width='0.8' fill='none' opacity='0.07'/%3E%3Cpath d='M15 27L45 27' stroke='%23C68642' stroke-width='0.4' fill='none' opacity='0.05'/%3E%3C/svg%3E");
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,251,245,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 60px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 24px; font-weight: 400;
+      color: var(--accent);
+      flex: 1;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo-tag {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-top: -2px;
+    }
+    .nav-back {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.25s;
+    }
+    .nav-back:hover { color: var(--accent-dark); }
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    .nav-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+    .avatar-wrap { position: relative; }
+    .avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--warm-mid));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .avatar:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(198,134,66,0.35); }
+    .liked-count {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: var(--muted);
+      cursor: pointer; white-space: nowrap;
+      transition: color 0.25s;
+    }
+    .liked-count:hover { color: var(--accent); }
+
+    /* DROPDOWN */
+    .avatar-dropdown {
+      position: absolute; top: 46px; right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(198,134,66,0.15);
+      min-width: 210px;
+      z-index: 200; display: none; overflow: hidden;
+    }
+    .avatar-dropdown.open { display: block; }
+    .dropdown-header { padding: 16px; border-bottom: 1px solid var(--border); }
+    .dropdown-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+    .dropdown-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .dropdown-streak { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+    .streak-badge { background: linear-gradient(135deg, #FF6B35, #FF4500); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+    .dropdown-item { padding: 11px 16px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: background 0.2s; }
+    .dropdown-item:hover { background: var(--accent-light); color: var(--accent-dark); }
+
+    /* PANELS */
+    .panel-overlay { position: fixed; inset: 0; background: rgba(28,20,10,0.3); backdrop-filter: blur(2px); z-index: 140; display: none; }
+    .panel-overlay.open { display: block; }
+
+    .prefs-panel {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 320px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      box-shadow: 8px 0 32px rgba(198,134,66,0.1);
+      z-index: 150;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+    }
+    .prefs-panel.open { transform: translateX(0); }
+    .panel-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+    .panel-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .panel-close:hover { background: var(--accent-light); color: var(--accent-dark); }
+    .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .pref-section { margin-bottom: 24px; }
+    .pref-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .pref-radio-group { display: flex; flex-direction: column; gap: 8px; }
+    .pref-radio { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text); }
+    .pref-radio input { accent-color: var(--accent); }
+    .lang-checks { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+    .lang-check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); }
+    .lang-check input { accent-color: var(--accent); }
+
+    .collection-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 320px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 32px rgba(198,134,66,0.1);
+      z-index: 150;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+    }
+    .collection-panel.open { transform: translateX(0); }
+    .collection-empty { padding: 48px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+    .collection-empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.3; }
+    .collection-item { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+    .collection-item:hover { background: var(--accent-light); }
+    .collection-word { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 500; color: var(--text); }
+    .collection-lang { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .collection-remove { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .collection-remove:hover { background: #FEE2E2; color: #DC2626; }
+
+    /* HEADER */
+    .caramel-header {
+      padding: 40px 28px 30px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .header-drip { margin-bottom: 4px; }
+    .header-logotype {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 64px; font-weight: 300;
+      color: var(--text);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .header-logotype span { color: var(--accent); }
+    .header-tagline {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* SEARCH */
+    .search-bar {
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .search-wrap { position: relative; max-width: 600px; margin: 0 auto; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+    .search-input {
+      width: 100%;
+      padding: 11px 16px 11px 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 400;
+      color: var(--text);
+      outline: none;
+      transition: all 0.25s;
+      box-shadow: 0 1px 3px rgba(198,134,66,0.06);
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,134,66,0.12); }
+    .search-input::placeholder { color: var(--muted); }
+
+    /* MAIN */
+    .main-layout { display: flex; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 240px); }
+
+    /* WORD LIST */
+    .word-list-panel {
+      width: 340px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .list-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .list-header-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .list-count { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .word-list { overflow-y: auto; max-height: calc(100vh - 310px); }
+
+    .word-card {
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(232,213,180,0.5);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex; gap: 12px; align-items: flex-start;
+      border-left: 3px solid transparent;
+    }
+    .word-card:hover {
+      background: var(--accent-light);
+      border-left-color: var(--warm-mid);
+      transform: translateX(2px);
+    }
+    .word-card.active {
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+    }
+    .word-card-main { flex: 1; min-width: 0; }
+    .word-card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 500; font-style: italic;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .word-card-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+    .word-card-flag { font-size: 13px; }
+    .word-card-lang {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--accent-dark);
+      background: var(--accent-light);
+      padding: 2px 7px; border-radius: 20px;
+    }
+    .word-card-pos {
+      font-size: 11px; font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 2px 7px; border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .word-card-snippet { font-size: 12px; color: var(--muted); margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+    .heart-btn {
+      background: none; border: none; font-size: 18px;
+      cursor: pointer; color: var(--border);
+      padding: 0; flex-shrink: 0;
+      transition: all 0.25s;
+    }
+    .heart-btn:hover { transform: scale(1.2); color: #FDA4AF; }
+    .heart-btn.liked { color: #EF4444; }
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.4); }
+      60% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .heart-btn.pop { animation: heartPop 0.35s ease; }
+
+    /* DETAIL */
+    .detail-panel {
+      flex: 1; overflow-y: auto;
+      max-height: calc(100vh - 240px);
+      padding: 48px 52px;
+    }
+    .detail-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 60%; text-align: center;
+    }
+    .detail-empty-art { margin-bottom: 20px; opacity: 0.25; }
+    .detail-empty-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 300; font-style: italic;
+      color: var(--muted);
+    }
+    .detail-empty-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .detail-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .detail-word {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 60px; font-weight: 300; font-style: italic;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .detail-heart {
+      background: none; border: none;
+      font-size: 34px; cursor: pointer;
+      color: var(--border);
+      transition: all 0.25s;
+      padding: 4px;
+    }
+    .detail-heart:hover { transform: scale(1.15); color: #FDA4AF; }
+    .detail-heart.liked { color: #EF4444; }
+    .detail-heart.pop { animation: heartPop 0.35s ease; }
+
+    .detail-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pill-flag { font-size: 20px; }
+    .pill-lang {
+      background: linear-gradient(135deg, var(--accent), var(--warm-mid));
+      color: white;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px;
+    }
+    .pill-pos {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+    }
+    .detail-pronun {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px; font-style: italic; font-weight: 400;
+      color: var(--muted);
+    }
+
+    .star-row { display: flex; gap: 5px; margin: 14px 0 28px; }
+    .star-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--border); transition: color 0.2s, transform 0.2s; }
+    .star-btn:hover { transform: scale(1.2); color: var(--warm-mid); }
+    .star-btn.filled { color: var(--accent); }
+
+    .detail-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 24px 0; }
+    .detail-section-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .detail-def {
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      background: var(--accent-light);
+      border-radius: 10px;
+      border-left: 3px solid var(--accent);
+    }
+    .detail-def-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 400;
+      color: var(--text); line-height: 1.7;
+    }
+    .detail-example {
+      font-size: 13px; font-style: italic;
+      color: var(--muted); margin-top: 8px; line-height: 1.6;
+    }
+    .detail-example::before { content: '"'; }
+    .detail-example::after { content: '"'; }
+
+    .detail-etym {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14px; color: var(--muted); line-height: 1.7;
+    }
+
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 13px; font-weight: 500;
+      padding: 5px 13px; border-radius: 20px;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .tag:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
+    .tag.antonym { border-style: dashed; }
+
+    /* FOOTER */
+    .caramel-footer {
+      text-align: center; padding: 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .footer-text { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.5px; }
+
+    @media (max-width: 640px) {
+      .main-layout { flex-direction: column; }
+      .word-list-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .word-list { max-height: 45vh; }
+      .detail-panel { padding: 24px 16px; max-height: none; }
+      .detail-word { font-size: 40px; }
+      .header-logotype { font-size: 44px; }
+      .prefs-panel, .collection-panel { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-logo">caramel</div>
+    <span class="nav-logo-tag">Global Dictionary</span>
+  </div>
+  <a href="index.html" class="nav-back">&#8592; Designs</a>
+  <button class="nav-btn" onclick="togglePrefs()" title="Preferences">&#9881;</button>
+  <div class="avatar-wrap">
+    <div class="avatar" onclick="toggleDropdown()">AC</div>
+    <div class="avatar-dropdown" id="avatarDropdown">
+      <div class="dropdown-header">
+        <div class="dropdown-name">Alex Chen</div>
+        <div class="dropdown-sub">Joined March 2024</div>
+      </div>
+      <div class="dropdown-streak">
+        <span class="streak-badge">&#128293; 7</span>
+        <span>day streak</span>
+      </div>
+      <div class="dropdown-item" onclick="toggleCollection()">My Collection (<span id="collectionCount">0</span> words)</div>
+      <div class="dropdown-item" onclick="alert('Signed out!')">Sign Out</div>
+    </div>
+  </div>
+  <span class="liked-count" onclick="toggleCollection()">&#9829; <span id="likedCount">0</span></span>
+</nav>
+
+<div class="panel-overlay" id="panelOverlay" onclick="closePanels()"></div>
+
+<div class="prefs-panel" id="prefsPanel">
+  <div class="panel-header">
+    <span class="panel-title">Preferences</span>
+    <button class="panel-close" onclick="togglePrefs()">&#10005;</button>
+  </div>
+  <div class="panel-body">
+    <div class="pref-section">
+      <div class="pref-label">Sort Order</div>
+      <div class="pref-radio-group">
+        <label class="pref-radio"><input type="radio" name="sort" value="az" onchange="onPrefChange()"> A to Z</label>
+        <label class="pref-radio"><input type="radio" name="sort" value="language" onchange="onPrefChange()"> By Language</label>
+        <label class="pref-radio"><input type="radio" name="sort" value="recent" onchange="onPrefChange()"> Recent First</label>
+      </div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-label">Minimum Definitions</div>
+      <div class="pref-radio-group">
+        <label class="pref-radio"><input type="radio" name="minDefs" value="any" onchange="onPrefChange()"> Any</label>
+        <label class="pref-radio"><input type="radio" name="minDefs" value="1" onchange="onPrefChange()"> 1+</label>
+        <label class="pref-radio"><input type="radio" name="minDefs" value="2" onchange="onPrefChange()"> 2+</label>
+      </div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-label">Languages</div>
+      <div class="lang-checks" id="langChecks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="collection-panel" id="collectionPanel">
+  <div class="panel-header">
+    <span class="panel-title">My Collection</span>
+    <button class="panel-close" onclick="toggleCollection()">&#10005;</button>
+  </div>
+  <div id="collectionList" style="overflow-y:auto;flex:1;"></div>
+</div>
+
+<!-- HEADER -->
+<header class="caramel-header">
+  <div class="header-drip">
+    <svg width="200" height="40" viewBox="0 0 200 40">
+      <defs>
+        <linearGradient id="caramelGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C68642"/>
+          <stop offset="100%" stop-color="#E8B870"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="30" cy="8" rx="12" ry="6" fill="url(#caramelGrad)" opacity="0.3"/>
+      <ellipse cx="80" cy="12" rx="16" ry="8" fill="url(#caramelGrad)" opacity="0.25"/>
+      <ellipse cx="140" cy="6" rx="10" ry="5" fill="url(#caramelGrad)" opacity="0.3"/>
+      <ellipse cx="180" cy="14" rx="8" ry="6" fill="url(#caramelGrad)" opacity="0.2"/>
+      <path d="M80 20 Q82 32 80 38" stroke="#C68642" stroke-width="4" stroke-linecap="round" opacity="0.25"/>
+      <path d="M30 14 Q31 22 29 28" stroke="#C68642" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+    </svg>
+  </div>
+  <div class="header-logotype">cara<span>mel</span></div>
+  <div class="header-tagline">A curated dictionary of the world's finest words</div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="search" class="search-input" placeholder="Search for a word, language, or meaning…" oninput="renderList()">
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+  <aside class="word-list-panel">
+    <div class="list-header">
+      <span class="list-header-title">Words</span>
+      <span class="list-count" id="listCount">0 words</span>
+    </div>
+    <div class="word-list" id="wordList"></div>
+  </aside>
+  <main class="detail-panel" id="detailPanel">
+    <div class="detail-empty" id="detailEmpty">
+      <div class="detail-empty-art">
+        <svg width="80" height="80" viewBox="0 0 200 40">
+          <defs>
+            <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#C68642"/>
+              <stop offset="100%" stop-color="#E8B870"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="30" cy="8" rx="12" ry="6" fill="url(#cg2)" opacity="0.5"/>
+          <ellipse cx="80" cy="12" rx="16" ry="8" fill="url(#cg2)" opacity="0.4"/>
+          <ellipse cx="140" cy="6" rx="10" ry="5" fill="url(#cg2)" opacity="0.5"/>
+          <ellipse cx="180" cy="14" rx="8" ry="6" fill="url(#cg2)" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="detail-empty-title">Select a word to explore</div>
+      <div class="detail-empty-sub">Choose from the list on the left to read its full entry</div>
+    </div>
+  </main>
+</div>
+
+<footer class="caramel-footer">
+  <div class="footer-text">caramel &nbsp;·&nbsp; A Global Dictionary &nbsp;·&nbsp; Twenty Languages, One Collection</div>
+</footer>
+
+<script>
+const USER = { name: "Alex Chen", initials: "AC", joined: "March 2024", streak: 7 };
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: ["happy accident", "fortunate"] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: ["transience", "impermanence"] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home or place you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska", "nostalgia"] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (ko, tree) + 漏れ (more, leaking/filtering) + 日 (bi, sun/light). A compound noun describing a precise visual phenomenon.", synonyms: [], antonyms: [], relatedWords: ["wabi-sabi", "mono no aware"] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on accepting transience and imperfection; finding beauty in the imperfect, impermanent, and incomplete.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi in its most perfect form." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (the beauty of age and wear). A central concept in Japanese aesthetics rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: ["komorebi", "mono no aware", "kintsugi"] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something or someone loved and lost, or perhaps never possessed.", example: "The fado music filled the room with an aching saudade that brought tears to his eyes." }], etymology: "From Latin 'solitas' (solitude). A defining concept of Portuguese and Brazilian culture, closely tied to the musical genre of fado.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: ["hiraeth", "toska", "desiderio"] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "A deep sadness and weariness about the state of the world; a feeling that reality can never satisfy the soul's ideal.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "From German 'Welt' (world) + 'Schmerz' (pain, grief). Coined by Jean Paul in his 1827 novel 'Selina'.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism", "joie de vivre"], relatedWords: ["Fernweh", "Sehnsucht"] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; a strong longing for distant, far-off places. The opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that same night." }], etymology: "From German 'fern' (far) + 'Weh' (pain, ache). The opposite of 'Heimweh' (homesickness, literally 'home-ache').", synonyms: ["wanderlust", "travel longing"], antonyms: ["Heimweh", "homesickness"], relatedWords: ["wanderlust", "Weltschmerz"] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when abroad or in an unfamiliar environment; the feeling of being a stranger in a foreign land.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "From French 'dé-' (un-) + 'pays' (country) + '-ment'. The sense of being 'un-countried' or removed from one's native land.", synonyms: ["disorientation", "estrangement", "alienation"], antonyms: ["belonging", "familiarity"], relatedWords: ["wanderlust", "exile"] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal has ended, engaged in conversation, drink, and relaxation.", example: "The sobremesa stretched into the afternoon as the family swapped stories and finished the wine." }], etymology: "From Spanish 'sobre' (over/on) + 'mesa' (table). Literally meaning 'over the table', reflecting the Mediterranean culture of unhurried post-meal socializing.", synonyms: ["lingering", "after-dinner conversation"], antonyms: [], relatedWords: ["convivialité", "dolce far niente"] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight. A fundamental concept in Bengali and Sanskrit philosophy.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss, joy). A concept central to Hindu and Buddhist philosophy, representing the highest state of happiness.", synonyms: ["joy", "bliss", "delight", "happiness"], antonyms: ["দুঃখ (grief)", "বিষাদ (sorrow)"], relatedWords: ["সুখ", "আহ্লাদ"] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Carries connotations of boundless freedom and infinite space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' meaning 'sky' or 'ether', one of the five classical elements (Panchabhutas). Represents space and openness.", synonyms: ["sky", "heaven", "expanse", "firmament"], antonyms: [], relatedWords: ["মেঘ (cloud)", "তারা (star)"] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A flexible, frugal innovation; a creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi, meaning a workaround or hack. Popularized internationally through business literature as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround", "innovation"], antonyms: [], relatedWords: ["innovation", "frugality", "resourcefulness"] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness you feel after eating a big meal; a post-lunch or post-dinner sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the whole family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off). The word perfectly captures the particular quality of food-induced sleepiness.", synonyms: ["drowsiness", "food coma", "lethargy"], antonyms: [], relatedWords: ["sobremesa", "siesta", "riposo"] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something that both desire but neither wants to start.", example: "Across the crowded room, their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego, an indigenous language of South America. Considered one of the most succinct words in the world. The language is now critically endangered.", synonyms: [], antonyms: [], relatedWords: ["longing", "hesitation", "mutual desire"] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a dull ache of the soul, a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog, heavy and formless." }], etymology: "From Russian тоска. Vladimir Nabokov described it as 'a sensation of great spiritual anguish, often without specific cause'. A core element of the Russian literary soul.", synonyms: ["melancholy", "ennui", "longing", "languor"], antonyms: [], relatedWords: ["saudade", "hiraeth", "Weltschmerz"] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief experienced when a story is so convincing you forget it is not real; the transporting quality of great storytelling.", example: "The novelist's prose was so vivid it created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in Urdu poetry and literary criticism to describe the almost magical power of great narrative to make one believe the impossible.", synonyms: ["immersion", "suspension of disbelief"], antonyms: ["skepticism"], relatedWords: ["narrative", "storytelling", "fiction"] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table or surface by a wet glass or cup.", example: "The old wooden bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom, tail). The word refers specifically to the circular impression left by the base of a moist vessel. Pleasantly specific.", synonyms: ["ring", "watermark", "stain"], antonyms: [], relatedWords: ["patina", "trace"] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming, euphoric feeling at the beginning of falling in love; the intoxicating rush of new romantic feelings.", example: "She was in the full grip of forelsket — the world had turned golden and everything seemed possible." }], etymology: "From Norwegian/Danish, related to 'forelsket seg' (to fall in love). Captures the specifically intoxicating, slightly dizzying quality of new love.", synonyms: ["infatuation", "love rush", "euphoria"], antonyms: ["heartbreak"], relatedWords: ["falling in love", "lovesickness"] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so poorly told, or so unfunny, that it paradoxically becomes funny; a humor of badness.", example: "His timing was so terrible and the punchline so weak that the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang, widely used in Indonesian youth culture and social media. Describes the peculiar humor of jokes that fail so completely they succeed.", synonyms: ["so-bad-it's-good", "cringe humor"], antonyms: [], relatedWords: ["corny", "dad joke"] }
+];
+
+let currentWord = null;
+
+function getLiked() { return JSON.parse(localStorage.getItem('dd_liked') || '[]'); }
+function isLiked(word) { return getLiked().includes(word); }
+function toggleLike(word) {
+  const liked = getLiked();
+  const idx = liked.indexOf(word);
+  if (idx >= 0) liked.splice(idx, 1); else liked.push(word);
+  localStorage.setItem('dd_liked', JSON.stringify(liked));
+  updateNavCount(); renderList();
+  if (currentWord && currentWord.word === word) renderDetailHearts();
+  const cp = document.getElementById('collectionPanel');
+  if (cp.classList.contains('open')) renderCollection();
+}
+function getRating(word) { return (JSON.parse(localStorage.getItem('dd_ratings') || '{}'))[word] || 0; }
+function rateWord(word, stars) {
+  const ratings = JSON.parse(localStorage.getItem('dd_ratings') || '{}');
+  ratings[word] = stars;
+  localStorage.setItem('dd_ratings', JSON.stringify(ratings));
+  renderStars(word);
+}
+function getPrefs() {
+  const allLangs = [...new Set(WORDS.map(w => w.language))];
+  return JSON.parse(sessionStorage.getItem('dd_prefs') || JSON.stringify({ sort: 'az', minDefs: 'any', langs: allLangs }));
+}
+function savePrefs(prefs) { sessionStorage.setItem('dd_prefs', JSON.stringify(prefs)); }
+function updateNavCount() {
+  const n = getLiked().length;
+  document.getElementById('likedCount').textContent = n;
+  document.getElementById('collectionCount').textContent = n;
+}
+function toggleDropdown() { document.getElementById('avatarDropdown').classList.toggle('open'); }
+function togglePrefs() {
+  const pp = document.getElementById('prefsPanel'), ov = document.getElementById('panelOverlay');
+  pp.classList.toggle('open'); ov.classList.toggle('open');
+  document.getElementById('collectionPanel').classList.remove('open');
+}
+function toggleCollection() {
+  const cp = document.getElementById('collectionPanel'), ov = document.getElementById('panelOverlay');
+  cp.classList.toggle('open'); ov.classList.toggle('open');
+  document.getElementById('prefsPanel').classList.remove('open');
+  document.getElementById('avatarDropdown').classList.remove('open');
+  if (cp.classList.contains('open')) renderCollection();
+}
+function closePanels() {
+  document.getElementById('prefsPanel').classList.remove('open');
+  document.getElementById('collectionPanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+function buildPrefsUI() {
+  const prefs = getPrefs();
+  document.querySelectorAll('input[name="sort"]').forEach(r => { r.checked = r.value === prefs.sort; });
+  document.querySelectorAll('input[name="minDefs"]').forEach(r => { r.checked = r.value === prefs.minDefs; });
+  const langs = [...new Set(WORDS.map(w => w.language))];
+  document.getElementById('langChecks').innerHTML = langs.map(l => `
+    <label class="lang-check">
+      <input type="checkbox" value="${l}" ${prefs.langs.includes(l) ? 'checked' : ''} onchange="onPrefChange()"> ${l}
+    </label>`).join('');
+}
+function onPrefChange() {
+  const prefs = getPrefs();
+  const sortEl = document.querySelector('input[name="sort"]:checked');
+  const minDefsEl = document.querySelector('input[name="minDefs"]:checked');
+  if (sortEl) prefs.sort = sortEl.value;
+  if (minDefsEl) prefs.minDefs = minDefsEl.value;
+  prefs.langs = [...document.querySelectorAll('#langChecks input:checked')].map(c => c.value);
+  savePrefs(prefs); renderList();
+}
+function renderList() {
+  const prefs = getPrefs();
+  const q = document.getElementById('search').value.toLowerCase();
+  let filtered = WORDS.filter(w => {
+    const matchSearch = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q) || w.definitions[0].meaning.toLowerCase().includes(q);
+    const matchLang = prefs.langs.includes(w.language);
+    const matchDefs = prefs.minDefs === 'any' ? true : prefs.minDefs === '1' ? w.definitions.length >= 1 : w.definitions.length >= 2;
+    return matchSearch && matchLang && matchDefs;
+  });
+  if (prefs.sort === 'az') filtered.sort((a, b) => a.word.localeCompare(b.word));
+  else if (prefs.sort === 'language') filtered.sort((a, b) => a.language.localeCompare(b.language));
+  else if (prefs.sort === 'recent') filtered.reverse();
+  const container = document.getElementById('wordList');
+  document.getElementById('listCount').textContent = `${filtered.length} word${filtered.length !== 1 ? 's' : ''}`;
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">No words match your filters.</div>';
+    return;
+  }
+  container.innerHTML = filtered.map(w => `
+    <div class="word-card ${currentWord && currentWord.word === w.word ? 'active' : ''}" onclick="showDetail('${w.word}')">
+      <div class="word-card-main">
+        <div class="word-card-name">${w.word}</div>
+        <div class="word-card-meta">
+          <span class="word-card-flag">${w.flag}</span>
+          <span class="word-card-lang">${w.language}</span>
+          <span class="word-card-pos">${w.partOfSpeech}</span>
+        </div>
+        <div class="word-card-snippet">${w.definitions[0].meaning}</div>
+      </div>
+      <button class="heart-btn ${isLiked(w.word) ? 'liked' : ''}" data-word="${w.word}"
+        onclick="event.stopPropagation(); handleHeartClick(this, '${w.word}')">
+        ${isLiked(w.word) ? '♥' : '♡'}
+      </button>
+    </div>`).join('');
+}
+function handleHeartClick(btn, word) {
+  btn.classList.add('pop');
+  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+  toggleLike(word);
+}
+function showDetail(wordName) {
+  const w = WORDS.find(x => x.word === wordName);
+  if (!w) return;
+  currentWord = w;
+  renderList();
+  renderDetailContent(w);
+}
+function renderDetailHearts() {
+  if (!currentWord) return;
+  const liked = isLiked(currentWord.word);
+  const dh = document.getElementById('detailHeart');
+  if (dh) { dh.textContent = liked ? '♥' : '♡'; dh.className = 'detail-heart' + (liked ? ' liked' : ''); }
+}
+function renderStars(wordName) {
+  const rating = getRating(wordName);
+  const container = document.getElementById('starRow');
+  if (!container) return;
+  container.querySelectorAll('.star-btn').forEach((s, i) => {
+    s.classList.toggle('filled', i < rating);
+    s.textContent = i < rating ? '★' : '☆';
+  });
+}
+function renderDetailContent(w) {
+  const liked = isLiked(w.word);
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-top">
+      <div class="detail-word">${w.word}</div>
+      <button id="detailHeart" class="detail-heart ${liked ? 'liked' : ''}" onclick="handleDetailHeart(this, '${w.word}')">
+        ${liked ? '♥' : '♡'}
+      </button>
+    </div>
+    <div class="detail-pills">
+      <span class="pill-flag">${w.flag}</span>
+      <span class="pill-lang">${w.language}</span>
+      <span class="pill-pos">${w.partOfSpeech}</span>
+      <span class="detail-pronun">${w.pronunciation}</span>
+    </div>
+    <div class="star-row" id="starRow">
+      ${[1,2,3,4,5].map(i => `<button class="star-btn" onclick="rateWord('${w.word}', ${i})">☆</button>`).join('')}
+    </div>
+    <div class="detail-divider"></div>
+    <div class="detail-section-title">Definition</div>
+    ${w.definitions.map(d => `
+      <div class="detail-def">
+        <div class="detail-def-text">${d.meaning}</div>
+        ${d.example ? `<div class="detail-example">${d.example}</div>` : ''}
+      </div>`).join('')}
+    ${w.etymology ? `
+      <div class="detail-divider"></div>
+      <div class="detail-section-title">Etymology</div>
+      <div class="detail-etym">${w.etymology}</div>
+    ` : ''}
+    ${w.synonyms.length ? `
+      <div class="detail-divider"></div>
+      <div class="detail-section-title">Synonyms</div>
+      <div class="tags-wrap">${w.synonyms.map(s => `<span class="tag">${s}</span>`).join('')}</div>
+    ` : ''}
+    ${w.antonyms.length ? `
+      <div style="margin-top:12px;">
+        <div class="detail-section-title">Antonyms</div>
+        <div class="tags-wrap">${w.antonyms.map(a => `<span class="tag antonym">${a}</span>`).join('')}</div>
+      </div>
+    ` : ''}
+    ${w.relatedWords.length ? `
+      <div style="margin-top:12px;">
+        <div class="detail-section-title">Related Words</div>
+        <div class="tags-wrap">${w.relatedWords.map(r => `<span class="tag">${r}</span>`).join('')}</div>
+      </div>
+    ` : ''}
+  `;
+  renderStars(w.word);
+}
+function handleDetailHeart(btn, word) {
+  btn.classList.add('pop');
+  btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+  toggleLike(word);
+}
+function renderCollection() {
+  const liked = getLiked();
+  const container = document.getElementById('collectionList');
+  if (liked.length === 0) {
+    container.innerHTML = '<div class="collection-empty"><div class="collection-empty-icon">&#9825;</div>Your collection is empty.<br>Click &#9825; on any word to save it.</div>';
+    return;
+  }
+  container.innerHTML = liked.map(wordName => {
+    const w = WORDS.find(x => x.word === wordName);
+    if (!w) return '';
+    return `
+      <div class="collection-item" onclick="showDetail('${w.word}'); toggleCollection();">
+        <div>
+          <div class="collection-word">${w.word}</div>
+          <div class="collection-lang">${w.flag} ${w.language}</div>
+        </div>
+        <button class="collection-remove" onclick="event.stopPropagation(); toggleLike('${w.word}');">&#10005;</button>
+      </div>`;
+  }).join('');
+}
+function init() {
+  buildPrefsUI(); renderList(); updateNavCount();
+}
+document.addEventListener('click', e => {
+  const dd = document.getElementById('avatarDropdown');
+  if (dd.classList.contains('open') && !e.target.closest('.avatar-wrap')) dd.classList.remove('open');
+});
+init();
+</script>
+</body>
+</html>

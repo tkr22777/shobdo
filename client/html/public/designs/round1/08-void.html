@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Void — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --black: #0A0A0A;
+      --ink: #1A1A1A;
+      --muted: #888888;
+      --light: #F5F5F5;
+      --border: #E8E8E8;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: var(--white);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .back-link {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .back-link:hover { color: var(--ink); }
+
+    /* MAIN LAYOUT */
+    .void-layout {
+      display: flex;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* WORD LIST — right aligned, minimal */
+    .word-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      overflow-y: auto;
+      order: 2;
+    }
+
+    .sidebar-search {
+      padding: 0 32px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .search-input-minimal {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      padding: 4px 0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input-minimal:focus { border-bottom-color: var(--ink); }
+    .search-input-minimal::placeholder { color: var(--muted); font-style: italic; }
+
+    .filter-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 0 32px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .filter-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      border: none;
+      padding: 0;
+      position: relative;
+    }
+
+    .filter-dot:hover { background: var(--muted); }
+    .filter-dot.active { background: var(--ink); }
+
+    .filter-all {
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      border: none;
+    }
+
+    .filter-all.active { color: var(--ink); border-bottom: 1px solid var(--ink); }
+    .filter-all:hover { color: var(--ink); }
+
+    #count-label {
+      padding: 0 32px;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .word-list {
+      padding: 0;
+    }
+
+    .word-item {
+      display: block;
+      padding: 8px 32px;
+      cursor: pointer;
+      text-align: right;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .word-item:hover .wi-name { color: var(--ink); }
+    .word-item.active .wi-name { color: var(--ink); border-bottom: 1px solid var(--ink); }
+
+    .wi-name {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--muted);
+      display: block;
+      transition: color 0.15s;
+    }
+
+    .wi-lang-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--border);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .no-results {
+      padding: 20px 32px;
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* MAIN DISPLAY */
+    .void-main {
+      flex: 1;
+      order: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 80px;
+      min-height: 500px;
+    }
+
+    /* Empty state */
+    .void-empty {
+      text-align: center;
+    }
+
+    .void-empty-word {
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 300;
+      color: var(--border);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .void-empty-hint {
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Word display */
+    .void-content {
+      width: 100%;
+      max-width: 560px;
+      animation: fadeGently 0.6s ease;
+    }
+
+    @keyframes fadeGently {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .void-lang {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .void-lang::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--muted);
+    }
+
+    .void-word {
+      font-size: clamp(3.5rem, 8vw, 6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 0.95;
+      margin-bottom: 16px;
+    }
+
+    .void-pron {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .void-pos {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .void-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 32px;
+    }
+
+    .void-def {
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .void-example {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .void-example::before { content: '"'; }
+    .void-example::after { content: '"'; }
+
+    .void-meta {
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+    }
+
+    .void-meta-row {
+      margin-bottom: 24px;
+    }
+
+    .void-meta-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .void-meta-content {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .void-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .void-tag {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .void-tag::before { content: '— '; }
+
+    @media (max-width: 768px) {
+      .void-layout { flex-direction: column-reverse; }
+      .word-sidebar { width: 100%; border-right: none; border-top: 1px solid var(--border); order: 2; padding: 24px 0; max-height: 40vh; }
+      .void-main { order: 1; padding: 40px 32px; min-height: auto; }
+      .top-bar { padding: 20px 24px; }
+      .void-word { font-size: clamp(2.5rem, 10vw, 5rem); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="logo">Void</span>
+  <a href="index.html" class="back-link">Gallery</a>
+</div>
+
+<div class="void-layout">
+  <main class="void-main" id="voidMain">
+    <div class="void-empty">
+      <div class="void-empty-word">word</div>
+      <div class="void-empty-hint">Choose a word</div>
+    </div>
+  </main>
+
+  <aside class="word-sidebar">
+    <div class="sidebar-search">
+      <input type="text" class="search-input-minimal" id="search" placeholder="search…" autocomplete="off">
+    </div>
+    <div class="filter-dots" id="filterDots"></div>
+    <span class="count-label" id="count-label"></span>
+    <div class="word-list" id="wordList"></div>
+  </aside>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka.", synonyms: ["fortune", "luck", "chance"], antonyms: ["misfortune"], relatedWords: [] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' — lasting only a day.", synonyms: ["fleeting", "transient"], antonyms: ["permanent"], relatedWords: [] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth." }], etymology: "Welsh 'hir' (long) + 'aeth' (grief). Uniquely Welsh.", synonyms: ["longing", "nostalgia"], antonyms: [], relatedWords: [] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Sunlight filtering through the gaps between leaves of trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "Japanese 木(tree)+漏れ(leaking)+日(sun).", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Finding beauty in imperfection, impermanence, and incompleteness.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi perfectly." }], etymology: "From 'wabi' (simplicity) and 'sabi' (beauty of age). Zen Buddhism.", synonyms: ["imperfection"], antonyms: [], relatedWords: [] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "Deep nostalgic longing for something or someone loved and lost.", example: "The fado music filled the room with an aching saudade." }], etymology: "From Latin 'solitas' (solitude). Central to Portuguese culture.", synonyms: ["longing", "melancholy"], antonyms: [], relatedWords: [] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "Deep sadness about the state of the world; feeling that reality can never satisfy the soul.", example: "After reading the news, an overwhelming Weltschmerz settled over him." }], etymology: "German 'Welt'(world)+'Schmerz'(pain). Jean Paul, 1827.", synonyms: ["world-weariness", "ennui"], antonyms: [], relatedWords: [] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; longing for distant, far-off places.", example: "The Fernweh struck her so hard she booked a flight to Patagonia that night." }], etymology: "German 'fern'(far)+'Weh'(ache). Opposite of Heimweh.", synonyms: ["wanderlust"], antonyms: [], relatedWords: [] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when in an unfamiliar environment abroad.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "French 'dé-'(un-)+'pays'(country). Being 'un-countried'.", synonyms: ["disorientation"], antonyms: [], relatedWords: [] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "Time spent lingering at the table after a meal, in conversation.", example: "The sobremesa stretched into the afternoon as the family finished the wine." }], etymology: "Spanish 'sobre'(over)+'mesa'(table).", synonyms: ["lingering"], antonyms: [], relatedWords: [] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "Sanskrit 'ānanda' (bliss). Central to Hindu and Buddhist philosophy.", synonyms: ["joy", "bliss"], antonyms: [], relatedWords: [] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Boundless freedom.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "Sanskrit 'ākāśa' — one of the five classical elements.", synonyms: ["sky", "heaven"], antonyms: [], relatedWords: [] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A frugal, creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "Hindi/Punjabi. Internationally known as 'frugal innovation'.", synonyms: ["hack", "improvisation"], antonyms: [], relatedWords: [] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness felt after eating a large meal; post-lunch sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended." }], etymology: "Italian dialect, from 'abbiocarsi' (to doze off).", synonyms: ["drowsiness"], antonyms: [], relatedWords: [] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look between two people, each wishing the other would initiate something both desire.", example: "Their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "Yaghan language, Tierra del Fuego. Critically endangered.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog." }], etymology: "Russian тоска. Nabokov: 'spiritual anguish, often without cause'.", synonyms: ["melancholy", "ennui"], antonyms: [], relatedWords: [] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "Suspension of disbelief when a story is so convincing you forget it's not real.", example: "The novelist's prose created complete goya — the reader forgot the world entirely." }], etymology: "Urdu گویا. Describes the magical power of great narrative.", synonyms: ["immersion"], antonyms: [], relatedWords: [] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table by a wet glass or cup.", example: "The old bar was covered in culaccini from decades of evenings well spent." }], etymology: "Italian 'culo' (bottom). Circular impression of a moist vessel's base.", synonyms: ["ring", "watermark"], antonyms: [], relatedWords: [] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming euphoric feeling at the beginning of falling in love.", example: "She was in the full grip of forelsket — the world had turned golden." }], etymology: "Norwegian, from 'forelske seg' (to fall in love).", synonyms: ["infatuation", "euphoria"], antonyms: [], relatedWords: [] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so unfunny it paradoxically becomes funny.", example: "His timing was terrible and the whole room dissolved into laughter — pure jayus." }], etymology: "Indonesian slang. Humor of jokes that fail completely.", synonyms: ["cringe humor"], antonyms: [], relatedWords: [] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+let activeWord = null;
+
+function init() {
+  const dots = document.getElementById('filterDots');
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-all active';
+  allBtn.textContent = 'all';
+  allBtn.title = 'All languages';
+  allBtn.addEventListener('click', () => {
+    currentFilter = 'All';
+    document.querySelectorAll('.filter-dot, .filter-all').forEach(b => b.classList.remove('active'));
+    allBtn.classList.add('active');
+    renderList();
+  });
+  dots.appendChild(allBtn);
+
+  langs.slice(1).forEach(l => {
+    const dot = document.createElement('button');
+    dot.className = 'filter-dot';
+    dot.title = l;
+    dot.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.filter-dot, .filter-all').forEach(b => b.classList.remove('active'));
+      dot.classList.add('active');
+      renderList();
+    });
+    dots.appendChild(dot);
+  });
+
+  document.getElementById('search').addEventListener('input', renderList);
+  renderList();
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  document.getElementById('count-label').textContent = `${filtered.length} words`;
+
+  const container = document.getElementById('wordList');
+  container.innerHTML = '';
+
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">nothing found</div>'; return; }
+
+  filtered.forEach(w => {
+    const item = document.createElement('button');
+    item.className = 'word-item' + (activeWord === w.word ? ' active' : '');
+    item.innerHTML = `<span class="wi-name">${w.word}</span><span class="wi-lang-label">${w.language}</span>`;
+    item.addEventListener('click', () => { activeWord = w.word; showWord(w, item); });
+    container.appendChild(item);
+  });
+}
+
+function showWord(w, el) {
+  document.querySelectorAll('.word-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const syns = w.synonyms.length ? w.synonyms.map(s => `<span class="void-tag">${s}</span>`).join('') : '<span class="void-tag" style="opacity:.4">—</span>';
+  const ants = w.antonyms.length ? w.antonyms.map(s => `<span class="void-tag">${s}</span>`).join('') : '<span class="void-tag" style="opacity:.4">—</span>';
+
+  document.getElementById('voidMain').innerHTML = `
+    <div class="void-content">
+      <div class="void-lang">${w.flag} &nbsp; ${w.language}</div>
+      <div class="void-word">${w.word}</div>
+      <div class="void-pron">${w.pronunciation}</div>
+      <div class="void-pos">${w.partOfSpeech}</div>
+      <div class="void-rule"></div>
+      <div class="void-def">${w.definitions[0].meaning}</div>
+      ${w.definitions[0].example ? `<div class="void-example">${w.definitions[0].example}</div>` : ''}
+      <div class="void-meta">
+        <div class="void-meta-row">
+          <div class="void-meta-label">Etymology</div>
+          <div class="void-meta-content">${w.etymology}</div>
+        </div>
+        <div class="void-meta-row">
+          <div class="void-meta-label">Related</div>
+          <div class="void-tags">${syns}</div>
+        </div>
+        <div class="void-meta-row">
+          <div class="void-meta-label">Contrast</div>
+          <div class="void-tags">${ants}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

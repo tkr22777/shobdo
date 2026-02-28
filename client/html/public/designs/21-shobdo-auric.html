@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en" data-scheme="light" data-header="hero">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shobdo — Auric · A dictionary of beautiful words</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Noto+Serif+Bengali:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CSS CUSTOM PROPERTIES — COLOR SCHEMES
+    ============================================================ */
+    :root, [data-scheme="light"] {
+      --bg: #FBF8F0;
+      --surface: #FFFFFF;
+      --text: #1C1510;
+      --text-soft: #3D3028;
+      --muted: #8B7055;
+      --subtle: #F0EAD8;
+      --border: #E5D8C0;
+      --accent: #C4881A;
+      --accent-light: #FEF3DC;
+      --accent-dark: #8B5A08;
+      --card-active: #FFF8EC;
+      --list-bg: #FAFAF5;
+      --nav-bg: rgba(251,248,240,0.95);
+    }
+
+    [data-scheme="warm"] {
+      --bg: #EDE0C8;
+      --surface: #F5ECD8;
+      --text: #2A1208;
+      --text-soft: #4A2815;
+      --muted: #8A5A35;
+      --subtle: #E5D4B8;
+      --border: #D4BCA0;
+      --accent: #8B3A10;
+      --accent-light: #F5E0D0;
+      --accent-dark: #5A2008;
+      --card-active: #F0D8C0;
+      --list-bg: #EAD8C0;
+      --nav-bg: rgba(237,224,200,0.95);
+    }
+
+    [data-scheme="dark"] {
+      --bg: #1A1510;
+      --surface: #241E16;
+      --text: #F0EAD8;
+      --text-soft: #D4C8B0;
+      --muted: #9A8870;
+      --subtle: #2E2820;
+      --border: #3A3028;
+      --accent: #D4A83A;
+      --accent-light: #3A2E18;
+      --accent-dark: #F5C850;
+      --card-active: #2E2010;
+      --list-bg: #1E180E;
+      --nav-bg: rgba(26,21,16,0.95);
+    }
+
+    [data-scheme="dusk"] {
+      --bg: #2A1E34;
+      --surface: #341E40;
+      --text: #F5E8D8;
+      --text-soft: #D8C8B8;
+      --muted: #AA8888;
+      --subtle: #3A2840;
+      --border: #4A3454;
+      --accent: #E8A84A;
+      --accent-light: #3A2820;
+      --accent-dark: #F5C870;
+      --card-active: #3A2830;
+      --list-bg: #2A1A30;
+      --nav-bg: rgba(42,30,52,0.95);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      font-family: 'Source Serif 4', 'Georgia', serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+    a { color: inherit; }
+
+    /* ============================================================
+       CONTROLS NAV
+    ============================================================ */
+    .ctrl-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .brand-script {
+      font-family: 'Noto Serif Bengali', 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      transition: color 0.2s ease;
+    }
+
+    .brand-roman {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease;
+    }
+
+    .brand-sep {
+      color: var(--border);
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .scheme-group, .header-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s ease;
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      flex-shrink: 0;
+    }
+
+    .dot:hover { transform: scale(1.3); }
+
+    .dot.active {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px currentColor;
+      transform: scale(1.15);
+    }
+
+    .hpill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .hpill:hover { border-color: var(--accent); color: var(--accent); }
+    .hpill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .back-lnk {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+
+    .back-lnk:hover { color: var(--accent); }
+
+    /* ============================================================
+       HEADER SWITCHER — show only active
+    ============================================================ */
+    .hdr-minimal, .hdr-masthead, .hdr-hero, .hdr-banner { display: none; }
+    [data-header="minimal"] .hdr-minimal { display: block; }
+    [data-header="masthead"] .hdr-masthead { display: block; }
+    [data-header="hero"] .hdr-hero { display: block; }
+    [data-header="banner"] .hdr-banner { display: block; }
+
+    /* ---- HEADER 1: Minimal ---- */
+    .hdr-minimal {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hmin-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .hmin-script {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+      margin-bottom: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .hmin-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      transition: color 0.2s ease;
+    }
+
+    .hmin-rule {
+      width: 80px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 14px;
+      transition: background 0.2s ease;
+    }
+
+    .hmin-tagline {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      transition: color 0.2s ease;
+    }
+
+    /* ---- HEADER 2: Masthead ---- */
+    .hdr-masthead {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .mast-outer { max-width: 900px; margin: 0 auto; padding: 0 28px; }
+
+    .mast-rule {
+      width: 100%;
+      background: var(--text);
+      transition: background 0.2s ease;
+    }
+    .mast-rule--thick { height: 4px; margin: 20px 0 3px; }
+    .mast-rule--thin { height: 1px; margin: 3px 0 0; }
+    .mast-rule--thin + .mast-main { margin-top: 0; }
+
+    .mast-main {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 18px 0;
+      gap: 20px;
+    }
+
+    .mast-left, .mast-right {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: 'Source Serif 4', serif;
+      line-height: 1.6;
+      transition: color 0.2s ease;
+    }
+
+    .mast-right { text-align: right; }
+
+    .mast-center { text-align: center; }
+
+    .mast-script {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 2px;
+      transition: color 0.2s ease;
+    }
+
+    .mast-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: var(--text);
+      line-height: 1;
+      transition: color 0.2s ease;
+    }
+
+    .mast-subtitle {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .mast-rule + .mast-rule--thick { margin-top: 0; }
+
+    .wotd-strip {
+      background: var(--text);
+      color: var(--bg);
+      padding: 9px 20px;
+      font-size: 0.75rem;
+      font-family: 'Source Serif 4', serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .wotd-lbl {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    .wotd-sep { color: var(--muted); opacity: 0.5; }
+
+    .wotd-wd {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--accent-dark);
+      transition: color 0.2s ease;
+    }
+
+    .wotd-def {
+      font-style: italic;
+      opacity: 0.75;
+      flex: 1;
+    }
+
+    /* ---- HEADER 3: Hero ---- */
+    .hdr-hero {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      min-height: 220px;
+      text-align: center;
+    }
+
+    .hero-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 12rem;
+      font-weight: 700;
+      color: var(--text);
+      opacity: 0.04;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+
+    .hero-decor {
+      position: absolute;
+      left: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      opacity: 0.6;
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .hero-decor--right {
+      left: auto;
+      right: 80px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-script {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+      transition: color 0.2s ease;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.5rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+
+    .hero-sub {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 8px;
+      max-width: 380px;
+      line-height: 1.55;
+      transition: color 0.2s ease;
+    }
+
+    /* ---- HEADER 4: Banner ---- */
+    .hdr-banner {
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s ease;
+    }
+
+    .banner-inner {
+      background: #1C1510;
+      color: #F0EAD8;
+      display: flex;
+      align-items: stretch;
+      min-height: 180px;
+      padding: 0;
+    }
+
+    .banner-left {
+      padding: 36px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 0 0 auto;
+      min-width: 260px;
+    }
+
+    .banner-script {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #D4A83A;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .banner-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-style: italic;
+      font-weight: 400;
+      color: #F0EAD8;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .banner-tagline {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.72rem;
+      font-style: italic;
+      color: rgba(240,234,216,0.5);
+      margin-top: 8px;
+      letter-spacing: 0.06em;
+    }
+
+    .banner-divider {
+      width: 1px;
+      background: rgba(240,234,216,0.15);
+      margin: 28px 0;
+      flex-shrink: 0;
+    }
+
+    .banner-right {
+      flex: 1;
+      padding: 28px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border-left: none;
+    }
+
+    .banner-wotd-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #D4A83A;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .banner-wotd-word {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-style: italic;
+      color: #F0EAD8;
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+
+    .banner-wotd-lang {
+      font-size: 0.7rem;
+      color: rgba(240,234,216,0.5);
+      font-style: italic;
+      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .banner-wotd-def {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: rgba(240,234,216,0.7);
+      line-height: 1.6;
+      max-width: 420px;
+    }
+
+    /* ============================================================
+       SEARCH BAR
+    ============================================================ */
+    .search-section {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    #search {
+      width: 100%;
+      padding: 13px 20px 13px 48px;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.95rem;
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    #search::placeholder { color: var(--muted); }
+
+    #search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    /* ============================================================
+       LANGUAGE FILTER PILLS
+    ============================================================ */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 14px 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .lang-pill {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 0.73rem;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .lang-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .lang-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ============================================================
+       MAIN LAYOUT
+    ============================================================ */
+    .main-layout {
+      display: flex;
+      flex: 1;
+      min-height: calc(100vh - 200px);
+    }
+
+    /* ---- Word List Panel (Ember-style) ---- */
+    .word-list-panel {
+      width: 340px;
+      flex-shrink: 0;
+      background: var(--list-bg);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .list-header {
+      padding: 14px 20px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--list-bg);
+      z-index: 10;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    #count {
+      color: var(--accent);
+      font-style: italic;
+      font-family: 'Source Serif 4', serif;
+      font-weight: 400;
+      font-size: 0.75rem;
+      transition: color 0.2s ease;
+    }
+
+    .word-card {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .word-card:hover {
+      background: var(--subtle);
+      border-left-color: var(--accent);
+    }
+
+    .word-card.active {
+      background: var(--card-active);
+      border-left-color: var(--accent);
+    }
+
+    .wc-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+
+    .wc-word {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      transition: color 0.2s ease;
+    }
+
+    .wc-lang {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-style: italic;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    .wc-def {
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s ease;
+    }
+
+    .wc-pos {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-style: italic;
+      color: var(--accent);
+      margin-right: 5px;
+      transition: color 0.2s ease;
+    }
+
+    .no-results {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+
+    /* ---- Article Column (Folio-style) ---- */
+    .article-col {
+      flex: 1;
+      overflow-y: auto;
+      padding: 48px 52px;
+      background: var(--bg);
+      transition: background 0.2s ease;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 400px;
+      text-align: center;
+      color: var(--muted);
+      transition: color 0.2s ease;
+    }
+
+    .empty-ornament {
+      font-size: 4rem;
+      opacity: 0.2;
+      margin-bottom: 16px;
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+    }
+
+    .empty-state p {
+      font-family: 'Source Serif 4', serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Article Content ---- */
+    .article {
+      max-width: 620px;
+      animation: fadeUp 0.3s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .article-kicker {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .article-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 14px;
+      transition: color 0.2s ease;
+    }
+
+    .article-deck {
+      font-family: 'Source Serif 4', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-soft);
+      border-left: 3px solid var(--accent);
+      padding-left: 18px;
+      margin-bottom: 22px;
+      line-height: 1.55;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .article-byline {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .article-byline strong {
+      color: var(--text);
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .article-body {
+      font-family: 'Source Serif 4', serif;
+      column-count: 2;
+      column-gap: 36px;
+      column-rule: 1px solid var(--border);
+    }
+
+    .def-graf {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      margin-bottom: 18px;
+      break-inside: avoid;
+      color: var(--text);
+      transition: color 0.2s ease;
+    }
+
+    .dropcap::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      float: left;
+      line-height: 0.8;
+      margin-right: 10px;
+      margin-top: 6px;
+      color: var(--accent);
+      transition: color 0.2s ease;
+    }
+
+    .pull-quote {
+      column-span: all;
+      border-top: 2px solid var(--text);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      margin: 24px 0;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--text);
+      text-align: center;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .example-graf {
+      font-family: 'Source Serif 4', serif;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.875rem;
+      padding-left: 16px;
+      border-left: 3px solid var(--border);
+      break-inside: avoid;
+      margin-bottom: 18px;
+      line-height: 1.6;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .etymology-note {
+      column-span: all;
+      background: var(--subtle);
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.875rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+      margin: 16px 0;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .article-footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 2px solid var(--text);
+      transition: border-color 0.2s ease;
+    }
+
+    .footer-section { margin-bottom: 20px; }
+
+    .footer-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .word-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .word-tag {
+      font-size: 0.78rem;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-soft);
+      font-family: 'Source Serif 4', serif;
+      transition: border-color 0.15s ease, color 0.15s ease;
+      cursor: default;
+    }
+
+    .word-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .main-layout { flex-direction: column; }
+      .word-list-panel {
+        width: 100%;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .article-col { padding: 28px 24px; }
+      .article-body { column-count: 1; }
+      .hero-watermark { display: none; }
+      .hero-decor { display: none; }
+      .mast-left, .mast-right { display: none; }
+      .mast-main { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .ctrl-nav {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+      }
+      .nav-controls { flex-wrap: wrap; gap: 10px; }
+      .search-section { padding: 14px 16px; }
+      .filter-row { padding: 10px 16px; }
+      .hdr-hero .hero-inner { padding: 36px 20px; }
+      .banner-inner { flex-direction: column; }
+      .banner-left { padding: 24px 24px 16px; min-width: 0; }
+      .banner-divider { display: none; }
+      .banner-right { padding: 16px 24px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       CONTROLS NAV
+  ============================================================ -->
+  <nav class="ctrl-nav">
+    <div class="nav-brand">
+      <span class="brand-script">শব্দ</span>
+      <span class="brand-sep">·</span>
+      <span class="brand-roman">Shobdo</span>
+    </div>
+    <div class="nav-controls">
+      <div class="scheme-group">
+        <span class="ctrl-label">Theme</span>
+        <button class="dot active" data-s="light" style="background:#C4881A" title="Light"></button>
+        <button class="dot" data-s="warm" style="background:#8B3A10" title="Warm"></button>
+        <button class="dot" data-s="dark" style="background:#3A3028;border:1px solid #D4A83A" title="Dark"></button>
+        <button class="dot" data-s="dusk" style="background:#4A3454;border:1px solid #E8A84A" title="Dusk"></button>
+      </div>
+      <div class="header-group">
+        <span class="ctrl-label">Header</span>
+        <button class="hpill" data-h="minimal">Minimal</button>
+        <button class="hpill" data-h="masthead">Masthead</button>
+        <button class="hpill active" data-h="hero">Hero</button>
+        <button class="hpill" data-h="banner">Banner</button>
+      </div>
+    </div>
+    <a href="index.html" class="back-lnk">← Gallery</a>
+  </nav>
+
+  <!-- ============================================================
+       HEADER 1: MINIMAL
+  ============================================================ -->
+  <div class="hdr-minimal">
+    <div class="hmin-inner">
+      <div class="hmin-script">শব্দ</div>
+      <div class="hmin-title">Shobdo</div>
+      <div class="hmin-rule"></div>
+      <div class="hmin-tagline">The Dictionary of Beautiful Words</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       HEADER 2: MASTHEAD
+  ============================================================ -->
+  <div class="hdr-masthead">
+    <div class="mast-outer">
+      <div class="mast-rule mast-rule--thick"></div>
+      <div class="mast-rule mast-rule--thin"></div>
+      <div class="mast-main">
+        <div class="mast-left">Vol. I &nbsp;&middot;&nbsp; No. 1<br>Est. MMXXIV</div>
+        <div class="mast-center">
+          <div class="mast-script">শব্দ</div>
+          <div class="mast-title">SHOBDO</div>
+          <div class="mast-subtitle">The Dictionary of Living Languages</div>
+        </div>
+        <div class="mast-right">
+          <span id="mastDate"></span><br>
+          20 Languages
+        </div>
+      </div>
+      <div class="mast-rule mast-rule--thin"></div>
+      <div class="mast-rule mast-rule--thick"></div>
+      <div class="wotd-strip">
+        <span class="wotd-lbl">Word of the Day</span>
+        <span class="wotd-sep">&middot;</span>
+        <span class="wotd-wd" id="wotdWord"></span>
+        <span class="wotd-sep">&middot;</span>
+        <span class="wotd-def" id="wotdDef"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       HEADER 3: HERO
+  ============================================================ -->
+  <div class="hdr-hero">
+    <div class="hero-inner">
+      <div class="hero-decor">
+        <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
+          <path d="M10 75 Q20 50 50 10" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+          <path d="M10 75 Q30 55 50 10 Q38 40 25 60 Q18 70 10 75Z" fill="currentColor" opacity="0.08"/>
+          <path d="M28 52 Q35 38 48 20" stroke="currentColor" stroke-width="0.8" opacity="0.2"/>
+          <path d="M20 62 Q30 48 45 28" stroke="currentColor" stroke-width="0.8" opacity="0.15"/>
+        </svg>
+      </div>
+      <div class="hero-watermark">শব্দ</div>
+      <div class="hero-content">
+        <div class="hero-script">শব্দ</div>
+        <h1 class="hero-title">Shobdo</h1>
+        <p class="hero-sub">A living dictionary of beautiful words across every language</p>
+      </div>
+      <div class="hero-decor hero-decor--right">
+        <svg width="60" height="80" viewBox="0 0 60 80" fill="none" style="transform:scaleX(-1)">
+          <path d="M10 75 Q20 50 50 10" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+          <path d="M10 75 Q30 55 50 10 Q38 40 25 60 Q18 70 10 75Z" fill="currentColor" opacity="0.08"/>
+          <path d="M28 52 Q35 38 48 20" stroke="currentColor" stroke-width="0.8" opacity="0.2"/>
+          <path d="M20 62 Q30 48 45 28" stroke="currentColor" stroke-width="0.8" opacity="0.15"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       HEADER 4: BANNER
+  ============================================================ -->
+  <div class="hdr-banner">
+    <div class="banner-inner">
+      <div class="banner-left">
+        <div class="banner-script">শব্দ</div>
+        <div class="banner-title">Shobdo</div>
+        <div class="banner-tagline">Dictionary of Living Languages</div>
+      </div>
+      <div class="banner-divider"></div>
+      <div class="banner-right">
+        <div class="banner-wotd-label">Word of the Day</div>
+        <div class="banner-wotd-word" id="bannerWotdWord"></div>
+        <div class="banner-wotd-lang" id="bannerWotdLang"></div>
+        <div class="banner-wotd-def" id="bannerWotdDef"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SEARCH BAR
+  ============================================================ -->
+  <div class="search-section">
+    <div class="search-wrap">
+      <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search" placeholder="Search words, languages, meanings…" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LANGUAGE FILTER PILLS
+  ============================================================ -->
+  <div class="filter-row" id="filterRow"></div>
+
+  <!-- ============================================================
+       MAIN LAYOUT
+  ============================================================ -->
+  <div class="main-layout">
+    <div class="word-list-panel">
+      <div class="list-header">
+        <span class="list-hdr-label">Words</span>
+        <span id="count"></span>
+      </div>
+      <div id="wordList"></div>
+    </div>
+    <div class="article-col" id="articleCol">
+      <div class="empty-state">
+        <div class="empty-ornament">&#10022;</div>
+        <p>Select a word from the index<br>to read its full entry</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCRIPT
+  ============================================================ -->
+  <script>
+    const WORDS = [
+      { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: ["happy accident", "fortunate"] },
+      { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: ["transience", "impermanence"] },
+      { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home or place you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska", "nostalgia"] },
+      { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (ko, tree) + 漏れ (more, leaking/filtering) + 日 (bi, sun/light). A compound noun describing a precise visual phenomenon.", synonyms: [], antonyms: [], relatedWords: ["wabi-sabi", "mono no aware"] },
+      { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on accepting transience and imperfection; finding beauty in the imperfect, impermanent, and incomplete.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi in its most perfect form." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (the beauty of age and wear). A central concept in Japanese aesthetics rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: ["komorebi", "mono no aware", "kintsugi"] },
+      { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something or someone loved and lost, or perhaps never possessed.", example: "The fado music filled the room with an aching saudade that brought tears to his eyes." }], etymology: "From Latin 'solitas' (solitude). A defining concept of Portuguese and Brazilian culture, closely tied to the musical genre of fado.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: ["hiraeth", "toska", "desiderio"] },
+      { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "A deep sadness and weariness about the state of the world; a feeling that reality can never satisfy the soul's ideal.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "From German 'Welt' (world) + 'Schmerz' (pain, grief). Coined by Jean Paul in his 1827 novel 'Selina'.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism", "joie de vivre"], relatedWords: ["Fernweh", "Sehnsucht"] },
+      { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; a strong longing for distant, far-off places. The opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that same night." }], etymology: "From German 'fern' (far) + 'Weh' (pain, ache). The opposite of 'Heimweh' (homesickness, literally 'home-ache').", synonyms: ["wanderlust", "travel longing"], antonyms: ["Heimweh", "homesickness"], relatedWords: ["wanderlust", "Weltschmerz"] },
+      { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when abroad or in an unfamiliar environment; the feeling of being a stranger in a foreign land.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "From French 'dé-' (un-) + 'pays' (country) + '-ment'. The sense of being 'un-countried' or removed from one's native land.", synonyms: ["disorientation", "estrangement", "alienation"], antonyms: ["belonging", "familiarity"], relatedWords: ["wanderlust", "exile"] },
+      { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal has ended, engaged in conversation, drink, and relaxation.", example: "The sobremesa stretched into the afternoon as the family swapped stories and finished the wine." }], etymology: "From Spanish 'sobre' (over/on) + 'mesa' (table). Literally meaning 'over the table', reflecting the Mediterranean culture of unhurried post-meal socializing.", synonyms: ["lingering", "after-dinner conversation"], antonyms: [], relatedWords: ["convivialité", "dolce far niente"] },
+      { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight. A fundamental concept in Bengali and Sanskrit philosophy.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss, joy). A concept central to Hindu and Buddhist philosophy, representing the highest state of happiness.", synonyms: ["joy", "bliss", "delight", "happiness"], antonyms: ["দুঃখ (grief)", "বিষাদ (sorrow)"], relatedWords: ["সুখ", "আহ্লাদ"] },
+      { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Carries connotations of boundless freedom and infinite space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' meaning 'sky' or 'ether', one of the five classical elements (Panchabhutas). Represents space and openness.", synonyms: ["sky", "heaven", "expanse", "firmament"], antonyms: [], relatedWords: ["মেঘ (cloud)", "তারা (star)"] },
+      { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A flexible, frugal innovation; a creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi, meaning a workaround or hack. Popularized internationally through business literature as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround", "innovation"], antonyms: [], relatedWords: ["innovation", "frugality", "resourcefulness"] },
+      { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness you feel after eating a big meal; a post-lunch or post-dinner sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the whole family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off). The word perfectly captures the particular quality of food-induced sleepiness.", synonyms: ["drowsiness", "food coma", "lethargy"], antonyms: [], relatedWords: ["sobremesa", "siesta", "riposo"] },
+      { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something that both desire but neither wants to start.", example: "Across the crowded room, their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego, an indigenous language of South America. Considered one of the most succinct words in the world. The language is now critically endangered.", synonyms: [], antonyms: [], relatedWords: ["longing", "hesitation", "mutual desire"] },
+      { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a dull ache of the soul, a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog, heavy and formless." }], etymology: "From Russian тоска. Vladimir Nabokov described it as 'a sensation of great spiritual anguish, often without specific cause'. A core element of the Russian literary soul.", synonyms: ["melancholy", "ennui", "longing", "languor"], antonyms: [], relatedWords: ["saudade", "hiraeth", "Weltschmerz"] },
+      { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief experienced when a story is so convincing you forget it is not real; the transporting quality of great storytelling.", example: "The novelist's prose was so vivid it created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in Urdu poetry and literary criticism to describe the almost magical power of great narrative to make one believe the impossible.", synonyms: ["immersion", "suspension of disbelief"], antonyms: ["skepticism"], relatedWords: ["narrative", "storytelling", "fiction"] },
+      { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table or surface by a wet glass or cup.", example: "The old wooden bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom, tail). The word refers specifically to the circular impression left by the base of a moist vessel. Pleasantly specific.", synonyms: ["ring", "watermark", "stain"], antonyms: [], relatedWords: ["patina", "trace"] },
+      { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming, euphoric feeling at the beginning of falling in love; the intoxicating rush of new romantic feelings.", example: "She was in the full grip of forelsket — the world had turned golden and everything seemed possible." }], etymology: "From Norwegian/Danish, related to 'forelsket seg' (to fall in love). Captures the specifically intoxicating, slightly dizzying quality of new love.", synonyms: ["infatuation", "love rush", "euphoria"], antonyms: ["heartbreak"], relatedWords: ["falling in love", "lovesickness"] },
+      { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so poorly told, or so unfunny, that it paradoxically becomes funny; a humor of badness.", example: "His timing was so terrible and the punchline so weak that the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang, widely used in Indonesian youth culture and social media. Describes the peculiar humor of jokes that fail so completely they succeed.", synonyms: ["so-bad-it's-good", "cringe humor"], antonyms: [], relatedWords: ["corny", "dad joke"] }
+    ];
+
+    // ---- Scheme + Header switcher ----
+    function setScheme(s) {
+      document.documentElement.dataset.scheme = s;
+      document.querySelectorAll('.dot').forEach(d => d.classList.toggle('active', d.dataset.s === s));
+      localStorage.setItem('shobdo_scheme', s);
+    }
+
+    function setHeader(h) {
+      document.documentElement.dataset.header = h;
+      document.querySelectorAll('.hpill').forEach(p => p.classList.toggle('active', p.dataset.h === h));
+      localStorage.setItem('shobdo_header', h);
+    }
+
+    // ---- Word of the Day ----
+    const wotd = WORDS[Math.floor(Math.random() * WORDS.length)];
+
+    function setWotd() {
+      const w  = document.getElementById('wotdWord');
+      const d  = document.getElementById('wotdDef');
+      const bw = document.getElementById('bannerWotdWord');
+      const bl = document.getElementById('bannerWotdLang');
+      const bd = document.getElementById('bannerWotdDef');
+      if (w)  w.textContent  = wotd.flag + ' ' + wotd.word;
+      if (d)  d.textContent  = wotd.definitions[0].meaning.substring(0, 80) + '…';
+      if (bw) bw.textContent = wotd.flag + ' ' + wotd.word;
+      if (bl) bl.textContent = wotd.language + ' · ' + wotd.partOfSpeech;
+      if (bd) bd.textContent = wotd.definitions[0].meaning;
+      const md = document.getElementById('mastDate');
+      if (md) md.textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    // ---- Filter state ----
+    const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+    let currentFilter = 'All';
+    let currentWord = null;
+
+    function init() {
+      // Restore saved preferences
+      const savedScheme = localStorage.getItem('shobdo_scheme') || 'light';
+      const savedHeader = localStorage.getItem('shobdo_header') || 'hero';
+      setScheme(savedScheme);
+      setHeader(savedHeader);
+
+      // Scheme dots
+      document.querySelectorAll('.dot').forEach(d => {
+        d.addEventListener('click', () => setScheme(d.dataset.s));
+      });
+
+      // Header pills
+      document.querySelectorAll('.hpill').forEach(p => {
+        p.addEventListener('click', () => setHeader(p.dataset.h));
+      });
+
+      // Build language filter pills
+      const fr = document.getElementById('filterRow');
+      langs.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = 'lang-pill' + (l === 'All' ? ' active' : '');
+        btn.textContent = l;
+        btn.addEventListener('click', () => {
+          currentFilter = l;
+          document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderList();
+        });
+        fr.appendChild(btn);
+      });
+
+      document.getElementById('search').addEventListener('input', renderList);
+
+      setWotd();
+      renderList();
+    }
+
+    function renderList() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = WORDS.filter(w => {
+        const matchLang = currentFilter === 'All' || w.language === currentFilter;
+        const matchQ = !q
+          || w.word.toLowerCase().includes(q)
+          || w.language.toLowerCase().includes(q)
+          || w.definitions[0].meaning.toLowerCase().includes(q);
+        return matchLang && matchQ;
+      }).sort((a, b) => a.word.localeCompare(b.word));
+
+      const container = document.getElementById('wordList');
+      container.innerHTML = '';
+      document.getElementById('count').textContent = filtered.length + ' words';
+
+      if (!filtered.length) {
+        container.innerHTML = '<div class="no-results">No words found</div>';
+        return;
+      }
+
+      filtered.forEach(w => {
+        const card = document.createElement('div');
+        card.className = 'word-card' + (currentWord && currentWord.word === w.word ? ' active' : '');
+        card.innerHTML =
+          '<div class="wc-top">' +
+            '<span class="wc-word">' + w.flag + ' ' + w.word + '</span>' +
+            '<span class="wc-lang">' + w.language + '</span>' +
+          '</div>' +
+          '<div class="wc-def"><span class="wc-pos">' + w.partOfSpeech + '</span>' +
+            escapeHtml(w.definitions[0].meaning.substring(0, 58)) + '…' +
+          '</div>';
+        card.addEventListener('click', () => showDetail(w, card));
+        container.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showDetail(w, el) {
+      currentWord = w;
+      document.querySelectorAll('.word-card').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      const syns = w.synonyms.length
+        ? '<div class="word-tags">' + w.synonyms.map(s => '<span class="word-tag">' + escapeHtml(s) + '</span>').join('') + '</div>'
+        : '<span style="color:var(--muted);font-style:italic">&mdash;</span>';
+
+      const ants = w.antonyms.length
+        ? '<div class="word-tags">' + w.antonyms.map(s => '<span class="word-tag">' + escapeHtml(s) + '</span>').join('') + '</div>'
+        : '<span style="color:var(--muted);font-style:italic">&mdash;</span>';
+
+      const related = w.relatedWords && w.relatedWords.length
+        ? '<div class="word-tags">' + w.relatedWords.map(s => '<span class="word-tag">' + escapeHtml(s) + '</span>').join('') + '</div>'
+        : '';
+
+      const exampleHtml = w.definitions[0].example
+        ? '<p class="example-graf">&ldquo;' + escapeHtml(w.definitions[0].example) + '&rdquo;</p>'
+        : '';
+
+      document.getElementById('articleCol').innerHTML =
+        '<div class="article">' +
+          '<div class="article-kicker">' + w.flag + ' &nbsp; ' + escapeHtml(w.language) + ' &nbsp; &bull; &nbsp; ' + escapeHtml(w.partOfSpeech) + '</div>' +
+          '<div class="article-headline">' + w.word + '</div>' +
+          '<div class="article-deck">' + escapeHtml(w.pronunciation) + ' &nbsp;&mdash;&nbsp; <em>' + escapeHtml(w.partOfSpeech) + '</em></div>' +
+          '<div class="article-byline">' +
+            'Language: <strong>' + escapeHtml(w.language) + '</strong>' +
+            ' &nbsp;&nbsp; Type: <strong>' + escapeHtml(w.partOfSpeech) + '</strong>' +
+            ' &nbsp;&nbsp; Script: <strong>' + escapeHtml(w.languageCode.toUpperCase()) + '</strong>' +
+          '</div>' +
+          '<div class="article-body">' +
+            '<p class="def-graf dropcap">' + escapeHtml(w.definitions[0].meaning) + '</p>' +
+            exampleHtml +
+            '<div class="pull-quote">' + w.word + ' &mdash; ' + escapeHtml(w.language) + '</div>' +
+            '<div class="etymology-note"><strong>Etymology</strong><br>' + escapeHtml(w.etymology) + '</div>' +
+          '</div>' +
+          '<div class="article-footer">' +
+            (w.synonyms.length ? '<div class="footer-section"><div class="footer-label">Synonyms</div>' + syns + '</div>' : '') +
+            (w.antonyms.length ? '<div class="footer-section"><div class="footer-label">Antonyms</div>' + ants + '</div>' : '') +
+            (w.relatedWords && w.relatedWords.length ? '<div class="footer-section"><div class="footer-label">Related Words</div>' + related + '</div>' : '') +
+          '</div>' +
+        '</div>';
+    }
+
+    init();
+  </script>
+</body>
+</html>

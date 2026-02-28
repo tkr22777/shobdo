@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kodak — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FDF6E3;
+      --cream-dark: #F0E5C8;
+      --brown: #3E2723;
+      --brown-mid: #6D4C41;
+      --brown-light: #A1887F;
+      --red-stamp: #8B1A1A;
+      --blue-ink: #1A237E;
+      --border: #C4A882;
+    }
+
+    body {
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    /* MASTHEAD */
+    .kodak-header {
+      border: 3px solid var(--brown);
+      border-bottom: none;
+      margin: 24px 32px 0;
+      padding: 20px 32px;
+      position: relative;
+    }
+
+    /* Double border corners */
+    .kodak-header::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid var(--brown);
+      pointer-events: none;
+    }
+
+    .header-inner {
+      text-align: center;
+      position: relative;
+    }
+
+    .header-vol {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--brown-mid);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--brown);
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .header-rule {
+      border: none;
+      border-top: 2px solid var(--brown);
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .header-sub {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+    }
+
+    .header-stamp {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 0.6rem;
+      font-family: 'Special Elite', cursive;
+      color: var(--red-stamp);
+      border: 2px solid var(--red-stamp);
+      padding: 4px 8px;
+      transform: rotate(-8deg);
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      font-size: 0.68rem;
+      color: var(--brown-mid);
+      text-decoration: none;
+      font-family: 'Courier Prime', monospace;
+    }
+    .back-link:hover { color: var(--red-stamp); }
+
+    /* SEARCH SECTION */
+    .search-section {
+      margin: 0 32px;
+      border: 3px solid var(--brown);
+      border-top: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--cream-dark);
+    }
+
+    .search-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--brown-mid);
+      white-space: nowrap;
+    }
+
+    #search {
+      flex: 1;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      border: none;
+      border-bottom: 2px solid var(--brown);
+      background: transparent;
+      color: var(--brown);
+      outline: none;
+      padding: 4px 2px;
+      max-width: 400px;
+    }
+
+    #search::placeholder { color: var(--brown-light); }
+    #search:focus { border-bottom-color: var(--red-stamp); }
+
+    /* FILTER ROW */
+    .filter-row {
+      margin: 0 32px;
+      border: 3px solid var(--brown);
+      border-top: none;
+      padding: 10px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: var(--cream);
+    }
+
+    .lang-btn {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--brown-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .lang-btn:hover { border-color: var(--brown); color: var(--brown); }
+    .lang-btn.active { background: var(--brown); color: var(--cream); border-color: var(--brown); }
+
+    /* MAIN CONTENT */
+    .kodak-body {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      margin: 0 32px;
+      border: 3px solid var(--brown);
+      border-top: none;
+      min-height: calc(100vh - 260px);
+    }
+
+    /* INDEX */
+    .index-col {
+      border-right: 2px solid var(--brown);
+      overflow-y: auto;
+      background: var(--cream-dark);
+    }
+
+    .index-header {
+      padding: 10px 16px;
+      border-bottom: 2px solid var(--brown);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Special Elite', cursive;
+    }
+
+    #count { color: var(--red-stamp); }
+
+    .index-item {
+      display: flex;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      align-items: baseline;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+
+    .index-item:hover { background: rgba(62,39,35,0.06); }
+    .index-item.active { background: rgba(139,26,26,0.08); }
+
+    .idx-num {
+      font-size: 0.62rem;
+      color: var(--brown-light);
+      font-family: 'Courier Prime', monospace;
+      width: 24px;
+      flex-shrink: 0;
+    }
+
+    .idx-word {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.9rem;
+      color: var(--brown);
+      flex: 1;
+    }
+
+    .idx-lang {
+      font-size: 0.6rem;
+      color: var(--brown-light);
+      font-style: italic;
+    }
+
+    .no-results {
+      padding: 24px 16px;
+      font-style: italic;
+      color: var(--brown-light);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    /* FOLIO */
+    .folio-col {
+      overflow-y: auto;
+      padding: 36px 40px;
+    }
+
+    .folio-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--brown-light);
+      text-align: center;
+    }
+
+    .folio-empty-char {
+      font-family: 'Special Elite', cursive;
+      font-size: 5rem;
+      opacity: 0.15;
+      margin-bottom: 12px;
+    }
+
+    .folio-empty-text { font-style: italic; font-size: 0.875rem; }
+
+    /* FOLIO CONTENT */
+    .folio-content {
+      max-width: 560px;
+      animation: typeReveal 0.15s ease;
+    }
+
+    @keyframes typeReveal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Stamp badge for part of speech */
+    .pos-stamp {
+      display: inline-block;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red-stamp);
+      border: 2px solid var(--red-stamp);
+      padding: 3px 10px;
+      transform: rotate(-2deg);
+      margin-bottom: 16px;
+    }
+
+    .folio-lang {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 8px;
+    }
+
+    .folio-word {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      color: var(--brown);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .folio-pron {
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--brown-mid);
+      margin-bottom: 20px;
+    }
+
+    .double-rule {
+      border: none;
+      border-top: 3px double var(--brown);
+      margin: 20px 0;
+    }
+
+    .folio-section-head {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      margin-bottom: 10px;
+      font-family: 'Courier Prime', monospace;
+    }
+
+    .folio-def {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--brown);
+      margin-bottom: 12px;
+    }
+
+    .folio-example {
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--brown-mid);
+      padding: 10px 16px;
+      border-left: 3px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .folio-etym {
+      font-size: 0.85rem;
+      color: var(--brown-mid);
+      line-height: 1.65;
+      background: var(--cream-dark);
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+    }
+
+    .folio-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .folio-tag {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border: 1px solid var(--border);
+      color: var(--brown-mid);
+    }
+
+    .folio-footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.65rem;
+      color: var(--brown-light);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Courier Prime', monospace;
+    }
+
+    @media (max-width: 900px) {
+      .kodak-header, .search-section, .filter-row, .kodak-body { margin-left: 16px; margin-right: 16px; }
+      .kodak-body { grid-template-columns: 1fr; }
+      .index-col { max-height: 35vh; border-right: none; border-bottom: 2px solid var(--brown); }
+      .folio-col { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="kodak-header">
+  <div class="header-inner">
+    <div class="back-link"><a href="index.html" style="color:inherit;text-decoration:none">← Gallery</a></div>
+    <div class="header-stamp">BETA EDITION</div>
+    <div class="header-vol">Established MMXXIV &mdash; Vol. I &mdash; Issue No. 1</div>
+    <div class="header-title">THE KODAK LEXICON</div>
+    <hr class="header-rule">
+    <div class="header-sub">A Compendium of Beautiful Words from Around the World</div>
+  </div>
+</div>
+
+<div class="search-section">
+  <span class="search-label">LOOK UP :</span>
+  <input type="text" id="search" placeholder="type here..." autocomplete="off">
+  <span style="font-size:.72rem;color:var(--brown-light)" id="count"></span>
+</div>
+
+<div class="filter-row" id="filterRow"></div>
+
+<div class="kodak-body">
+  <div class="index-col">
+    <div class="index-header">
+      <span>Index</span>
+    </div>
+    <div id="wordList"></div>
+  </div>
+  <div class="folio-col" id="folioPanel">
+    <div class="folio-empty">
+      <div class="folio-empty-char">❦</div>
+      <div class="folio-empty-text">Select an entry from the index to read its definition</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale.", synonyms: ["fortune", "luck", "chance"], antonyms: ["misfortune"], relatedWords: [] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day'.", synonyms: ["fleeting", "transient"], antonyms: ["permanent"], relatedWords: [] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth." }], etymology: "Welsh 'hir' (long) + 'aeth' (grief). Uniquely Welsh.", synonyms: ["longing", "nostalgia"], antonyms: [], relatedWords: [] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Sunlight filtering through the gaps between leaves of trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "Japanese 木(tree)+漏れ(leaking)+日(sun).", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Finding beauty in imperfection, impermanence, and incompleteness.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi perfectly." }], etymology: "From 'wabi' (simplicity) and 'sabi' (beauty of age). Zen Buddhism.", synonyms: ["imperfection"], antonyms: [], relatedWords: [] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "Deep nostalgic longing for something or someone loved and lost.", example: "The fado music filled the room with an aching saudade." }], etymology: "From Latin 'solitas' (solitude). Central to Portuguese culture.", synonyms: ["longing", "melancholy"], antonyms: [], relatedWords: [] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "Deep sadness about the state of the world.", example: "After reading the news, an overwhelming Weltschmerz settled over him." }], etymology: "German 'Welt'(world)+'Schmerz'(pain). Jean Paul, 1827.", synonyms: ["world-weariness"], antonyms: [], relatedWords: [] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; longing for distant, far-off places.", example: "The Fernweh struck her so hard she booked a flight to Patagonia that night." }], etymology: "German 'fern'(far)+'Weh'(ache). Opposite of Heimweh.", synonyms: ["wanderlust"], antonyms: [], relatedWords: [] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when in an unfamiliar environment abroad.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "French 'dé-'(un-)+'pays'(country).", synonyms: ["disorientation"], antonyms: [], relatedWords: [] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "Time spent lingering at the table after a meal, in conversation.", example: "The sobremesa stretched into the afternoon as the family finished the wine." }], etymology: "Spanish 'sobre'(over)+'mesa'(table).", synonyms: ["lingering"], antonyms: [], relatedWords: [] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "Sanskrit 'ānanda' (bliss). Hindu and Buddhist philosophy.", synonyms: ["joy", "bliss"], antonyms: [], relatedWords: [] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Boundless freedom.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "Sanskrit 'ākāśa' — one of the five classical elements.", synonyms: ["sky", "heaven"], antonyms: [], relatedWords: [] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A frugal, creative workaround or improvised solution.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "Hindi/Punjabi. 'Frugal innovation'.", synonyms: ["hack", "improvisation"], antonyms: [], relatedWords: [] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness felt after eating a large meal.", example: "After the enormous Sunday feast, an inevitable abbiocco descended." }], etymology: "Italian dialect, from 'abbiocarsi' (to doze off).", synonyms: ["drowsiness"], antonyms: [], relatedWords: [] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look between two people, each wishing the other would initiate something both desire.", example: "Their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "Yaghan language, Tierra del Fuego. Critically endangered.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; vague restlessness.", example: "On grey winter afternoons, toska would settle over him like fog." }], etymology: "Russian тоска. Nabokov: 'spiritual anguish, often without cause'.", synonyms: ["melancholy", "ennui"], antonyms: [], relatedWords: [] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "Suspension of disbelief when a story is so convincing you forget it's not real.", example: "The novelist's prose created complete goya — the reader forgot the world entirely." }], etymology: "Urdu گویا. The power of great narrative.", synonyms: ["immersion"], antonyms: [], relatedWords: [] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table by a wet glass or cup.", example: "The old bar was covered in culaccini from decades of evenings well spent." }], etymology: "Italian 'culo' (bottom). Circular impression of a moist vessel's base.", synonyms: ["ring", "watermark"], antonyms: [], relatedWords: [] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming euphoric feeling at the beginning of falling in love.", example: "She was in the full grip of forelsket — the world had turned golden." }], etymology: "Norwegian, from 'forelske seg' (to fall in love).", synonyms: ["infatuation", "euphoria"], antonyms: [], relatedWords: [] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so unfunny it paradoxically becomes funny.", example: "His timing was terrible and the whole room dissolved into laughter — pure jayus." }], etymology: "Indonesian slang. Humor of jokes that fail completely.", synonyms: ["cringe humor"], antonyms: [], relatedWords: [] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+let activeWord = null;
+let visibleCount = 0;
+
+function init() {
+  const fr = document.getElementById('filterRow');
+  langs.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-btn' + (l === 'All' ? ' active' : '');
+    btn.textContent = l;
+    btn.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    });
+    fr.appendChild(btn);
+  });
+  document.getElementById('search').addEventListener('input', renderList);
+  renderList();
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  visibleCount = filtered.length;
+  document.getElementById('count').textContent = `${filtered.length} entr${filtered.length !== 1 ? 'ies' : 'y'}`;
+
+  const container = document.getElementById('wordList');
+  container.innerHTML = '';
+
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">No entries found.</div>'; return; }
+
+  filtered.forEach((w, i) => {
+    const item = document.createElement('div');
+    item.className = 'index-item' + (activeWord === w.word ? ' active' : '');
+    item.innerHTML = `<span class="idx-num">${(i+1).toString().padStart(3,'0')}.</span><span class="idx-word">${w.word}</span><span class="idx-lang">${w.language}</span>`;
+    item.addEventListener('click', () => { activeWord = w.word; showFolio(w, item); });
+    container.appendChild(item);
+  });
+}
+
+function showFolio(w, el) {
+  document.querySelectorAll('.index-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const syns = w.synonyms.length ? w.synonyms.map(s => `<span class="folio-tag">${s}</span>`).join('') : '<span style="color:var(--brown-light);font-size:.8rem">none recorded</span>';
+  const ants = w.antonyms.length ? w.antonyms.map(s => `<span class="folio-tag">${s}</span>`).join('') : '<span style="color:var(--brown-light);font-size:.8rem">none recorded</span>';
+
+  document.getElementById('folioPanel').innerHTML = `
+    <div class="folio-content">
+      <div class="folio-lang">${w.flag} &nbsp; ${w.language} &nbsp; &bull; &nbsp; ${w.languageCode.toUpperCase()}</div>
+      <div class="folio-word">${w.word}</div>
+      <div class="folio-pron">${w.pronunciation}</div>
+      <div class="pos-stamp">${w.partOfSpeech}</div>
+      <hr class="double-rule">
+      <div class="folio-section-head">Definition</div>
+      <div class="folio-def">${w.definitions[0].meaning}</div>
+      ${w.definitions[0].example ? `<div class="folio-example">"${w.definitions[0].example}"</div>` : ''}
+      <hr class="double-rule">
+      <div class="folio-section-head">Etymology &amp; Notes</div>
+      <div class="folio-etym">${w.etymology}</div>
+      <hr class="double-rule">
+      <div class="folio-section-head" style="margin-bottom:8px">Synonyms</div>
+      <div class="folio-tags" style="margin-bottom:16px">${syns}</div>
+      <div class="folio-section-head" style="margin-bottom:8px">Antonyms</div>
+      <div class="folio-tags">${ants}</div>
+      <div class="folio-footer">
+        <span>THE KODAK LEXICON</span>
+        <span>${w.language} &mdash; ${w.languageCode.toUpperCase()}</span>
+        <span>Vol. I, Issue 1</span>
+      </div>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

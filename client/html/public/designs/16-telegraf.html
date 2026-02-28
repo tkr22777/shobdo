@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegraf — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FEFCE8;
+      --surface: #FFFEF5;
+      --text: #1C1C1C;
+      --muted: #5A5040;
+      --border: #D4CC90;
+      --accent: #1C1C1C;
+      --yellow: #FEFCE8;
+      --yellow-dark: #F0E840;
+      --red-tape: #CC0000;
+    }
+
+    body {
+      font-family: 'Special Elite', monospace;
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L0 0L0 20' fill='none' stroke='%231C1C1C' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* TICKER ANIMATION */
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .ticker-wrap {
+      overflow: hidden;
+      background: #1C1C1C;
+      color: #FEFCE8;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.75rem;
+      padding: 6px 0;
+      white-space: nowrap;
+    }
+    .ticker-content {
+      display: inline-block;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker-sep { margin: 0 16px; opacity: 0.5; }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 3px solid var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      height: 52px;
+    }
+    .nav-logo {
+      font-family: 'Special Elite', monospace;
+      font-size: 1.1rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+    .nav-back {
+      text-decoration: none;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--text); }
+    .nav-spacer { flex: 1; }
+    .nav-btn {
+      background: none;
+      border: 2px solid var(--text);
+      border-radius: 0;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: var(--yellow-dark); }
+    .nav-liked {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--red-tape);
+      cursor: pointer;
+      padding: 4px 8px;
+      border: 1.5px solid var(--red-tape);
+      transition: background 0.15s;
+    }
+    .nav-liked:hover { background: rgba(204,0,0,0.08); }
+    .nav-avatar {
+      width: 32px; height: 32px;
+      border: 2px solid var(--text);
+      border-radius: 0;
+      background: var(--yellow-dark);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .avatar-dropdown {
+      position: absolute;
+      top: 44px; right: 20px;
+      background: var(--surface);
+      border: 2px solid var(--text);
+      padding: 12px;
+      min-width: 210px;
+      display: none;
+      z-index: 200;
+      box-shadow: 4px 4px 0 var(--text);
+    }
+    .avatar-dropdown.open { display: block; }
+    .dropdown-name {
+      font-family: 'Special Elite', monospace;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .dropdown-streak {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .dropdown-divider { border: none; border-top: 1px dashed var(--border); margin: 8px 0; }
+    .dropdown-item {
+      display: block; width: 100%;
+      background: none; border: none;
+      text-align: left; padding: 6px 0;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.82rem;
+      color: var(--muted); cursor: pointer;
+      transition: color 0.2s; letter-spacing: 0.03em;
+    }
+    .dropdown-item:hover { color: var(--text); }
+
+    /* PREFS PANEL */
+    .prefs-overlay {
+      position: fixed; inset: 0;
+      background: rgba(28,28,28,0.4);
+      z-index: 300; display: none;
+    }
+    .prefs-overlay.open { display: block; }
+    .prefs-panel {
+      position: fixed;
+      top: 60px; right: 20px;
+      background: var(--surface);
+      border: 2px solid var(--text);
+      box-shadow: 4px 4px 0 var(--text);
+      padding: 20px;
+      width: 272px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 400;
+      display: none;
+    }
+    .prefs-panel.open { display: block; }
+    .prefs-title {
+      font-family: 'Special Elite', monospace;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
+    }
+    .prefs-section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px; margin-top: 14px;
+    }
+    .prefs-radio-group label, .prefs-check-group label {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.82rem; color: var(--text);
+      margin-bottom: 6px; cursor: pointer;
+    }
+    .prefs-radio-group input, .prefs-check-group input {
+      accent-color: var(--text);
+    }
+    .prefs-close {
+      margin-top: 16px; width: 100%; padding: 8px;
+      background: var(--text); color: var(--yellow);
+      border: none; cursor: pointer;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* COLLECTION PANEL */
+    .collection-panel {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 310px;
+      background: var(--surface);
+      border-left: 3px solid var(--text);
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .collection-panel.open { display: flex; transform: translateX(0); }
+    .collection-header {
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--text);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--yellow-dark);
+    }
+    .collection-title {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .collection-close {
+      background: none; border: none;
+      font-size: 1.2rem; cursor: pointer; color: var(--text);
+      font-family: 'Space Mono', monospace;
+    }
+    .collection-list { flex: 1; overflow-y: auto; padding: 12px; }
+    .collection-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px; border: 1px dashed var(--border);
+      margin-bottom: 6px; cursor: pointer; background: var(--bg);
+      transition: border-color 0.15s;
+    }
+    .collection-item:hover { border-color: var(--text); }
+    .collection-word {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.9rem; color: var(--text);
+      text-transform: uppercase;
+    }
+    .collection-lang {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; color: var(--muted);
+    }
+    .collection-remove {
+      background: none; border: none; color: var(--red-tape);
+      cursor: pointer; font-size: 0.85rem; padding: 2px 6px;
+      font-family: 'Space Mono', monospace;
+      transition: background 0.15s;
+    }
+    .collection-remove:hover { background: rgba(204,0,0,0.08); }
+    .collection-empty {
+      text-align: center; padding: 40px 20px;
+      color: var(--muted);
+      font-family: 'Special Elite', monospace;
+      font-size: 0.85rem; letter-spacing: 0.04em;
+    }
+
+    /* MASTHEAD / HEADER */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 3px solid var(--text);
+    }
+    .masthead {
+      padding: 24px 24px 20px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .masthead-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 12px;
+    }
+    .masthead-text {}
+    .masthead-title {
+      font-family: 'Special Elite', monospace;
+      font-size: 2.4rem;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .masthead-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .masthead-key { flex-shrink: 0; margin-top: 4px; }
+    .masthead-meta {
+      display: flex;
+      gap: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+
+    /* LAYOUT */
+    .dispatch-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: calc(100vh - 200px);
+    }
+
+    /* DISPATCH LIST */
+    .dispatch-list-panel {
+      border-right: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .search-bar {
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--border);
+      background: var(--bg);
+    }
+    .search-input {
+      width: 100%;
+      padding: 7px 12px;
+      border: 2px solid var(--text);
+      background: var(--surface);
+      font-family: 'Special Elite', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      outline: none;
+      border-radius: 0;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { background: var(--yellow-dark); }
+    .word-list { flex: 1; overflow-y: auto; padding: 10px; }
+
+    /* DISPATCH CARD */
+    .dispatch-card {
+      border: 1.5px dashed var(--border);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      background: var(--surface);
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+    .dispatch-card:hover { border-color: var(--text); }
+    .dispatch-card.active { border-color: var(--text); background: var(--yellow-dark); }
+    .dispatch-card-header {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dispatch-no {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .dispatch-meta-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: flex;
+      gap: 10px;
+    }
+    .dispatch-word {
+      font-family: 'Special Elite', monospace;
+      font-size: 1.2rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .dispatch-heart {
+      background: none; border: none;
+      font-size: 0.95rem; cursor: pointer;
+      color: var(--border);
+      transition: color 0.15s, transform 0.15s;
+      padding: 2px;
+      font-family: 'Special Elite', monospace;
+    }
+    .dispatch-heart.liked { color: var(--red-tape); }
+    .dispatch-heart:active { transform: scale(1.4); }
+    .urgent-stamp {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--red-tape);
+      border: 2px solid var(--red-tape);
+      padding: 1px 5px;
+      transform: rotate(-3deg);
+      opacity: 0.9;
+    }
+    .dispatch-def {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.77rem;
+      color: var(--muted);
+      line-height: 1.5;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      letter-spacing: 0.01em;
+    }
+    .dispatch-rule {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 8px 0;
+    }
+    .list-empty {
+      text-align: center; padding: 48px 20px;
+      color: var(--muted);
+      font-family: 'Special Elite', monospace;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* DETAIL */
+    .detail-panel {
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+    .detail-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 300px; gap: 16px;
+      color: var(--muted);
+    }
+    .detail-empty-icon {
+      font-size: 2.5rem;
+      opacity: 0.25;
+    }
+    .detail-empty-text {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+
+    /* FULL DISPATCH */
+    .full-dispatch {
+      border: 2px solid var(--text);
+      padding: 24px 28px;
+      background: var(--surface);
+      box-shadow: 4px 4px 0 rgba(28,28,28,0.15);
+    }
+    .fd-transmission {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .fd-transmission-label { color: var(--red-tape); font-weight: 700; }
+    .fd-from-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .fd-word {
+      font-family: 'Special Elite', monospace;
+      font-size: 2.8rem;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .fd-pronunciation {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+    .fd-pos-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .fd-pos {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      border: 1.5px solid var(--text);
+      padding: 2px 8px;
+    }
+    .fd-flag { font-size: 1.2rem; }
+    .fd-lang {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    .fd-controls {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px;
+      padding: 12px 0;
+      border-top: 1px dashed var(--border);
+      border-bottom: 1px dashed var(--border);
+    }
+    .fd-heart {
+      background: none;
+      border: 2px solid var(--text);
+      width: 40px; height: 40px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+    .fd-heart.liked { background: var(--red-tape); color: #fff; border-color: var(--red-tape); }
+    .fd-heart:active { transform: scale(1.1); }
+    .star-row { display: flex; gap: 4px; }
+    .star {
+      font-size: 1.1rem; cursor: pointer;
+      color: var(--border); transition: color 0.15s, transform 0.1s;
+    }
+    .star.lit { color: var(--text); }
+    .star:hover { transform: scale(1.15); }
+
+    .fd-rule {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin: 16px 0;
+    }
+    .fd-section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fd-section-label::after {
+      content: '';
+      flex: 1;
+      border-top: 1px dashed var(--border);
+    }
+    .definition-item { margin-bottom: 14px; }
+    .definition-meaning {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .definition-example {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 5px;
+      padding-left: 14px;
+      border-left: 2px solid var(--border);
+      line-height: 1.5;
+    }
+    .etymology-text {
+      font-family: 'Special Elite', monospace;
+      font-size: 0.87rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      background: var(--bg);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s;
+    }
+    .tag:hover { border-color: var(--text); color: var(--text); }
+
+    .fd-footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .dispatch-layout { grid-template-columns: 1fr; }
+      .detail-panel { display: none; }
+      .detail-panel.mobile-show { display: block; }
+      .dispatch-list-panel { border-right: none; }
+      .masthead-title { font-size: 1.5rem; }
+      .full-dispatch { padding: 16px 14px; }
+      .fd-word { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">&#x26A1; TELEGRAF</span>
+  <a href="index.html" class="nav-back">&#8592; DESIGNS</a>
+  <span class="nav-spacer"></span>
+  <button class="nav-btn" id="prefsBtn">&#9881; PREFS</button>
+  <span class="nav-liked" id="navLiked" title="My Collection">&#x2665; 0</span>
+  <div class="nav-avatar" id="avatarBtn">AC
+    <div class="avatar-dropdown" id="avatarDropdown">
+      <div class="dropdown-name">Alex Chen</div>
+      <div class="dropdown-streak">7-day streak &mdash; active</div>
+      <hr class="dropdown-divider">
+      <button class="dropdown-item" id="openCollectionBtn">My Collection (<span id="dropCollectionCount">0</span>)</button>
+      <button class="dropdown-item">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<!-- PREFS OVERLAY + PANEL -->
+<div class="prefs-overlay" id="prefsOverlay"></div>
+<div class="prefs-panel" id="prefsPanel">
+  <div class="prefs-title">Dispatch Filters</div>
+  <div class="prefs-section-label">Sort Order</div>
+  <div class="prefs-radio-group" id="sortGroup">
+    <label><input type="radio" name="sort" value="az" checked> A–Z</label>
+    <label><input type="radio" name="sort" value="language"> By Language</label>
+    <label><input type="radio" name="sort" value="recent"> Recent</label>
+  </div>
+  <div class="prefs-section-label">Min. Definitions</div>
+  <div class="prefs-radio-group" id="minDefsGroup">
+    <label><input type="radio" name="minDefs" value="any" checked> Any</label>
+    <label><input type="radio" name="minDefs" value="1"> 1+</label>
+    <label><input type="radio" name="minDefs" value="2"> 2+</label>
+  </div>
+  <div class="prefs-section-label">Languages</div>
+  <div class="prefs-check-group" id="langCheckGroup"></div>
+  <button class="prefs-close" id="prefsClose">Close</button>
+</div>
+
+<!-- COLLECTION PANEL -->
+<div class="collection-panel" id="collectionPanel">
+  <div class="collection-header">
+    <span class="collection-title">&#x2665; Saved Dispatches</span>
+    <button class="collection-close" id="collectionClose">&times;</button>
+  </div>
+  <div class="collection-list" id="collectionList"></div>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="masthead">
+    <div class="masthead-top">
+      <div class="masthead-text">
+        <div class="masthead-title">Telegraf Lexicon Bureau</div>
+        <div class="masthead-sub">Dispatch Service for Rare &amp; Unusual Vocabulary &mdash; Est. 2024</div>
+      </div>
+      <div class="masthead-key">
+        <svg width="100" height="60" viewBox="0 0 100 60">
+          <rect x="5" y="45" width="90" height="8" rx="2" fill="#1C1C1C"/>
+          <rect x="20" y="30" width="60" height="8" rx="2" fill="#5A5040" transform-origin="30 34" style="transform: rotate(-5deg)"/>
+          <circle cx="30" cy="34" r="5" fill="#1C1C1C"/>
+          <circle cx="75" cy="30" r="4" fill="#8B6914"/>
+          <ellipse cx="75" cy="27" rx="8" ry="5" fill="#5A5040"/>
+          <path d="M15 45 Q10 35 5 30" stroke="#1C1C1C" stroke-width="1.5" fill="none"/>
+          <path d="M85 45 Q90 35 95 30" stroke="#1C1C1C" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+    </div>
+    <div class="masthead-meta">
+      <span>Correspondent: Alex Chen</span>
+      <span>&#x2014;</span>
+      <span>20 Dispatches on File</span>
+      <span>&#x2014;</span>
+      <span>Transmission Frequency: Daily</span>
+    </div>
+  </div>
+  <!-- TICKER TAPE -->
+  <div class="ticker-wrap">
+    <span class="ticker-content" id="tickerContent"></span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="dispatch-layout">
+  <!-- LIST -->
+  <div class="dispatch-list-panel">
+    <div class="search-bar">
+      <input class="search-input" id="searchInput" type="text" placeholder="SEARCH DISPATCHES...">
+    </div>
+    <div class="word-list" id="wordList"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty" id="detailEmpty">
+      <div class="detail-empty-icon">&#x26A1;</div>
+      <div class="detail-empty-text">Awaiting Transmission<br>Select a dispatch to receive full message.</div>
+    </div>
+    <div id="detailContent" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+  const USER = { name: "Alex Chen", initials: "AC", joined: "March 2024", streak: 7 };
+
+  const WORDS = [
+    { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale 'The Three Princes of Serendip'.", synonyms: ["fortune", "luck", "chance", "providence"], antonyms: ["misfortune", "design"], relatedWords: ["happy accident", "fortunate"] },
+    { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' (on) + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary", "brief"], antonyms: ["permanent", "eternal", "enduring"], relatedWords: ["transience", "impermanence"] },
+    { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home or place you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth for a childhood she had never quite lived." }], etymology: "From Welsh 'hir' (long) + 'aeth' (going, grief). A uniquely Welsh concept with no direct English translation.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: ["saudade", "toska", "nostalgia"] },
+    { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "The interplay of light and leaves; sunlight filtering through the gaps between trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "From Japanese 木 (ko, tree) + 漏れ (more, leaking/filtering) + 日 (bi, sun/light). A compound noun describing a precise visual phenomenon.", synonyms: [], antonyms: [], relatedWords: ["wabi-sabi", "mono no aware"] },
+    { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "A Japanese aesthetic philosophy centered on accepting transience and imperfection; finding beauty in the imperfect, impermanent, and incomplete.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi in its most perfect form." }], etymology: "From 'wabi' (simplicity, humility) and 'sabi' (the beauty of age and wear). A central concept in Japanese aesthetics rooted in Zen Buddhism.", synonyms: ["imperfection", "transience"], antonyms: ["perfection"], relatedWords: ["komorebi", "mono no aware", "kintsugi"] },
+    { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "A deep emotional state of nostalgic longing for something or someone loved and lost, or perhaps never possessed.", example: "The fado music filled the room with an aching saudade that brought tears to his eyes." }], etymology: "From Latin 'solitas' (solitude). A defining concept of Portuguese and Brazilian culture, closely tied to the musical genre of fado.", synonyms: ["longing", "melancholy", "nostalgia"], antonyms: ["contentment"], relatedWords: ["hiraeth", "toska", "desiderio"] },
+    { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "A deep sadness and weariness about the state of the world; a feeling that reality can never satisfy the soul's ideal.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "From German 'Welt' (world) + 'Schmerz' (pain, grief). Coined by Jean Paul in his 1827 novel 'Selina'.", synonyms: ["world-weariness", "pessimism", "ennui"], antonyms: ["optimism", "joie de vivre"], relatedWords: ["Fernweh", "Sehnsucht"] },
+    { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; a strong longing for distant, far-off places. The opposite of homesickness.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that same night." }], etymology: "From German 'fern' (far) + 'Weh' (pain, ache). The opposite of 'Heimweh' (homesickness, literally 'home-ache').", synonyms: ["wanderlust", "travel longing"], antonyms: ["Heimweh", "homesickness"], relatedWords: ["wanderlust", "Weltschmerz"] },
+    { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when abroad or in an unfamiliar environment; the feeling of being a stranger in a foreign land.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "From French 'dé-' (un-) + 'pays' (country) + '-ment'. The sense of being 'un-countried' or removed from one's native land.", synonyms: ["disorientation", "estrangement", "alienation"], antonyms: ["belonging", "familiarity"], relatedWords: ["wanderlust", "exile"] },
+    { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal has ended, engaged in conversation, drink, and relaxation.", example: "The sobremesa stretched into the afternoon as the family swapped stories and finished the wine." }], etymology: "From Spanish 'sobre' (over/on) + 'mesa' (table). Literally meaning 'over the table', reflecting the Mediterranean culture of unhurried post-meal socializing.", synonyms: ["lingering", "after-dinner conversation"], antonyms: [], relatedWords: ["convivialité", "dolce far niente"] },
+    { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight. A fundamental concept in Bengali and Sanskrit philosophy.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss, joy). A concept central to Hindu and Buddhist philosophy, representing the highest state of happiness.", synonyms: ["joy", "bliss", "delight", "happiness"], antonyms: ["দুঃখ (grief)", "বিষাদ (sorrow)"], relatedWords: ["সুখ", "আহ্লাদ"] },
+    { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Carries connotations of boundless freedom and infinite space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' meaning 'sky' or 'ether', one of the five classical elements (Panchabhutas). Represents space and openness.", synonyms: ["sky", "heaven", "expanse", "firmament"], antonyms: [], relatedWords: ["মেঘ (cloud)", "তারা (star)"] },
+    { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A flexible, frugal innovation; a creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi, meaning a workaround or hack. Popularized internationally through business literature as 'frugal innovation'.", synonyms: ["improvisation", "hack", "workaround", "innovation"], antonyms: [], relatedWords: ["innovation", "frugality", "resourcefulness"] },
+    { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness you feel after eating a big meal; a post-lunch or post-dinner sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the whole family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off). The word perfectly captures the particular quality of food-induced sleepiness.", synonyms: ["drowsiness", "food coma", "lethargy"], antonyms: [], relatedWords: ["sobremesa", "siesta", "riposo"] },
+    { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something that both desire but neither wants to start.", example: "Across the crowded room, their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego, an indigenous language of South America. Considered one of the most succinct words in the world. The language is now critically endangered.", synonyms: [], antonyms: [], relatedWords: ["longing", "hesitation", "mutual desire"] },
+    { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a dull ache of the soul, a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog, heavy and formless." }], etymology: "From Russian тоска. Vladimir Nabokov described it as 'a sensation of great spiritual anguish, often without specific cause'. A core element of the Russian literary soul.", synonyms: ["melancholy", "ennui", "longing", "languor"], antonyms: [], relatedWords: ["saudade", "hiraeth", "Weltschmerz"] },
+    { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief experienced when a story is so convincing you forget it is not real; the transporting quality of great storytelling.", example: "The novelist's prose was so vivid it created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in Urdu poetry and literary criticism to describe the almost magical power of great narrative to make one believe the impossible.", synonyms: ["immersion", "suspension of disbelief"], antonyms: ["skepticism"], relatedWords: ["narrative", "storytelling", "fiction"] },
+    { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table or surface by a wet glass or cup.", example: "The old wooden bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom, tail). The word refers specifically to the circular impression left by the base of a moist vessel. Pleasantly specific.", synonyms: ["ring", "watermark", "stain"], antonyms: [], relatedWords: ["patina", "trace"] },
+    { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming, euphoric feeling at the beginning of falling in love; the intoxicating rush of new romantic feelings.", example: "She was in the full grip of forelsket — the world had turned golden and everything seemed possible." }], etymology: "From Norwegian/Danish, related to 'forelsket seg' (to fall in love). Captures the specifically intoxicating, slightly dizzying quality of new love.", synonyms: ["infatuation", "love rush", "euphoria"], antonyms: ["heartbreak"], relatedWords: ["falling in love", "lovesickness"] },
+    { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so poorly told, or so unfunny, that it paradoxically becomes funny; a humor of badness.", example: "His timing was so terrible and the punchline so weak that the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang, widely used in Indonesian youth culture and social media. Describes the peculiar humor of jokes that fail so completely they succeed.", synonyms: ["so-bad-it's-good", "cringe humor"], antonyms: [], relatedWords: ["corny", "dad joke"] }
+  ];
+
+  function getLiked() { return JSON.parse(localStorage.getItem('dd_liked') || '[]'); }
+  function isLiked(word) { return getLiked().includes(word); }
+  function toggleLike(word) {
+    const liked = getLiked();
+    const idx = liked.indexOf(word);
+    if (idx >= 0) liked.splice(idx, 1); else liked.push(word);
+    localStorage.setItem('dd_liked', JSON.stringify(liked));
+  }
+  function getRating(word) { return (JSON.parse(localStorage.getItem('dd_ratings') || '{}'))[word] || 0; }
+  function rateWord(word, stars) {
+    const ratings = JSON.parse(localStorage.getItem('dd_ratings') || '{}');
+    ratings[word] = stars;
+    localStorage.setItem('dd_ratings', JSON.stringify(ratings));
+  }
+
+  function getPrefs() {
+    const allLangs = [...new Set(WORDS.map(w => w.language))];
+    return JSON.parse(sessionStorage.getItem('dd_prefs') || JSON.stringify({ sort: 'az', minDefs: 'any', langs: allLangs }));
+  }
+  function savePrefs(prefs) { sessionStorage.setItem('dd_prefs', JSON.stringify(prefs)); }
+
+  let currentWord = null;
+
+  function updateNavCount() {
+    const n = getLiked().length;
+    document.getElementById('navLiked').textContent = '\u2665 ' + n;
+    document.getElementById('dropCollectionCount').textContent = n;
+  }
+
+  function buildTicker() {
+    const excerpts = WORDS.map(w => w.word.toUpperCase() + ': ' + (w.definitions[0] ? w.definitions[0].meaning.slice(0,60) + '...' : ''));
+    const joined = excerpts.join(' \u2014 ');
+    const doubled = joined + ' \u2014 ' + joined;
+    document.getElementById('tickerContent').textContent = doubled;
+  }
+
+  function renderList() {
+    const prefs = getPrefs();
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    let words = WORDS.filter(w => {
+      if (!prefs.langs.includes(w.language)) return false;
+      if (prefs.minDefs === '1' && w.definitions.length < 1) return false;
+      if (prefs.minDefs === '2' && w.definitions.length < 2) return false;
+      if (q) {
+        const hay = (w.word + w.language + w.definitions.map(d => d.meaning).join(' ')).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if (prefs.sort === 'az') words.sort((a, b) => a.word.localeCompare(b.word));
+    else if (prefs.sort === 'language') words.sort((a, b) => a.language.localeCompare(b.language));
+    else if (prefs.sort === 'recent') words = [...words].reverse();
+
+    const container = document.getElementById('wordList');
+    if (!words.length) {
+      container.innerHTML = '<div class="list-empty">NO DISPATCHES FOUND</div>';
+      return;
+    }
+    container.innerHTML = words.map((w, i) => {
+      const liked = isLiked(w.word);
+      const idx = WORDS.indexOf(w) + 1;
+      const def = w.definitions[0] ? w.definitions[0].meaning : '';
+      return `<div class="dispatch-card${currentWord === w.word ? ' active' : ''}" onclick="handleCardClick(event,'${w.word}')">
+        <div class="dispatch-card-header">
+          <span>&#x2014;&#x2014; <span class="dispatch-no">DISPATCH NO. ${String(idx).padStart(4,'0')}</span> &#x2014;&#x2014;</span>
+          ${liked ? '<span class="urgent-stamp">URGENT</span>' : ''}
+        </div>
+        <div class="dispatch-meta-line">
+          <span>FROM: ${w.language.toUpperCase()} BUREAU</span>
+          <span>PRIORITY: ${w.partOfSpeech.toUpperCase()}</span>
+        </div>
+        <div class="dispatch-word">
+          ${w.flag} ${w.word.toUpperCase()}
+          <button class="dispatch-heart${liked ? ' liked' : ''}" onclick="handleHeartClick(event,'${w.word}')" title="${liked ? 'Unlike' : 'Like'}">${liked ? '♥' : '♡'}</button>
+        </div>
+        <hr class="dispatch-rule">
+        <div class="dispatch-def">${def}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function handleCardClick(e, word) {
+    currentWord = word;
+    showDetail(word);
+    renderList();
+  }
+
+  function handleHeartClick(e, word) {
+    e.stopPropagation();
+    toggleLike(word);
+    updateNavCount();
+    renderList();
+    if (currentWord === word) showDetail(word);
+    if (document.getElementById('collectionPanel').classList.contains('open')) renderCollection();
+  }
+
+  function showDetail(wordStr) {
+    const w = WORDS.find(x => x.word === wordStr);
+    if (!w) return;
+    const liked = isLiked(w.word);
+    const rating = getRating(w.word);
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="star${i <= rating ? ' lit' : ''}" onclick="handleRate('${w.word}',${i})">&#9733;</span>`
+    ).join('');
+    const idx = WORDS.indexOf(w) + 1;
+    const ref = 'REF-' + String(idx).padStart(4,'0') + '-' + w.language.toUpperCase().slice(0,3);
+    const defs = w.definitions.map((d, i) =>
+      `<div class="definition-item">
+        <div class="definition-meaning">${i+1}. ${d.meaning}</div>
+        ${d.example ? `<div class="definition-example">${d.example}</div>` : ''}
+      </div>`
+    ).join('');
+
+    document.getElementById('detailEmpty').style.display = 'none';
+    document.getElementById('detailContent').style.display = 'block';
+    document.getElementById('detailContent').innerHTML = `
+      <div class="full-dispatch">
+        <div class="fd-transmission">
+          <span><span class="fd-transmission-label">TRANSMISSION RECEIVED</span> &mdash; ${ref}</span>
+          <span>${new Date().toDateString().toUpperCase()}</span>
+        </div>
+        <div class="fd-from-line">FROM: ${w.language.toUpperCase()} BUREAU &nbsp; | &nbsp; RE: ${w.word.toUpperCase()}</div>
+        <div class="fd-word">${w.word.toUpperCase()}</div>
+        <div class="fd-pronunciation">${w.pronunciation}</div>
+        <div class="fd-pos-row">
+          <span class="fd-pos">${w.partOfSpeech}</span>
+          <span class="fd-flag">${w.flag}</span>
+          <span class="fd-lang">${w.language}</span>
+          ${liked ? '<span class="urgent-stamp">URGENT</span>' : ''}
+        </div>
+        <div class="fd-controls">
+          <button class="fd-heart${liked ? ' liked' : ''}" id="detailHeart" onclick="handleDetailHeart('${w.word}')">${liked ? '♥' : '♡'}</button>
+          <div class="star-row">${stars}</div>
+        </div>
+
+        <div class="fd-section-label">Full Message</div>
+        ${defs}
+
+        <hr class="fd-rule">
+        <div class="fd-section-label">Provenance</div>
+        <div class="etymology-text">${w.etymology}</div>
+
+        ${w.synonyms.length ? `<hr class="fd-rule"><div class="fd-section-label">See Also (Synonyms)</div><div class="tags-row">${w.synonyms.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+        ${w.antonyms.length ? `<hr class="fd-rule"><div class="fd-section-label">Contradictions (Antonyms)</div><div class="tags-row">${w.antonyms.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+        ${w.relatedWords.length ? `<hr class="fd-rule"><div class="fd-section-label">Related Transmissions</div><div class="tags-row">${w.relatedWords.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+
+        <div class="fd-footer">End of Transmission &mdash; ${ref} &mdash; Telegraf Lexicon Bureau</div>
+      </div>`;
+  }
+
+  function handleDetailHeart(word) {
+    toggleLike(word);
+    updateNavCount();
+    renderList();
+    showDetail(word);
+    if (document.getElementById('collectionPanel').classList.contains('open')) renderCollection();
+  }
+
+  function handleRate(word, stars) {
+    rateWord(word, stars);
+    showDetail(word);
+  }
+
+  function renderCollection() {
+    const liked = getLiked();
+    const el = document.getElementById('collectionList');
+    if (!liked.length) {
+      el.innerHTML = '<div class="collection-empty">No dispatches saved.<br>Mark as URGENT to collect.</div>';
+      return;
+    }
+    el.innerHTML = liked.map(wStr => {
+      const w = WORDS.find(x => x.word === wStr);
+      if (!w) return '';
+      return `<div class="collection-item" onclick="showDetail('${w.word}');currentWord='${w.word}';renderList();">
+        <div><div class="collection-word">${w.flag} ${w.word.toUpperCase()}</div><div class="collection-lang">${w.language}</div></div>
+        <button class="collection-remove" onclick="event.stopPropagation();handleHeartClick(event,'${w.word}')">&#x2715;</button>
+      </div>`;
+    }).join('');
+  }
+
+  function buildPrefsUI() {
+    const prefs = getPrefs();
+    document.querySelectorAll('#sortGroup input').forEach(r => { r.checked = r.value === prefs.sort; });
+    document.querySelectorAll('#minDefsGroup input').forEach(r => { r.checked = r.value === prefs.minDefs; });
+    const allLangs = [...new Set(WORDS.map(w => w.language))];
+    const langGroup = document.getElementById('langCheckGroup');
+    langGroup.innerHTML = allLangs.map(lang => {
+      const checked = prefs.langs.includes(lang);
+      return `<label><input type="checkbox" value="${lang}" ${checked ? 'checked' : ''}> ${lang}</label>`;
+    }).join('');
+    langGroup.querySelectorAll('input').forEach(cb => cb.addEventListener('change', onPrefsChange));
+    document.querySelectorAll('#sortGroup input').forEach(r => r.addEventListener('change', onPrefsChange));
+    document.querySelectorAll('#minDefsGroup input').forEach(r => r.addEventListener('change', onPrefsChange));
+  }
+
+  function onPrefsChange() {
+    const sort = document.querySelector('#sortGroup input:checked').value;
+    const minDefs = document.querySelector('#minDefsGroup input:checked').value;
+    const langs = [...document.querySelectorAll('#langCheckGroup input:checked')].map(c => c.value);
+    savePrefs({ sort, minDefs, langs });
+    renderList();
+  }
+
+  function init() {
+    buildTicker();
+    buildPrefsUI();
+    renderList();
+    updateNavCount();
+    document.getElementById('searchInput').addEventListener('input', renderList);
+    document.getElementById('prefsBtn').addEventListener('click', () => {
+      document.getElementById('prefsPanel').classList.toggle('open');
+      document.getElementById('prefsOverlay').classList.toggle('open');
+    });
+    document.getElementById('prefsClose').addEventListener('click', () => {
+      document.getElementById('prefsPanel').classList.remove('open');
+      document.getElementById('prefsOverlay').classList.remove('open');
+    });
+    document.getElementById('prefsOverlay').addEventListener('click', () => {
+      document.getElementById('prefsPanel').classList.remove('open');
+      document.getElementById('prefsOverlay').classList.remove('open');
+    });
+    document.getElementById('avatarBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('avatarDropdown').classList.toggle('open');
+    });
+    document.addEventListener('click', () => document.getElementById('avatarDropdown').classList.remove('open'));
+    document.getElementById('openCollectionBtn').addEventListener('click', () => {
+      document.getElementById('avatarDropdown').classList.remove('open');
+      document.getElementById('collectionPanel').classList.add('open');
+      renderCollection();
+    });
+    document.getElementById('navLiked').addEventListener('click', () => {
+      document.getElementById('collectionPanel').classList.add('open');
+      renderCollection();
+    });
+    document.getElementById('collectionClose').addEventListener('click', () => {
+      document.getElementById('collectionPanel').classList.remove('open');
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>

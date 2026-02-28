@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grove — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sage: #E8F0E9;
+      --sage-mid: #C9DCC9;
+      --forest: #2D6A4F;
+      --forest-dark: #1B4332;
+      --sand: #D4A373;
+      --sand-light: #F4E8D8;
+      --text: #1A2E1A;
+      --text-mid: #3D5A3D;
+      --muted: #7A9A7A;
+      --border: #B5CDB5;
+      --white: #FAFCFA;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--sage);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--white);
+      border-bottom: 2px solid var(--sage-mid);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: var(--forest);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1.5px solid var(--border);
+      transition: all 0.15s;
+    }
+
+    .back-link:hover { background: var(--forest); color: white; border-color: var(--forest); }
+
+    /* HERO */
+    .hero {
+      background: var(--forest);
+      padding: 60px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--sage);
+      border-radius: 60px 60px 0 0;
+    }
+
+    /* Botanical SVG decoration */
+    .botanical-left, .botanical-right {
+      position: absolute;
+      top: 0;
+      opacity: 0.2;
+    }
+    .botanical-left { left: 0; }
+    .botanical-right { right: 0; transform: scaleX(-1); }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: white;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .hero h1 em { color: var(--sand); font-style: italic; }
+
+    .hero p {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .search-organic {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 14px 22px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 40px;
+      position: relative;
+    }
+
+    .search-organic svg { color: rgba(255,255,255,0.7); flex-shrink: 0; }
+
+    #search {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: white;
+      outline: none;
+    }
+
+    #search::placeholder { color: rgba(255,255,255,0.6); }
+
+    /* FILTER ROW */
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 24px 40px;
+    }
+
+    .lang-chip {
+      padding: 7px 18px;
+      border-radius: 24px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 2px solid var(--sage-mid);
+      background: var(--white);
+      color: var(--text-mid);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .lang-chip:hover { border-color: var(--forest); color: var(--forest); transform: translateY(-1px); }
+    .lang-chip.active { background: var(--forest); border-color: var(--forest); color: white; }
+
+    /* MAIN */
+    .grove-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+      padding: 0 40px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* WORD LIST */
+    .word-list-panel {
+      background: var(--white);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(45,106,79,0.1);
+    }
+
+    .list-header {
+      padding: 16px 20px;
+      background: var(--forest);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #count { color: var(--sand); }
+
+    .word-list-inner {
+      overflow-y: auto;
+      max-height: calc(100vh - 350px);
+      min-height: 200px;
+    }
+
+    .word-item {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--sage);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .word-item:hover { background: var(--sage); }
+    .word-item.active { background: var(--sand-light); border-left: 4px solid var(--sand); padding-left: 16px; }
+
+    .wi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wi-word {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    .wi-lang {
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: var(--sage);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .wi-def {
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .no-results {
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.875rem;
+    }
+
+    /* DETAIL PANEL */
+    .detail-panel {
+      background: var(--white);
+      border-radius: 32px;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(45,106,79,0.1);
+      padding: 40px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 300px;
+      color: var(--muted);
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-leaf { font-size: 3rem; opacity: 0.3; }
+
+    .detail-content {
+      animation: growIn 0.3s ease;
+    }
+
+    @keyframes growIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .detail-flag { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+    .detail-lang-chip {
+      display: inline-block;
+      padding: 4px 14px;
+      background: var(--forest);
+      color: white;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .detail-word {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .detail-pron {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .detail-pos {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--forest);
+      background: var(--sage);
+      padding: 3px 10px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .grove-divider {
+      border: none;
+      border-top: 2px solid var(--sage-mid);
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .grove-divider::after {
+      content: '🌿';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--white);
+      padding-left: 8px;
+      font-size: 0.9rem;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .def-block {
+      background: var(--sage);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .def-meaning {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .def-example {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--text-mid);
+      border-left: 3px solid var(--sand);
+      padding-left: 12px;
+    }
+
+    .etym-box {
+      background: var(--sand-light);
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 0.875rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .grove-tag {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      background: var(--sage);
+      color: var(--text-mid);
+      border: 1.5px solid var(--sage-mid);
+    }
+
+    @media (max-width: 900px) {
+      .grove-layout { grid-template-columns: 1fr; padding: 0 20px 40px; }
+      .word-list-inner { max-height: 300px; }
+      .detail-panel { padding: 28px 22px; }
+      nav { padding: 14px 20px; }
+      .hero { padding: 40px 20px; }
+      .filter-row { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--forest)">
+      <path d="M12 2C8 2 4 5 4 9c0 3 2 6 5 7.5V20h6v-3.5C18 15 20 12 20 9c0-4-4-7-8-7z" opacity=".6"/>
+      <rect x="11" y="18" width="2" height="4" fill="var(--forest-dark)"/>
+    </svg>
+    Grove Dictionary
+  </div>
+  <a href="index.html" class="back-link">← Gallery</a>
+</nav>
+
+<div class="hero">
+  <svg class="botanical-left" width="200" height="300" viewBox="0 0 200 300">
+    <ellipse cx="60" cy="80" rx="50" ry="25" fill="white" transform="rotate(-30 60 80)"/>
+    <ellipse cx="40" cy="140" rx="60" ry="22" fill="white" transform="rotate(-15 40 140)"/>
+    <ellipse cx="80" cy="200" rx="45" ry="20" fill="white" transform="rotate(-40 80 200)"/>
+    <line x1="60" y1="80" x2="40" y2="240" stroke="white" stroke-width="3"/>
+  </svg>
+  <svg class="botanical-right" width="200" height="300" viewBox="0 0 200 300">
+    <ellipse cx="60" cy="80" rx="50" ry="25" fill="white" transform="rotate(-30 60 80)"/>
+    <ellipse cx="40" cy="140" rx="60" ry="22" fill="white" transform="rotate(-15 40 140)"/>
+    <ellipse cx="80" cy="200" rx="45" ry="20" fill="white" transform="rotate(-40 80 200)"/>
+    <line x1="60" y1="80" x2="40" y2="240" stroke="white" stroke-width="3"/>
+  </svg>
+  <h1>Nature's <em>Language</em></h1>
+  <p>Words rooted in the beauty of the natural and human world</p>
+  <div class="search-organic">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search the grove…" autocomplete="off">
+  </div>
+</div>
+
+<div class="filter-row" id="filterRow"></div>
+
+<div class="grove-layout">
+  <div class="word-list-panel">
+    <div class="list-header">
+      <span>Grove Index</span>
+      <span id="count">—</span>
+    </div>
+    <div class="word-list-inner" id="wordList"></div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel">
+    <div class="empty-state">
+      <span class="empty-leaf">🌿</span>
+      <p>Choose a word to explore its meaning</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance, especially when looking for something else.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka, based on a Persian fairy tale.", synonyms: ["fortune", "luck", "chance"], antonyms: ["misfortune"], relatedWords: [] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' meaning 'lasting only a day', from 'epi' + 'hemera' (day).", synonyms: ["fleeting", "transient", "momentary"], antonyms: ["permanent", "eternal"], relatedWords: [] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep, nostalgic longing for a home you cannot return to, or perhaps never existed.", example: "Walking through the old village, she felt a profound hiraeth." }], etymology: "From Welsh 'hir' (long) + 'aeth' (grief). A uniquely Welsh concept.", synonyms: ["longing", "nostalgia", "yearning"], antonyms: [], relatedWords: [] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Sunlight filtering through the gaps between leaves of trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "Japanese 木 (tree) + 漏れ (leaking) + 日 (sun).", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Finding beauty in imperfection, impermanence, and incompleteness.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi perfectly." }], etymology: "From 'wabi' (simplicity) and 'sabi' (beauty of age). Rooted in Zen Buddhism.", synonyms: ["imperfection"], antonyms: ["perfection"], relatedWords: [] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "Deep nostalgic longing for something or someone loved and lost.", example: "The fado music filled the room with an aching saudade." }], etymology: "From Latin 'solitas' (solitude). Central to Portuguese culture.", synonyms: ["longing", "melancholy"], antonyms: ["contentment"], relatedWords: [] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "Deep sadness about the state of the world; feeling that reality can never satisfy the soul's ideal.", example: "After reading the news, an overwhelming Weltschmerz settled over him." }], etymology: "German 'Welt' (world) + 'Schmerz' (pain). Coined by Jean Paul in 1827.", synonyms: ["world-weariness", "ennui"], antonyms: ["optimism"], relatedWords: [] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; longing for distant, far-off places.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that night." }], etymology: "German 'fern' (far) + 'Weh' (ache). Opposite of 'Heimweh' (homesickness).", synonyms: ["wanderlust"], antonyms: ["Heimweh"], relatedWords: [] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when in an unfamiliar environment abroad.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "French 'dé-' (un-) + 'pays' (country). Being 'un-countried'.", synonyms: ["disorientation", "estrangement"], antonyms: ["belonging"], relatedWords: [] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "The time spent lingering at the table after a meal, in conversation.", example: "The sobremesa stretched into the afternoon as the family finished the wine." }], etymology: "Spanish 'sobre' (over) + 'mesa' (table). Mediterranean culture.", synonyms: ["lingering"], antonyms: [], relatedWords: [] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss). Central to Hindu and Buddhist philosophy.", synonyms: ["joy", "bliss", "delight"], antonyms: ["grief"], relatedWords: [] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Boundless freedom and space.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' — one of the five classical elements.", synonyms: ["sky", "heaven", "expanse"], antonyms: [], relatedWords: [] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A frugal, creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi. Known internationally as 'frugal innovation'.", synonyms: ["improvisation", "hack"], antonyms: [], relatedWords: [] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness felt after eating a large meal; post-lunch sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off).", synonyms: ["drowsiness", "food coma"], antonyms: [], relatedWords: [] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look between two people, each wishing the other would initiate something both desire.", example: "Their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego. Critically endangered.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog." }], etymology: "Russian тоска. Nabokov: 'spiritual anguish, often without specific cause'.", synonyms: ["melancholy", "ennui"], antonyms: [], relatedWords: [] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "Suspension of disbelief when a story is so convincing you forget it's not real.", example: "The novelist's prose created complete goya — the reader forgot the world entirely." }], etymology: "Urdu گویا. Describes the power of great narrative in poetry.", synonyms: ["immersion"], antonyms: [], relatedWords: [] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table by a wet glass or cup.", example: "The old bar was covered in culaccini from decades of evenings well spent." }], etymology: "Italian 'culo' (bottom). The circular impression of a moist vessel's base.", synonyms: ["ring", "watermark"], antonyms: [], relatedWords: [] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming euphoric feeling at the beginning of falling in love.", example: "She was in the full grip of forelsket — the world had turned golden." }], etymology: "Norwegian, related to 'forelske seg' (to fall in love).", synonyms: ["infatuation", "euphoria"], antonyms: ["heartbreak"], relatedWords: [] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so unfunny that it paradoxically becomes funny.", example: "His timing was so terrible the whole room dissolved into laughter — pure jayus." }], etymology: "Indonesian slang. Humor of jokes that fail so completely they succeed.", synonyms: ["cringe humor"], antonyms: [], relatedWords: [] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+let activeWord = null;
+
+function init() {
+  const fr = document.getElementById('filterRow');
+  langs.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-chip' + (l === 'All' ? ' active' : '');
+    btn.textContent = l;
+    btn.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.lang-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    });
+    fr.appendChild(btn);
+  });
+  document.getElementById('search').addEventListener('input', renderList);
+  renderList();
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q) || w.definitions[0].meaning.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  const container = document.getElementById('wordList');
+  container.innerHTML = '';
+  document.getElementById('count').textContent = filtered.length;
+
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">No words found in this grove.</div>'; return; }
+
+  filtered.forEach(w => {
+    const item = document.createElement('div');
+    item.className = 'word-item' + (activeWord === w.word ? ' active' : '');
+    item.innerHTML = `
+      <div class="wi-top">
+        <span class="wi-word">${w.flag} ${w.word}</span>
+        <span class="wi-lang">${w.language}</span>
+      </div>
+      <div class="wi-def">${w.definitions[0].meaning.substring(0, 55)}…</div>
+    `;
+    item.addEventListener('click', () => { activeWord = w.word; showDetail(w, item); });
+    container.appendChild(item);
+  });
+}
+
+function showDetail(w, el) {
+  document.querySelectorAll('.word-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const syns = w.synonyms.length ? `<div class="tags-row">${w.synonyms.map(s => `<span class="grove-tag">${s}</span>`).join('')}</div>` : '<p style="color:var(--muted);font-size:.85rem">—</p>';
+  const ants = w.antonyms.length ? `<div class="tags-row">${w.antonyms.map(s => `<span class="grove-tag">${s}</span>`).join('')}</div>` : '<p style="color:var(--muted);font-size:.85rem">—</p>';
+
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-content">
+      <span class="detail-flag">${w.flag}</span>
+      <span class="detail-lang-chip">${w.language}</span>
+      <div class="detail-word">${w.word}</div>
+      <div class="detail-pron">${w.pronunciation}</div>
+      <span class="detail-pos">${w.partOfSpeech}</span>
+      <hr class="grove-divider">
+      <div class="section-label">Definition</div>
+      <div class="def-block">
+        <div class="def-meaning">${w.definitions[0].meaning}</div>
+        ${w.definitions[0].example ? `<div class="def-example">"${w.definitions[0].example}"</div>` : ''}
+      </div>
+      <hr class="grove-divider">
+      <div class="section-label">Etymology</div>
+      <div class="etym-box">${w.etymology}</div>
+      <hr class="grove-divider">
+      <div class="section-label">Synonyms</div>
+      ${syns}
+      <div style="margin-top:16px">
+        <div class="section-label">Antonyms</div>
+        ${ants}
+      </div>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dusk — Global Dictionary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass-bg: rgba(255,255,255,0.18);
+      --glass-border: rgba(255,255,255,0.35);
+      --glass-shadow: 0 8px 32px rgba(31,38,135,0.18);
+      --text: #2A2040;
+      --text-light: rgba(42,32,64,0.65);
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ANIMATED GRADIENT BG */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 40%, #f0f4ff 70%, #ffd1dc 100%);
+      background-size: 400% 400%;
+      animation: meshMove 18s ease infinite;
+    }
+
+    .bg-mesh::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 80%, rgba(167,139,250,0.4) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(147,197,253,0.4) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 50%, rgba(253,164,175,0.3) 0%, transparent 60%);
+    }
+
+    @keyframes meshMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* GLASS UTILITY */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    /* LAYOUT */
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .logo em {
+      color: rgba(147,51,234,0.8);
+      font-style: normal;
+    }
+
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--text);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 100px;
+    }
+    .back-link:hover { background: var(--glass-bg); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 40px 32px 32px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 span { color: rgba(147,51,234,0.85); }
+
+    .hero p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    /* SEARCH */
+    .search-glass {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      border-radius: 100px;
+    }
+
+    .search-glass svg { color: var(--text-light); flex-shrink: 0; }
+
+    #search {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    #search::placeholder { color: var(--text-light); }
+
+    /* FILTER PILLS */
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px 32px;
+    }
+
+    .lang-pill {
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1.5px solid var(--glass-border);
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .lang-pill:hover { background: rgba(255,255,255,0.35); transform: translateY(-1px); }
+    .lang-pill.active { background: rgba(147,51,234,0.75); color: white; border-color: rgba(147,51,234,0.5); }
+
+    /* WORD GRID */
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding: 8px 32px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .word-card {
+      padding: 24px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      animation: cardIn 0.3s ease both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .word-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 60px rgba(31,38,135,0.25);
+    }
+
+    .word-card.active {
+      background: rgba(147,51,234,0.2);
+      border-color: rgba(147,51,234,0.5);
+    }
+
+    .wc-flag {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .wc-word {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .wc-lang {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(147,51,234,0.8);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .wc-pos {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-style: italic;
+      background: rgba(255,255,255,0.35);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .wc-def {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 580px;
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 28px;
+      padding: 36px;
+      position: relative;
+      animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.8) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.4);
+      color: var(--text);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.7); }
+
+    .modal-flag { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+    .modal-lang {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(147,51,234,0.9);
+      margin-bottom: 8px;
+    }
+
+    .modal-word {
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .modal-pron {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .modal-pos {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: rgba(147,51,234,0.8);
+      margin-bottom: 20px;
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: 20px 0;
+    }
+
+    .modal-section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .modal-def {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .modal-example {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--text-light);
+      background: rgba(255,255,255,0.25);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border-left: 3px solid rgba(147,51,234,0.5);
+      line-height: 1.6;
+    }
+
+    .modal-etym {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      line-height: 1.6;
+      background: rgba(255,255,255,0.2);
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+
+    .modal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .modal-tag {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.3);
+      color: var(--text);
+      border: 1px solid var(--glass-border);
+    }
+
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    #resultCount {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      padding: 0 32px 8px;
+    }
+
+    @media (max-width: 640px) {
+      nav, .hero, .filter-row, .word-grid { padding-left: 16px; padding-right: 16px; }
+      .word-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .modal { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+
+<div class="app">
+  <nav>
+    <div class="logo">Lexicon <em>Dusk</em></div>
+    <a href="index.html" class="back-link glass">← Gallery</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Words that <span>Glow</span></h1>
+    <p>Beautiful words from every corner of the world</p>
+    <div class="search-glass glass">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search" placeholder="Search words or languages…">
+    </div>
+  </div>
+
+  <div class="filter-row" id="filterRow"></div>
+  <div id="resultCount"></div>
+  <div class="word-grid" id="wordGrid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal glass" id="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "serendipity", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ˌser.ənˈdɪp.ɪ.ti/", partOfSpeech: "noun", definitions: [{ meaning: "The occurrence of pleasant surprises by chance.", example: "A fortunate stroke of serendipity led her to discover the hidden garden." }], etymology: "Coined by Horace Walpole in 1754 from 'Serendip', an old name for Sri Lanka.", synonyms: ["fortune", "luck", "chance"], antonyms: ["misfortune"], relatedWords: [] },
+  { word: "ephemeral", language: "English", languageCode: "en", flag: "🇬🇧", pronunciation: "/ɪˈfem.ər.əl/", partOfSpeech: "adjective", definitions: [{ meaning: "Lasting for a very short time; transitory.", example: "The ephemeral beauty of cherry blossoms is what makes them so precious." }], etymology: "From Greek 'ephemeros' — lasting only a day.", synonyms: ["fleeting", "transient", "momentary"], antonyms: ["permanent", "eternal"], relatedWords: [] },
+  { word: "hiraeth", language: "Welsh", languageCode: "cy", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", pronunciation: "/ˈhɪr.aɪθ/", partOfSpeech: "noun", definitions: [{ meaning: "A deep nostalgic longing for a home you cannot return to.", example: "Walking through the old village, she felt a profound hiraeth." }], etymology: "From Welsh 'hir' (long) + 'aeth' (grief). Uniquely Welsh.", synonyms: ["longing", "nostalgia"], antonyms: [], relatedWords: [] },
+  { word: "komorebi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ko.mo.re.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Sunlight filtering through the gaps between leaves of trees.", example: "The photographer spent hours capturing the komorebi in the ancient forest." }], etymology: "木 (tree) + 漏れ (leaking) + 日 (sun). A precise Japanese visual concept.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "wabi-sabi", language: "Japanese", languageCode: "ja", flag: "🇯🇵", pronunciation: "/ˈwɑː.bi ˈsɑː.bi/", partOfSpeech: "noun", definitions: [{ meaning: "Finding beauty in imperfection, impermanence, and incompleteness.", example: "The cracked glaze on the ancient tea bowl embodied wabi-sabi perfectly." }], etymology: "From 'wabi' (simplicity) and 'sabi' (beauty of age). Rooted in Zen Buddhism.", synonyms: ["imperfection"], antonyms: ["perfection"], relatedWords: [] },
+  { word: "saudade", language: "Portuguese", languageCode: "pt", flag: "🇵🇹", pronunciation: "/saʊˈdɑː.də/", partOfSpeech: "noun", definitions: [{ meaning: "Deep nostalgic longing for something or someone loved and lost.", example: "The fado music filled the room with an aching saudade." }], etymology: "From Latin 'solitas' (solitude). Central to Portuguese culture and fado.", synonyms: ["longing", "melancholy"], antonyms: ["contentment"], relatedWords: [] },
+  { word: "Weltschmerz", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈvɛlt.ʃmɛrts/", partOfSpeech: "noun", definitions: [{ meaning: "Deep sadness and weariness about the state of the world.", example: "After reading the morning news, an overwhelming Weltschmerz settled over him." }], etymology: "German: 'Welt' (world) + 'Schmerz' (pain). Coined by Jean Paul in 1827.", synonyms: ["world-weariness", "ennui"], antonyms: ["optimism"], relatedWords: [] },
+  { word: "Fernweh", language: "German", languageCode: "de", flag: "🇩🇪", pronunciation: "/ˈfɛrn.veː/", partOfSpeech: "noun", definitions: [{ meaning: "An aching to travel; longing for distant, far-off places.", example: "The Fernweh struck her so hard that she booked a flight to Patagonia that night." }], etymology: "German: 'fern' (far) + 'Weh' (ache). Opposite of 'Heimweh' (homesickness).", synonyms: ["wanderlust"], antonyms: ["Heimweh"], relatedWords: [] },
+  { word: "dépaysement", language: "French", languageCode: "fr", flag: "🇫🇷", pronunciation: "/de.pɛ.iz.mɑ̃/", partOfSpeech: "noun", definitions: [{ meaning: "The disorientation felt when in an unfamiliar environment abroad.", example: "The dépaysement she felt in Tokyo was both unsettling and exhilarating." }], etymology: "French: 'dé-' (un-) + 'pays' (country). Being 'un-countried'.", synonyms: ["disorientation", "estrangement"], antonyms: ["belonging"], relatedWords: [] },
+  { word: "sobremesa", language: "Spanish", languageCode: "es", flag: "🇪🇸", pronunciation: "/ˌso.bɾe.ˈme.sa/", partOfSpeech: "noun", definitions: [{ meaning: "Time spent lingering at the table after a meal, in conversation.", example: "The sobremesa stretched into the afternoon as the family finished the wine." }], etymology: "Spanish: 'sobre' (over) + 'mesa' (table). Mediterranean post-meal culture.", synonyms: ["lingering"], antonyms: [], relatedWords: [] },
+  { word: "আনন্দ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːnɔnd̪o/", partOfSpeech: "noun", definitions: [{ meaning: "Pure, uncomplicated joy; bliss; delight.", example: "The children's আনন্দ was boundless as they played in the monsoon rain." }], etymology: "From Sanskrit 'ānanda' (bliss). Central to Hindu and Buddhist philosophy.", synonyms: ["joy", "bliss"], antonyms: ["grief"], relatedWords: [] },
+  { word: "আকাশ", language: "Bengali", languageCode: "bn", flag: "🇧🇩", pronunciation: "/aːkaʃ/", partOfSpeech: "noun", definitions: [{ meaning: "The sky; the open expanse above; ether. Boundless freedom.", example: "She gazed at the আকাশ and dreamed of everything beyond the horizon." }], etymology: "From Sanskrit 'ākāśa' — one of the five classical elements.", synonyms: ["sky", "heaven"], antonyms: [], relatedWords: [] },
+  { word: "jugaad", language: "Hindi", languageCode: "hi", flag: "🇮🇳", pronunciation: "/dʒʊˈɡɑːd/", partOfSpeech: "noun", definitions: [{ meaning: "A frugal, creative workaround or improvised solution using limited resources.", example: "Using a fan and wet cloth as an air cooler was pure jugaad engineering." }], etymology: "From Hindi/Punjabi. Internationally known as 'frugal innovation'.", synonyms: ["improvisation", "hack"], antonyms: [], relatedWords: [] },
+  { word: "abbiocco", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ab.ˈbjok.ko/", partOfSpeech: "noun", definitions: [{ meaning: "The drowsiness felt after eating a large meal; post-lunch sleepiness.", example: "After the enormous Sunday feast, an inevitable abbiocco descended on the family." }], etymology: "From Italian dialect, related to 'abbiocarsi' (to doze off).", synonyms: ["drowsiness", "food coma"], antonyms: [], relatedWords: [] },
+  { word: "mamihlapinatapai", language: "Yaghan", languageCode: "yag", flag: "🌍", pronunciation: "/mɑːmɪhlɑːpɪnɑːtɑːpɑɪ/", partOfSpeech: "noun", definitions: [{ meaning: "A look shared between two people, each wishing the other would initiate something both desire.", example: "Their eyes met in pure mamihlapinatapai — both wanting to speak, neither daring to." }], etymology: "From the Yaghan language of Tierra del Fuego. Critically endangered.", synonyms: [], antonyms: [], relatedWords: [] },
+  { word: "toska", language: "Russian", languageCode: "ru", flag: "🇷🇺", pronunciation: "/ˈtos.kə/", partOfSpeech: "noun", definitions: [{ meaning: "A longing with nothing to long for; a vague restlessness without specific cause.", example: "On grey winter afternoons, toska would settle over him like fog." }], etymology: "From Russian тоска. Described by Nabokov as 'spiritual anguish, often without specific cause'.", synonyms: ["melancholy", "ennui"], antonyms: [], relatedWords: [] },
+  { word: "goya", language: "Urdu", languageCode: "ur", flag: "🇵🇰", pronunciation: "/ˈɡoɪ.ə/", partOfSpeech: "noun", definitions: [{ meaning: "The suspension of disbelief when a story is so convincing you forget it's not real.", example: "The novelist's prose created complete goya — the reader forgot the world entirely." }], etymology: "From Urdu گویا. Used in poetry to describe the power of great narrative.", synonyms: ["immersion"], antonyms: [], relatedWords: [] },
+  { word: "culaccino", language: "Italian", languageCode: "it", flag: "🇮🇹", pronunciation: "/ku.laˈtʃiː.no/", partOfSpeech: "noun", definitions: [{ meaning: "The ring or mark left on a table by a wet glass or cup.", example: "The old bar was covered in culaccini from decades of evenings well spent." }], etymology: "From Italian 'culo' (bottom). The circular impression of a moist vessel base.", synonyms: ["ring", "watermark"], antonyms: [], relatedWords: [] },
+  { word: "forelsket", language: "Norwegian", languageCode: "no", flag: "🇳🇴", pronunciation: "/fɔˈrɛls.kət/", partOfSpeech: "noun", definitions: [{ meaning: "The overwhelming euphoric feeling at the beginning of falling in love.", example: "She was in the full grip of forelsket — the world had turned golden." }], etymology: "From Norwegian, related to 'forelske seg' (to fall in love).", synonyms: ["infatuation", "euphoria"], antonyms: ["heartbreak"], relatedWords: [] },
+  { word: "jayus", language: "Indonesian", languageCode: "id", flag: "🇮🇩", pronunciation: "/ˈdʒaɪ.ʊs/", partOfSpeech: "noun", definitions: [{ meaning: "A joke so unfunny that it paradoxically becomes funny.", example: "His timing was so terrible the whole room dissolved into laughter — pure jayus." }], etymology: "From Indonesian slang. Humor of jokes that fail so completely they succeed.", synonyms: ["cringe humor"], antonyms: [], relatedWords: [] }
+];
+
+const langs = ['All', ...new Set(WORDS.map(w => w.language))];
+let currentFilter = 'All';
+
+function init() {
+  const filterRow = document.getElementById('filterRow');
+  langs.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-pill' + (l === 'All' ? ' active' : '');
+    btn.textContent = l;
+    btn.addEventListener('click', () => {
+      currentFilter = l;
+      document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGrid();
+    });
+    filterRow.appendChild(btn);
+  });
+
+  document.getElementById('search').addEventListener('input', renderGrid);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+  renderGrid();
+}
+
+function renderGrid() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchLang = currentFilter === 'All' || w.language === currentFilter;
+    const matchQ = !q || w.word.toLowerCase().includes(q) || w.language.toLowerCase().includes(q) || w.definitions[0].meaning.toLowerCase().includes(q);
+    return matchLang && matchQ;
+  });
+
+  const grid = document.getElementById('wordGrid');
+  document.getElementById('resultCount').textContent = `${filtered.length} word${filtered.length !== 1 ? 's' : ''}`;
+  grid.innerHTML = '';
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="no-results">No words found matching your search</div>';
+    return;
+  }
+
+  filtered.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'word-card glass';
+    card.style.animationDelay = `${i * 0.04}s`;
+    card.innerHTML = `
+      <span class="wc-flag">${w.flag}</span>
+      <div class="wc-word">${w.word}</div>
+      <div class="wc-lang">${w.language}</div>
+      <span class="wc-pos">${w.partOfSpeech}</span>
+      <div class="wc-def">${w.definitions[0].meaning}</div>
+    `;
+    card.addEventListener('click', () => showModal(w));
+    grid.appendChild(card);
+  });
+}
+
+function showModal(w) {
+  const syns = w.synonyms.length ? w.synonyms.map(s => `<span class="modal-tag">${s}</span>`).join('') : '<span style="color:var(--text-light);font-size:.85rem">—</span>';
+  document.getElementById('modalContent').innerHTML = `
+    <span class="modal-flag">${w.flag}</span>
+    <div class="modal-lang">${w.language}</div>
+    <div class="modal-word">${w.word}</div>
+    <div class="modal-pron">${w.pronunciation}</div>
+    <div class="modal-pos">${w.partOfSpeech}</div>
+    <div class="modal-divider"></div>
+    <div class="modal-section-label">Definition</div>
+    <div class="modal-def">${w.definitions[0].meaning}</div>
+    ${w.definitions[0].example ? `<div class="modal-example">"${w.definitions[0].example}"</div>` : ''}
+    <div class="modal-divider"></div>
+    <div class="modal-section-label">Etymology</div>
+    <div class="modal-etym">${w.etymology}</div>
+    <div class="modal-divider"></div>
+    <div class="modal-section-label">Synonyms</div>
+    <div class="modal-tags">${syns}</div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+init();
+</script>
+</body>
+</html>
