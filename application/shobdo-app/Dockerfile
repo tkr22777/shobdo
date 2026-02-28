@@ -6,14 +6,14 @@
 ARG BUILD_FROM_SOURCE=true
 
 # Build stage
-FROM openjdk:8-jdk-alpine AS build
+FROM eclipse-temurin:8-jdk AS build
 
 # Set build argument in this stage
 ARG BUILD_FROM_SOURCE
 
 # Install SBT and other build dependencies if building from source
 RUN if [ "$BUILD_FROM_SOURCE" = "true" ] ; then \
-        apk add --no-cache bash curl && \
+        apt-get update && apt-get install -y --no-install-recommends bash curl && \
         curl -L -o sbt.tgz https://github.com/sbt/sbt/releases/download/v0.13.18/sbt-0.13.18.tgz && \
         mkdir -p /opt/sbt && \
         tar -xf sbt.tgz -C /opt/sbt --strip-components=1 && \
@@ -45,10 +45,10 @@ RUN if [ "$BUILD_FROM_SOURCE" = "true" ] ; then \
     fi
 
 # Runtime stage 
-FROM openjdk:8-jre-alpine
+FROM eclipse-temurin:8-jre
 
 # Install necessary runtime dependencies
-RUN apk add --no-cache bash unzip
+RUN apt-get update && apt-get install -y --no-install-recommends bash unzip && rm -rf /var/lib/apt/lists/*
 
 # Pass the build argument to this stage
 ARG BUILD_FROM_SOURCE
