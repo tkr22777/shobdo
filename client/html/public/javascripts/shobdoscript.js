@@ -141,49 +141,94 @@ function handleWordMeaningResult(data, status, jqXHR) {
     meaningHolder.innerHTML = handleMeaningData(data);
 }
 
+// SVG icons used in generated HTML (no Bootstrap dependency)
+const SHARE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+const CHECK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+
 function handleMeaningData(data) {
     const meanings = data.meanings;
-    const totalMeanings = Object.keys(meanings).length;
+    const entries = Object.entries(meanings);
+    const totalMeanings = entries.length;
 
-    const meaningSections = Object.entries(meanings).map(([key, meaning], index) => {
-        // Create a function to highlight exact and derived word matches
-        // the following styling logic is better pre-computed and set in the backend
-        const highlightWord = (sentence, word) => {
-            if (!sentence) return '';
-            // Split sentence into words and preserve whitespace/punctuation
-            return sentence.split(/(\s+|[।,!?])/g).map(part => {
-                // If the part contains our word (for derived forms)
-                if (part.includes(word)) {
-                    return ` <span class="highlighted-word"> ${part} </span> `;
-                }
-                return part;
-            }).join('');
-        };
+    const highlightWord = (sentence, word) => {
+        if (!sentence) return '';
+        return sentence.split(/(\s+|[।,!?])/g).map(part => {
+            if (part.includes(word)) {
+                return `<span class="highlighted-word">${part}</span>`;
+            }
+            return part;
+        }).join('');
+    };
 
-        const sections = [
-            totalMeanings > 1
-                ? `<div class='meaning-number'>${getBengaliDigit(index + 1)}.</div>` : '',
-            `<div class="meaning-text"><u>অর্থ:</u> ${meaning.text}</div>`,
-            Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0
-                ? `<div><u>সমার্থসমূহ:</u> ${meaning.synonyms.join(', ')}</div>` : '',
-            Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0
-                ? `<div><u>বিপরীতার্থসমূহ:</u> ${meaning.antonyms.join(', ')}</div>` : '',
-            meaning.exampleSentence
-                ? `<div><u>উদাহরণ বাক্য:</u> ${highlightWord(meaning.exampleSentence, data.spelling)}</div>` : ''
-        ].filter(Boolean).join('');
+    // First meaning text for the article deck (italic lead)
+    const firstMeaning = entries[0] ? entries[0][1] : null;
+    const deckText = firstMeaning ? firstMeaning.text : '';
 
-        return `<div class='meaning-section'>${sections}</div>`;
+    // Collect all synonyms for article footer tags
+    const allSynonyms = [];
+
+    // Build article body paragraphs
+    const bodyParagraphs = entries.map(([key, meaning], index) => {
+        const isFirst = index === 0;
+        const hasSynonyms = Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0;
+        const hasAntonyms = Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0;
+        const hasExample = !!meaning.exampleSentence;
+
+        if (hasSynonyms) allSynonyms.push(...meaning.synonyms);
+
+        let paraContent = '';
+        if (totalMeanings > 1) {
+            paraContent += `<span class="meaning-number">${getBengaliDigit(index + 1)}.</span> `;
+        }
+        paraContent += meaning.text;
+
+        const defGraf = `<p class="def-graf${isFirst ? ' dropcap' : ''}">${paraContent}</p>`;
+
+        // Relations (synonyms / antonyms) inline after first def
+        let relationsHTML = '';
+        if (hasSynonyms || hasAntonyms) {
+            const parts = [];
+            if (hasSynonyms) parts.push(`<em>সমার্থ:</em> ${meaning.synonyms.join(', ')}`);
+            if (hasAntonyms) parts.push(`<em>বিপরীত:</em> ${meaning.antonyms.join(', ')}`);
+            relationsHTML = `<p class="example-graf" style="font-style:normal">${parts.join(' &nbsp;·&nbsp; ')}</p>`;
+        }
+
+        const exampleGraf = hasExample
+            ? `<p class="example-graf">${highlightWord(meaning.exampleSentence, data.spelling)}</p>`
+            : '';
+
+        // Pull-quote from the first example sentence when there are multiple meanings
+        const pullQuote = (isFirst && totalMeanings > 1 && hasExample)
+            ? `<div class="pull-quote">&ldquo;${meaning.exampleSentence}&rdquo;</div>`
+            : '';
+
+        return defGraf + relationsHTML + exampleGraf + pullQuote;
     }).join('');
 
-    // Add a share button to the title section
+    // Synonym tags in article footer
+    const uniqueSynonyms = [...new Set(allSynonyms)].slice(0, 8);
+    const footerHTML = uniqueSynonyms.length > 0
+        ? `<div class="article-footer">
+               <div class="footer-label">সম্পর্কিত শব্দ</div>
+               <div class="word-tags">${uniqueSynonyms.map(s => `<span class="word-tag">${s}</span>`).join('')}</div>
+           </div>`
+        : '';
+
     return `
-        <div class='word-title-container'>
-            <div class='word-title'>${data.spelling}</div>
-            <button id="meaningShareButton" class="meaning-share-btn" title="শেয়ার করুন" onclick="copyMeaningUrl('${data.spelling}')">
-                <span class="glyphicon glyphicon-share"></span>
-            </button>
+        <div class="article">
+            <div class="article-kicker">বাংলা অভিধান</div>
+            <h1 class="article-headline">${data.spelling}</h1>
+            ${deckText ? `<div class="article-deck">${deckText}</div>` : ''}
+            <div class="article-byline">
+                <span>বাংলা</span>
+                <button id="meaningShareButton" class="meaning-share-btn"
+                    title="শেয়ার করুন" onclick="copyMeaningUrl('${data.spelling}')">
+                    ${SHARE_SVG} শেয়ার
+                </button>
+            </div>
+            <div class="article-body">${bodyParagraphs}</div>
+            ${footerHTML}
         </div>
-        <div class='meanings-container'>${meaningSections}</div>
     `;
 }
 
@@ -200,29 +245,26 @@ function getBengaliDigit(digit) {
 
 
 function listWordElement(element) {
-    var linkedWordText = document.createElement("a");
-    linkedWordText.textContent = element;
-    var listItem = document.createElement('li');
+    var card = document.createElement('li');
+    card.className = 'word-card';
 
-    // Move the click handler to the li element
-    listItem.onclick = function () {
-        // Remove active class from all links and list items
-        document.querySelectorAll('#wordList a').forEach(a => a.classList.remove('active'));
-        document.querySelectorAll('#wordList li').forEach(li => li.classList.remove('active'));
+    var wordDiv = document.createElement('div');
+    wordDiv.className = 'wc-word';
+    wordDiv.textContent = element;
 
-        // Add active class to clicked elements
-        linkedWordText.classList.add('active');
-        listItem.classList.add('active');
+    card.onclick = function () {
+        // Remove active from all cards
+        document.querySelectorAll('#wordList .word-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
 
         // Scroll word meaning pane to top before loading new content
         document.getElementById('wordMeaning').scrollTop = 0;
 
-        // Load the meaning for the selected word
-        meaningSearch(linkedWordText.textContent);
+        meaningSearch(element);
     };
 
-    listItem.appendChild(linkedWordText);
-    return listItem;
+    card.appendChild(wordDiv);
+    return card;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -265,12 +307,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('aboutLink').addEventListener('click', function (e) {
         e.preventDefault();
         const aboutContent = `
-            <div class='word-title'>পরিচিতি</div>
-            <div class='meanings-container'>
-                <div class='meaning-section'>
-                    <div class="meaning-text">
-                        <p>শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।</p>
-                    </div>
+            <div class="about-article">
+                <div class="article-kicker">ABOUT</div>
+                <h1 class="article-headline">পরিচিতি</h1>
+                <div class="article-deck">বাংলা ভাষার শব্দ ও অর্থের সন্ধানে।</div>
+                <div class="article-byline"><span>শব্দ টিম · MMXXIV</span></div>
+                <div class="article-body">
+                    <p class="def-graf dropcap">শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।</p>
                 </div>
             </div>
         `;
@@ -332,18 +375,16 @@ document.addEventListener('DOMContentLoaded', function () {
 // Function to copy meaning URL to clipboard
 function copyMeaningUrl(word) {
     const shareableUrl = window.getShareableUrl(word);
+    const shareButton = document.getElementById('meaningShareButton');
+    const originalHTML = shareButton.innerHTML;
 
-    // Copy to clipboard
+    const showConfirm = () => {
+        shareButton.innerHTML = CHECK_SVG + ' কপি হয়েছে';
+        setTimeout(() => { shareButton.innerHTML = originalHTML; }, 2000);
+    };
+
     navigator.clipboard.writeText(shareableUrl)
-        .then(() => {
-            // Show a temporary tooltip or change the button temporarily
-            const shareButton = document.getElementById('meaningShareButton');
-            const originalHTML = shareButton.innerHTML;
-            shareButton.innerHTML = '<span class="glyphicon glyphicon-ok"></span>';
-            setTimeout(() => {
-                shareButton.innerHTML = originalHTML;
-            }, 2000);
-        })
+        .then(showConfirm)
         .catch(err => {
             console.error('Failed to copy: ', err);
             // Fallback for older browsers
@@ -353,12 +394,6 @@ function copyMeaningUrl(word) {
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-
-            const shareButton = document.getElementById('meaningShareButton');
-            const originalHTML = shareButton.innerHTML;
-            shareButton.innerHTML = '<span class="glyphicon glyphicon-ok"></span>';
-            setTimeout(() => {
-                shareButton.innerHTML = originalHTML;
-            }, 2000);
+            showConfirm();
         });
 }

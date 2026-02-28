@@ -9,7 +9,7 @@
         content="শব্দ - সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান। বাংলা শব্দ খুঁজুন, অর্থ জানুন এবং ব্যবহার শিখুন।">
     <meta name="keywords" content="বাংলা অভিধান, বাংলা শব্দকোষ, বাংলা ডিকশনারি, bengali dictionary, bangla dictionary">
     <meta name="author" content="শব্দ টিম">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#C4881A">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Facebook -->
@@ -35,16 +35,12 @@
     <link rel="canonical" href="https://www.shobdobaaz.com/">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap"
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Noto+Serif+Bengali:wght@400;700&display=swap"
         rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Custom CSS -->
+    <!-- App CSS -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
 
     <!-- JSON-LD for structured data -->
@@ -66,66 +62,114 @@
 </head>
 
 <body>
-    <header class="jumbotron text-center">
-        <h1>শব্দ</h1>
-        <div class="search-container">
-            <div class="search-box-wrapper">
-                <label for="wordSearchBox" class="sr-only">শব্দ খুঁজুন</label>
-                <input type="text" name="Search Box" id="wordSearchBox" onkeyup="debouncedWordSearch(this)"
-                    placeholder="শব্দ খুঁজুন..." autocomplete="off">
-                <button id="shareButton" class="btn share-btn" title="শেয়ার করুন" aria-label="শেয়ার করুন">
-                    <span class="glyphicon glyphicon-share"></span>
-                </button>
+
+    <!-- ============================================================
+         MASTHEAD HEADER — newspaper-style
+    ============================================================ -->
+    <header class="hdr-masthead">
+        <div class="mast-outer">
+            <div class="mast-rule mast-rule--thick"></div>
+            <div class="mast-rule mast-rule--thin"></div>
+            <div class="mast-main">
+                <div class="mast-left">বাংলা অভিধান<br>Est. MMXXIV</div>
+                <div class="mast-center">
+                    <div class="mast-script">শব্দ</div>
+                    <div class="mast-title">SHOBDO</div>
+                    <div class="mast-subtitle">বাংলা শব্দকোষ · Bengali Dictionary</div>
+                </div>
+                <div class="mast-right">
+                    <a href="#" id="aboutLink">পরিচিতি</a><br>
+                    <a href="#" id="themeToggle">ভা-ব</a>
+                </div>
             </div>
-            <div class="transliteration-container">
-                <span id="transliteratedText" class="transliterated-label"></span>
-            </div>
+            <div class="mast-rule mast-rule--thin"></div>
+            <div class="mast-rule mast-rule--thick"></div>
         </div>
     </header>
 
-    <main class="container">
-        <div class="row">
-            <aside class="col-sm-4">
-                <nav aria-label="শব্দের তালিকা">
-                    <ul id="wordList"></ul>
-                </nav>
-            </aside>
-            <section class="col-sm-8">
-                <article id="wordMeaning"></article>
-            </section>
+    <!-- ============================================================
+         SEARCH BAR — Caramel pill style
+    ============================================================ -->
+    <div class="search-section">
+        <div class="search-wrap">
+            <!-- Search icon -->
+            <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+
+            <label for="wordSearchBox" class="sr-only">শব্দ খুঁজুন</label>
+            <input type="text" name="Search Box" id="wordSearchBox"
+                onkeyup="debouncedWordSearch(this)"
+                placeholder="শব্দ খুঁজুন..." autocomplete="off">
+
+            <!-- Share / copy URL button -->
+            <button id="shareButton" class="share-btn" title="শেয়ার করুন" aria-label="শেয়ার করুন">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+            </button>
         </div>
+
+        <div class="transliteration-container">
+            <span id="transliteratedText" class="transliterated-label"></span>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN LAYOUT — word list (340px) + article detail
+    ============================================================ -->
+    <main class="main-layout">
+
+        <!-- Word list panel (Ember-style) -->
+        <aside class="word-list-panel">
+            <div class="list-header">শব্দ তালিকা</div>
+            <nav aria-label="শব্দের তালিকা">
+                <ul id="wordList"></ul>
+            </nav>
+        </aside>
+
+        <!-- Article / meaning detail (Folio-style) -->
+        <article id="wordMeaning">
+            <div class="empty-state">
+                <div class="empty-ornament">শ</div>
+                <p>একটি শব্দ খুঁজুন<br>
+                    <span style="opacity:0.6;font-size:0.85em">Type a word to begin</span>
+                </p>
+            </div>
+        </article>
+
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p class="copyright">© ২০২৫ শব্দ</p>
-                <p class="version">সংস্করণ ০.৮</p>
-                <div class="footer-links">
-                    <a href="https://github.com/tkr22777/shobdo" target="_blank" rel="noopener">গিটহাব</a>
-                    <span class="separator">•</span>
-                    <a href="#" id="aboutLink">পরিচিতি</a>
-                    <span class="separator">•</span>
-                    <a href="#" id="themeToggle">ভা-ব</a>
-                    <span class="separator">•</span>
-                    <a href="health-check.html">স্টেটাস</a>
-                </div>
+    <!-- ============================================================
+         FOOTER
+    ============================================================ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span class="footer-copy">© ২০২৫ শব্দ · সংস্করণ ০.৮</span>
+            <div class="footer-links">
+                <a href="https://github.com/tkr22777/shobdo" target="_blank" rel="noopener">গিটহাব</a>
+                <span>·</span>
+                <a href="health-check.html">স্টেটাস</a>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts at the end for better performance -->
-    <!-- jQuery and Bootstrap -->
+    <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-
-    <!-- App scripts -->
     <script src='javascripts/bangla-conversion/ridmikmap.js'></script>
     <script src='javascripts/bangla-conversion/StringBuilder.js'></script>
     <script src='javascripts/bangla-conversion/ridmikparser.js'></script>
     <script type="text/javascript" src="javascripts/shobdoscript.js"></script>
+
 </body>
 
 </html>
