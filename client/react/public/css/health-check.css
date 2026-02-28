@@ -1,68 +1,218 @@
-/* Styles for health check page */
-
-body.health-page {
-    font-family: 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
+/* ============================================================
+   Design tokens (mirrors main style.css green theme defaults)
+============================================================ */
+:root {
+  --bg:           #FBF8F0;
+  --surface:      #FFFFFF;
+  --text:         #1C1510;
+  --text-soft:    #3D3028;
+  --muted:        #8B7055;
+  --subtle:       #F0EAD8;
+  --border:       #E5D8C0;
+  --accent:       #C4881A;
+  --accent-light: #FEF3DC;
+  --accent-dark:  #8B5A08;
 }
 
-body.health-check {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f5f5f5;
+/* ============================================================
+   Base
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Source Serif 4', 'Georgia', serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
 }
 
-.container {
-    text-align: center;
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 80%;
+/* ============================================================
+   Header (mimics .hdr-masthead)
+============================================================ */
+.hc-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-h1 { margin-top: 0; color: #2c3e50; }
-
-.status { font-size: 1.5rem; margin: 2rem 0; font-weight: 500; }
-
-.status-indicator {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    margin-right: 8px;
+.hc-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--accent);
+  text-decoration: none;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
-.loading    { background-color: #f39c12; }
-.healthy    { background-color: #2ecc71; }
-.unhealthy  { background-color: #e74c3c; }
+.hc-logo:hover { color: var(--accent-dark); }
 
-.details {
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-top: 1rem;
-    text-align: left;
+.hc-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
 }
 
-.home-link { margin-top: 2rem; }
-.home-link a { color: #3498db; text-decoration: none; }
-.home-link a:hover { text-decoration: underline; }
-
-.button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #3498db;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border: none;
-    cursor: pointer;
+/* ============================================================
+   Main layout
+============================================================ */
+.hc-main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 64px 24px;
+  min-height: calc(100% - 54px);
 }
 
-.button:hover { background-color: #2980b9; }
+/* ============================================================
+   Card
+============================================================ */
+.hc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 40px 48px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.hc-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ============================================================
+   Status row
+============================================================ */
+.hc-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hc-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.hc-dot.loading   { background: var(--accent); opacity: 0.5; animation: hc-pulse 1.2s ease-in-out infinite; }
+.hc-dot.healthy   { background: #2ecc71; opacity: 1; animation: none; }
+.hc-dot.unhealthy { background: #e74c3c; opacity: 1; animation: none; }
+
+@keyframes hc-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.9; }
+}
+
+.hc-status-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+/* ============================================================
+   Details table
+============================================================ */
+.hc-details {
+  display: none;
+  margin-bottom: 28px;
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+
+.hc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.hc-table th,
+.hc-table td {
+  text-align: left;
+  padding: 5px 0;
+  vertical-align: top;
+}
+
+.hc-table th {
+  color: var(--muted);
+  font-weight: 400;
+  width: 40%;
+  padding-right: 12px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hc-table td { color: var(--text); font-weight: 600; }
+
+.hc-table tr + tr th,
+.hc-table tr + tr td { border-top: 1px solid var(--border); padding-top: 8px; }
+
+.hc-error {
+  color: #c0392b;
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   Action buttons (mirrors .sign-in-btn / .word-tag)
+============================================================ */
+.hc-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hc-btn {
+  display: inline-block;
+  padding: 6px 18px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: none;
+  color: var(--text);
+  font-family: 'Source Serif 4', 'Georgia', serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.hc-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.hc-btn-ghost { color: var(--muted); }
+.hc-btn-ghost:hover { color: var(--accent); }
+
+/* ============================================================
+   Responsive
+============================================================ */
+@media (max-width: 480px) {
+  .hc-card { padding: 28px 24px; }
+  .hc-header { padding: 0 20px; }
+  .hc-main { padding: 32px 16px; }
+}
