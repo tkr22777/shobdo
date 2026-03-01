@@ -43,32 +43,30 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
+            // Font CSS from Google — must be StaleWhileRevalidate so the
+            // Bengali subset entry is always fresh (CacheFirst can serve a
+            // stale sheet that omits the Noto Serif Bengali unicode-range).
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'google-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheName: 'google-fonts-stylesheets',
               cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
+            // Actual woff2 font files are immutable — CacheFirst is correct.
+            // maxEntries raised to 30: Noto Serif Bengali alone has many
+            // unicode-range subset files.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheName: 'google-fonts-webfonts',
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          {
-            urlPattern: /^\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
+          // API calls (POST-heavy) are intentionally not cached — service
+          // worker body-cloning of POST requests can silently empty the body.
         ],
       },
     }),
