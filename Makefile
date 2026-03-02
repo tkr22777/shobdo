@@ -28,8 +28,12 @@ generate-react-env:
 	@echo "VITE_GOOGLE_CLIENT_ID=$(GOOGLE_CLIENT_ID)" > client/react/.env.local
 	@echo "Generated client/react/.env.local"
 
+# Generate sitemap.xml from the MongoDB BSON dump into client/react/public/sitemap.xml
+generate-sitemap:
+	node scripts/generate-sitemap.mjs
+
 # Install React dependencies and build the production bundle into client/react/dist/
-build-react: generate-react-env
+build-react: generate-react-env generate-sitemap
 	npm --prefix client/react install
 	npm --prefix client/react run build
 
