@@ -133,6 +133,7 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
                   {totalMeanings > 1 && (
                     <span className="meaning-number">{getBengaliDigit(index + 1)}.</span>
                   )}{' '}
+                  {meaning.partOfSpeech && <span className="pos-badge">{meaning.partOfSpeech}</span>}{' '}
                   {meaning.text}
                 </p>
                 {(hasSynonyms || hasAntonyms) && (

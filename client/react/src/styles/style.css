@@ -703,6 +703,14 @@ ul { list-style: none; }
   color: var(--accent);
 }
 
+.pos-badge {
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--accent);
+  opacity: 0.85;
+  font-family: 'Source Serif 4', serif;
+}
+
 /* About content */
 .about-article { max-width: 620px; }
 .about-article .article-body { column-count: 1; }
