@@ -703,6 +703,13 @@ ul { list-style: none; }
   color: var(--accent);
 }
 
+.syn-ant-section {
+  margin: 10px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .pos-badge {
   font-size: 0.72rem;
   font-style: italic;

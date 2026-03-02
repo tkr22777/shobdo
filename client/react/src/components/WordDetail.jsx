@@ -193,11 +193,28 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
                   {meaning.text}
                 </p>
                 {(hasSynonyms || hasAntonyms) && (
-                  <p className="example-graf" style={{ fontStyle: 'normal' }}>
-                    {hasSynonyms && <em>সমার্থ: {meaning.synonyms.join(', ')}</em>}
-                    {hasSynonyms && hasAntonyms && <span> &nbsp;·&nbsp; </span>}
-                    {hasAntonyms && <em>বিপরীত: {meaning.antonyms.join(', ')}</em>}
-                  </p>
+                  <div className="syn-ant-section">
+                    {hasSynonyms && (
+                      <div className="syn-ant-group">
+                        <div className="footer-label">সমার্থ</div>
+                        <div className="word-tags">
+                          {meaning.synonyms.map(s => (
+                            <span key={s} className="word-tag" onClick={() => onTagClick(s)}>{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {hasAntonyms && (
+                      <div className="syn-ant-group">
+                        <div className="footer-label">বিপরীত</div>
+                        <div className="word-tags">
+                          {meaning.antonyms.map(a => (
+                            <span key={a} className="word-tag" onClick={() => onTagClick(a)}>{a}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
                 {hasExample && (
                   <p className="example-graf">
