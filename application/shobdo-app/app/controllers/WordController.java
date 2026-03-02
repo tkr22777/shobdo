@@ -13,6 +13,7 @@ import word.caches.WordCache;
 import word.WordLogic;
 import word.stores.WordStoreMongoImpl;
 import word.objects.Meaning;
+import word.objects.Word;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,6 +94,52 @@ public class WordController extends Controller {
                 );
             }
         );
+    }
+
+    // OG preview page for social/link-preview bots: GET /bn/word/<spelling>
+    // Returns minimal HTML with word-specific og:title / og:description baked in.
+    // Real browsers are immediately bounced back to the SPA via window.location.replace.
+    public Result wordOgPage(final String spelling) {
+        return ControllerUtils.executeEndpoint("", "", "wordOgPage", new HashMap<>(),
+            () -> {
+                final Word word = wordLogic.getWordBySpelling(spelling);
+                final String firstMeaningText = (word.getMeanings() != null && !word.getMeanings().isEmpty())
+                    ? word.getMeanings().values().iterator().next().getText()
+                    : "";
+                final String desc = spelling + " এর অর্থ: " + firstMeaningText;
+                final String truncDesc = desc.length() > 160 ? desc.substring(0, 160) : desc;
+                final String encodedSpelling;
+                try {
+                    encodedSpelling = java.net.URLEncoder.encode(spelling, "UTF-8").replace("+", "%20");
+                } catch (java.io.UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+                final String canonicalUrl = "https://www.shobdo.info/bn/word/" + encodedSpelling;
+                final String title = spelling + " - অর্থ ও সংজ্ঞা | শব্দ";
+                final String html =
+                    "<!DOCTYPE html>\n<html lang=\"bn\">\n<head>\n" +
+                    "<meta charset=\"UTF-8\">\n" +
+                    "<title>" + escapeHtml(title) + "</title>\n" +
+                    "<meta property=\"og:title\" content=\"" + escapeHtml(title) + "\" />\n" +
+                    "<meta property=\"og:description\" content=\"" + escapeHtml(truncDesc) + "\" />\n" +
+                    "<meta property=\"og:url\" content=\"" + canonicalUrl + "\" />\n" +
+                    "<meta property=\"og:type\" content=\"website\" />\n" +
+                    "<meta name=\"twitter:card\" content=\"summary\" />\n" +
+                    "<meta name=\"twitter:title\" content=\"" + escapeHtml(title) + "\" />\n" +
+                    "<meta name=\"twitter:description\" content=\"" + escapeHtml(truncDesc) + "\" />\n" +
+                    "<link rel=\"canonical\" href=\"" + canonicalUrl + "\" />\n" +
+                    "<script>window.location.replace(\"" + canonicalUrl + "\");</script>\n" +
+                    "</head>\n<body>\n" +
+                    "<h1>" + escapeHtml(spelling) + "</h1>\n" +
+                    "<p>" + escapeHtml(truncDesc) + "</p>\n" +
+                    "</body>\n</html>\n";
+                return ok(html).as("text/html; charset=utf-8");
+            }
+        );
+    }
+
+    private static String escapeHtml(final String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
 
     //READ by lang + spelling: GET /api/v1/bn/word/<spelling>

@@ -9,6 +9,9 @@ GET     /                                                controllers.WordControl
 GET     /api/v1                                          controllers.WordController.index()
 GET     /api/v1/health                                   controllers.AdminController.health()
 
+# OG preview page served to social/link-preview bots for word URLs
+GET     /bn/word/:spelling                               controllers.WordController.wordOgPage(spelling: String)
+
 ################################
 # CRUDL and search API for word:
 ################################
