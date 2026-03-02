@@ -192,6 +192,16 @@ export default function App() {
     }
   }, []);
 
+  const handleStatus = useCallback((e) => {
+    e.preventDefault();
+    setViewMode('status');
+    setWordDetail(null);
+    setSelectedSpelling(null);
+    if (!isInitialLoad.current) {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
@@ -345,7 +355,7 @@ export default function App() {
             <span>·</span>
             <a href="#" onClick={handleThemeToggle}>ভা-ব</a>
             <span>·</span>
-            <a href="health-check.html">স্টেটাস</a>
+            <a href="#" onClick={handleStatus}>স্টেটাস</a>
           </div>
         </div>
       </footer>
