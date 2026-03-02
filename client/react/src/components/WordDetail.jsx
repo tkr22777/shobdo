@@ -189,37 +189,36 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
                   {totalMeanings > 1 && (
                     <span className="meaning-number">{getBengaliDigit(index + 1)}.</span>
                   )}{' '}
-                  {meaning.partOfSpeech && <span className="pos-badge">{meaning.partOfSpeech}</span>}{' '}
                   {meaning.text}
                 </p>
-                {(hasSynonyms || hasAntonyms) && (
-                  <div className="syn-ant-section">
-                    {hasSynonyms && (
-                      <div className="syn-ant-group">
-                        <div className="footer-label">সমার্থ</div>
-                        <div className="word-tags">
-                          {meaning.synonyms.map(s => (
-                            <span key={s} className="word-tag" onClick={() => onTagClick(s)}>{s}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {hasAntonyms && (
-                      <div className="syn-ant-group">
-                        <div className="footer-label">বিপরীত</div>
-                        <div className="word-tags">
-                          {meaning.antonyms.map(a => (
-                            <span key={a} className="word-tag" onClick={() => onTagClick(a)}>{a}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                {meaning.partOfSpeech && (
+                  <div className="pos-badge">{meaning.partOfSpeech}</div>
                 )}
                 {hasExample && (
                   <p className="example-graf">
                     {highlightWord(meaning.exampleSentence, data.spelling, onTagClick)}
                   </p>
+                )}
+                {(hasSynonyms || hasAntonyms) && (
+                  <div className="syn-ant-row">
+                    {hasSynonyms && (
+                      <>
+                        <span className="syn-ant-label">সমার্থ</span>
+                        {meaning.synonyms.map(s => (
+                          <span key={s} className="syn-word" onClick={() => onTagClick(s)}>{s}</span>
+                        ))}
+                      </>
+                    )}
+                    {hasSynonyms && hasAntonyms && <span className="syn-ant-sep">·</span>}
+                    {hasAntonyms && (
+                      <>
+                        <span className="syn-ant-label">বিপরীত</span>
+                        {meaning.antonyms.map(a => (
+                          <span key={a} className="ant-word" onClick={() => onTagClick(a)}>{a}</span>
+                        ))}
+                      </>
+                    )}
+                  </div>
                 )}
                 {isFirst && totalMeanings > 1 && hasExample && (
                   <div className="pull-quote">

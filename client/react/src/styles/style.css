@@ -703,19 +703,59 @@ ul { list-style: none; }
   color: var(--accent);
 }
 
-.syn-ant-section {
-  margin: 10px 0 4px;
+.syn-ant-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
 }
 
+.syn-ant-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'Source Serif 4', serif;
+}
+
+.syn-ant-sep {
+  color: var(--muted);
+  margin: 0 2px;
+}
+
+.syn-word {
+  font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text-soft);
+  border-bottom: 1.5px dotted var(--accent);
+  padding-bottom: 1px;
+  transition: color 0.15s, border-bottom-style 0.15s;
+}
+.syn-word:hover { color: var(--accent); border-bottom-style: solid; }
+
+.ant-word {
+  font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text-soft);
+  border-bottom: 1.5px dotted #C4604A;
+  padding-bottom: 1px;
+  transition: color 0.15s, border-bottom-style 0.15s;
+}
+.ant-word:hover { color: #C4604A; border-bottom-style: solid; }
+
 .pos-badge {
+  display: block;
   font-size: 0.72rem;
   font-style: italic;
   color: var(--accent);
   opacity: 0.85;
   font-family: 'Source Serif 4', serif;
+  margin-top: -12px;
+  margin-bottom: 12px;
 }
 
 /* About content */
