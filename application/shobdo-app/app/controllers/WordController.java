@@ -95,6 +95,18 @@ public class WordController extends Controller {
         );
     }
 
+    //READ by lang + spelling: GET /api/v1/bn/word/<spelling>
+    public Result getWordByLangAndSpelling(final String lang, final String spelling) {
+        return ControllerUtils.executeEndpoint("", "", "getWordByLangAndSpelling", new HashMap<>(),
+            () -> {
+                if (!"bn".equals(lang)) {
+                    return badRequest("Unsupported language: " + lang);
+                }
+                return ok(wordLogic.getWordBySpelling(spelling).jsonNode());
+            }
+        );
+    }
+
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateWord(final String wordId) {
 

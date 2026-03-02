@@ -25,6 +25,9 @@ GET     /api/v1/words/:id                                controllers.WordControl
 # 3. POST Get word by spelling: body contains "spelling" key and query value as Bengali unicode chars breaks route :(
 POST    /api/v1/words/postget                            controllers.WordController.getWordBySpellingPost()
 
+# 3b. GET word by lang + spelling: /api/v1/bn/word/<spelling>  (Phase 1: bn only)
+GET     /api/v1/:lang/word/:spelling                    controllers.WordController.getWordByLangAndSpelling(lang: String, spelling: String)
+
 # 4. Update word:
 PUT     /api/v1/words/:id                                controllers.WordController.updateWord(id: String)
 
