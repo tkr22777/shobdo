@@ -3,6 +3,7 @@ package request;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import common.objects.EntityStatus;
+import exceptions.EntityDoesNotExist;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import request.objects.RequestOperation;
@@ -41,7 +42,11 @@ public class UserRequestLogic {
         if (requestId == null || requestId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + requestId);
         }
-        return userRequestDao.get(requestId);
+        final UserRequest request = userRequestDao.get(requestId);
+        if (request == null) {
+            throw new EntityDoesNotExist(Constants.Messages.EntityNotFound(requestId));
+        }
+        return request;
     }
 
     //The following creates a word creation request
@@ -82,21 +87,6 @@ public class UserRequestLogic {
         return userRequestDao.create(updateRequest);
     }
 
-    public UserRequest createUserRequestForWordDeletion(final String wordId) {
-
-        final Map<TargetType, String> targetIds = new HashMap<>();
-        targetIds.put(TargetType.WORD, wordId);
-
-        final UserRequest deleteRequest = UserRequest.builder()
-            .id(generateUserRequestId())
-            .targetIds(targetIds)
-            .targetType(TargetType.WORD)
-            .operation(RequestOperation.DELETE)
-            .build();
-
-        return userRequestDao.create(deleteRequest);
-    }
-
     //todo make transactional
     //approveUserRequest applies the requested changes to a word
     public boolean approveUserRequest(final String requestId) {
@@ -113,10 +103,8 @@ public class UserRequestLogic {
                         wordId = Preconditions.checkNotNull(request.getTargetIds().get(TargetType.WORD));
                         wordLogic.updateWord(wordId, request.getRequestBody());
                         break;
-                    case DELETE:
-                        wordId = Preconditions.checkNotNull(request.getTargetIds().get(TargetType.WORD));
-                        wordLogic.deleteWord(wordId);
-                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported operation for WORD request: " + request.getOperation());
                 }
                 break;
             case MEANING:

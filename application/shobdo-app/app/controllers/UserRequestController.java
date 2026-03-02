@@ -56,43 +56,16 @@ public class UserRequestController extends Controller {
         );
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result createUserRequestForWordDeletion(final String wordId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
-        final JsonNode wordJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "WordDeletionRequest", new HashMap<>(),
-            () -> created(
-                requestLogic.createUserRequestForWordDeletion(wordId)
-                    .jsonNode()
-            )
+    public Result getUserRequest(final String requestId) {
+        return ControllerUtils.executeEndpoint("", "", "GetUserRequest", new HashMap<>(),
+            () -> ok(requestLogic.getRequest(requestId).jsonNode())
         );
     }
 
-    public Result getUserRequest(final String userRequestId) {
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
-        final JsonNode wordJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "GetUserRequest", new HashMap<>(),
-            () -> ok(
-                requestLogic.getRequest(userRequestId)
-                    .jsonNode()
-            )
-        );
-    }
-
-    public Result approveUserRequest(final String userRequestId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
-        final JsonNode wordJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "ApproveUserRequest", new HashMap<>(),
+    public Result approveUserRequest(final String requestId) {
+        return ControllerUtils.executeEndpoint("", "", "ApproveUserRequest", new HashMap<>(),
             () -> {
-                requestLogic.approveUserRequest(userRequestId);
+                requestLogic.approveUserRequest(requestId);
                 return ok();
             }
         );

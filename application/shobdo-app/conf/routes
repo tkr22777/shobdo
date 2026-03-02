@@ -51,14 +51,17 @@ POST    /api/v1/words/search                             controllers.WordControl
 # User Request APIs for Word :
 ##############################
 
-# Create request for word creation:
+# Submit request to create a new word:
 POST    /api/v1/requests/words                           controllers.UserRequestController.createUserRequestForWordCreation()
 
-# Create request for word update:
-POST    /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordUpdate(wordId: String)
+# Submit request to update an existing word:
+PUT     /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordUpdate(wordId: String)
 
-# Create request for word deletion:
-POST    /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordDeletion(wordId: String)
+# Get a specific user request by id:
+GET     /api/v1/requests/:requestId                      controllers.UserRequestController.getUserRequest(requestId: String)
+
+# Approve a pending user request (admin only — role check coming in chunk 2):
+POST    /api/v1/requests/:requestId/approve              controllers.UserRequestController.approveUserRequest(requestId: String)
 
 ##############################
 # CRUDL API for word meanings:
