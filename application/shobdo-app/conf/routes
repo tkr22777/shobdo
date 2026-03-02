@@ -19,7 +19,10 @@ GET     /bn/word/:spelling                               controllers.WordControl
 # 1. Create word:
 POST    /api/v1/words                                    controllers.WordController.createWord()
 
-# 2. Get random word (must be before /:id to avoid being matched as id):
+# 2. Get word of the day (date-seeded, same for all users):
+GET     /api/v1/words/daily                              controllers.WordController.getWordOfDay()
+
+# 2b. Get random word (must be before /:id to avoid being matched as id):
 GET     /api/v1/words/random                             controllers.WordController.getRandomWord()
 
 # 3. Get word by id:

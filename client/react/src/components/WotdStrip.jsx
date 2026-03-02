@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getRandomWord } from '../api';
+import { getWordOfDay } from '../api';
 
 function todayKey() {
   const d = new Date();
@@ -27,7 +27,7 @@ export default function WotdStrip({ onNavigate }) {
       return;
     }
 
-    getRandomWord()
+    getWordOfDay()
       .then(data => {
         if (!data?.spelling) return;
         setWotd(data);

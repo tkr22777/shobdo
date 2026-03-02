@@ -49,6 +49,13 @@ public class WordController extends Controller {
         );
     }
 
+    //READ word of the day — same word for all users on a given UTC date
+    public Result getWordOfDay() {
+        return ControllerUtils.executeEndpoint("", "", "getWordOfDay", new HashMap<>(),
+            () -> ok(wordLogic.getWordOfDay().jsonNode())
+        );
+    }
+
     //READ random
     public Result getRandomWord() {
         return ControllerUtils.executeEndpoint("", "", "getRandomWord", new HashMap<>(),

@@ -88,6 +88,21 @@ public class WordLogic {
         throw new IllegalStateException(String.format("Failed to generate unique word ID after %s attempts", numberOfTries));
     }
 
+    /* GET the word of the day — deterministic for all users on the same UTC date */
+    public Word getWordOfDay() {
+        final long total = wordStore.count();
+        if (total == 0) {
+            throw new EntityDoesNotExist("No words available in the dictionary");
+        }
+        final long daysSinceEpoch = java.time.LocalDate.now(java.time.ZoneOffset.UTC).toEpochDay();
+        final int index = (int) (daysSinceEpoch % total);
+        final Word word = wordStore.getWordAtIndex(index);
+        if (word == null) {
+            throw new EntityDoesNotExist("Word of the day not found at index " + index);
+        }
+        return word;
+    }
+
     /* GET a random word */
     public Word getRandomWord() {
         final Word word = wordStore.getRandomWord();

@@ -87,6 +87,14 @@ public class WordStoreMongoImpl implements WordStore {
     }
 
     @Override
+    public Word getWordAtIndex(final int index) {
+        final BasicDBObject query = Word.getActiveObjectQuery();
+        final Document wordDoc = wordCollection.find(query).skip(index).limit(1).first();
+        log.debug("getWordAtIndex index: " + index + " result: " + wordDoc);
+        return wordDoc == null ? null : Word.fromBsonDoc(wordDoc);
+    }
+
+    @Override
     public Word getRandomWord() {
         final Document matchStage = new Document("$match", Word.getActiveObjectQuery());
         final Document sampleStage = new Document("$sample", new Document("size", 1));

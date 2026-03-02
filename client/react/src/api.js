@@ -20,6 +20,12 @@ export async function getWordDetail(spelling) {
   return res.json();
 }
 
+export async function getWordOfDay() {
+  const res = await fetch('/api/v1/words/daily');
+  if (!res.ok) throw new Error('Word of the day failed');
+  return res.json();
+}
+
 export async function getRandomWord() {
   const res = await fetch('/api/v1/words/random');
   if (!res.ok) throw new Error('Random word failed');
