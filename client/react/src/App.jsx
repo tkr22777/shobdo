@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { searchWords, getWordDetail } from './api';
 import { RidmikParser } from './lib/ridmik';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -6,6 +7,29 @@ import Masthead from './components/Masthead';
 import SearchBar from './components/SearchBar';
 import WordList from './components/WordList';
 import WordDetail from './components/WordDetail';
+
+// Parse /bn/word/ধরা  or  /bn-en/word/ধরা  or legacy ?word=ধরা
+function parseCurrentUrl() {
+  const { pathname, search } = window.location;
+  const params = new URLSearchParams(search);
+  const match = pathname.match(/^\/([a-z]{2}(?:-[a-z]{2})?)\/word\/(.+)$/);
+  if (match) {
+    const [, langSegment, encodedSpelling] = match;
+    const [lang, targetLang = null] = langSegment.split('-');
+    return { lang, targetLang, spelling: decodeURIComponent(encodedSpelling), query: params.get('q') || '' };
+  }
+  const legacyWord = params.get('word');
+  if (legacyWord) return { lang: 'bn', targetLang: null, spelling: legacyWord, query: params.get('q') || '' };
+  return { lang: 'bn', targetLang: null, spelling: null, query: params.get('q') || '' };
+}
+
+function buildWordUrl(spelling, lang = 'bn', targetLang = null, query = '') {
+  const seg = targetLang ? `${lang}-${targetLang}` : lang;
+  const url = new URL(window.location.origin);
+  url.pathname = `/${seg}/word/${encodeURIComponent(spelling)}`;
+  if (query) url.searchParams.set('q', query);
+  return url;
+}
 
 const THEMES = ['green', 'dark', 'blue', 'light'];
 
@@ -69,18 +93,21 @@ export default function App() {
 
   // URL sync on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    const word = params.get('word');
+    const { spelling, query, lang } = parseCurrentUrl();
+    const isLegacy = !!new URLSearchParams(window.location.search).get('word');
 
-    if (q) {
-      setSearchQuery(q);
-      performSearch(q);
+    if (query) {
+      setSearchQuery(query);
+      performSearch(query);
     }
-    if (word) {
-      setSelectedSpelling(word);
+    if (spelling) {
+      if (isLegacy) {
+        const canonical = buildWordUrl(spelling, lang, null, query);
+        window.history.replaceState({}, '', canonical.toString());
+      }
+      setSelectedSpelling(spelling);
       setViewMode('word');
-      getWordDetail(word)
+      getWordDetail(spelling)
         .then(data => setWordDetail(data))
         .catch(() => {});
     }
@@ -92,10 +119,9 @@ export default function App() {
   // URL sync on state changes (debounced, skip initial load)
   useEffect(() => {
     if (isInitialLoad.current) return;
-    const url = new URL(window.location.href);
-    url.search = '';
-    if (searchQuery) url.searchParams.set('q', searchQuery);
-    if (selectedSpelling && viewMode === 'word') url.searchParams.set('word', selectedSpelling);
+    const url = selectedSpelling && viewMode === 'word'
+      ? buildWordUrl(selectedSpelling, 'bn', null, searchQuery)
+      : new URL(`${window.location.origin}/${searchQuery ? '?q=' + encodeURIComponent(searchQuery) : ''}`);
     window.history.replaceState({}, '', url.toString());
   }, [searchQuery, selectedSpelling, viewMode]);
 
@@ -142,10 +168,9 @@ export default function App() {
   }, [performSearch]);
 
   const handleShare = useCallback(() => {
-    const url = new URL(window.location.href);
-    url.search = '';
-    if (searchQuery) url.searchParams.set('q', searchQuery);
-    if (selectedSpelling && viewMode === 'word') url.searchParams.set('word', selectedSpelling);
+    const url = selectedSpelling && viewMode === 'word'
+      ? buildWordUrl(selectedSpelling, 'bn', null, searchQuery)
+      : new URL(window.location.origin);
     navigator.clipboard.writeText(url.toString()).catch(() => {});
   }, [searchQuery, selectedSpelling, viewMode]);
 
@@ -163,7 +188,7 @@ export default function App() {
     setWordDetail(null);
     setSelectedSpelling(null);
     if (!isInitialLoad.current) {
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', '/');
     }
   }, []);
 
@@ -254,8 +279,30 @@ export default function App() {
     };
   }, []);
 
+  const isWordView = viewMode === 'word' && wordDetail;
+  const firstMeaningText = isWordView
+    ? Object.values(wordDetail.meanings || {})[0]?.text || ''
+    : '';
+  const pageTitle = isWordView
+    ? `${wordDetail.spelling} - অর্থ ও সংজ্ঞা | শব্দ`
+    : 'শব্দ - বাংলা শব্দকোষ এবং অভিধান | Shobdo - Bengali Dictionary';
+  const pageDesc = isWordView
+    ? `${wordDetail.spelling} এর অর্থ: ${firstMeaningText}`.slice(0, 160)
+    : 'শব্দ - সহজ ও দ্রুত বাংলা শব্দকোষ অনলাইন অভিধান। বাংলা শব্দ খুঁজুন, অর্থ জানুন এবং ব্যবহার শিখুন।';
+  const pageUrl = isWordView
+    ? `https://www.shobdo.info/bn/word/${encodeURIComponent(wordDetail.spelling)}`
+    : 'https://www.shobdo.info/';
+
   return (
     <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <meta property="og:title" content={isWordView ? `${wordDetail.spelling} - বাংলা অভিধান` : 'শব্দ - বাংলা শব্দকোষ এবং অভিধান'} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:url" content={pageUrl} />
+        <link rel="canonical" href={pageUrl} />
+      </Helmet>
       <Masthead onNavigate={handleNavigate} />
       <SearchBar
         value={searchQuery}

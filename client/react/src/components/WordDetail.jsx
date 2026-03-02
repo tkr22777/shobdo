@@ -81,10 +81,9 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
   }, [data?.id]);
 
   const handleShare = () => {
-    const url = new URL(window.location.href);
-    if (data?.spelling) {
-      url.searchParams.set('word', data.spelling);
-    }
+    if (!data?.spelling) return;
+    const url = new URL(window.location.origin);
+    url.pathname = `/bn/word/${encodeURIComponent(data.spelling)}`;
     navigator.clipboard.writeText(url.toString()).catch(() => {});
     setShareCopied(true);
     setTimeout(() => setShareCopied(false), 2000);
