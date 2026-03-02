@@ -17,6 +17,7 @@ export default defineConfig({
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        lang: 'bn',
         orientation: 'portrait',
         icons: [
           {
