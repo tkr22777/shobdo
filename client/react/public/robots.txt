@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /health-check.html
 
-Sitemap: https://www.shobdobaaz.com/sitemap.xml
+Sitemap: https://www.shobdo.info/sitemap.xml

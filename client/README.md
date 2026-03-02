@@ -48,7 +48,7 @@ sed -i '' "s/<lastmod>.*<\/lastmod>/<lastmod>$(date +%Y-%m-%d)<\/lastmod>/g" cli
 ```
 # Install and run Lighthouse CLI for performance auditing
 npm install -g lighthouse
-lighthouse https://www.shobdobaaz.com --output=html --output-path=./lighthouse-report.html
+lighthouse https://www.shobdo.info --output=html --output-path=./lighthouse-report.html
 ```
 
 ### Image Optimization
@@ -61,7 +61,7 @@ imagemin client/html/public/images/* --out-dir=client/html/public/images/optimiz
 ### Testing Mobile Responsiveness
 ```
 # Use Chrome DevTools Device Mode
-open -a "Google Chrome" https://www.shobdobaaz.com
+open -a "Google Chrome" https://www.shobdo.info
 # Then press F12 and click the mobile device icon
 ```
 
