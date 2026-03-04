@@ -4,20 +4,84 @@ A Bangla Dictionary Webservice
 
 Shobdo ("শব্দ", meaning "word" in Bangla) is a modern dictionary application that provides Bangla word definitions, pronunciations, and related information through a web interface.
 
-## Getting Started
-
-Microservices can be found in the application directory.
-
-Current list of services:
-- shobdo-app: A Java-based dockerized dictionary service
-
 ## Project Structure
 
-- `/application`: Contains the core backend services
-- `/client`: Frontend implementation based on Nginx with vanilla JavaScript and jQuery
-- `/data`: Storage for dictionary data files
-- `/deploy`: Deployment configuration files
-- `/scripts`: Utility scripts for development and deployment
+- `/application/shobdo-app`: Play Java backend API service
+- `/client/react`: Vite + React frontend (primary UI)
+- `/client`: Nginx configuration and legacy HTML frontend
+- `/data`: Dictionary data files (MongoDB dump, 42k+ words)
+- `/deploy`: Docker Compose and environment configuration
+- `/scripts`: Utility scripts
+
+## Getting Started (Local)
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/) and Docker Compose
+- [sbt](https://www.scala-sbt.org/) (to build the backend)
+- [Node.js](https://nodejs.org/) 18+ and npm (to build the frontend)
+- `make`
+
+### 1. Copy the environment template
+
+```bash
+cp deploy/local.env.template deploy/local.env
+```
+
+`deploy/local.env` is gitignored and never committed.
+
+### 2. Set up Google OAuth
+
+Sign-in uses Google Identity Services. You need a Google OAuth client ID:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com) → **APIs & Services** → **Credentials**
+2. Click **Create Credentials** → **OAuth client ID** → Application type: **Web application**
+3. Under **Authorised JavaScript origins**, add:
+   - `http://localhost:32779` (local Docker)
+   - Your production URL (e.g. `https://www.shobdo.info`)
+4. No redirect URIs needed — this uses the GSI popup flow, not redirects
+5. Copy the **Client ID** (format: `xxxx.apps.googleusercontent.com`)
+
+Open `deploy/local.env` and set:
+
+```
+SHOBDO_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
+
+This single value is used by both the backend (to verify ID tokens) and the frontend (to render the Google sign-in button). `make start-docker-compose` propagates it automatically.
+
+### 3. Build the backend Docker image
+
+This only needs to be re-run when backend source changes.
+
+```bash
+cd application/shobdo-app
+make build-docker-image-from-source
+cd ../..
+```
+
+### 4. Start the stack
+
+```bash
+make start-docker-compose
+```
+
+This will:
+- Generate `client/react/.env.local` from `deploy/local.env`
+- Install frontend dependencies and run `vite build`
+- Start MongoDB, the Play backend, and the Nginx frontend via Docker Compose
+
+The app will be available at **http://localhost:32779**
+
+MongoDB data (42,545 words) is restored automatically on first startup.
+
+### 5. Stop the stack
+
+```bash
+make stop-docker-compose
+```
+
+---
 
 ## Setting Up an Admin User
 
@@ -45,6 +109,8 @@ An "অ্যাডমিন" link will appear in the site footer. From there yo
 | ADMIN | USER, REVIEWER |
 | OWNER | USER, REVIEWER, ADMIN, OWNER |
 
+---
+
 ## User Request (Contribution) System
 
 Signed-in users can suggest changes to the dictionary. All suggestions are queued as **pending requests** and only take effect after a REVIEWER approves them.
@@ -56,6 +122,13 @@ User submits request → stored as PENDING → REVIEWER approves → change appl
 ```
 
 The request body is stored verbatim. Approval replays it against the live word store.
+
+### Enabling crowdsourcing
+
+1. **Bootstrap an OWNER** (see above)
+2. Sign in to the app and open **অ্যাডমিন** in the footer
+3. Assign the **REVIEWER** role to trusted users from the Admin panel
+4. Signed-in users can now submit suggestions; REVIEWERs will approve them
 
 ### Submission flows
 
@@ -100,10 +173,14 @@ A request is **ACTIVE** (pending) until it is approved. On approval:
 
 There is currently no reject/dismiss endpoint — requests stay pending until explicitly approved or manually removed from MongoDB.
 
+---
+
 ## Built With
 
-* [Nginx](https://nginx.org/): - Frontend serving vanilla JavaScript with jQuery https://shobdo-1.onrender.com/ [Beta]
-* [Play Java Framework](https://www.playframework.com/) - Web Framework for Java and Scala for backend API
-* [MongoDB](https://www.mongodb.com/) - Used as the primary datastore for words
-* [Redis](https://redis.io/) - Used for caching word search results and definitions (disabled for now)
-* [Docker](https://www.docker.com/) - Container platform for development and deployment
+* [Play Java Framework](https://www.playframework.com/) — Backend API (Java)
+* [React 18](https://react.dev/) + [Vite](https://vitejs.dev/) — Frontend UI
+* [Nginx](https://nginx.org/) — Static file serving and reverse proxy
+* [MongoDB](https://www.mongodb.com/) — Primary datastore for words
+* [Redis](https://redis.io/) — Caching (infrastructure wired, currently disabled)
+* [Docker](https://www.docker.com/) — Container platform for development and deployment
+* [Google Identity Services](https://developers.google.com/identity) — User authentication
