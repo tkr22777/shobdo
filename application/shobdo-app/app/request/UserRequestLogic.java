@@ -19,6 +19,7 @@ import word.WordLogic;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,6 +39,10 @@ public class UserRequestLogic {
         return String.format("%s-%s", Constants.PREFIX_REQUEST_ID, UUID.randomUUID());
     }
 
+    public List<UserRequest> getRequestsBySubmitter(final String submitterId) {
+        return userRequestDao.listBySubmitterId(submitterId);
+    }
+
     public UserRequest getRequest(@NotNull final String requestId) {
         if (requestId == null || requestId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + requestId);
@@ -50,13 +55,14 @@ public class UserRequestLogic {
     }
 
     //The following creates a word creation request
-    public UserRequest createUserRequestForWordCreation(final JsonNode wordJNode) {
+    public UserRequest createUserRequestForWordCreation(final JsonNode wordJNode, final String submitterId) {
 
         final Word createWord = (Word) JsonUtil.jNodeToObject(wordJNode, Word.class);
         wordLogic.validateCreateWordObject(createWord);
 
         final UserRequest createRequest = UserRequest.builder()
             .id(generateUserRequestId())
+            .submitterId(submitterId)
             .targetIds(new HashMap<>())
             .targetType(TargetType.WORD)
             .operation(RequestOperation.CREATE)
@@ -67,7 +73,7 @@ public class UserRequestLogic {
     }
 
     //The following creates a word update request and returns the id
-    public UserRequest createUserRequestForWordUpdate(final String wordId, final JsonNode wordJsonNode) {
+    public UserRequest createUserRequestForWordUpdate(final String wordId, final JsonNode wordJsonNode, final String submitterId) {
 
         final Word updateWord = (Word) JsonUtil.jNodeToObject(wordJsonNode, Word.class);
         updateWord.setId(wordId);
@@ -78,6 +84,7 @@ public class UserRequestLogic {
 
         final UserRequest updateRequest = UserRequest.builder()
             .id(generateUserRequestId())
+            .submitterId(submitterId)
             .targetIds(targetIds)
             .targetType(TargetType.WORD)
             .operation(RequestOperation.UPDATE)
@@ -131,8 +138,8 @@ public class UserRequestLogic {
         return true;
     }
 
-    //The following creates a word update request and returns the id
-    public UserRequest createUserRequestForMeaningCreation(final String wordId, final JsonNode meaningJNode) {
+    //The following creates a meaning creation request
+    public UserRequest createUserRequestForMeaningCreation(final String wordId, final JsonNode meaningJNode, final String submitterId) {
 
         final Meaning meaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
         wordLogic.validateCreateMeaningObject(wordId, meaning);
@@ -142,6 +149,7 @@ public class UserRequestLogic {
 
         final UserRequest createRequest = UserRequest.builder()
             .id(generateUserRequestId())
+            .submitterId(submitterId)
             .targetIds(targetIds)
             .targetType(TargetType.MEANING)
             .operation(RequestOperation.CREATE)
@@ -151,8 +159,8 @@ public class UserRequestLogic {
         return userRequestDao.create(createRequest);
     }
 
-    //The following creates a word update request and returns the id
-    public UserRequest createUserRequestForMeaningUpdate(final String wordId, final JsonNode meaningJNode) {
+    //The following creates a meaning update request
+    public UserRequest createUserRequestForMeaningUpdate(final String wordId, final JsonNode meaningJNode, final String submitterId) {
 
         final Meaning updateMeaning = (Meaning) JsonUtil.jNodeToObject(meaningJNode, Meaning.class);
         wordLogic.validateUpdateMeaningObject(wordId, updateMeaning);
@@ -163,6 +171,7 @@ public class UserRequestLogic {
 
         final UserRequest updateRequest = UserRequest.builder()
             .id(generateUserRequestId())
+            .submitterId(submitterId)
             .targetIds(targetIds)
             .targetType(TargetType.MEANING)
             .operation(RequestOperation.UPDATE)
@@ -172,15 +181,16 @@ public class UserRequestLogic {
         return userRequestDao.create(updateRequest);
     }
 
-    //The following creates a word update request and returns the id
-    public UserRequest createUserRequestForMeaningDeletion(final String wordId, final String meangingId) {
+    //The following creates a meaning deletion request
+    public UserRequest createUserRequestForMeaningDeletion(final String wordId, final String meaningId, final String submitterId) {
 
         final Map<TargetType, String> targetIds = new HashMap<>();
         targetIds.put(TargetType.WORD, wordId);
-        targetIds.put(TargetType.MEANING, meangingId);
+        targetIds.put(TargetType.MEANING, meaningId);
 
         final UserRequest updateRequest = UserRequest.builder()
             .id(generateUserRequestId())
+            .submitterId(submitterId)
             .targetIds(targetIds)
             .targetType(TargetType.MEANING)
             .operation(RequestOperation.DELETE)

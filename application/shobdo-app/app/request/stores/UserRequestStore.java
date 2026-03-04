@@ -2,6 +2,7 @@ package request.stores;
 
 import request.objects.UserRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 public interface UserRequestStore {
 
@@ -16,4 +17,6 @@ public interface UserRequestStore {
      long count();
 
      ArrayList<UserRequest> list(String startId, int limit);
+
+     List<UserRequest> listBySubmitterId(String submitterId);
 }

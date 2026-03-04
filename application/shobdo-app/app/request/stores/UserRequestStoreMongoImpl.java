@@ -2,12 +2,14 @@ package request.stores;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 import request.objects.UserRequest;
 import utilities.ShobdoLogger;
 import word.stores.WordStoreMongoImpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserRequestStoreMongoImpl implements UserRequestStore {
 
@@ -58,5 +60,18 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
     public ArrayList<UserRequest> list(String startId, int limit) {
         //TODO implement
         return null;
+    }
+
+    @Override
+    public List<UserRequest> listBySubmitterId(final String submitterId) {
+        final BasicDBObject query = UserRequest.getActiveObjectQuery();
+        query.put("submitterId", submitterId);
+        final MongoCursor<Document> cursor = userRequestCollection.find(query).iterator();
+        final List<UserRequest> results = new ArrayList<>();
+        while (cursor.hasNext()) {
+            results.add(UserRequest.fromBsonDoc(cursor.next()));
+        }
+        log.info("listBySubmitterId submitterId:" + submitterId + " count:" + results.size());
+        return results;
     }
 }

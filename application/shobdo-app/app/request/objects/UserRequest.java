@@ -19,6 +19,7 @@ import java.util.Map;
 public class UserRequest extends MongoEntity implements APIEntity {
 
     private String id; /* The id of the user request */
+    private String submitterId; /* userId of the user who submitted this request */
     private RequestOperation operation; /* the operation type of the request */
 
     /* It might be better to create separate target specific UserRequest object, e.g. WordUserRequest */

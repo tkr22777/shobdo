@@ -7,6 +7,7 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import request.UserRequestLogic;
+import request.objects.UserRequest;
 import request.stores.UserRequestStoreMongoImpl;
 import utilities.ShobdoLogger;
 import word.caches.WordCache;
@@ -15,6 +16,8 @@ import word.stores.WordStoreMongoImpl;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class UserRequestController extends Controller {
 
@@ -28,16 +31,21 @@ public class UserRequestController extends Controller {
         requestLogic = new UserRequestLogic(wordLogic, userStoreMongo);
     }
 
+    /** Returns the signed-in userId from the session, or null if not authenticated. */
+    private String currentUserId() {
+        return Optional.ofNullable(session("userId")).orElse(null);
+    }
+
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForWordCreation() {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
         final JsonNode wordJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "WordCreationRequest", new HashMap<>(),
+        return ControllerUtils.executeEndpoint("", "", "WordCreationRequest", new HashMap<>(),
             () -> created(
-                requestLogic.createUserRequestForWordCreation(wordJson)
+                requestLogic.createUserRequestForWordCreation(wordJson, submitterId)
                     .jsonNode()
             )
         );
@@ -45,14 +53,14 @@ public class UserRequestController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForWordUpdate(final String wordId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
         final JsonNode wordJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "WordUpdateRequest", new HashMap<>(),
+        return ControllerUtils.executeEndpoint("", "", "WordUpdateRequest", new HashMap<>(),
             () -> ok(
-                requestLogic.createUserRequestForWordUpdate(wordId, wordJson)
+                requestLogic.createUserRequestForWordUpdate(wordId, wordJson, submitterId)
                     .jsonNode()
             )
         );
@@ -62,6 +70,20 @@ public class UserRequestController extends Controller {
         return ControllerUtils.executeEndpoint("", "", "GetUserRequest", new HashMap<>(),
             () -> ok(requestLogic.getRequest(requestId).jsonNode())
         );
+    }
+
+    public Result getMyRequests() {
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
+        try {
+            final List<UserRequest> requests = requestLogic.getRequestsBySubmitter(submitterId);
+            return ok(Json.toJson(requests));
+        } catch (Exception ex) {
+            logger.error("@URC001 getMyRequests error", ex);
+            return internalServerError(Json.toJson(Collections.singletonMap("error", "Failed to load requests")));
+        }
     }
 
     public Result approveUserRequest(final String requestId) {
@@ -78,14 +100,14 @@ public class UserRequestController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForMeaningCreation(final String wordId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
         final JsonNode meaningJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningCreationRequest", new HashMap<>(),
+        return ControllerUtils.executeEndpoint("", "", "MeaningCreationRequest", new HashMap<>(),
             () -> created(
-                requestLogic.createUserRequestForMeaningCreation(wordId, meaningJson)
+                requestLogic.createUserRequestForMeaningCreation(wordId, meaningJson, submitterId)
                     .jsonNode()
             )
         );
@@ -93,14 +115,14 @@ public class UserRequestController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForMeaningUpdate(final String wordId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
         final JsonNode meaningJson = request().body().asJson();
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningUpdateRequest", new HashMap<>(),
+        return ControllerUtils.executeEndpoint("", "", "MeaningUpdateRequest", new HashMap<>(),
             () -> created(
-                requestLogic.createUserRequestForMeaningUpdate(wordId, meaningJson)
+                requestLogic.createUserRequestForMeaningUpdate(wordId, meaningJson, submitterId)
                     .jsonNode()
             )
         );
@@ -108,13 +130,13 @@ public class UserRequestController extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result createUserRequestForMeaningDeletion(final String wordId, final String meaningId) {
-
-        final String transactionId = ""; // request().getHeader(Headers.X_TRANSACTION_ID);
-        final String requestId = ""; // request().getHeader(Headers.X_REQUEST_ID);
-
-        return ControllerUtils.executeEndpoint(transactionId, requestId, "MeaningDeletionRequest", new HashMap<>(),
+        final String submitterId = currentUserId();
+        if (submitterId == null) {
+            return unauthorized(Json.toJson(Collections.singletonMap("error", "Sign in required")));
+        }
+        return ControllerUtils.executeEndpoint("", "", "MeaningDeletionRequest", new HashMap<>(),
             () -> created(
-                requestLogic.createUserRequestForMeaningDeletion(wordId, meaningId)
+                requestLogic.createUserRequestForMeaningDeletion(wordId, meaningId, submitterId)
                     .jsonNode()
             )
         );

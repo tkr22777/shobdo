@@ -60,8 +60,20 @@ PUT     /api/v1/requests/words/:wordId                   controllers.UserRequest
 # Get a specific user request by id:
 GET     /api/v1/requests/:requestId                      controllers.UserRequestController.getUserRequest(requestId: String)
 
-# Approve a pending user request (admin only — role check coming in chunk 2):
+# Get the signed-in user's own requests:
+GET     /api/v1/requests/mine                            controllers.UserRequestController.getMyRequests()
+
+# Approve a pending user request (REVIEWER+):
 POST    /api/v1/requests/:requestId/approve              controllers.UserRequestController.approveUserRequest(requestId: String)
+
+# Submit request to add a new meaning to an existing word:
+POST    /api/v1/requests/words/:wordId/meanings                          controllers.UserRequestController.createUserRequestForMeaningCreation(wordId: String)
+
+# Submit request to update an existing meaning:
+PUT     /api/v1/requests/words/:wordId/meanings                          controllers.UserRequestController.createUserRequestForMeaningUpdate(wordId: String)
+
+# Submit request to delete an existing meaning:
+DELETE  /api/v1/requests/words/:wordId/meanings/:meaningId               controllers.UserRequestController.createUserRequestForMeaningDeletion(wordId: String, meaningId: String)
 
 ##############################
 # CRUDL API for word meanings:
