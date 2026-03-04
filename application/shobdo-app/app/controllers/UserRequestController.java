@@ -90,9 +90,10 @@ public class UserRequestController extends Controller {
         if (!ControllerUtils.hasMinRole("REVIEWER")) {
             return forbidden(Json.toJson(Collections.singletonMap("error", "Requires REVIEWER role or above")));
         }
+        final String approverId = currentUserId();
         return ControllerUtils.executeEndpoint("", "", "ApproveUserRequest", new HashMap<>(),
             () -> {
-                requestLogic.approveUserRequest(requestId);
+                requestLogic.approveUserRequest(requestId, approverId);
                 return ok();
             }
         );

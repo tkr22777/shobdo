@@ -1,31 +1,23 @@
 import { useState, useEffect } from 'react';
 import { submitWordCreation, getMyRequests } from '../api';
 
-const POS_OPTIONS = ['', 'বিশেষ্য', 'বিশেষণ', 'ক্রিয়া', 'অব্যয়', 'সর্বনাম', 'ক্রিয়াবিশেষণ'];
-
 const OP_LABEL = { CREATE: 'নতুন', UPDATE: 'সম্পাদনা', DELETE: 'মুছুন' };
 const TARGET_LABEL = { WORD: 'শব্দ', MEANING: 'অর্থ' };
 
 function NewWordForm() {
   const [spelling, setSpelling] = useState('');
-  const [meaningText, setMeaningText] = useState('');
-  const [pos, setPos] = useState('');
-  const [example, setExample] = useState('');
   const [status, setStatus] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!spelling.trim() || !meaningText.trim()) return;
+    if (!spelling.trim()) return;
     setStatus('submitting');
     setErrorMsg('');
     try {
-      await submitWordCreation(spelling.trim(), meaningText.trim(), pos || null, example.trim() || null);
+      await submitWordCreation(spelling.trim());
       setStatus('success');
       setSpelling('');
-      setMeaningText('');
-      setPos('');
-      setExample('');
     } catch (err) {
       setStatus('error');
       setErrorMsg(err.message);
@@ -35,7 +27,10 @@ function NewWordForm() {
   return (
     <form className="contribute-form" onSubmit={handleSubmit}>
       <h3 className="contribute-section-title">নতুন শব্দ যোগ করুন</h3>
-      <p className="contribute-hint">আপনার জমা দেওয়া তথ্য একজন পর্যালোচকের অনুমোদনের পরে প্রকাশিত হবে।</p>
+      <p className="contribute-hint">
+        শুধু শব্দের বানান জমা দিন। একজন পর্যালোচক অনুমোদন করলে শব্দটি তৈরি হবে।
+        এরপর সেই শব্দের পাতায় গিয়ে অর্থ যোগ করার পরামর্শ দিতে পারবেন।
+      </p>
 
       <label className="contribute-label">শব্দ <span className="required">*</span></label>
       <input
@@ -45,30 +40,7 @@ function NewWordForm() {
         onChange={e => setSpelling(e.target.value)}
         placeholder="বাংলায় লিখুন…"
         required
-      />
-
-      <label className="contribute-label">অর্থ <span className="required">*</span></label>
-      <textarea
-        className="contribute-textarea"
-        value={meaningText}
-        onChange={e => setMeaningText(e.target.value)}
-        placeholder="সংক্ষিপ্ত সংজ্ঞা লিখুন…"
-        rows={3}
-        required
-      />
-
-      <label className="contribute-label">পদ (ঐচ্ছিক)</label>
-      <select className="contribute-select" value={pos} onChange={e => setPos(e.target.value)}>
-        {POS_OPTIONS.map(p => <option key={p} value={p}>{p || '— বাছুন —'}</option>)}
-      </select>
-
-      <label className="contribute-label">উদাহরণ বাক্য (ঐচ্ছিক)</label>
-      <input
-        className="contribute-input"
-        type="text"
-        value={example}
-        onChange={e => setExample(e.target.value)}
-        placeholder="শব্দটি ব্যবহার করে একটি বাক্য লিখুন…"
+        autoFocus
       />
 
       {status === 'success' && (
@@ -81,7 +53,7 @@ function NewWordForm() {
       <button
         className="contribute-submit"
         type="submit"
-        disabled={status === 'submitting' || !spelling.trim() || !meaningText.trim()}
+        disabled={status === 'submitting' || !spelling.trim()}
       >
         {status === 'submitting' ? 'জমা হচ্ছে…' : 'জমা দিন'}
       </button>

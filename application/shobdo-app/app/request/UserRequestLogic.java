@@ -96,7 +96,7 @@ public class UserRequestLogic {
 
     //todo make transactional
     //approveUserRequest applies the requested changes to a word
-    public boolean approveUserRequest(final String requestId) {
+    public boolean approveUserRequest(final String requestId, final String approverId) {
 
         final UserRequest request = getRequest(requestId);
         final String wordId;
@@ -134,7 +134,7 @@ public class UserRequestLogic {
                 }
                 break;
         }
-        saveRequestAsMerged("deleterId", request);
+        saveRequestAsMerged(approverId, request);
         return true;
     }
 

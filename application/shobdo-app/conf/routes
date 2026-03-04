@@ -57,11 +57,11 @@ POST    /api/v1/requests/words                           controllers.UserRequest
 # Submit request to update an existing word:
 PUT     /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordUpdate(wordId: String)
 
+# Get the signed-in user's own requests (must be before /:requestId to avoid shadowing):
+GET     /api/v1/requests/mine                            controllers.UserRequestController.getMyRequests()
+
 # Get a specific user request by id:
 GET     /api/v1/requests/:requestId                      controllers.UserRequestController.getUserRequest(requestId: String)
-
-# Get the signed-in user's own requests:
-GET     /api/v1/requests/mine                            controllers.UserRequestController.getMyRequests()
 
 # Approve a pending user request (REVIEWER+):
 POST    /api/v1/requests/:requestId/approve              controllers.UserRequestController.approveUserRequest(requestId: String)
@@ -108,10 +108,10 @@ POST    /api/v1/words/:wordId/meanings/:meaningId/antonym/remove             con
 # API for adding/removing synonyms:
 ###################################
 
-# 1. Add an antonym to a word
+# 1. Add a synonym to a word
 POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/add                controllers.WordController.addSynonym(wordId: String, meaningId: String)
 
-# 2. Remove an antonym from a word
+# 2. Remove a synonym from a word
 POST    /api/v1/words/:wordId/meanings/:meaningId/synonym/remove             controllers.WordController.removeSynonym(wordId: String, meaningId: String)
 
 ##############

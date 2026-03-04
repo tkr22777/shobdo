@@ -81,18 +81,13 @@ export async function getLikeCount(wordId) {
   return data.count || 0;
 }
 
-export async function submitWordCreation(spelling, meaningText, partOfSpeech, exampleSentence) {
-  const body = { spelling, meanings: {} };
-  if (meaningText) {
-    const meaning = { text: meaningText };
-    if (partOfSpeech) meaning.partOfSpeech = partOfSpeech;
-    if (exampleSentence) meaning.exampleSentence = exampleSentence;
-    body.meanings['m1'] = meaning;
-  }
+// Word creation requests accept spelling only.
+// Meanings must be submitted as separate requests once the word is approved.
+export async function submitWordCreation(spelling) {
   const res = await fetch('/api/v1/requests/words', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ spelling }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
