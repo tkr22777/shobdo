@@ -81,6 +81,64 @@ export async function getLikeCount(wordId) {
   return data.count || 0;
 }
 
+export async function submitWordCreation(spelling, meaningText, partOfSpeech, exampleSentence) {
+  const body = { spelling, meanings: {} };
+  if (meaningText) {
+    const meaning = { text: meaningText };
+    if (partOfSpeech) meaning.partOfSpeech = partOfSpeech;
+    if (exampleSentence) meaning.exampleSentence = exampleSentence;
+    body.meanings['m1'] = meaning;
+  }
+  const res = await fetch('/api/v1/requests/words', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Submission failed');
+  }
+  return res.json();
+}
+
+export async function submitMeaningCreation(wordId, meaningText, partOfSpeech, exampleSentence) {
+  const meaning = { text: meaningText };
+  if (partOfSpeech) meaning.partOfSpeech = partOfSpeech;
+  if (exampleSentence) meaning.exampleSentence = exampleSentence;
+  const res = await fetch('/api/v1/requests/words/' + encodeURIComponent(wordId) + '/meanings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(meaning),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Submission failed');
+  }
+  return res.json();
+}
+
+export async function submitMeaningUpdate(wordId, meaningId, meaningText, partOfSpeech, exampleSentence) {
+  const meaning = { id: meaningId, text: meaningText };
+  if (partOfSpeech) meaning.partOfSpeech = partOfSpeech;
+  if (exampleSentence) meaning.exampleSentence = exampleSentence;
+  const res = await fetch('/api/v1/requests/words/' + encodeURIComponent(wordId) + '/meanings', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(meaning),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Submission failed');
+  }
+  return res.json();
+}
+
+export async function getMyRequests() {
+  const res = await fetch('/api/v1/requests/mine');
+  if (!res.ok) throw new Error('Failed to load submissions');
+  return res.json();
+}
+
 export async function listUsers() {
   const res = await fetch('/api/v1/admin/users');
   if (!res.ok) throw new Error('Failed to list users');

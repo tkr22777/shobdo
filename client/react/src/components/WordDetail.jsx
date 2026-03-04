@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useLikes } from '../context/LikeContext';
+import { useAuth } from '../context/AuthContext';
+import { submitMeaningCreation, submitMeaningUpdate } from '../api';
 import LikeButton from './LikeButton';
 
 function getBengaliDigit(n) {
@@ -119,9 +121,74 @@ function StatusPage() {
   );
 }
 
+const POS_OPTIONS = ['', 'বিশেষ্য', 'বিশেষণ', 'ক্রিয়া', 'অব্যয়', 'সর্বনাম', 'ক্রিয়াবিশেষণ'];
+
+function MeaningEditForm({ wordId, meaning, onDone }) {
+  const [text, setText] = useState(meaning?.text || '');
+  const [pos, setPos] = useState(meaning?.partOfSpeech || '');
+  const [example, setExample] = useState(meaning?.exampleSentence || '');
+  const [status, setStatus] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const isNew = !meaning;
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setStatus('submitting');
+    try {
+      if (isNew) {
+        await submitMeaningCreation(wordId, text.trim(), pos || null, example.trim() || null);
+      } else {
+        await submitMeaningUpdate(wordId, meaning.id, text.trim(), pos || null, example.trim() || null);
+      }
+      setStatus('success');
+      setTimeout(onDone, 1200);
+    } catch (err) {
+      setStatus('error');
+      setErrorMsg(err.message);
+    }
+  }
+
+  return (
+    <form className="meaning-edit-form" onSubmit={handleSubmit}>
+      <textarea
+        className="contribute-textarea"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="অর্থ লিখুন…"
+        rows={2}
+        required
+        autoFocus
+      />
+      <div className="meaning-edit-row">
+        <select className="contribute-select" value={pos} onChange={e => setPos(e.target.value)}>
+          {POS_OPTIONS.map(p => <option key={p} value={p}>{p || '— পদ —'}</option>)}
+        </select>
+        <input
+          className="contribute-input"
+          type="text"
+          value={example}
+          onChange={e => setExample(e.target.value)}
+          placeholder="উদাহরণ বাক্য (ঐচ্ছিক)"
+        />
+      </div>
+      {status === 'success' && <p className="contribute-success">জমা হয়েছে!</p>}
+      {status === 'error' && <p className="contribute-error">{errorMsg}</p>}
+      <div className="meaning-edit-actions">
+        <button type="submit" className="contribute-submit small" disabled={status === 'submitting' || !text.trim()}>
+          {status === 'submitting' ? 'জমা হচ্ছে…' : 'জমা দিন'}
+        </button>
+        <button type="button" className="contribute-cancel" onClick={onDone}>বাতিল</button>
+      </div>
+    </form>
+  );
+}
+
 export default function WordDetail({ data, viewMode, onTagClick }) {
   const { fetchLikeCount } = useLikes();
+  const { user } = useAuth();
   const [shareCopied, setShareCopied] = useState(false);
+  const [editingMeaningKey, setEditingMeaningKey] = useState(null); // meaningKey or 'new'
   const articleRef = useRef(null);
 
   useEffect(() => {
@@ -182,52 +249,82 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
             const hasSynonyms = Array.isArray(meaning.synonyms) && meaning.synonyms.length > 0;
             const hasAntonyms = Array.isArray(meaning.antonyms) && meaning.antonyms.length > 0;
             const hasExample = !!meaning.exampleSentence;
+            const isEditing = editingMeaningKey === key;
 
             return (
               <div key={key}>
-                <p className="def-graf">
-                  {totalMeanings > 1 && (
-                    <span className="meaning-number">{getBengaliDigit(index + 1)}.</span>
-                  )}{' '}
-                  {meaning.text}
-                </p>
-                {meaning.partOfSpeech && (
-                  <div className="pos-badge">{meaning.partOfSpeech}</div>
-                )}
-                {hasExample && (
-                  <p className="example-graf">
-                    {highlightWord(meaning.exampleSentence, data.spelling, onTagClick)}
-                  </p>
-                )}
-                {(hasSynonyms || hasAntonyms) && (
-                  <div className="syn-ant-row">
-                    {hasSynonyms && (
-                      <>
-                        <span className="syn-ant-label">সমার্থ</span>
-                        {meaning.synonyms.map(s => (
-                          <span key={s} className="syn-word" onClick={() => onTagClick(s)}>{s}</span>
-                        ))}
-                      </>
+                {isEditing ? (
+                  <MeaningEditForm
+                    wordId={data.id}
+                    meaning={{ id: key, text: meaning.text, partOfSpeech: meaning.partOfSpeech, exampleSentence: meaning.exampleSentence }}
+                    onDone={() => setEditingMeaningKey(null)}
+                  />
+                ) : (
+                  <>
+                    <p className="def-graf">
+                      {totalMeanings > 1 && (
+                        <span className="meaning-number">{getBengaliDigit(index + 1)}.</span>
+                      )}{' '}
+                      {meaning.text}
+                      {user && (
+                        <button
+                          className="meaning-edit-btn"
+                          title="সম্পাদনা পরামর্শ দিন"
+                          onClick={() => setEditingMeaningKey(key)}
+                        >✏</button>
+                      )}
+                    </p>
+                    {meaning.partOfSpeech && (
+                      <div className="pos-badge">{meaning.partOfSpeech}</div>
                     )}
-                    {hasSynonyms && hasAntonyms && <span className="syn-ant-sep">·</span>}
-                    {hasAntonyms && (
-                      <>
-                        <span className="syn-ant-label">বিপরীত</span>
-                        {meaning.antonyms.map(a => (
-                          <span key={a} className="ant-word" onClick={() => onTagClick(a)}>{a}</span>
-                        ))}
-                      </>
+                    {hasExample && (
+                      <p className="example-graf">
+                        {highlightWord(meaning.exampleSentence, data.spelling, onTagClick)}
+                      </p>
                     )}
-                  </div>
-                )}
-                {isFirst && totalMeanings > 1 && hasExample && (
-                  <div className="pull-quote">
-                    &ldquo;{meaning.exampleSentence}&rdquo;
-                  </div>
+                    {(hasSynonyms || hasAntonyms) && (
+                      <div className="syn-ant-row">
+                        {hasSynonyms && (
+                          <>
+                            <span className="syn-ant-label">সমার্থ</span>
+                            {meaning.synonyms.map(s => (
+                              <span key={s} className="syn-word" onClick={() => onTagClick(s)}>{s}</span>
+                            ))}
+                          </>
+                        )}
+                        {hasSynonyms && hasAntonyms && <span className="syn-ant-sep">·</span>}
+                        {hasAntonyms && (
+                          <>
+                            <span className="syn-ant-label">বিপরীত</span>
+                            {meaning.antonyms.map(a => (
+                              <span key={a} className="ant-word" onClick={() => onTagClick(a)}>{a}</span>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {isFirst && totalMeanings > 1 && hasExample && (
+                      <div className="pull-quote">
+                        &ldquo;{meaning.exampleSentence}&rdquo;
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             );
           })}
+          {user && editingMeaningKey !== 'new' && (
+            <button className="add-meaning-btn" onClick={() => setEditingMeaningKey('new')}>
+              + অর্থ যোগ করুন
+            </button>
+          )}
+          {user && editingMeaningKey === 'new' && (
+            <MeaningEditForm
+              wordId={data.id}
+              meaning={null}
+              onDone={() => setEditingMeaningKey(null)}
+            />
+          )}
         </div>
         {uniqueSynonyms.length > 0 && (
           <div className="article-footer">

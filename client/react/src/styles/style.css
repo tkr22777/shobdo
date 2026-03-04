@@ -910,6 +910,215 @@ ul { list-style: none; }
 }
 
 /* ============================================================
+   CONTRIBUTE PANEL
+============================================================ */
+.contribute-panel {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-y: auto;
+  max-width: 640px;
+}
+
+.contribute-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.contribute-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.contribute-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 6px 14px;
+  font-size: .85rem;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.contribute-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.contribute-section-title {
+  font-size: .95rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.contribute-hint {
+  font-size: .8rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.contribute-label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 12px 0 4px;
+}
+
+.contribute-label .required { color: var(--accent); }
+
+.contribute-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: .9rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.contribute-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: .9rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.contribute-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: .85rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.contribute-submit {
+  margin-top: 16px;
+  padding: 9px 22px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.contribute-submit:disabled { opacity: .5; cursor: default; }
+.contribute-submit.small { margin-top: 8px; padding: 6px 16px; font-size: .8rem; }
+
+.contribute-cancel {
+  margin-top: 8px;
+  margin-left: 8px;
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: .8rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.contribute-success { color: var(--accent); font-size: .85rem; margin-top: 8px; }
+.contribute-error   { color: var(--danger, #e05); font-size: .85rem; margin-top: 8px; }
+
+/* My Submissions list */
+.submissions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.submission-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .85rem;
+}
+
+.submission-tag {
+  font-size: .7rem;
+  font-weight: 700;
+  background: var(--subtle);
+  color: var(--muted);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.submission-op {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.submission-word { font-weight: 600; color: var(--text); }
+.submission-text { color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Inline meaning edit form (in WordDetail) */
+.meaning-edit-btn {
+  background: none;
+  border: none;
+  font-size: .75rem;
+  color: var(--muted);
+  cursor: pointer;
+  margin-left: 6px;
+  opacity: .5;
+  vertical-align: middle;
+}
+
+.meaning-edit-btn:hover { opacity: 1; }
+
+.meaning-edit-form {
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 8px 0;
+}
+
+.meaning-edit-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.meaning-edit-row .contribute-select { flex: 0 0 140px; }
+.meaning-edit-row .contribute-input  { flex: 1; }
+
+.meaning-edit-actions { display: flex; align-items: center; }
+
+.add-meaning-btn {
+  margin-top: 16px;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: .8rem;
+  color: var(--muted);
+  cursor: pointer;
+  width: 100%;
+}
+
+.add-meaning-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ============================================================
    ADMIN PANEL
 ============================================================ */
 .admin-panel {

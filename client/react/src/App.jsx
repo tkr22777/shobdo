@@ -9,6 +9,7 @@ import SearchBar from './components/SearchBar';
 import WordList from './components/WordList';
 import WordDetail from './components/WordDetail';
 import AdminPanel from './components/AdminPanel';
+import ContributePanel from './components/ContributePanel';
 
 // Parse /bn/word/ধরা  or  /bn-en/word/ধরা  or legacy ?word=ধরা
 function parseCurrentUrl() {
@@ -215,6 +216,16 @@ export default function App() {
     }
   }, []);
 
+  const handleContribute = useCallback((e) => {
+    e.preventDefault();
+    setViewMode('contribute');
+    setWordDetail(null);
+    setSelectedSpelling(null);
+    if (!isInitialLoad.current) {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
@@ -354,6 +365,8 @@ export default function App() {
         </aside>
         {viewMode === 'admin' ? (
           <AdminPanel />
+        ) : viewMode === 'contribute' ? (
+          <ContributePanel />
         ) : (
           <WordDetail
             data={wordDetail}
@@ -373,6 +386,12 @@ export default function App() {
             <a href="#" onClick={handleThemeToggle}>ভা-ব</a>
             <span>·</span>
             <a href="#" onClick={handleStatus}>স্টেটাস</a>
+            {user && (
+              <>
+                <span>·</span>
+                <a href="#" onClick={handleContribute}>অবদান</a>
+              </>
+            )}
             {(user?.role === 'ADMIN' || user?.role === 'OWNER') && (
               <>
                 <span>·</span>
