@@ -55,10 +55,12 @@ public class AuthController extends Controller {
             session("userId", user.getId());
             session("userName", user.getName() != null ? user.getName() : "");
             session("userEmail", user.getEmail() != null ? user.getEmail() : "");
+            session("userRole", user.getRole().name());
             final Map<String, String> responseMap = new HashMap<>();
             responseMap.put("id", user.getId());
             responseMap.put("name", user.getName());
             responseMap.put("email", user.getEmail());
+            responseMap.put("role", user.getRole().name());
             return ok(Json.toJson(responseMap));
         } catch (Exception ex) {
             log.error("@AC001 googleSignIn error", ex);
@@ -84,10 +86,12 @@ public class AuthController extends Controller {
             // instead store name/email in session as well.
             final String name = session("userName");
             final String email = session("userEmail");
+            final String role = session("userRole");
             final Map<String, String> responseMap = new HashMap<>();
             responseMap.put("id", userId);
             responseMap.put("name", name != null ? name : "");
             responseMap.put("email", email != null ? email : "");
+            responseMap.put("role", role != null ? role : "USER");
             return ok(Json.toJson(responseMap));
         } catch (Exception ex) {
             log.error("@AC002 me error", ex);

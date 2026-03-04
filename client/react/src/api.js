@@ -80,3 +80,19 @@ export async function getLikeCount(wordId) {
   const data = await res.json();
   return data.count || 0;
 }
+
+export async function listUsers() {
+  const res = await fetch('/api/v1/admin/users');
+  if (!res.ok) throw new Error('Failed to list users');
+  return res.json();
+}
+
+export async function assignRole(userId, role) {
+  const res = await fetch('/api/v1/admin/users/' + encodeURIComponent(userId) + '/role', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ role }),
+  });
+  if (!res.ok) throw new Error('Failed to assign role');
+  return res.json();
+}

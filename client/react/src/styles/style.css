@@ -899,6 +899,69 @@ ul { list-style: none; }
 
 .sign-in-btn:hover { background: var(--subtle); }
 
+.role-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ============================================================
+   ADMIN PANEL
+============================================================ */
+.admin-panel {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-y: auto;
+}
+
+.admin-panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+.admin-error {
+  color: var(--danger, #e05);
+  margin-bottom: 12px;
+}
+
+.admin-loading {
+  color: var(--muted);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.admin-table select {
+  font-size: .8rem;
+  padding: 2px 6px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 /* ============================================================
    LIKE BUTTON
 ============================================================ */

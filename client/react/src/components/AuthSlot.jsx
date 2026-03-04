@@ -55,10 +55,12 @@ export default function AuthSlot() {
     const initials = user.name
       ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
       : '?';
+    const showBadge = user.role === 'ADMIN' || user.role === 'OWNER';
     return (
       <div className="auth-slot">
         <div className="avatar" title={user.name || ''}>{initials}</div>
         <span className="auth-name">{user.name || user.email || ''}</span>
+        {showBadge && <span className="role-badge">{user.role}</span>}
         <button className="sign-in-btn" onClick={signOut}>সাইন আউট</button>
       </div>
     );

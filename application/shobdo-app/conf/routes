@@ -120,8 +120,11 @@ GET     /api/v1/likes                          controllers.LikeController.getLik
 ##############
 # Admin stuff:
 ##############
-# CRUDL for users GENERAL, REVIEWER, ADMIN
 # 9. To clear/flush redis cache:
 GET     /api/v1/admin/flushcache                        controllers.AdminController.flushCache()
+# List all users (ADMIN+):
+GET     /api/v1/admin/users                             controllers.AdminController.listUsers()
+# Assign a role to a user (ADMIN+ can assign USER/REVIEWER; OWNER can assign any):
+PUT     /api/v1/admin/users/:userId/role                controllers.AdminController.assignRole(userId: String)
 
 GET     /assets/*file                                   controllers.Assets.at(path="public", file)

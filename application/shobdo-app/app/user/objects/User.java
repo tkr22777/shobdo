@@ -18,6 +18,11 @@ public class User extends MongoEntity {
     private String googleId;
     private String email;
     private String name;
+    private UserRole role;
+
+    public UserRole getRole() {
+        return role != null ? role : UserRole.USER;
+    }
 
     public static User fromBsonDoc(final Document doc) {
         doc.remove("_id");

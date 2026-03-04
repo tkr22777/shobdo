@@ -3,10 +3,12 @@ import { Helmet } from 'react-helmet-async';
 import { searchWords, getWordDetail } from './api';
 import { RidmikParser } from './lib/ridmik';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useAuth } from './context/AuthContext';
 import Masthead from './components/Masthead';
 import SearchBar from './components/SearchBar';
 import WordList from './components/WordList';
 import WordDetail from './components/WordDetail';
+import AdminPanel from './components/AdminPanel';
 
 // Parse /bn/word/ধরা  or  /bn-en/word/ধরা  or legacy ?word=ধরা
 function parseCurrentUrl() {
@@ -42,12 +44,13 @@ function debounce(fn, ms) {
 }
 
 export default function App() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [transliterated, setTransliterated] = useState('');
   const [searchResults, setSearchResults] = useState(null); // null = not yet searched
   const [selectedSpelling, setSelectedSpelling] = useState(null);
   const [wordDetail, setWordDetail] = useState(null);
-  const [viewMode, setViewMode] = useState('empty'); // 'empty' | 'word' | 'about'
+  const [viewMode, setViewMode] = useState('empty'); // 'empty' | 'word' | 'about' | 'status' | 'admin'
   const [panelWidth, setPanelWidth] = useState(260);
   const [theme, setTheme] = useLocalStorage('theme', 'green');
 
@@ -202,6 +205,16 @@ export default function App() {
     }
   }, []);
 
+  const handleAdmin = useCallback((e) => {
+    e.preventDefault();
+    setViewMode('admin');
+    setWordDetail(null);
+    setSelectedSpelling(null);
+    if (!isInitialLoad.current) {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
@@ -339,11 +352,15 @@ export default function App() {
           </nav>
           <div className="panel-resize-handle" ref={handleRef} title="Drag to resize"></div>
         </aside>
-        <WordDetail
-          data={wordDetail}
-          viewMode={viewMode}
-          onTagClick={handleTagClick}
-        />
+        {viewMode === 'admin' ? (
+          <AdminPanel />
+        ) : (
+          <WordDetail
+            data={wordDetail}
+            viewMode={viewMode}
+            onTagClick={handleTagClick}
+          />
+        )}
       </main>
       <footer className="site-footer">
         <div className="footer-inner">
@@ -356,6 +373,12 @@ export default function App() {
             <a href="#" onClick={handleThemeToggle}>ভা-ব</a>
             <span>·</span>
             <a href="#" onClick={handleStatus}>স্টেটাস</a>
+            {(user?.role === 'ADMIN' || user?.role === 'OWNER') && (
+              <>
+                <span>·</span>
+                <a href="#" onClick={handleAdmin}>অ্যাডমিন</a>
+              </>
+            )}
           </div>
         </div>
       </footer>

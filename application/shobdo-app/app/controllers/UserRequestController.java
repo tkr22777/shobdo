@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import common.stores.MongoStoreFactory;
+import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -12,6 +13,7 @@ import word.caches.WordCache;
 import word.WordLogic;
 import word.stores.WordStoreMongoImpl;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 public class UserRequestController extends Controller {
@@ -63,6 +65,9 @@ public class UserRequestController extends Controller {
     }
 
     public Result approveUserRequest(final String requestId) {
+        if (!ControllerUtils.hasMinRole("REVIEWER")) {
+            return forbidden(Json.toJson(Collections.singletonMap("error", "Requires REVIEWER role or above")));
+        }
         return ControllerUtils.executeEndpoint("", "", "ApproveUserRequest", new HashMap<>(),
             () -> {
                 requestLogic.approveUserRequest(requestId);

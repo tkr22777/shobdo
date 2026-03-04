@@ -19,6 +19,32 @@ Current list of services:
 - `/deploy`: Deployment configuration files
 - `/scripts`: Utility scripts for development and deployment
 
+## Setting Up an Admin User
+
+There is no sign-up flow for elevated roles — the first OWNER must be assigned directly in MongoDB. All subsequent role assignments can be done through the Admin panel in the UI.
+
+**1. Start the stack and sign in at least once** so your user document exists in MongoDB.
+
+**2. Assign the OWNER role directly in MongoDB:**
+
+```bash
+docker exec deploy-mongo-1 mongosh Dictionary --eval \
+  'db.Users.updateOne({ email: "your@email.com" }, { $set: { role: "OWNER" } })'
+```
+
+**3. Sign out and sign back in.** The session will pick up the new role.
+
+An "অ্যাডমিন" link will appear in the site footer. From there you can assign roles to other users via the Admin panel.
+
+**Role hierarchy:**
+
+| Role | Can assign |
+|---|---|
+| USER | — |
+| REVIEWER | — |
+| ADMIN | USER, REVIEWER |
+| OWNER | USER, REVIEWER, ADMIN, OWNER |
+
 ## Built With
 
 * [Nginx](https://nginx.org/): - Frontend serving vanilla JavaScript with jQuery https://shobdo-1.onrender.com/ [Beta]
