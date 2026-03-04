@@ -1,8 +1,15 @@
-.PHONY :
+.PHONY : install-hooks
 #The following vars are a copy of application/shobdo-app/Makefile
 SUBNET="172.10.0.0/16"
 NETWORK_NAME="shobdo_net"
 CLIENT_IP="172.10.0.2"
+
+# Install git hooks from scripts/hooks/ into .git/hooks/.
+# Run once after cloning: make install-hooks
+install-hooks:
+	cp scripts/hooks/pre-commit .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo "Installed pre-commit hook."
 
 # Generate client/html/public/env.js from deploy/local.env.
 # This file is gitignored; run this before starting any client container.

@@ -50,7 +50,15 @@ SHOBDO_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
 This single value is used by both the backend (to verify ID tokens) and the frontend (to render the Google sign-in button). `make start-docker-compose` propagates it automatically.
 
-### 3. Build the backend Docker image
+### 3. Install git hooks
+
+```bash
+make install-hooks
+```
+
+This installs a pre-commit hook that runs `sbt test` automatically when backend files (`application/shobdo-app/app/`, `conf/`, `test/`) are staged. Frontend-only commits skip it.
+
+### 4. Build the backend Docker image
 
 This only needs to be re-run when backend source changes.
 
@@ -60,7 +68,7 @@ make build-docker-image-from-source
 cd ../..
 ```
 
-### 4. Start the stack
+### 5. Start the stack
 
 ```bash
 make start-docker-compose
@@ -75,7 +83,7 @@ The app will be available at **http://localhost:32779**
 
 MongoDB data (42,545 words) is restored automatically on first startup.
 
-### 5. Stop the stack
+### 6. Stop the stack
 
 ```bash
 make stop-docker-compose

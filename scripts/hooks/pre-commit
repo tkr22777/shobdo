@@ -1,0 +1,20 @@
+#!/bin/sh
+# Pre-commit hook: run backend test suite when Java/conf/test files are staged.
+# Install via: make install-hooks
+
+BACKEND_CHANGED=$(git diff --cached --name-only | grep -E '^application/shobdo-app/(app|conf|test)/' | wc -l | tr -d ' ')
+
+if [ "$BACKEND_CHANGED" -gt 0 ]; then
+  echo "Backend changes detected ($BACKEND_CHANGED file(s)) — running test suite..."
+  cd application/shobdo-app && sbt test
+  STATUS=$?
+  cd ../..
+  if [ $STATUS -ne 0 ]; then
+    echo ""
+    echo "Pre-commit: tests failed. Fix failures before committing."
+    exit 1
+  fi
+  echo "Pre-commit: all tests passed."
+fi
+
+exit 0
