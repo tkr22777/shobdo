@@ -57,6 +57,9 @@ POST    /api/v1/requests/words                           controllers.UserRequest
 # Submit request to update an existing word:
 PUT     /api/v1/requests/words/:wordId                   controllers.UserRequestController.createUserRequestForWordUpdate(wordId: String)
 
+# List all pending requests (REVIEWER+):
+GET     /api/v1/requests                                 controllers.UserRequestController.listPendingRequests()
+
 # Get the signed-in user's own requests (must be before /:requestId to avoid shadowing):
 GET     /api/v1/requests/mine                            controllers.UserRequestController.getMyRequests()
 

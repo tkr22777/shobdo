@@ -134,6 +134,23 @@ export async function getMyRequests() {
   return res.json();
 }
 
+export async function getPendingRequests() {
+  const res = await fetch('/api/v1/requests');
+  if (!res.ok) throw new Error('Failed to load pending requests');
+  return res.json();
+}
+
+export async function approveRequest(requestId) {
+  const res = await fetch('/api/v1/requests/' + encodeURIComponent(requestId) + '/approve', {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Approval failed');
+  }
+  return res.ok;
+}
+
 export async function listUsers() {
   const res = await fetch('/api/v1/admin/users');
   if (!res.ok) throw new Error('Failed to list users');

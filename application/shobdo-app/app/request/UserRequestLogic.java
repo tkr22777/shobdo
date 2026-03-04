@@ -43,6 +43,10 @@ public class UserRequestLogic {
         return userRequestDao.listBySubmitterId(submitterId);
     }
 
+    public List<UserRequest> getPendingRequests() {
+        return userRequestDao.listPending();
+    }
+
     public UserRequest getRequest(@NotNull final String requestId) {
         if (requestId == null || requestId.trim().length() == 0) {
             throw new IllegalArgumentException(Constants.MESSAGES_ID_NULLOREMPTY + requestId);

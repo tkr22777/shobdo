@@ -42,7 +42,7 @@ public class Meaning implements APIEntity {
     };
 
     public void removeSynonym(final String synonym) {
-        synonyms.add(synonym);
+        synonyms.remove(synonym);
     };
 
     @Override

@@ -74,4 +74,16 @@ public class UserRequestStoreMongoImpl implements UserRequestStore {
         log.info("listBySubmitterId submitterId:" + submitterId + " count:" + results.size());
         return results;
     }
+
+    @Override
+    public List<UserRequest> listPending() {
+        final BasicDBObject query = UserRequest.getActiveObjectQuery();
+        final MongoCursor<Document> cursor = userRequestCollection.find(query).iterator();
+        final List<UserRequest> results = new ArrayList<>();
+        while (cursor.hasNext()) {
+            results.add(UserRequest.fromBsonDoc(cursor.next()));
+        }
+        log.info("listPending count:" + results.size());
+        return results;
+    }
 }

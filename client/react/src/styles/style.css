@@ -1172,6 +1172,65 @@ ul { list-style: none; }
 }
 
 /* ============================================================
+   REVIEW PANEL
+============================================================ */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+
+.review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.review-card-meta {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+
+.review-submitter {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-left: auto;
+  font-family: monospace;
+}
+
+.review-card-content {
+  font-size: .95rem;
+  color: var(--text);
+  padding: .25rem 0;
+}
+
+.review-approve-btn {
+  align-self: flex-start;
+  margin-top: .2rem;
+  padding: .3rem .85rem;
+  font-size: .8rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity .15s;
+}
+
+.review-approve-btn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+/* ============================================================
    LIKE BUTTON
 ============================================================ */
 .like-btn {

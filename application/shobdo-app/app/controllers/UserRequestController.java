@@ -72,6 +72,19 @@ public class UserRequestController extends Controller {
         );
     }
 
+    public Result listPendingRequests() {
+        if (!ControllerUtils.hasMinRole("REVIEWER")) {
+            return forbidden(Json.toJson(Collections.singletonMap("error", "Requires REVIEWER role or above")));
+        }
+        try {
+            final List<UserRequest> requests = requestLogic.getPendingRequests();
+            return ok(Json.toJson(requests));
+        } catch (Exception ex) {
+            logger.error("@URC002 listPendingRequests error", ex);
+            return internalServerError(Json.toJson(Collections.singletonMap("error", "Failed to load pending requests")));
+        }
+    }
+
     public Result getMyRequests() {
         final String submitterId = currentUserId();
         if (submitterId == null) {

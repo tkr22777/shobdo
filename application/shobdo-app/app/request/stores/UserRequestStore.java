@@ -19,4 +19,6 @@ public interface UserRequestStore {
      ArrayList<UserRequest> list(String startId, int limit);
 
      List<UserRequest> listBySubmitterId(String submitterId);
+
+     List<UserRequest> listPending();
 }
