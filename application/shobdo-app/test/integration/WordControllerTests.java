@@ -587,10 +587,14 @@ public class WordControllerTests extends WithApplication {
             Result result = Helpers.route(Helpers.fakeRequest(POST,"/api/v1/words/search").bodyJson(requestBodyJson));
             Assert.assertEquals(Helpers.OK, result.status());
 
+            // Search now returns [{id, spelling}] objects; verify spellings match
             JsonNode resultsJson = JsonUtil.jStringToJNode(contentAsString(result));
-            JsonNode expectedResult = JsonUtil.objectToJNode(spellingsWithPrefixes);
+            Set<String> returnedSpellings = new java.util.HashSet<>();
+            for (JsonNode node : resultsJson) {
+                returnedSpellings.add(node.get("spelling").asText());
+            }
             log.info("results json:" + resultsJson);
-            Assert.assertEquals(expectedResult, resultsJson);
+            Assert.assertEquals(spellingsWithPrefixes, returnedSpellings);
         });
     }
 
