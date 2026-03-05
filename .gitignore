@@ -105,6 +105,9 @@ Thumbs.db
 *.sql
 *.sqlite
 
+# MongoDB snapshots (local only — too large for git; committed seed is data/mongodump/Dictionary/)
+data/mongodump/snapshots/
+
 # Build output
 target/
 dist/

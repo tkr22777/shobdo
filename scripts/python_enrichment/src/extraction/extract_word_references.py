@@ -34,9 +34,12 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Dict, List
 
 from pymongo import MongoClient
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from logger import logger
 
@@ -172,7 +175,13 @@ def main():
         default=0,
         help="Limit number of words scanned (0 = all, useful for testing)",
     )
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Check imports only; skip MongoDB connection and file writes")
     args = parser.parse_args()
+
+    if args.dry_run:
+        logger.info(f"[DRY RUN] Imports OK. Would connect to {args.mongo}/{args.db} and write to {args.out}. No reads or writes.")
+        return
 
     logger.info(f"Connecting to {args.mongo} / {args.db} …")
     client = MongoClient(args.mongo)

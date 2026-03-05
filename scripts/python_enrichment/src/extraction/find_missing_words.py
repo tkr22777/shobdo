@@ -34,8 +34,11 @@ Run:
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from pymongo import MongoClient
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from logger import logger
 
@@ -107,7 +110,13 @@ def main():
         default="data/missing_words_compact.json",
         help="Compact output path (default: data/missing_words_compact.json)",
     )
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Check imports only; skip MongoDB connection and file writes")
     args = parser.parse_args()
+
+    if args.dry_run:
+        logger.info(f"[DRY RUN] Imports OK. Would load {args.refs}, connect to {args.mongo}/{args.db}, and write outputs. No reads or writes.")
+        return
 
     # --- load referenced words ---
     logger.info(f"Loading references from {args.refs} …")
