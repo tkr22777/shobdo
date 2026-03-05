@@ -52,3 +52,7 @@ coverage.xml
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Large generated data files (regenerate with extract_word_references.py + find_missing_words.py)
+data/word_references.json
+data/missing_words.json
