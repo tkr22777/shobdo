@@ -23,17 +23,17 @@ SNAPSHOT_PATH="$SNAPSHOTS_DIR/$SNAPSHOT_NAME"
 mkdir -p "$SNAPSHOT_PATH"
 
 MONGO_CONTAINER="${MONGO_CONTAINER:-deploy-mongo-1}"
+SEED_ARCHIVE="$SCRIPT_DIR/Dictionary.gz"
 
 echo "Dumping to: $SNAPSHOT_PATH"
-docker exec "$MONGO_CONTAINER" mongodump -d Dictionary -o /tmp/mongodump_tmp
-docker cp "$MONGO_CONTAINER":/tmp/mongodump_tmp/Dictionary "$SNAPSHOT_PATH/Dictionary"
-docker exec "$MONGO_CONTAINER" rm -rf /tmp/mongodump_tmp
-echo "Snapshot saved: $SNAPSHOT_PATH"
+docker exec "$MONGO_CONTAINER" mongodump -d Dictionary --archive=/tmp/mongodump_tmp.gz --gzip
+docker cp "$MONGO_CONTAINER":/tmp/mongodump_tmp.gz "$SNAPSHOT_PATH/Dictionary.gz"
+docker exec "$MONGO_CONTAINER" rm -f /tmp/mongodump_tmp.gz
+echo "Snapshot saved: $SNAPSHOT_PATH/Dictionary.gz"
 
-# Optionally update the committed seed (Dictionary/)
+# Optionally update the committed seed (Dictionary.gz)
 if [ "$UPDATE_SEED" = "--update-seed" ]; then
-    echo "Updating committed seed at $SCRIPT_DIR/Dictionary/ ..."
-    rm -rf "$SCRIPT_DIR/Dictionary"
-    cp -r "$SNAPSHOT_PATH/Dictionary" "$SCRIPT_DIR/Dictionary"
-    echo "Seed updated."
+    echo "Updating committed seed at $SEED_ARCHIVE ..."
+    cp "$SNAPSHOT_PATH/Dictionary.gz" "$SEED_ARCHIVE"
+    echo "Seed updated: $SEED_ARCHIVE"
 fi

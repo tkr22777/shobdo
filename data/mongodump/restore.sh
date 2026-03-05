@@ -8,7 +8,7 @@ set -e
 
 MONGO_CONTAINER="${MONGO_CONTAINER:-deploy-mongo-1}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-TARGET=${1:-"$SCRIPT_DIR/Dictionary"}
+TARGET=${1:-"$SCRIPT_DIR/Dictionary.gz"}
 
 # If a relative path is given, resolve relative to script dir
 if [[ "$TARGET" != /* ]]; then
