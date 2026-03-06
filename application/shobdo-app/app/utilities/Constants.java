@@ -9,6 +9,7 @@ public final class Constants {
     public static final String PREFIX_WORD_ID = "WD";
     public static final String PREFIX_MEANING_ID = "MNG";
     public static final String PREFIX_REQUEST_ID = "REQ";
+    public static final String PREFIX_INFLECTION_INDEX_ID = "INF";
 
     //REST REQUEST FIELD NAMES
     public static final String KEY_SPELLING = "spelling";
@@ -37,6 +38,10 @@ public final class Constants {
 
         public static String SpellingExists(final String spelling) {
             return String.format("Word with the spelling: %s already exist", spelling);
+        }
+
+        public static String SpellingIsInflection(final String spelling) {
+            return String.format("Spelling '%s' is an inflected form of another word and cannot be a root entry", spelling);
         }
 
         public static String EntityNotFound(final String entityId) {

@@ -61,6 +61,7 @@ data/missing_words.json
 data/generated_entries.json
 data/discarded_words.json
 data/upload_progress.json
+data/generation/
 data/workers/
 data/workers_backup/
 data/discovery/

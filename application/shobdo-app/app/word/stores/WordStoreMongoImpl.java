@@ -10,6 +10,8 @@ import org.bson.Document;
 import java.util.Arrays;
 import utilities.Constants;
 import utilities.ShobdoLogger;
+import word.objects.Inflection;
+import word.objects.InflectionIndex;
 import word.objects.Word;
 
 import java.util.ArrayList;
@@ -19,10 +21,13 @@ import java.util.regex.Pattern;
 public class WordStoreMongoImpl implements WordStore {
 
     private final MongoCollection<Document> wordCollection;
+    private final MongoCollection<Document> inflectionIndexCollection;
     private static final ShobdoLogger log = new ShobdoLogger(WordStoreMongoImpl.class);
 
-    public WordStoreMongoImpl(MongoCollection<Document> wordCollection) {
+    public WordStoreMongoImpl(MongoCollection<Document> wordCollection,
+                              MongoCollection<Document> inflectionIndexCollection) {
         this.wordCollection = wordCollection;
+        this.inflectionIndexCollection = inflectionIndexCollection;
     }
 
     @Override
@@ -109,10 +114,47 @@ public class WordStoreMongoImpl implements WordStore {
         return wordCollection.countDocuments();
     }
 
+    @Override
+    public InflectionIndex findInflectionBySpelling(final String spelling) {
+        final BasicDBObject query = InflectionIndex.getActiveObjectQuery();
+        query.put(Constants.KEY_SPELLING, spelling);
+        final Document doc = inflectionIndexCollection.find(query).first();
+        log.debug("@WDMI010 findInflectionBySpelling spelling: " + spelling + " result: " + doc);
+        return doc == null ? null : InflectionIndex.fromBsonDoc(doc);
+    }
+
+    @Override
+    public InflectionIndex createInflectionIndex(final InflectionIndex entry) {
+        final Document doc = entry.toDocument();
+        inflectionIndexCollection.insertOne(doc);
+        log.debug("@WDMI011 createInflectionIndex spelling: " + entry.getSpelling());
+        return entry;
+    }
+
+    @Override
+    public void addInflectionsToWord(final String wordId, final List<Inflection> inflections) {
+        final Word word = getById(wordId);
+        if (word == null) {
+            throw new IllegalArgumentException(Constants.Messages.EntityNotFound(wordId));
+        }
+        for (final Inflection inflection : inflections) {
+            word.addInflection(inflection);
+        }
+        update(word);
+        log.debug("@WDMI012 addInflectionsToWord wordId: " + wordId + " count: " + inflections.size());
+    }
+
     public void deleteAll() {
         //TODO remove allowing mass deletion from here. Move to test section
         final DeleteResult result = wordCollection.deleteMany(new BasicDBObject());
         log.debug("Delete db entries: " + result);
+    }
+
+    @Override
+    public void deleteAllInflectionIndexEntries() {
+        //TODO remove allowing mass deletion from here. Move to test section
+        final DeleteResult result = inflectionIndexCollection.deleteMany(new BasicDBObject());
+        log.debug("Delete inflection index entries: " + result);
     }
 
     @Override

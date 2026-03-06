@@ -1,12 +1,15 @@
 package word.objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import common.objects.APIEntity;
 import common.objects.MongoEntity;
 import lombok.*;
 import org.bson.Document;
 import utilities.JsonUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 @Setter
@@ -22,6 +25,9 @@ public class Word extends MongoEntity implements APIEntity {
 
     //Easier to lookup/de-dupe following operations
     private HashMap<String, Meaning> meanings;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Inflection> inflections;
 
     public void putMeaning(final Meaning meaning) {
         if (meaning == null || meaning.getId() == null) {
@@ -51,6 +57,22 @@ public class Word extends MongoEntity implements APIEntity {
             setMeanings(new HashMap<>());
         }
         return getMeanings().get(meaningId);
+    }
+
+    public void addInflection(final Inflection inflection) {
+        if (inflection == null || inflection.getSpelling() == null) {
+            throw new IllegalArgumentException("Inflection or its spelling is null");
+        }
+        if (inflections == null) {
+            inflections = new ArrayList<>();
+        }
+        inflections.add(inflection);
+    }
+
+    public void removeInflection(final String spelling) {
+        if (inflections != null) {
+            inflections.removeIf(i -> spelling.equals(i.getSpelling()));
+        }
     }
 
     public static Word fromBsonDoc(final Document doc) {

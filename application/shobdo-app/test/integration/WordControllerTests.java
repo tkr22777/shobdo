@@ -36,7 +36,10 @@ public class WordControllerTests extends WithApplication {
 
     public WordControllerTests() {
         log = new ShobdoLogger(WordControllerTests.class);
-        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        WordStoreMongoImpl storeMongo = new WordStoreMongoImpl(
+            MongoStoreFactory.getWordCollection(),
+            MongoStoreFactory.getInflectionIndexCollection()
+        );
         wordLogic = new WordLogic(storeMongo, WordCache.getCache());
         createdWords = new ArrayList<>();
         createdMeaningForWord = new HashMap<>();
@@ -64,6 +67,7 @@ public class WordControllerTests extends WithApplication {
         createdWords.clear();
         createdMeaningForWord.clear();
         wordLogic.deleteAllWords();  //cleaning up for tests
+        wordLogic.deleteAllInflectionIndexEntries();
         wordLogic.flushCache();
     }
 

@@ -11,28 +11,45 @@ genai.configure(api_key=settings.GEMINI_API_KEY)
 
 MISSING_WORD_PROMPT = """You are a Bangla language expert and dictionary editor.
 
-Given a single Bangla word or phrase, decide whether it deserves a dictionary entry.
-If yes, generate all distinct meaning entries for it.
-If no (only for truly invalid input), return the reason.
+Given a single Bangla word or phrase, decide ONE of three things:
 
-━━━ VALIDITY RULES ━━━
+A) It deserves its own dictionary entry → generate all distinct meanings.
+B) It is a grammatical inflection of a simpler root word → return the root.
+C) It is truly invalid (garbled, random characters) → return the reason.
+
+━━━ RULE B — INFLECTION DETECTION ━━━
+
+A word is an INFLECTION (choose B) when:
+- It is a surface-level grammatical form of a base/root word, obtained by adding
+  a Bangla case suffix, number suffix, tense marker, or similar grammatical ending.
+- The root word is a real, well-formed Bangla word in its own right.
+- The inflected form adds NO new lexical meaning beyond what the root already covers.
+
+Common Bangla inflection patterns:
+  Case   : -র / -এর / -দের (genitive)  →  আলোচনার → root: আলোচনা
+           -য় / -তে / -এ (locative)    →  আলোচনায় → root: আলোচনা
+           -কে (objective)              →  বইকে    → root: বই
+           -থেকে (ablative)             →  বাড়িথেকে → root: বাড়ি
+  Number : -রা / -গুলো / -গুলি         →  মানুষেরা → root: মানুষ
+  Determ.: -টি / -টা                   →  বইটি    → root: বই
+  Verb   : tense endings (-ছিল, -ছিলাম, -েছে, -বে, -ল, -লাম, -লেন)
+           →  বলেছিলাম → root: বলা
+
+Do NOT choose B if:
+- The form has an independent, distinct lexical meaning from the root.
+- It is a fixed expression, idiom, compound word, or adverb formed from a root.
+- The "root" you'd suggest is itself not a real Bangla word.
+
+━━━ RULE C — INVALID ━━━
 
 INVALID only when the input is:
 - Random characters with no Bengali morphological basis (e.g. "কখজঞতথদ")
 - Clearly garbled, corrupted, or a transcription error
 - Has absolutely no conceptual existence as a Bangla word or expression
 
-VALID (generate entries for all of these):
-- Common, archaic, colloquial, or dialectal words
-- Particles, conjunctions, interjections, pronouns
-- Compound words, derived forms, verb forms, inflected forms
-- Loanwords written in Bangla script
-- Multi-word fixed expressions or idioms
-- Technical, regional, or rare terms
-
 ━━━ OUTPUT FORMAT ━━━
 
-If VALID — return exactly this JSON structure:
+If VALID (A) — return exactly this JSON structure:
 {
   "valid": true,
   "entries": [
@@ -47,9 +64,18 @@ If VALID — return exactly this JSON structure:
   ]
 }
 
-If NOT VALID — return exactly this JSON structure:
+If INFLECTION (B) — return exactly this JSON structure:
 {
   "valid": false,
+  "inflection": true,
+  "root": "<the base/root word in its simplest form>",
+  "reason": "<one short phrase: e.g. 'locative suffix -য়', 'genitive suffix -র'>"
+}
+
+If NOT VALID (C) — return exactly this JSON structure:
+{
+  "valid": false,
+  "inflection": false,
   "reason": "<one short sentence explaining why>"
 }
 
@@ -170,10 +196,29 @@ Output:
   ]
 }
 
+Input: word: "আলোচনায়"
+Output:
+{
+  "valid": false,
+  "inflection": true,
+  "root": "আলোচনা",
+  "reason": "locative suffix -য়"
+}
+
+Input: word: "ছাত্রছাত্রীদের"
+Output:
+{
+  "valid": false,
+  "inflection": true,
+  "root": "ছাত্রছাত্রী",
+  "reason": "genitive plural suffix -দের"
+}
+
 Input: word: "কখজঞতথদ"
 Output:
 {
   "valid": false,
+  "inflection": false,
   "reason": "এটি এলোমেলো বর্ণের সমষ্টি; বাংলায় কোনো পরিচিত শব্দ বা প্রকাশভঙ্গি হিসেবে এর অস্তিত্ব নেই।"
 }
 
@@ -182,15 +227,19 @@ Output:
 """
 
 
+GEMINI_MODEL = "models/gemini-2.5-flash-lite"
+
+
 def generate_missing_word(word: str) -> str:
     """Call Gemini to generate a dictionary entry for a single Bangla word.
 
     Returns:
         JSON string: {"valid": true, "entries": [...]}
-                  or {"valid": false, "reason": "..."}
+                  or {"valid": false, "inflection": true, "root": "...", "reason": "..."}
+                  or {"valid": false, "inflection": false, "reason": "..."}
                   or {"status": "error", "message": "..."} on API/parse failure.
     """
-    model = genai.GenerativeModel("models/gemini-2.5-flash-lite")
+    model = genai.GenerativeModel(GEMINI_MODEL)
 
     generation_config = genai.types.GenerationConfig(
         temperature=0.15,

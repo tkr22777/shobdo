@@ -11,11 +11,9 @@ export async function searchWords(searchString) {
 }
 
 export async function getWordDetail(spelling) {
-  const res = await fetch('/api/v1/words/postget', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ spelling }),
-  });
+  // GET /api/v1/bn/word/:spelling — also falls back to InflectionIndex and returns
+  // `inflectedFrom` field when the spelling is an inflected form of another word.
+  const res = await fetch('/api/v1/bn/word/' + encodeURIComponent(spelling));
   if (!res.ok) throw new Error('Word detail failed');
   return res.json();
 }

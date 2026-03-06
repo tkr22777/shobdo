@@ -1,5 +1,7 @@
 package word.stores;
 
+import word.objects.Inflection;
+import word.objects.InflectionIndex;
 import word.objects.Word;
 
 import java.util.ArrayList;
@@ -19,7 +21,13 @@ public interface WordStore {
      void delete(String wordId);
      ArrayList<Word> list(String startWordId, int limit);
 
+     /* Inflections */
+     InflectionIndex findInflectionBySpelling(String spelling);
+     InflectionIndex createInflectionIndex(InflectionIndex entry);
+     void addInflectionsToWord(String wordId, List<Inflection> inflections);
+
      /* For test/admin purpose */
      long count();
      void deleteAll();
+     void deleteAllInflectionIndexEntries();
 }
