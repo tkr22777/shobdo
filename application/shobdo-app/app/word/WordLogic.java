@@ -7,6 +7,8 @@ import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import utilities.*;
 import word.caches.WordCache;
+import word.objects.Inflection;
+import word.objects.InflectionIndex;
 import word.objects.Meaning;
 import word.objects.Word;
 import word.stores.WordStore;
@@ -38,6 +40,10 @@ public class WordLogic {
         return String.format("%s-%s", Constants.PREFIX_MEANING_ID, UUID.randomUUID());
     }
 
+    private String generateInflectionIndexId() {
+        return String.format("%s-%s", Constants.PREFIX_INFLECTION_INDEX_ID, UUID.randomUUID());
+    }
+
     /* Create */
     /* Validation criteria:
         1. No user provided Id
@@ -58,6 +64,11 @@ public class WordLogic {
         final Word existingWord = wordStore.getBySpelling(word.getSpelling());
         if (existingWord != null) {
             throw new IllegalArgumentException(Constants.Messages.SpellingExists(word.getSpelling()));
+        }
+
+        final InflectionIndex existingInflection = wordStore.findInflectionBySpelling(word.getSpelling());
+        if (existingInflection != null) {
+            throw new IllegalArgumentException(Constants.Messages.SpellingIsInflection(word.getSpelling()));
         }
 
         //word creation does not accept meanings
@@ -236,6 +247,10 @@ public class WordLogic {
         wordStore.deleteAll();
     }
 
+    public void deleteAllInflectionIndexEntries(){
+        wordStore.deleteAllInflectionIndexEntries();
+    }
+
     public void flushCache(){
         wordCache.flushCache();
     }
@@ -379,5 +394,50 @@ public class WordLogic {
         word.putMeaning(meaning);
         wordStore.update(word);
         wordCache.cacheBySpelling(word);
+    }
+
+    /* Inflections */
+    public void addInflectionsToWord(final String wordId, final List<Inflection> inflections) {
+        if (inflections == null || inflections.isEmpty()) {
+            throw new IllegalArgumentException("Inflections list is null or empty");
+        }
+        final Word word = getWordById(wordId); // validates word exists
+
+        for (final Inflection inflection : inflections) {
+            if (inflection.getSpelling() == null || inflection.getSpelling().trim().isEmpty()) {
+                throw new IllegalArgumentException("Inflection spelling is null or empty");
+            }
+            final InflectionIndex existing = wordStore.findInflectionBySpelling(inflection.getSpelling());
+            if (existing != null) {
+                throw new IllegalArgumentException(
+                    String.format("Inflection '%s' already exists for root '%s'",
+                        inflection.getSpelling(), existing.getRootSpelling()));
+            }
+        }
+
+        wordStore.addInflectionsToWord(wordId, inflections);
+
+        for (final Inflection inflection : inflections) {
+            final InflectionIndex indexEntry = InflectionIndex.builder()
+                .id(generateInflectionIndexId())
+                .spelling(inflection.getSpelling())
+                .rootId(wordId)
+                .rootSpelling(word.getSpelling())
+                .build();
+            wordStore.createInflectionIndex(indexEntry);
+        }
+
+        // refresh cache so next fetch returns updated inflections
+        final Word updated = wordStore.getById(wordId);
+        if (updated != null) {
+            wordCache.cacheBySpelling(updated);
+        }
+    }
+
+    public InflectionIndex findInflectionBySpelling(final String spelling) {
+        if (spelling == null || spelling.trim().isEmpty()) {
+            throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
+        }
+        return wordStore.findInflectionBySpelling(spelling);
     }
 }

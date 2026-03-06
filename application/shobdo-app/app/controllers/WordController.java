@@ -1,20 +1,27 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import common.stores.MongoStoreFactory;
+import exceptions.EntityDoesNotExist;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utilities.Constants;
+import utilities.JsonUtil;
 import utilities.ShobdoLogger;
 import word.caches.WordCache;
 import word.WordLogic;
 import word.stores.WordStoreMongoImpl;
+import word.objects.Inflection;
+import word.objects.InflectionIndex;
 import word.objects.Meaning;
 import word.objects.Word;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WordController extends Controller {
@@ -26,7 +33,10 @@ public class WordController extends Controller {
     }
 
     public WordController() {
-        WordStoreMongoImpl storeMongoDB = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        WordStoreMongoImpl storeMongoDB = new WordStoreMongoImpl(
+            MongoStoreFactory.getWordCollection(),
+            MongoStoreFactory.getInflectionIndexCollection()
+        );
         wordLogic = new WordLogic(storeMongoDB, WordCache.getCache());
     }
 
@@ -150,13 +160,26 @@ public class WordController extends Controller {
     }
 
     //READ by lang + spelling: GET /api/v1/bn/word/<spelling>
+    // Falls back to InflectionIndex if the spelling is not a root word —
+    // returns the root word with an extra "inflectedFrom" field.
     public Result getWordByLangAndSpelling(final String lang, final String spelling) {
         return ControllerUtils.executeEndpoint("", "", "getWordByLangAndSpelling", new HashMap<>(),
             () -> {
                 if (!"bn".equals(lang)) {
                     return badRequest("Unsupported language: " + lang);
                 }
-                return ok(wordLogic.getWordBySpelling(spelling).jsonNode());
+                try {
+                    return ok(wordLogic.getWordBySpelling(spelling).jsonNode());
+                } catch (EntityDoesNotExist e) {
+                    final InflectionIndex idx = wordLogic.findInflectionBySpelling(spelling);
+                    if (idx != null) {
+                        final Word rootWord = wordLogic.getWordById(idx.getRootId());
+                        final ObjectNode response = (ObjectNode) rootWord.jsonNode();
+                        response.put("inflectedFrom", spelling);
+                        return ok(response);
+                    }
+                    throw e;
+                }
             }
         );
     }
@@ -216,6 +239,25 @@ public class WordController extends Controller {
                         .map(w -> { java.util.Map<String,String> m = new java.util.LinkedHashMap<>(); m.put("id", w.getId()); m.put("spelling", w.getSpelling()); return m; })
                         .collect(java.util.stream.Collectors.toList())
                 ));
+            }
+        );
+    }
+
+    /* Inflection related API */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result addInflectionsToWord(final String wordId) {
+        return ControllerUtils.executeEndpoint("", "", "addInflectionsToWord", new HashMap<>(),
+            () -> {
+                final JsonNode body = request().body().asJson();
+                if (!body.isArray()) {
+                    return badRequest("Expected a JSON array of inflections");
+                }
+                final List<Inflection> inflections = new ArrayList<>();
+                for (final JsonNode node : body) {
+                    inflections.add((Inflection) JsonUtil.jNodeToObject(node, Inflection.class));
+                }
+                wordLogic.addInflectionsToWord(wordId, inflections);
+                return ok(wordLogic.getWordById(wordId).jsonNode());
             }
         );
     }

@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inflection UI Mock — Shobdo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+/* ── Base theme (matches app exactly) ── */
+:root {
+  --bg: #FBF8F0;
+  --surface: #FFFFFF;
+  --text: #1C1510;
+  --text-soft: #3D3028;
+  --muted: #8B7055;
+  --subtle: #F0EAD8;
+  --border: #E5D8C0;
+  --accent: #C4881A;
+  --accent-light: #FEF3DC;
+  --accent-dark: #8B5A08;
+  --inf-bg: #EEF3FB;
+  --inf-border: #B8CBE8;
+  --inf-text: #2A4A7A;
+  --inf-muted: #6A8AB8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100%;
+}
+
+/* ── Chrome ── */
+.chrome-header {
+  background: var(--surface);
+  border-bottom: 3px solid var(--text);
+  padding: 10px 32px 8px;
+  text-align: center;
+}
+.chrome-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+.chrome-sub {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Top-level tabs ── */
+.top-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 1px 6px rgba(28,21,16,0.06);
+}
+.top-tab {
+  padding: 11px 18px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font-family: 'Source Serif 4', serif;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.top-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.top-tab:hover:not(.active) { color: var(--text); }
+
+/* ── Scenario wrapper ── */
+.scenario { display: none; max-width: 740px; margin: 0 auto; padding: 40px 28px 80px; }
+.scenario.active { display: block; }
+
+.scenario-kicker {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+}
+.scenario-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;
+}
+.scenario-desc {
+  font-size: 0.82rem; color: var(--muted); font-style: italic;
+  border-left: 3px solid var(--border); padding-left: 14px;
+  margin-bottom: 30px; line-height: 1.75;
+}
+
+/* ── Redirect banner (shared) ── */
+.redirect-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--inf-bg); border: 1px solid var(--inf-border);
+  border-radius: 8px; padding: 10px 16px; margin-bottom: 26px;
+  font-size: 0.875rem; color: var(--inf-text); line-height: 1.5;
+}
+.redirect-banner strong { font-family: 'Noto Serif Bengali', serif; font-weight: 700; }
+.redirect-banner .badge {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; background: var(--inf-border);
+  color: var(--inf-text); border-radius: 3px; padding: 1px 6px; margin: 0 3px;
+}
+
+/* ── Base article (matches app) ── */
+.article-shell {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 40px 44px;
+  box-shadow: 0 2px 12px rgba(28,21,16,0.06);
+  animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.article-headline {
+  font-family: 'Noto Serif Bengali', 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3rem); font-weight: 700;
+  line-height: 1.1; color: var(--text); margin-bottom: 14px;
+}
+.article-deck {
+  font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
+  font-size: 1rem; font-style: italic; color: var(--text-soft);
+  border-left: 3px solid var(--accent); padding-left: 18px;
+  margin-bottom: 20px; line-height: 1.65;
+}
+.article-byline {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); padding-bottom: 16px;
+  border-bottom: 1px solid var(--border); margin-bottom: 24px;
+}
+.def-graf {
+  font-size: 1.05rem; line-height: 1.9; margin-bottom: 12px;
+  color: var(--text); font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
+}
+.meaning-number {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  color: var(--accent); margin-right: 4px; font-size: 0.85em;
+}
+.pos-badge {
+  display: inline-block; font-size: 0.7rem; font-style: italic;
+  color: var(--accent); opacity: 0.85; margin-bottom: 10px;
+}
+.example-graf {
+  font-family: 'Noto Serif Bengali', 'Source Serif 4', serif;
+  font-style: italic; color: var(--muted); font-size: 0.875rem;
+  padding-left: 14px; border-left: 3px solid var(--border);
+  margin-bottom: 16px; line-height: 1.65;
+}
+.syn-ant-row {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px; margin-bottom: 20px;
+}
+.syn-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--muted);
+}
+.syn-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.85rem;
+  color: var(--text-soft); border-bottom: 1.5px dotted var(--accent);
+  padding-bottom: 1px; cursor: pointer;
+}
+.syn-word:hover { color: var(--accent); border-bottom-style: solid; }
+.ant-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.85rem;
+  color: var(--text-soft); border-bottom: 1.5px dotted #C4604A;
+  padding-bottom: 1px; cursor: pointer;
+}
+.ant-word:hover { color: #C4604A; border-bottom-style: solid; }
+.article-footer {
+  margin-top: 24px; padding-top: 18px; border-top: 2px solid var(--text);
+}
+.footer-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.word-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.word-tag {
+  font-size: 0.78rem; padding: 4px 12px;
+  border: 1px solid var(--border); border-radius: 100px;
+  color: var(--text-soft); font-family: 'Noto Serif Bengali', serif; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.word-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Inflections header (shared across variants) ── */
+.inflections-header {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-top: 28px; padding-top: 18px;
+  border-top: 1px dashed var(--border); margin-bottom: 14px;
+}
+.inflections-title {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted);
+}
+.inflections-count {
+  font-size: 0.65rem; color: var(--inf-muted); font-style: italic;
+}
+
+/* ─────────────────────────────────────────────────────────
+   VARIANT 1 — ACCORDION ROWS
+   Clean rows; tap to reveal details beneath
+───────────────────────────────────────────────────────── */
+.v1-row {
+  border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 8px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.v1-row.expanded { border-color: var(--inf-border); }
+.v1-row.redirected { border-color: var(--inf-border); box-shadow: 0 0 0 3px var(--inf-bg); }
+
+.v1-trigger {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; cursor: pointer;
+  background: var(--surface); transition: background 0.15s;
+  user-select: none;
+}
+.v1-trigger:hover { background: var(--subtle); }
+.v1-row.expanded .v1-trigger { background: var(--inf-bg); border-bottom: 1px solid var(--inf-border); }
+.v1-row.redirected .v1-trigger { background: var(--inf-bg); }
+
+.v1-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 1.05rem;
+  font-weight: 700; color: var(--text); flex: 1;
+}
+.v1-row.redirected .v1-word { color: var(--inf-text); }
+.v1-type {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--inf-muted);
+  background: var(--inf-bg); border: 1px solid var(--inf-border);
+  border-radius: 3px; padding: 2px 7px;
+}
+.v1-you-searched {
+  font-size: 0.62rem; color: var(--inf-muted); font-style: italic;
+  background: var(--inf-border); border-radius: 3px;
+  padding: 1px 6px; opacity: 0.85;
+}
+.v1-arrow {
+  font-size: 0.75rem; color: var(--muted);
+  transition: transform 0.2s; flex-shrink: 0;
+}
+.v1-row.expanded .v1-arrow { transform: rotate(180deg); color: var(--inf-text); }
+
+.v1-body {
+  display: none; padding: 16px 20px 18px;
+  background: var(--inf-bg); border-top: none;
+}
+.v1-row.expanded .v1-body { display: block; }
+
+.v1-meaning {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.95rem;
+  line-height: 1.8; color: var(--text-soft); margin-bottom: 8px;
+}
+.v1-example {
+  font-style: italic; color: var(--muted); font-size: 0.85rem;
+  font-family: 'Noto Serif Bengali', serif;
+  border-left: 3px solid var(--inf-border); padding-left: 12px;
+  margin-bottom: 10px; line-height: 1.65;
+}
+.v1-syn-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.v1-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--inf-muted);
+}
+.v1-syn-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.82rem;
+  color: var(--inf-text); border-bottom: 1.5px dotted var(--inf-border);
+  padding-bottom: 1px; cursor: pointer;
+}
+.v1-syn-word:hover { border-bottom-style: solid; }
+
+/* ─────────────────────────────────────────────────────────
+   VARIANT 2 — MAGAZINE CARDS
+   Compact cards; collapsed shows teaser line; expanded reveals full
+───────────────────────────────────────────────────────── */
+.v2-grid { display: flex; flex-direction: column; gap: 0; }
+
+.v2-card {
+  border-bottom: 1px solid var(--border); padding: 0;
+  transition: background 0.15s;
+}
+.v2-card:last-child { border-bottom: none; }
+.v2-card.redirected { background: var(--inf-bg); border-radius: 8px; border: 1px solid var(--inf-border); margin-bottom: 2px; }
+
+.v2-collapsed {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 4px; cursor: pointer;
+}
+.v2-card.redirected .v2-collapsed { padding: 12px 14px; }
+.v2-card.expanded .v2-collapsed { padding-bottom: 8px; }
+
+.v2-col-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 1rem;
+  font-weight: 700; color: var(--text); min-width: 110px;
+}
+.v2-card.redirected .v2-col-word { color: var(--inf-text); }
+.v2-col-type {
+  font-size: 0.62rem; color: var(--inf-muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  min-width: 70px;
+}
+.v2-col-teaser {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.82rem;
+  color: var(--muted); flex: 1; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.v2-card.expanded .v2-col-teaser { display: none; }
+.v2-toggle {
+  font-size: 0.65rem; color: var(--inf-muted); font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.v2-expanded-body {
+  display: none; padding: 0 4px 16px;
+}
+.v2-card.redirected .v2-expanded-body { padding: 0 14px 16px; }
+.v2-card.expanded .v2-expanded-body { display: block; }
+
+.v2-meaning {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.92rem;
+  line-height: 1.8; color: var(--text-soft); margin-bottom: 8px;
+}
+.v2-example {
+  font-style: italic; color: var(--muted); font-size: 0.82rem;
+  font-family: 'Noto Serif Bengali', serif;
+  border-left: 3px solid var(--border); padding-left: 12px;
+  margin-bottom: 10px; line-height: 1.65;
+}
+.v2-card.redirected .v2-example { border-left-color: var(--inf-border); }
+.v2-tags-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.v2-tag-label {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--muted);
+}
+.v2-tag-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.8rem;
+  padding: 2px 9px; border: 1px solid var(--border);
+  border-radius: 100px; color: var(--text-soft); cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.v2-tag-word:hover { border-color: var(--accent); color: var(--accent); }
+.v2-card.redirected .v2-tag-word { border-color: var(--inf-border); color: var(--inf-text); }
+
+/* ─────────────────────────────────────────────────────────
+   VARIANT 3 — SYNONYM-STYLE TAGS + CLICK-TO-EXPAND PANEL
+   Tags look exactly like synonym words (dotted accent underline)
+   Hover  = meaning bubble
+   Click  = detail panel appears below the tag row
+   Active = solid underline, amber colour
+───────────────────────────────────────────────────────── */
+
+/* Tag strip */
+.v3-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline;
+}
+
+.v3-tag {
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  border-bottom: 1.5px dotted var(--accent);
+  padding-bottom: 1px;
+  cursor: pointer;
+  transition: color 0.15s, border-bottom-style 0.15s, border-bottom-color 0.15s;
+  line-height: 2;
+}
+.v3-tag:hover { color: var(--accent); border-bottom-style: solid; }
+.v3-tag.active {
+  color: var(--accent); border-bottom-style: solid;
+  font-weight: 700;
+}
+.v3-tag.redirected-tag {
+  color: var(--inf-text);
+  border-bottom-color: var(--inf-border);
+  border-bottom-style: solid;
+  font-weight: 700;
+}
+.v3-tag.redirected-tag.active {
+  color: var(--inf-text);
+}
+
+/* Detail panel — slides in below the tags */
+.v3-panel {
+  display: none;
+  margin-top: 14px;
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  animation: v3PanelIn 0.18s ease;
+}
+.v3-panel.open { display: block; }
+.v3-panel.redirected-panel {
+  background: var(--inf-bg);
+  border-color: var(--inf-border);
+}
+
+@keyframes v3PanelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Panel header: word + type badge on same line */
+.v3-panel-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.v3-panel-word {
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--text);
+}
+.v3-panel.redirected-panel .v3-panel-word { color: var(--inf-text); }
+
+.v3-panel-type {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--inf-muted);
+  background: var(--inf-bg); border: 1px solid var(--inf-border);
+  border-radius: 3px; padding: 2px 7px;
+}
+.v3-panel.redirected-panel .v3-panel-type {
+  background: var(--inf-border); color: var(--inf-text);
+}
+.v3-you-searched-badge {
+  font-size: 0.6rem; color: var(--inf-muted); font-style: italic;
+  background: #c8daef; border-radius: 3px; padding: 1px 6px;
+}
+
+.v3-panel-def {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.92rem;
+  line-height: 1.8; color: var(--text-soft); margin-bottom: 8px;
+}
+.v3-panel-ex {
+  font-style: italic; color: var(--muted); font-size: 0.82rem;
+  font-family: 'Noto Serif Bengali', serif;
+  border-left: 2px solid var(--border); padding-left: 10px;
+  margin-bottom: 10px; line-height: 1.65;
+}
+.v3-panel.redirected-panel .v3-panel-ex { border-left-color: var(--inf-border); }
+
+.v3-panel-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.v3-panel-meta-label {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+}
+.v3-panel-meta-word {
+  font-family: 'Noto Serif Bengali', serif; font-size: 0.82rem;
+  color: var(--text-soft); border-bottom: 1px dotted var(--muted);
+  padding-bottom: 1px; cursor: pointer;
+}
+.v3-panel-meta-word:hover { color: var(--accent); }
+
+/* ── Hover meaning bubble ── */
+#meaning-bubble {
+  position: fixed; display: none; max-width: 300px;
+  background: var(--text); color: var(--bg);
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 0.875rem; line-height: 1.65;
+  padding: 9px 13px; border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(28,21,16,0.22);
+  pointer-events: none; z-index: 999;
+  transition: opacity 0.1s;
+}
+#meaning-bubble::after {
+  content: ''; position: absolute;
+  left: 16px; bottom: -5px;
+  width: 10px; height: 10px;
+  background: var(--text); transform: rotate(45deg); border-radius: 2px;
+}
+#meaning-bubble.flip::after { bottom: auto; top: -5px; }
+
+/* ── Simulation controls ── */
+.sim-bar {
+  background: var(--subtle); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px;
+  margin-bottom: 24px; display: flex; align-items: center;
+  gap: 12px; flex-wrap: wrap;
+}
+.sim-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.sim-btn {
+  font-size: 0.78rem; padding: 5px 14px;
+  border: 1px solid var(--border); border-radius: 100px;
+  background: var(--surface); color: var(--text-soft);
+  cursor: pointer; font-family: 'Noto Serif Bengali', serif;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sim-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sim-btn.active { border-color: var(--inf-border); background: var(--inf-bg); color: var(--inf-text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="chrome-header">
+  <div class="chrome-title">SHOBDO</div>
+  <div class="chrome-sub">Inflection UI Mock · Three Variants · Design Review</div>
+</div>
+
+<div class="top-nav">
+  <button class="top-tab active" onclick="showTab('v1', this)">Variant 1 — Accordion</button>
+  <button class="top-tab" onclick="showTab('v2', this)">Variant 2 — Cards</button>
+  <button class="top-tab" onclick="showTab('v3', this)">Variant 3 — Dictionary Entries</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VARIANT 1 — ACCORDION ROWS
+════════════════════════════════════════════ -->
+<div id="tab-v1" class="scenario active">
+  <div class="scenario-kicker">Variant 1</div>
+  <div class="scenario-title">Accordion rows — tap to reveal</div>
+  <div class="scenario-desc">
+    Each inflected form is a compact row. Clicking expands to show meaning, example sentence,
+    synonyms and antonyms on a coloured background. When arrived via redirect,
+    the relevant row auto-expands and is visually distinguished.
+  </div>
+
+  <!-- Redirect simulator -->
+  <div class="sim-bar">
+    <span class="sim-label">Simulate redirect from:</span>
+    <button class="sim-btn" id="v1-sim-none" onclick="v1Redirect(null)">None (direct visit)</button>
+    <button class="sim-btn" id="v1-sim-alocanay" onclick="v1Redirect('আলোচনায়')">আলোচনায়</button>
+    <button class="sim-btn" id="v1-sim-alocanar" onclick="v1Redirect('আলোচনার')">আলোচনার</button>
+    <button class="sim-btn" id="v1-sim-gulo" onclick="v1Redirect('আলোচনাগুলো')">আলোচনাগুলো</button>
+  </div>
+
+  <!-- Redirect banner (hidden by default) -->
+  <div id="v1-redirect-banner" class="redirect-banner" style="display:none;">
+    <span>↩</span>
+    <div>আপনি <strong id="v1-searched-word"></strong> খুঁজেছিলেন — এটি একটি
+      <span class="badge" id="v1-searched-type"></span> রূপ। নিচে মূল শব্দের তথ্য দেওয়া হলো।</div>
+  </div>
+
+  <div class="article-shell">
+    <h1 class="article-headline">আলোচনা</h1>
+    <div class="article-deck">কোনো বিষয়ে পারস্পরিক মতবিনিময় বা পর্যালোচনা।</div>
+    <div class="article-byline"><span>বাংলা · বিশেষ্য</span><span>♡ ১২</span></div>
+
+    <p class="def-graf"><span class="meaning-number">১.</span> কোনো বিষয় নিয়ে দুই বা ততোধিক ব্যক্তির মধ্যে মতবিনিময় বা পর্যালোচনা।</p>
+    <p class="example-graf">দুই দেশের নেতারা শান্তি চুক্তি নিয়ে দীর্ঘ আলোচনায় বসলেন এবং সন্ধ্যা পর্যন্ত কোনো সিদ্ধান্তে পৌঁছাতে পারলেন না।</p>
+    <div class="syn-ant-row">
+      <span class="syn-label">সমার্থ</span>
+      <span class="syn-word">পর্যালোচনা</span>
+      <span class="syn-word">মতবিনিময়</span>
+      <span class="syn-word">বিচার-বিশ্লেষণ</span>
+    </div>
+    <p class="def-graf"><span class="meaning-number">২.</span> কোনো গ্রন্থ বা বিষয়ের সমালোচনামূলক পর্যালোচনা।</p>
+    <p class="example-graf">এই কবিতার আলোচনায় অধ্যাপক বললেন যে কবি সমাজের ভণ্ডামির বিরুদ্ধে কলম ধরেছেন।</p>
+
+    <div class="article-footer">
+      <div class="footer-label">সম্পর্কিত শব্দ</div>
+      <div class="word-tags">
+        <span class="word-tag">বিতর্ক</span>
+        <span class="word-tag">সংলাপ</span>
+        <span class="word-tag">সমালোচনা</span>
+        <span class="word-tag">মতামত</span>
+      </div>
+    </div>
+
+    <!-- INFLECTIONS -->
+    <div class="inflections-header">
+      <span class="inflections-title">রূপভেদ</span>
+      <span class="inflections-count">৬টি রূপ পাওয়া গেছে</span>
+    </div>
+
+    <div id="v1-rows">
+      <div class="v1-row" data-word="আলোচনায়" data-type="অধিকরণ">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনায়</span>
+          <span class="v1-type">অধিকরণ</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">কোনো আলোচনার প্রসঙ্গে বা ভেতরে — অধিকরণ বিভক্তি (-য়) রূপ।</p>
+          <p class="v1-example">বৈঠকে তিনি শিক্ষা ব্যবস্থার সংস্কার নিয়ে আলোচনায় সরব ভূমিকা রাখলেন।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">পর্যালোচনায়</span>
+            <span class="v1-syn-word">বিচারে</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-row" data-word="আলোচনার" data-type="সম্বন্ধ">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনার</span>
+          <span class="v1-type">সম্বন্ধ</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">আলোচনা সম্পর্কিত বা আলোচনার অন্তর্গত — সম্বন্ধ বিভক্তি (-র) রূপ।</p>
+          <p class="v1-example">দীর্ঘ আলোচনার পরে তারা একটি সর্বসম্মত সিদ্ধান্তে পৌঁছাল।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">পর্যালোচনার</span>
+            <span class="v1-syn-word">বিতর্কের</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-row" data-word="আলোচনাটি" data-type="নির্দেশক">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনাটি</span>
+          <span class="v1-type">নির্দেশক</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">একটি নির্দিষ্ট আলোচনাকে চিহ্নিত করার রূপ — নির্দেশক (-টি) প্রত্যয়।</p>
+          <p class="v1-example">গতকালের আলোচনাটি অত্যন্ত ফলপ্রসূ ছিল — দুটি বড় সিদ্ধান্ত নেওয়া হয়েছে।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">আলোচনাটা</span>
+            <span class="v1-syn-word">বিচারটি</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-row" data-word="আলোচনাকে" data-type="কর্ম">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনাকে</span>
+          <span class="v1-type">কর্ম</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">আলোচনাকে লক্ষ্য বা উদ্দেশ্য করে — কর্মকারক বিভক্তি (-কে) রূপ।</p>
+          <p class="v1-example">সবাই এই আলোচনাকে ঐতিহাসিক বলে মনে করছেন।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">বিতর্ককে</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-row" data-word="আলোচনাগুলো" data-type="বহুবচন">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনাগুলো</span>
+          <span class="v1-type">বহুবচন</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">একাধিক আলোচনা — বহুবচন (-গুলো) রূপ।</p>
+          <p class="v1-example">গত সপ্তাহের আলোচনাগুলো থেকে অনেক নতুন ধারণা পাওয়া গেছে।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">বৈঠকগুলো</span>
+            <span class="v1-syn-word">পর্যালোচনাগুলো</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-row" data-word="আলোচনাটা" data-type="নির্দেশক">
+        <div class="v1-trigger" onclick="v1Toggle(this.parentElement)">
+          <span class="v1-word">আলোচনাটা</span>
+          <span class="v1-type">নির্দেশক</span>
+          <span class="v1-you-searched" style="display:none;">আপনি এটি খুঁজেছিলেন</span>
+          <span class="v1-arrow">▾</span>
+        </div>
+        <div class="v1-body">
+          <p class="v1-meaning">একটি নির্দিষ্ট আলোচনার কথ্য রূপ — নির্দেশক (-টা) প্রত্যয়।</p>
+          <p class="v1-example">আলোচনাটা শেষ না হতেই বৃষ্টি এলো, সবাই চুপ করে গেল।</p>
+          <div class="v1-syn-row">
+            <span class="v1-label">সমার্থ</span>
+            <span class="v1-syn-word">আলোচনাটি</span>
+            <span class="v1-syn-word">বৈঠকটা</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /v1-rows -->
+  </div><!-- /article-shell -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VARIANT 2 — MAGAZINE CARDS
+════════════════════════════════════════════ -->
+<div id="tab-v2" class="scenario">
+  <div class="scenario-kicker">Variant 2</div>
+  <div class="scenario-title">Inline card rows — teaser collapses to detail</div>
+  <div class="scenario-desc">
+    Each inflection sits in a clean table-like row showing word, grammatical type, and a
+    truncated meaning preview. Clicking expands in place to show the full entry. The redirected
+    form is visually lifted (blue tinted card) and starts expanded.
+  </div>
+
+  <div class="sim-bar">
+    <span class="sim-label">Simulate redirect from:</span>
+    <button class="sim-btn" id="v2-sim-none" onclick="v2Redirect(null)">None</button>
+    <button class="sim-btn" id="v2-sim-alocanay" onclick="v2Redirect('আলোচনায়')">আলোচনায়</button>
+    <button class="sim-btn" id="v2-sim-alocanar" onclick="v2Redirect('আলোচনার')">আলোচনার</button>
+    <button class="sim-btn" id="v2-sim-gulo" onclick="v2Redirect('আলোচনাগুলো')">আলোচনাগুলো</button>
+  </div>
+
+  <div id="v2-redirect-banner" class="redirect-banner" style="display:none;">
+    <span>↩</span>
+    <div>আপনি <strong id="v2-searched-word"></strong> খুঁজেছিলেন — এটি একটি
+      <span class="badge" id="v2-searched-type"></span> রূপ।</div>
+  </div>
+
+  <div class="article-shell">
+    <h1 class="article-headline">আলোচনা</h1>
+    <div class="article-deck">কোনো বিষয়ে পারস্পরিক মতবিনিময় বা পর্যালোচনা।</div>
+    <div class="article-byline"><span>বাংলা · বিশেষ্য</span><span>♡ ১২</span></div>
+
+    <p class="def-graf"><span class="meaning-number">১.</span> কোনো বিষয় নিয়ে দুই বা ততোধিক ব্যক্তির মধ্যে মতবিনিময় বা পর্যালোচনা।</p>
+    <p class="example-graf">দুই দেশের নেতারা শান্তি চুক্তি নিয়ে দীর্ঘ আলোচনায় বসলেন।</p>
+    <div class="syn-ant-row">
+      <span class="syn-label">সমার্থ</span>
+      <span class="syn-word">পর্যালোচনা</span>
+      <span class="syn-word">মতবিনিময়</span>
+    </div>
+
+    <div class="article-footer">
+      <div class="footer-label">সম্পর্কিত শব্দ</div>
+      <div class="word-tags">
+        <span class="word-tag">বিতর্ক</span>
+        <span class="word-tag">সংলাপ</span>
+        <span class="word-tag">সমালোচনা</span>
+      </div>
+    </div>
+
+    <div class="inflections-header">
+      <span class="inflections-title">রূপভেদ</span>
+      <span class="inflections-count">৬টি রূপ</span>
+    </div>
+
+    <div id="v2-cards" class="v2-grid">
+      <div class="v2-card" data-word="আলোচনায়" data-type="অধিকরণ">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনায়</span>
+          <span class="v2-col-type">অধিকরণ</span>
+          <span class="v2-col-teaser">কোনো আলোচনার প্রসঙ্গে বা ভেতরে…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">কোনো আলোচনার প্রসঙ্গে বা ভেতরে — অধিকরণ বিভক্তি (-য়) রূপ।</p>
+          <p class="v2-example">বৈঠকে তিনি শিক্ষা ব্যবস্থার সংস্কার নিয়ে আলোচনায় সরব ভূমিকা রাখলেন।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">পর্যালোচনায়</span>
+            <span class="v2-tag-word">বিচারে</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v2-card" data-word="আলোচনার" data-type="সম্বন্ধ">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনার</span>
+          <span class="v2-col-type">সম্বন্ধ</span>
+          <span class="v2-col-teaser">আলোচনা সম্পর্কিত বা অন্তর্গত…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">আলোচনা সম্পর্কিত বা আলোচনার অন্তর্গত — সম্বন্ধ বিভক্তি (-র) রূপ।</p>
+          <p class="v2-example">দীর্ঘ আলোচনার পরে তারা একটি সর্বসম্মত সিদ্ধান্তে পৌঁছাল।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">পর্যালোচনার</span>
+            <span class="v2-tag-word">বিতর্কের</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v2-card" data-word="আলোচনাটি" data-type="নির্দেশক">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনাটি</span>
+          <span class="v2-col-type">নির্দেশক</span>
+          <span class="v2-col-teaser">একটি নির্দিষ্ট আলোচনাকে চিহ্নিত করে…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">একটি নির্দিষ্ট আলোচনাকে চিহ্নিত করার রূপ — নির্দেশক (-টি) প্রত্যয়।</p>
+          <p class="v2-example">গতকালের আলোচনাটি অত্যন্ত ফলপ্রসূ ছিল।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">আলোচনাটা</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v2-card" data-word="আলোচনাকে" data-type="কর্ম">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনাকে</span>
+          <span class="v2-col-type">কর্ম</span>
+          <span class="v2-col-teaser">আলোচনাকে লক্ষ্য বা উদ্দেশ্য করে…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">আলোচনাকে লক্ষ্য বা উদ্দেশ্য করে — কর্মকারক বিভক্তি (-কে) রূপ।</p>
+          <p class="v2-example">সবাই এই আলোচনাকে ঐতিহাসিক বলে মনে করছেন।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">বিতর্ককে</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v2-card" data-word="আলোচনাগুলো" data-type="বহুবচন">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনাগুলো</span>
+          <span class="v2-col-type">বহুবচন</span>
+          <span class="v2-col-teaser">একাধিক আলোচনা…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">একাধিক আলোচনার সমষ্টি — বহুবচন (-গুলো) রূপ।</p>
+          <p class="v2-example">গত সপ্তাহের আলোচনাগুলো থেকে অনেক নতুন ধারণা পাওয়া গেছে।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">বৈঠকগুলো</span>
+            <span class="v2-tag-word">পর্যালোচনাগুলো</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="v2-card" data-word="আলোচনাটা" data-type="নির্দেশক">
+        <div class="v2-collapsed" onclick="v2Toggle(this.parentElement)">
+          <span class="v2-col-word">আলোচনাটা</span>
+          <span class="v2-col-type">নির্দেশক</span>
+          <span class="v2-col-teaser">একটি নির্দিষ্ট আলোচনার কথ্য রূপ…</span>
+          <span class="v2-toggle">বিস্তার ▾</span>
+        </div>
+        <div class="v2-expanded-body">
+          <p class="v2-meaning">একটি নির্দিষ্ট আলোচনার কথ্য রূপ — নির্দেশক (-টা) প্রত্যয়।</p>
+          <p class="v2-example">আলোচনাটা শেষ না হতেই বৃষ্টি এলো, সবাই চুপ করে গেল।</p>
+          <div class="v2-tags-row">
+            <span class="v2-tag-label">সমার্থ</span>
+            <span class="v2-tag-word">আলোচনাটি</span>
+            <span class="v2-tag-word">বৈঠকটা</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /v2-cards -->
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VARIANT 3 — DICTIONARY ENTRY STYLE
+════════════════════════════════════════════ -->
+<div id="tab-v3" class="scenario">
+  <div class="scenario-kicker">Variant 3</div>
+  <div class="scenario-title">Print dictionary sub-entries — compact lines with expandable detail</div>
+  <div class="scenario-desc">
+    Inflected forms are rendered as a dense sub-list in the style of a print dictionary —
+    headword bold, type italic, definition in a single line. Clicking a row expands to a
+    full mini-entry. The redirected form starts expanded with a subtle blue lift.
+  </div>
+
+  <div class="sim-bar">
+    <span class="sim-label">Simulate redirect from:</span>
+    <button class="sim-btn" id="v3-sim-none" onclick="v3Redirect(null)">None</button>
+    <button class="sim-btn" id="v3-sim-alocanay" onclick="v3Redirect('আলোচনায়')">আলোচনায়</button>
+    <button class="sim-btn" id="v3-sim-alocanar" onclick="v3Redirect('আলোচনার')">আলোচনার</button>
+    <button class="sim-btn" id="v3-sim-gulo" onclick="v3Redirect('আলোচনাগুলো')">আলোচনাগুলো</button>
+  </div>
+
+  <div id="v3-redirect-banner" class="redirect-banner" style="display:none;">
+    <span>↩</span>
+    <div>আপনি <strong id="v3-searched-word"></strong> খুঁজেছিলেন — এটি একটি
+      <span class="badge" id="v3-searched-type"></span> রূপ। নিচে প্রসারিত করা হয়েছে।</div>
+  </div>
+
+  <div class="article-shell">
+    <h1 class="article-headline">আলোচনা</h1>
+    <div class="article-deck">কোনো বিষয়ে পারস্পরিক মতবিনিময় বা পর্যালোচনা।</div>
+    <div class="article-byline"><span>বাংলা · বিশেষ্য</span><span>♡ ১২</span></div>
+
+    <p class="def-graf"><span class="meaning-number">১.</span> কোনো বিষয় নিয়ে দুই বা ততোধিক ব্যক্তির মধ্যে মতবিনিময় বা পর্যালোচনা।</p>
+    <p class="example-graf">দুই দেশের নেতারা শান্তি চুক্তি নিয়ে দীর্ঘ আলোচনায় বসলেন।</p>
+    <div class="syn-ant-row">
+      <span class="syn-label">সমার্থ</span>
+      <span class="syn-word">পর্যালোচনা</span>
+      <span class="syn-word">মতবিনিময়</span>
+    </div>
+
+    <div class="article-footer">
+      <div class="footer-label">সম্পর্কিত শব্দ</div>
+      <div class="word-tags">
+        <span class="word-tag">বিতর্ক</span>
+        <span class="word-tag">সংলাপ</span>
+        <span class="word-tag">সমালোচনা</span>
+      </div>
+    </div>
+
+    <div class="inflections-header">
+      <span class="inflections-title">রূপভেদ</span>
+      <span class="inflections-count">৬টি রূপ</span>
+    </div>
+
+    <!-- Tag strip: words only, styled like synonyms -->
+    <div class="v3-tags" id="v3-tags">
+      <span class="v3-tag" data-word="আলোচনায়" data-type="অধিকরণ"
+        data-meaning="কোনো আলোচনার প্রসঙ্গে বা ভেতরে।"
+        data-def="কোনো আলোচনার প্রসঙ্গে বা ভেতরে — অধিকরণ বিভক্তি (-য়) রূপ।"
+        data-ex="বৈঠকে তিনি শিক্ষা ব্যবস্থার সংস্কার নিয়ে আলোচনায় সরব ভূমিকা রাখলেন।"
+        data-syn="পর্যালোচনায়,বিচারে">আলোচনায়</span>
+      <span class="v3-tag" data-word="আলোচনার" data-type="সম্বন্ধ"
+        data-meaning="আলোচনা সম্পর্কিত বা অন্তর্গত।"
+        data-def="আলোচনা সম্পর্কিত বা আলোচনার অন্তর্গত — সম্বন্ধ বিভক্তি (-র) রূপ।"
+        data-ex="দীর্ঘ আলোচনার পরে তারা একটি সর্বসম্মত সিদ্ধান্তে পৌঁছাল।"
+        data-syn="পর্যালোচনার,বিতর্কের">আলোচনার</span>
+      <span class="v3-tag" data-word="আলোচনাটি" data-type="নির্দেশক"
+        data-meaning="একটি নির্দিষ্ট আলোচনাকে চিহ্নিত করার রূপ।"
+        data-def="একটি নির্দিষ্ট আলোচনাকে চিহ্নিত করার রূপ — নির্দেশক (-টি) প্রত্যয়।"
+        data-ex="গতকালের আলোচনাটি অত্যন্ত ফলপ্রসূ ছিল — দুটি বড় সিদ্ধান্ত নেওয়া হয়েছে।"
+        data-syn="আলোচনাটা">আলোচনাটি</span>
+      <span class="v3-tag" data-word="আলোচনাকে" data-type="কর্ম"
+        data-meaning="আলোচনাকে লক্ষ্য বা উদ্দেশ্য করে।"
+        data-def="আলোচনাকে লক্ষ্য বা উদ্দেশ্য করে — কর্মকারক বিভক্তি (-কে) রূপ।"
+        data-ex="সবাই এই আলোচনাকে ঐতিহাসিক বলে মনে করছেন।"
+        data-syn="বিতর্ককে">আলোচনাকে</span>
+      <span class="v3-tag" data-word="আলোচনাগুলো" data-type="বহুবচন"
+        data-meaning="একাধিক আলোচনার সমষ্টি।"
+        data-def="একাধিক আলোচনার সমষ্টি — বহুবচন (-গুলো) রূপ।"
+        data-ex="গত সপ্তাহের আলোচনাগুলো থেকে অনেক নতুন ধারণা পাওয়া গেছে।"
+        data-syn="বৈঠকগুলো,পর্যালোচনাগুলো">আলোচনাগুলো</span>
+      <span class="v3-tag" data-word="আলোচনাটা" data-type="নির্দেশক"
+        data-meaning="একটি নির্দিষ্ট আলোচনার কথ্য রূপ।"
+        data-def="একটি নির্দিষ্ট আলোচনার কথ্য রূপ — নির্দেশক (-টা) প্রত্যয়।"
+        data-ex="আলোচনাটা শেষ না হতেই বৃষ্টি এলো, সবাই চুপ করে গেল।"
+        data-syn="আলোচনাটি,বৈঠকটা">আলোচনাটা</span>
+    </div>
+
+    <!-- Single detail panel, populated on click -->
+    <div class="v3-panel" id="v3-panel">
+      <div class="v3-panel-head">
+        <span class="v3-panel-word" id="v3-panel-word"></span>
+        <span class="v3-panel-type" id="v3-panel-type"></span>
+        <span class="v3-you-searched-badge" id="v3-panel-badge" style="display:none;">আপনি খুঁজেছিলেন</span>
+      </div>
+      <p class="v3-panel-def" id="v3-panel-def"></p>
+      <p class="v3-panel-ex" id="v3-panel-ex"></p>
+      <div class="v3-panel-meta" id="v3-panel-meta"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Floating meaning bubble (shared, single instance) -->
+<div id="meaning-bubble"></div>
+
+<script>
+/* ── Tab switcher ── */
+function showTab(id, btn) {
+  document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── Shared redirect logic ── */
+const inflectionMeta = {
+  'আলোচনায়':    'অধিকরণ',
+  'আলোচনার':    'সম্বন্ধ',
+  'আলোচনাগুলো': 'বহুবচন',
+};
+
+function applyRedirect(prefix, word) {
+  const banner = document.getElementById(prefix + '-redirect-banner');
+  const swEl   = document.getElementById(prefix + '-searched-word');
+  const stEl   = document.getElementById(prefix + '-searched-type');
+  const rows   = document.querySelectorAll(
+    `#${prefix}-rows .v1-row, #${prefix}-cards .v2-card, #${prefix}-list .v3-entry`
+  );
+
+  document.querySelectorAll(`[id^="${prefix}-sim-"]`).forEach(b => b.classList.remove('active'));
+
+  if (!word) {
+    banner.style.display = 'none';
+    rows.forEach(r => {
+      r.classList.remove('redirected', 'expanded');
+      const ys = r.querySelector('.v1-you-searched, .v3-you-searched');
+      if (ys) ys.style.display = 'none';
+    });
+    document.getElementById(prefix + '-sim-none')?.classList.add('active');
+    return;
+  }
+
+  banner.style.display = 'flex';
+  swEl.textContent = word;
+  stEl.textContent = inflectionMeta[word] || '';
+
+  rows.forEach(r => {
+    r.classList.remove('redirected', 'expanded');
+    const ys = r.querySelector('.v1-you-searched, .v3-you-searched');
+    if (ys) ys.style.display = 'none';
+    if (r.dataset.word === word) {
+      r.classList.add('redirected', 'expanded');
+      if (ys) ys.style.display = 'inline';
+      setTimeout(() => r.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+  });
+
+  const btnId = prefix + '-sim-' +
+    (word === 'আলোচনায়' ? 'alocanay' : word === 'আলোচনার' ? 'alocanar' : 'gulo');
+  document.getElementById(btnId)?.classList.add('active');
+}
+
+function v1Redirect(word) { applyRedirect('v1', word); }
+function v2Redirect(word) { applyRedirect('v2', word); }
+
+function v3Redirect(word) {
+  // Reset sim buttons
+  document.querySelectorAll('[id^="v3-sim-"]').forEach(b => b.classList.remove('active'));
+
+  // Reset redirect styling on all tags
+  document.querySelectorAll('#v3-tags .v3-tag').forEach(t => t.classList.remove('redirected-tag'));
+
+  const banner = document.getElementById('v3-redirect-banner');
+
+  if (!word) {
+    banner.style.display = 'none';
+    v3ClosePanel();
+    document.getElementById('v3-sim-none').classList.add('active');
+    return;
+  }
+
+  // Show banner
+  banner.style.display = 'flex';
+  document.getElementById('v3-searched-word').textContent = word;
+  document.getElementById('v3-searched-type').textContent = inflectionMeta[word] || '';
+
+  // Mark the tag as redirected and open it
+  const tag = document.querySelector(`#v3-tags .v3-tag[data-word="${word}"]`);
+  if (tag) {
+    tag.classList.add('redirected-tag');
+    v3OpenTag(tag);
+    setTimeout(() => tag.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+  }
+
+  const btnId = 'v3-sim-' +
+    (word === 'আলোচনায়' ? 'alocanay' : word === 'আলোচনার' ? 'alocanar' : 'gulo');
+  document.getElementById(btnId)?.classList.add('active');
+}
+
+/* ── Variant 1 toggle ── */
+function v1Toggle(row) { row.classList.toggle('expanded'); }
+
+/* ── Variant 2 toggle ── */
+function v2Toggle(card) {
+  card.classList.toggle('expanded');
+  const t = card.querySelector('.v2-toggle');
+  t.textContent = card.classList.contains('expanded') ? 'বন্ধ ▴' : 'বিস্তার ▾';
+}
+
+/* ── Variant 3: tag click → populate & show single panel ── */
+let v3ActiveWord = null;
+
+function v3OpenTag(tag) {
+  const word = tag.dataset.word;
+
+  // Toggle off if clicking the active tag
+  if (v3ActiveWord === word) {
+    v3ClosePanel();
+    return;
+  }
+
+  v3ActiveWord = word;
+
+  // Update tag highlights
+  document.querySelectorAll('#v3-tags .v3-tag').forEach(t => {
+    t.classList.remove('active');
+    if (t.dataset.word === word) t.classList.add('active');
+  });
+
+  // Populate panel
+  const panel   = document.getElementById('v3-panel');
+  const isRedir = tag.classList.contains('redirected-tag');
+
+  document.getElementById('v3-panel-word').textContent = word;
+  document.getElementById('v3-panel-type').textContent = tag.dataset.type;
+  document.getElementById('v3-panel-def').textContent  = tag.dataset.def;
+  document.getElementById('v3-panel-ex').textContent   = tag.dataset.ex;
+
+  const badge = document.getElementById('v3-panel-badge');
+  badge.style.display = isRedir ? 'inline' : 'none';
+
+  // Synonyms
+  const metaEl = document.getElementById('v3-panel-meta');
+  metaEl.innerHTML = '';
+  const syns = (tag.dataset.syn || '').split(',').filter(Boolean);
+  if (syns.length) {
+    const lbl = document.createElement('span');
+    lbl.className = 'v3-panel-meta-label'; lbl.textContent = 'সমার্থ';
+    metaEl.appendChild(lbl);
+    syns.forEach(s => {
+      const w = document.createElement('span');
+      w.className = 'v3-panel-meta-word'; w.textContent = s;
+      metaEl.appendChild(w);
+    });
+  }
+
+  panel.classList.toggle('redirected-panel', isRedir);
+  panel.classList.remove('open');
+  // Force reflow so animation re-triggers
+  void panel.offsetWidth;
+  panel.classList.add('open');
+}
+
+function v3ClosePanel() {
+  v3ActiveWord = null;
+  document.querySelectorAll('#v3-tags .v3-tag').forEach(t => t.classList.remove('active'));
+  document.getElementById('v3-panel').classList.remove('open');
+}
+
+// Wire up tag clicks
+document.querySelectorAll('#v3-tags .v3-tag').forEach(tag => {
+  tag.addEventListener('click', () => v3OpenTag(tag));
+});
+
+/* ── Hover bubble for Variant 3 tags ── */
+const bubble = document.getElementById('meaning-bubble');
+let bubbleTimer = null;
+
+function showBubble(el, meaning) {
+  clearTimeout(bubbleTimer);
+  bubble.textContent = meaning;
+  bubble.style.display = 'block';
+  bubble.style.opacity = '1';
+
+  requestAnimationFrame(() => {
+    const rect = el.getBoundingClientRect();
+    const bw = bubble.offsetWidth;
+    const bh = bubble.offsetHeight;
+    let top = rect.top - bh - 10;
+    let flip = false;
+    if (top < 8) { top = rect.bottom + 10; flip = true; }
+    let left = rect.left;
+    if (left + bw > window.innerWidth - 8) left = window.innerWidth - bw - 8;
+    bubble.style.top  = top + 'px';
+    bubble.style.left = left + 'px';
+    bubble.classList.toggle('flip', flip);
+  });
+}
+
+function hideBubble() {
+  bubbleTimer = setTimeout(() => {
+    bubble.style.opacity = '0';
+    setTimeout(() => { bubble.style.display = 'none'; }, 100);
+  }, 60);
+}
+
+document.querySelectorAll('#v3-tags .v3-tag').forEach(tag => {
+  tag.addEventListener('mouseenter', () => {
+    if (tag.classList.contains('active')) return;
+    showBubble(tag, tag.dataset.meaning);
+  });
+  tag.addEventListener('mouseleave', hideBubble);
+});
+
+/* Init */
+document.querySelectorAll('[id$="-sim-none"]').forEach(b => b.classList.add('active'));
+</script>
+</body>
+</html>

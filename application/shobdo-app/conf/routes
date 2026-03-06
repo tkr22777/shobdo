@@ -40,6 +40,9 @@ PUT     /api/v1/words/:id                                controllers.WordControl
 # 5. Delete word:
 DELETE  /api/v1/words/:id                                controllers.WordController.deleteWord(id: String)
 
+# 5b. Add inflections to a word:
+PUT     /api/v1/words/:id/inflections                    controllers.WordController.addInflectionsToWord(id: String)
+
 # 6. List words
 GET     /api/v1/words                                    controllers.WordController.listWords(startWordId: String?=null, limit: Integer?=null)
 

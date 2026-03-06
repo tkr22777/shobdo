@@ -29,7 +29,10 @@ public class AdminController extends Controller {
     private static final ShobdoLogger logger = new ShobdoLogger(AdminController.class);
 
     public AdminController() {
-        WordStoreMongoImpl wordStoreMongo = new WordStoreMongoImpl(MongoStoreFactory.getWordCollection());
+        WordStoreMongoImpl wordStoreMongo = new WordStoreMongoImpl(
+            MongoStoreFactory.getWordCollection(),
+            MongoStoreFactory.getInflectionIndexCollection()
+        );
         wordLogic = new WordLogic(wordStoreMongo, WordCache.getCache());
         userLogic = new UserLogic(new UserStoreMongoImpl(MongoStoreFactory.getUsersCollection()));
     }

@@ -3,6 +3,7 @@ import { useLikes } from '../context/LikeContext';
 import { useAuth } from '../context/AuthContext';
 import { submitMeaningCreation, submitMeaningUpdate } from '../api';
 import LikeButton from './LikeButton';
+import InflectionSection from './InflectionSection';
 
 function getBengaliDigit(n) {
   const zero = '০'.charCodeAt(0);
@@ -232,6 +233,11 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
 
     content = (
       <div className="article">
+        {data.inflectedFrom && (
+          <div className="inflection-redirect-banner">
+            ↩ আপনি &ldquo;{data.inflectedFrom}&rdquo; খুঁজেছিলেন — এটি &ldquo;{data.spelling}&rdquo;-এর একটি রূপ।
+          </div>
+        )}
         <h1 className="article-headline">{data.spelling}</h1>
         {deckText && <div className="article-deck">{deckText}</div>}
         <div className="article-byline" data-word-id={data.id}>
@@ -326,6 +332,11 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
             />
           )}
         </div>
+        <InflectionSection
+          inflections={data.inflections}
+          inflectedFrom={data.inflectedFrom}
+          onTagClick={onTagClick}
+        />
         {uniqueSynonyms.length > 0 && (
           <div className="article-footer">
             <div className="footer-label">সম্পর্কিত শব্দ</div>
