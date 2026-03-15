@@ -109,6 +109,18 @@ public class WordStoreMongoImpl implements WordStore {
     }
 
     @Override
+    public List<Word> getRandomWords(final int count) {
+        final Document matchStage = new Document("$match", Word.getActiveObjectQuery());
+        final Document sampleStage = new Document("$sample", new Document("size", count));
+        final List<Word> results = new ArrayList<>();
+        for (Document doc : wordCollection.aggregate(Arrays.asList(matchStage, sampleStage))) {
+            results.add(Word.fromBsonDoc(doc));
+        }
+        log.debug("getRandomWords count requested: " + count + " returned: " + results.size());
+        return results;
+    }
+
+    @Override
     public long count() {
         //TODO implement/verify
         return wordCollection.countDocuments();

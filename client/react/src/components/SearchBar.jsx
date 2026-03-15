@@ -45,7 +45,7 @@ export default function SearchBar({ value, transliterated, onChange, onSurprise,
   const handleSurprise = async () => {
     try {
       const data = await getRandomWord();
-      if (data?.spelling) onSurprise(data.spelling);
+      if (data?.spelling) onSurprise(data);
     } catch {}
   };
 

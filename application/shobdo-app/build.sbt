@@ -32,6 +32,10 @@ libraryDependencies += "com.google.api-client" % "google-api-client" % "2.0.0"
 libraryDependencies += "com.google.oauth-client" % "google-oauth-client-jetty" % "1.34.1"
 libraryDependencies += "com.google.apis" % "google-api-services-sheets" % "v4-rev20220927-2.0.0"
 
+// Include test/resources/ on the test classpath so test/resources/application.conf
+// (which omits SchedulerModule) takes precedence over conf/application.conf during tests
+unmanagedResourceDirectories in Test += baseDirectory.value / "test" / "resources"
+
 libraryDependencies += filters
 
 libraryDependencies ++= Seq(

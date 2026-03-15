@@ -1,6 +1,7 @@
 package unit;
 
 import exceptions.EntityDoesNotExist;
+import word.caches.RandomWordPool;
 import word.caches.WordCache;
 import word.stores.WordStore;
 import word.WordLogic;
@@ -14,6 +15,7 @@ import utilities.Constants;
 import utilities.ShobdoLogger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -235,6 +237,63 @@ public class WordLogicTest {
 
         verify(mockWordStore, never()).addInflectionsToWord(anyString(), anyList());
         verify(mockWordStore, never()).createInflectionIndex(any());
+    }
+
+    // ─── getRandomWord / fillRandomWordPool ───────────────────────────────────
+
+    @Test
+    public void getRandomWord_poolReady_servesFromPool() {
+        final RandomWordPool mockPool = mock(RandomWordPool.class);
+        when(mockPool.getRandom()).thenReturn(theWord);
+        final WordLogic wl = new WordLogic(mockWordStore, mockWordCache, mockPool);
+
+        final Word result = wl.getRandomWord();
+
+        assertEquals(theWord, result);
+        verify(mockWordStore, never()).getRandomWord();
+    }
+
+    @Test
+    public void getRandomWord_poolEmpty_fallsBackToStore() {
+        final RandomWordPool mockPool = mock(RandomWordPool.class);
+        when(mockPool.getRandom()).thenReturn(null);
+        when(mockWordStore.getRandomWord()).thenReturn(theWord);
+        final WordLogic wl = new WordLogic(mockWordStore, mockWordCache, mockPool);
+
+        final Word result = wl.getRandomWord();
+
+        assertEquals(theWord, result);
+        verify(mockWordStore, times(1)).getRandomWord();
+    }
+
+    @Test
+    public void fillRandomWordPool_storeReturnsWords_poolFilled() {
+        final RandomWordPool mockPool = mock(RandomWordPool.class);
+        // Return POOL_SIZE words in one batch so the loop exits immediately (no sleep iterations)
+        final List<Word> batch = new ArrayList<>();
+        for (int i = 0; i < RandomWordPool.POOL_SIZE; i++) {
+            batch.add(Word.builder().spelling("word" + i).build());
+        }
+        when(mockWordStore.getRandomWords(anyInt())).thenReturn(batch);
+        final WordLogic wl = new WordLogic(mockWordStore, mockWordCache, mockPool);
+
+        wl.fillRandomWordPool();
+
+        verify(mockPool, times(1)).clear();
+        verify(mockPool, atLeastOnce()).addWord(any(Word.class));
+    }
+
+    @Test
+    public void fillRandomWordPool_storeThrows_doesNotPropagateException() {
+        final RandomWordPool mockPool = mock(RandomWordPool.class);
+        when(mockWordStore.getRandomWords(anyInt())).thenThrow(new RuntimeException("DB error"));
+        final WordLogic wl = new WordLogic(mockWordStore, mockWordCache, mockPool);
+
+        // must not throw
+        wl.fillRandomWordPool();
+
+        verify(mockPool, times(1)).clear();
+        verify(mockPool, never()).addWord(any());
     }
 
     // ─── findInflectionBySpelling ─────────────────────────────────────────────
