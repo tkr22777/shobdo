@@ -6,6 +6,7 @@ import common.objects.EntityStatus;
 import exceptions.EntityDoesNotExist;
 import com.fasterxml.jackson.databind.JsonNode;
 import utilities.*;
+import word.caches.RandomWordPool;
 import word.caches.WordCache;
 import word.objects.Inflection;
 import word.objects.InflectionIndex;
@@ -22,13 +23,21 @@ public class WordLogic {
 
     private final WordStore wordStore;
     private final WordCache wordCache;
+    private final RandomWordPool randomWordPool;
 
     private static final ShobdoLogger logger = new ShobdoLogger(WordLogic.class);
 
     public WordLogic(final WordStore wordStore,
                      final WordCache wordCache) {
+        this(wordStore, wordCache, RandomWordPool.getInstance());
+    }
+
+    public WordLogic(final WordStore wordStore,
+                     final WordCache wordCache,
+                     final RandomWordPool randomWordPool) {
         this.wordStore = wordStore;
         this.wordCache = wordCache;
+        this.randomWordPool = randomWordPool;
     }
 
     private String generateWordId() {
@@ -116,11 +125,38 @@ public class WordLogic {
 
     /* GET a random word */
     public Word getRandomWord() {
+        final Word pooled = randomWordPool.getRandom();
+        if (pooled != null) return pooled;
+        // Fallback: pool not ready yet
         final Word word = wordStore.getRandomWord();
         if (word == null) {
             throw new EntityDoesNotExist("No words available in the dictionary");
         }
         return word;
+    }
+
+    public void fillRandomWordPool() {
+        try {
+            randomWordPool.clear();
+            int added = 0;
+            while (added < RandomWordPool.POOL_SIZE) {
+                final List<Word> batch = wordStore.getRandomWords(RandomWordPool.BATCH_SIZE);
+                if (batch.isEmpty()) break;
+                for (final Word w : batch) {
+                    randomWordPool.addWord(w);
+                    added++;
+                }
+                if (added < RandomWordPool.POOL_SIZE) {
+                    Thread.sleep(RandomWordPool.BATCH_SLEEP_MS);
+                }
+            }
+            logger.info("@WL012 Random word pool filled: " + added + " words");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("@WL013 Random word pool fill interrupted: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("@WL013 Failed to fill random word pool: " + e.getMessage());
+        }
     }
 
     /* GET word by id */

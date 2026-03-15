@@ -149,7 +149,22 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // Used by WotdStrip WOTD click, WotdStrip Surprise Me, and SearchBar Surprise Me
+  // Used by SearchBar Surprise Me — receives full word object from /random, skips re-fetch
+  const handleSurprise = useCallback((wordData) => {
+    const spelling = wordData?.spelling;
+    if (!spelling) return;
+    setSearchQuery(spelling);
+    setSelectedSpelling(spelling);
+    setViewMode('word');
+    performSearch(spelling);
+    if (wordData?.meanings) {
+      setWordDetail(wordData);
+    } else {
+      getWordDetail(spelling).then(setWordDetail).catch(() => {});
+    }
+  }, [performSearch]);
+
+  // Used by WotdStrip WOTD click, WotdStrip Surprise Me
   const handleNavigate = useCallback((spelling) => {
     setSearchQuery(spelling);
     setSelectedSpelling(spelling);
@@ -353,7 +368,7 @@ export default function App() {
         value={searchQuery}
         transliterated={transliterated}
         onChange={handleSearchChange}
-        onSurprise={handleNavigate}
+        onSurprise={handleSurprise}
         onShare={handleShare}
         inputRef={searchInputRef}
       />

@@ -21,6 +21,8 @@ public interface WordStore {
      void delete(String wordId);
      ArrayList<Word> list(String startWordId, int limit);
 
+     List<Word> getRandomWords(int count);
+
      /* Inflections */
      InflectionIndex findInflectionBySpelling(String spelling);
      InflectionIndex createInflectionIndex(InflectionIndex entry);

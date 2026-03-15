@@ -3,11 +3,15 @@ package modules;
 import akka.actor.ActorSystem;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import play.Configuration;
+import common.stores.MongoStoreFactory;
 import play.inject.ApplicationLifecycle;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import utilities.ShobdoLogger;
+import word.WordLogic;
 import word.caches.WordCache;
+import word.stores.WordStoreMongoImpl;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -42,25 +46,52 @@ public class SchedulerModule extends AbstractModule {
         @Inject
         public TaskScheduler(ActorSystem actorSystem,
                             ExecutionContext executionContext,
-                            ApplicationLifecycle lifecycle) {
+                            ApplicationLifecycle lifecycle,
+                            Configuration config) {
             this.actorSystem = actorSystem;
             this.executionContext = executionContext;
 
+            // Register stop hook first so it always fires
+            lifecycle.addStopHook(() -> {
+                log.debug("Shutting down scheduled tasks");
+                return CompletableFuture.completedFuture(null);
+            });
+
+            // Skip all scheduling when disabled (e.g. during tests)
+            if (!config.getBoolean("shobdo.scheduler.enabled", true)) {
+                log.debug("SchedulerModule disabled via shobdo.scheduler.enabled=false — skipping all tasks");
+                return;
+            }
+
+            final WordLogic wordLogic = new WordLogic(
+                new WordStoreMongoImpl(
+                    MongoStoreFactory.getWordCollection(),
+                    MongoStoreFactory.getInflectionIndexCollection()
+                ),
+                WordCache.getCache()
+            );
+
+            // Async startup fill — non-blocking, pool stays empty until done
+            CompletableFuture.runAsync(() -> wordLogic.fillRandomWordPool());
+
+            // Periodic refresh every 2 hours
+            actorSystem.scheduler().schedule(
+                Duration.create(2, TimeUnit.HOURS),
+                Duration.create(2, TimeUnit.HOURS),
+                () -> wordLogic.fillRandomWordPool(),
+                executionContext
+            );
+
             // Check if pinging is disabled via environment variable
             boolean pingDisabled = Boolean.parseBoolean(System.getenv(DISABLE_PING_ENV));
-            
+
             if (pingDisabled) {
                 log.info("Periodic ping task is disabled via " + DISABLE_PING_ENV + " environment variable");
             } else {
                 // Schedule the periodic task only if not disabled
                 this.schedulePeriodicTask();
             }
-            
-            // Graceful shutdown
-            lifecycle.addStopHook(() -> {
-                log.info("Shutting down scheduled tasks");
-                return CompletableFuture.completedFuture(null);
-            });
+
         }
 
         /**
