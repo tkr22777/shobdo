@@ -47,6 +47,20 @@ build-react: generate-react-env generate-sitemap
 start-docker-compose: build-react
 	docker-compose -f deploy/docker-compose.yml up -d
 
+build-combined-image:
+	$(eval GOOGLE_CLIENT_ID=$(shell grep --color=never '^SHOBDO_GOOGLE_CLIENT_ID=' deploy/local.env | cut -d'=' -f2-))
+	docker build \
+		--build-arg VITE_GOOGLE_CLIENT_ID=$(GOOGLE_CLIENT_ID) \
+		-f deploy/Dockerfile \
+		-t shobdo-combined \
+		.
+
+start-docker-compose-combined: build-combined-image
+	docker-compose -f deploy/docker-compose-combined.yml up -d
+
+stop-docker-compose-combined:
+	docker-compose -f deploy/docker-compose-combined.yml down
+
 stop-docker-compose:
 	docker-compose -f deploy/docker-compose.yml down
 

@@ -1,0 +1,17 @@
+version: '2'
+services:
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "../data/mongodump:/mongoshobdodump"
+      - "../data/mongodump/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro"
+
+  shobdo-combined:
+    image: "shobdo-combined"
+    ports:
+      - "32779:80"
+    env_file: local.env
+    depends_on:
+      - "mongo"
