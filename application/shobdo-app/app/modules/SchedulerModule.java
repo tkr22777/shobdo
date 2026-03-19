@@ -103,8 +103,7 @@ public class SchedulerModule extends AbstractModule {
                 Duration.create(10, TimeUnit.SECONDS),    // Start after 10 seconds
                 Duration.create(10, TimeUnit.SECONDS),    // Run every 10 seconds
                 () -> {
-                    pingUrl("https://shobdo.onrender.com");
-                    pingUrl("https://shobdo-1.onrender.com");
+                    pingUrl("https://www.shobdo.info");
                     WordCache.getCache().printCacheInfo();
                 },
                 executionContext
