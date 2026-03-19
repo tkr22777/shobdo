@@ -1,74 +1,89 @@
 # Shobdo — Backlog
 
 Feature ideas, technical debt, and future improvements.
+GitHub issues are the source of truth — this file is a human-readable summary.
 
 ---
 
-## Authentication & Sessions
+## Active / In Progress
 
-### [ ] Implement Google OAuth login
-- Use Google Identity Services JS SDK (frontend, just a `<script>` tag)
-- Backend: `POST /api/v1/auth/google` — receive ID token, verify with
-  `google-auth-library-java`, return a session token
-- Store user profile (email, name, Google subject ID) in MongoDB
-- Start with Play's signed cookie session (stateless, works for single instance)
+### [ ] Inflection data pipeline — #86
+All code is live (API + UI), but no words have inflection data yet.
+1. Run Gemini enrichment to generate `inflections.json` for ~107k words
+2. Write bulk upload script (doesn't exist yet)
+3. Upload to Atlas via `PUT /api/v1/words/:id/inflections`
 
-### [ ] Move session storage to Redis
-- **Why:** Play's signed cookie session is stateless — logout cannot truly
-  invalidate a token, and sessions cannot be revoked (e.g. "sign out of all
-  devices"). In a multi-instance deployment, stateless sessions work fine for
-  auth but offer no server-side control.
-- **How:** Generate a random session ID on login → store
-  `session:<id> → { userId, email, createdAt }` in Redis with a TTL (e.g. 7 days).
-  On each request, look up the session ID in Redis. Logout = delete the key.
-- **Infrastructure:** Redis is already in `deploy/docker-compose.yml`, just
-  commented out. Re-enable it and point `SHOBDO_REDIS_HOSTNAME` at it.
-- **When:** Before scaling to multiple backend instances, or when true
-  logout / session revocation is needed.
+### [ ] Configure Google OAuth credentials — #85
+All backend + frontend plumbing is done. Just needs real credentials:
+- Create OAuth Client ID at Google Cloud Console
+- Set `VITE_GOOGLE_CLIENT_ID` + `SHOBDO_GOOGLE_CLIENT_ID` in local env and Render
+
+---
+
+## Data & Discovery
+
+### [ ] Word discovery script — #87
+`src/discovery/query_prefix_sets.py` is built but paused mid-tuning.
+Fix: reword end-of-prompt to stop padding. Then run 895 prefix sets.
 
 ---
 
 ## Search & Discovery
 
-### [ ] Autocomplete / typeahead
-- New endpoint: `GET /api/v1/words/suggest?q=<prefix>`
-- Return top N prefix matches as a lightweight JSON array
-- Render as a dropdown below the search box while typing
+### [ ] Autocomplete / typeahead — #89
+New endpoint: `GET /api/v1/words/suggest?q=<prefix>` → dropdown while typing.
 
 ### [ ] Fuzzy / phonetic search
-- Handle common typos and near-spellings (e.g. "আমর" → "আমার")
-- MongoDB text index or custom Soundex/Metaphone matching
+Handle common typos and near-spellings (e.g. "আমর" → "আমার").
 
 ### [ ] Search by meaning
-- Full-text search across definition text, not just spelling
-- MongoDB `$text` index on the `meanings.*.text` field
-
----
-
-## Data & Content
-
-### [ ] Richer word schema
-- Add `partOfSpeech`, `pronunciation` (IPA), `difficulty`, `register`
-  (formal / colloquial / archaic) to the Meaning object
-
-### [ ] Word of the Day — deterministic seed
-- Current WOTD is random-per-load (cached in localStorage by date)
-- A server-side date-seeded endpoint would ensure all users see the
-  same word on the same day regardless of device/browser
+Full-text search across definition text. MongoDB `$text` index on `meanings.*.text`.
 
 ---
 
 ## Infrastructure
 
-### [ ] Re-enable Redis caching
-- Word cache (already implemented in `WordCache`) was disabled
-- Re-enabling reduces MongoDB load on popular words
+### [ ] Re-enable Redis caching — #88
+`WordCache` is implemented. Redis is in docker-compose (commented out). Just re-enable.
 
-### [ ] API rate limiting
-- No rate limiting on search or meaning endpoints currently
-- Add per-IP limits to prevent abuse
+### [ ] API rate limiting — #90
+No rate limiting exists. Start with Nginx `limit_req_zone` — no code changes needed.
+
+### [ ] Move session storage to Redis
+Before scaling to multiple backend instances. Current signed-cookie sessions can't
+be server-side revoked. Redis already in docker-compose.
 
 ### [ ] Health check improvements
-- `health-check.html` exists on the frontend
-- Backend `/api/v1/health` could return DB + cache connectivity status
-  rather than a static response
+`/api/v1/health` should return DB + Redis connectivity status, not a static response.
+
+### [ ] Address Dependabot security alerts — #70
+GitHub flagged 15 vulnerabilities (1 critical, 7 high, 7 moderate) as of 2026-03-19.
+See: https://github.com/tkr22777/shobdo/security/dependabot
+
+---
+
+## Data Schema
+
+### [ ] Richer word schema
+Add `pronunciation` (IPA), `difficulty`, `register` (formal/colloquial/archaic)
+to the Meaning object.
+
+---
+
+## Done (for reference)
+
+- [x] Google Sign-In backend + frontend plumbing (needs credentials — see #85)
+- [x] Multi-role user system (USER / REVIEWER / ADMIN / OWNER)
+- [x] Inflection support — backend schema, API, frontend UI (no data yet — see #86)
+- [x] Random word pool — O(1) surprise serving, 2000-word in-memory pool
+- [x] Word enrichment pipeline — 107,943 words in Atlas (was 42,545)
+- [x] Contribution UI — new word form, inline meaning edit, my submissions
+- [x] Reviewer approval UI
+- [x] Word of the Day — date-seeded, same word for all users on a given day
+- [x] OG preview cards for social bots (word URLs)
+- [x] PWA support — installable on iOS and Android
+- [x] Clickable synonym / antonym tags
+- [x] Custom domain — shobdo.info live on Render
+- [x] React + Vite frontend migration
+- [x] Sitemap (107,944 URLs)
+- [x] partOfSpeech badge on meanings
