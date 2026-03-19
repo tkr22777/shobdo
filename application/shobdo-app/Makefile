@@ -13,6 +13,9 @@ clean:
 	sbt clean
 
 test: spin-up-mongodb-container spin-up-redis-container
+	sbt test
+
+clean-test: spin-up-mongodb-container spin-up-redis-container
 	sbt clean test
 
 run: spin-up-mongodb-container spin-up-redis-container
