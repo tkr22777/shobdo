@@ -762,6 +762,46 @@ ul { list-style: none; }
 .about-article { max-width: 620px; }
 .about-article .article-body { column-count: 1; }
 
+/* ── Settings page ───────────────────────────────────────── */
+.settings-page { max-width: 520px; padding: 8px 0 48px; }
+.settings-header { margin-bottom: 8px; }
+.settings-section { border-top: 1px solid var(--border); padding: 20px 0; }
+.settings-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.settings-body-text { font-size: 0.92rem; line-height: 1.6; color: var(--text); margin: 0 0 6px; }
+.settings-meta { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+.theme-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.theme-btn:hover { border-color: var(--accent); }
+.theme-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.settings-account-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.settings-account-name { font-size: 0.9rem; color: var(--text); }
+.settings-signout-btn {
+  padding: 5px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.settings-signout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
 /* ============================================================
    SITE FOOTER
 ============================================================ */

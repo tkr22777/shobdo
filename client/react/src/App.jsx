@@ -52,7 +52,7 @@ export default function App() {
   const [searchResults, setSearchResults] = useState(null); // null = not yet searched
   const [selectedSpelling, setSelectedSpelling] = useState(null);
   const [wordDetail, setWordDetail] = useState(null);
-  const [viewMode, setViewMode] = useState('empty'); // 'empty' | 'word' | 'about' | 'status' | 'admin'
+  const [viewMode, setViewMode] = useState('empty'); // 'empty' | 'word' | 'settings' | 'admin' | 'contribute' | 'review'
   const [panelWidth, setPanelWidth] = useState(260);
   const [theme, setTheme] = useLocalStorage('theme', 'green');
 
@@ -194,27 +194,9 @@ export default function App() {
     navigator.clipboard.writeText(url.toString()).catch(() => {});
   }, [searchQuery, selectedSpelling, viewMode]);
 
-  const handleThemeToggle = useCallback((e) => {
+  const handleSettings = useCallback((e) => {
     e.preventDefault();
-    setTheme(prev => {
-      const idx = THEMES.indexOf(prev);
-      return THEMES[(idx + 1) % THEMES.length];
-    });
-  }, [setTheme]);
-
-  const handleAbout = useCallback((e) => {
-    e.preventDefault();
-    setViewMode('about');
-    setWordDetail(null);
-    setSelectedSpelling(null);
-    if (!isInitialLoad.current) {
-      window.history.replaceState({}, '', '/');
-    }
-  }, []);
-
-  const handleStatus = useCallback((e) => {
-    e.preventDefault();
-    setViewMode('status');
+    setViewMode('settings');
     setWordDetail(null);
     setSelectedSpelling(null);
     if (!isInitialLoad.current) {
@@ -405,13 +387,9 @@ export default function App() {
       </main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <span className="footer-copy">© ২০২৫ শব্দ · সংস্করণ ০.৯</span>
+          <span className="footer-copy">© ২০২৫ শব্দ</span>
           <div className="footer-links">
-            <a href="#" onClick={handleAbout}>পরিচিতি</a>
-            <span>·</span>
-            <a href="#" onClick={handleThemeToggle}>ভা-ব</a>
-            <span>·</span>
-            <a href="#" onClick={handleStatus}>স্টেটাস</a>
+            <a href="#" onClick={handleSettings}>সেটিংস</a>
             {user && (
               <>
                 <span>·</span>

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { submitMeaningCreation, submitMeaningUpdate } from '../api';
 import LikeButton from './LikeButton';
 import InflectionSection from './InflectionSection';
+import SettingsPage from './SettingsPage';
 
 function getBengaliDigit(n) {
   const zero = '০'.charCodeAt(0);
@@ -54,73 +55,6 @@ function EmptyState() {
   );
 }
 
-function AboutPage() {
-  return (
-    <div className="about-article">
-      <div className="article-kicker">ABOUT</div>
-      <h1 className="article-headline">পরিচিতি</h1>
-      <div className="article-deck">বাংলা ভাষার শব্দ ও অর্থের সন্ধানে।</div>
-      <div className="article-byline"><span>শব্দ টিম · MMXXIV</span></div>
-      <div className="article-body">
-        <p className="def-graf">শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।</p>
-      </div>
-    </div>
-  );
-}
-
-function StatusPage() {
-  const [status, setStatus] = useState('loading'); // 'loading' | 'healthy' | 'unhealthy'
-  const [details, setDetails] = useState(null);
-  const [error, setError] = useState(null);
-
-  const check = useCallback(() => {
-    setStatus('loading');
-    setDetails(null);
-    setError(null);
-    fetch('/api/v1/health', { headers: { Accept: 'application/json' } })
-      .then(res => res.json().then(data => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
-        setStatus(ok ? 'healthy' : 'unhealthy');
-        if (data && typeof data === 'object') setDetails(data);
-      })
-      .catch(err => {
-        setStatus('unhealthy');
-        setError(err.message);
-      });
-  }, []);
-
-  useEffect(() => { check(); }, [check]);
-
-  const statusText = status === 'loading'
-    ? 'যাচাই করা হচ্ছে…'
-    : status === 'healthy' ? 'Backend সচল আছে ✓' : 'Backend সচল নেই';
-
-  return (
-    <div className="about-article">
-      <div className="article-kicker">STATUS</div>
-      <h1 className="article-headline">স্ট্যাটাস</h1>
-      <div className="hc-status-row">
-        <span className={`hc-dot ${status}`}></span>
-        <span className="hc-status-text">{statusText}</span>
-      </div>
-      {details && (
-        <div className="hc-details-table">
-          <table className="hc-table">
-            <tbody>
-              {Object.entries(details).map(([k, v]) => (
-                <tr key={k}><th>{k}</th><td>{String(v)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      {error && <p className="hc-error">{error}</p>}
-      <div style={{ marginTop: '24px' }}>
-        <button className="hc-refresh-btn" onClick={check}>পুনরায় যাচাই</button>
-      </div>
-    </div>
-  );
-}
 
 const POS_OPTIONS = ['', 'বিশেষ্য', 'বিশেষণ', 'ক্রিয়া', 'অব্যয়', 'সর্বনাম', 'ক্রিয়াবিশেষণ'];
 
@@ -212,10 +146,8 @@ export default function WordDetail({ data, viewMode, onTagClick }) {
   };
 
   let content;
-  if (viewMode === 'about') {
-    content = <AboutPage />;
-  } else if (viewMode === 'status') {
-    content = <StatusPage />;
+  if (viewMode === 'settings') {
+    content = <SettingsPage />;
   } else if (!data) {
     content = <EmptyState />;
   } else {
