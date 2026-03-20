@@ -856,6 +856,31 @@ ul { list-style: none; }
   transition: color 0.2s ease;
 }
 
+.footer-theme-swatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.footer-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.footer-swatch:hover {
+  border-color: var(--accent);
+}
+
+.footer-swatch.active {
+  border-color: var(--swatch-ring, var(--accent));
+  box-shadow: 0 0 0 2px var(--swatch-ring, var(--accent));
+}
+
 .footer-links {
   display: flex;
   gap: 12px;

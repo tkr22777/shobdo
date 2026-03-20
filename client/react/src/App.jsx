@@ -384,14 +384,25 @@ export default function App() {
             data={wordDetail}
             viewMode={viewMode}
             onTagClick={handleTagClick}
-            theme={theme}
-            onThemeChange={handleThemeChange}
           />
         )}
       </main>
       <footer className="site-footer">
         <div className="footer-inner">
           <span className="footer-copy">© ২০২৫ শব্দ</span>
+          <div className="footer-theme-swatches">
+            {[{ id: 'green', label: 'সবুজ', bg: '#FBF8F0', ring: '#C4881A' },
+              { id: 'dark',  label: 'রাত',  bg: '#1A1510', ring: '#D4A83A' }].map(t => (
+              <button
+                key={t.id}
+                className={`footer-swatch${theme === t.id ? ' active' : ''}`}
+                style={{ background: t.bg, '--swatch-ring': t.ring }}
+                title={t.label}
+                onClick={() => handleThemeChange(t.id)}
+                aria-label={`থিম: ${t.label}`}
+              />
+            ))}
+          </div>
           <div className="footer-links">
             <a href="#" onClick={handleSettings}>সেটিংস</a>
             {user && (

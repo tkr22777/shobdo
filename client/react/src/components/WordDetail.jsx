@@ -119,7 +119,7 @@ function MeaningEditForm({ wordId, meaning, onDone }) {
   );
 }
 
-export default function WordDetail({ data, viewMode, onTagClick, theme, onThemeChange }) {
+export default function WordDetail({ data, viewMode, onTagClick }) {
   const { fetchLikeCount } = useLikes();
   const { user } = useAuth();
   const [shareCopied, setShareCopied] = useState(false);
@@ -147,7 +147,7 @@ export default function WordDetail({ data, viewMode, onTagClick, theme, onThemeC
 
   let content;
   if (viewMode === 'settings') {
-    content = <SettingsPage theme={theme} onThemeChange={onThemeChange} />;
+    content = <SettingsPage />;
   } else if (!data) {
     content = <EmptyState />;
   } else {

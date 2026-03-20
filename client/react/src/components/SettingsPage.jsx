@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const THEMES = [
-  { id: 'green', label: 'সবুজ' },
-  { id: 'dark',  label: 'রাত' },
-];
-
 function StatusCheck() {
   const [status, setStatus] = useState('loading');
   const [details, setDetails] = useState(null);
@@ -60,7 +55,7 @@ function StatusCheck() {
   );
 }
 
-export default function SettingsPage({ theme, onThemeChange }) {
+export default function SettingsPage() {
   const { user, signOut } = useAuth();
 
   return (
@@ -77,22 +72,6 @@ export default function SettingsPage({ theme, onThemeChange }) {
           শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও
           ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।
         </p>
-      </div>
-
-      {/* Appearance */}
-      <div className="settings-section">
-        <div className="settings-section-title">থিম</div>
-        <div className="theme-picker">
-          {THEMES.map(t => (
-            <button
-              key={t.id}
-              className={`theme-btn theme-btn--${t.id}${theme === t.id ? ' active' : ''}`}
-              onClick={() => onThemeChange(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Status */}
