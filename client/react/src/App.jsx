@@ -347,7 +347,7 @@ export default function App() {
         <meta property="og:url" content={pageUrl} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
-      <Masthead onNavigate={handleNavigate} theme={theme} onThemeChange={handleThemeChange} />
+      <Masthead onNavigate={handleNavigate} />
       <SearchBar
         value={searchQuery}
         transliterated={transliterated}
