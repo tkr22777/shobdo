@@ -407,8 +407,6 @@ export default function App() {
         <div className="footer-inner">
           <span className="footer-copy">© ২০২৫ শব্দ · সংস্করণ ০.৯</span>
           <div className="footer-links">
-            <a href="https://github.com/tkr22777/shobdo" target="_blank" rel="noopener noreferrer">গিটহাব</a>
-            <span>·</span>
             <a href="#" onClick={handleAbout}>পরিচিতি</a>
             <span>·</span>
             <a href="#" onClick={handleThemeToggle}>ভা-ব</a>

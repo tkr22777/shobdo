@@ -62,6 +62,15 @@ See: https://github.com/tkr22777/shobdo/security/dependabot
 
 ---
 
+## UX / Polish
+
+### [ ] PWA install prompt — surface "Add to Home Screen"
+PWA manifest + service worker are already in place (app is installable).
+Add an in-app install prompt so users on mobile are actively nudged to save
+the app to their home screen rather than relying on the browser's buried menu.
+
+---
+
 ## Data Schema
 
 ### [ ] Richer word schema
@@ -82,6 +91,7 @@ to the Meaning object.
 - [x] Word of the Day — date-seeded, same word for all users on a given day
 - [x] OG preview cards for social bots (word URLs)
 - [x] PWA support — installable on iOS and Android
+- [x] Remove GitHub repo link from footer
 - [x] Clickable synonym / antonym tags
 - [x] Custom domain — shobdo.info live on Render
 - [x] React + Vite frontend migration
