@@ -177,6 +177,32 @@ ul { list-style: none; }
 
 .mast-right a:hover { color: var(--accent); }
 
+.mast-theme-swatches {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.mast-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mast-swatch:hover {
+  border-color: var(--accent);
+}
+
+.mast-swatch.active {
+  border-color: var(--swatch-ring, var(--accent));
+  box-shadow: 0 0 0 2px var(--swatch-ring, var(--accent));
+}
+
 .mast-center { text-align: center; }
 
 .mast-script {

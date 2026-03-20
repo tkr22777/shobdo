@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const THEMES = [
   { id: 'green', label: 'সবুজ' },
@@ -61,18 +60,8 @@ function StatusCheck() {
   );
 }
 
-export default function SettingsPage() {
+export default function SettingsPage({ theme, onThemeChange }) {
   const { user, signOut } = useAuth();
-  const [theme, setTheme] = useLocalStorage('theme', 'green');
-
-  const handleTheme = (id) => {
-    setTheme(id);
-    if (id && id !== 'green') {
-      document.documentElement.setAttribute('data-theme', id);
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  };
 
   return (
     <div className="settings-page">
@@ -98,7 +87,7 @@ export default function SettingsPage() {
             <button
               key={t.id}
               className={`theme-btn theme-btn--${t.id}${theme === t.id ? ' active' : ''}`}
-              onClick={() => handleTheme(t.id)}
+              onClick={() => onThemeChange(t.id)}
             >
               {t.label}
             </button>

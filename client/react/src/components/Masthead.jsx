@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import AuthSlot from './AuthSlot';
 import WotdStrip from './WotdStrip';
 
-export default function Masthead({ onNavigate }) {
+const THEMES = [
+  { id: 'green', label: 'সবুজ', bg: '#FBF8F0', ring: '#C4881A' },
+  { id: 'dark',  label: 'রাত',  bg: '#1A1510', ring: '#D4A83A' },
+];
+
+export default function Masthead({ onNavigate, theme, onThemeChange }) {
   const [dateStr, setDateStr] = useState('');
 
   useEffect(() => {
@@ -24,6 +29,18 @@ export default function Masthead({ onNavigate }) {
             <div className="mast-subtitle">বাংলা শব্দকোষ · Bengali Dictionary</div>
           </div>
           <div className="mast-right">
+            <div className="mast-theme-swatches">
+              {THEMES.map(t => (
+                <button
+                  key={t.id}
+                  className={`mast-swatch${theme === t.id ? ' active' : ''}`}
+                  style={{ background: t.bg, '--swatch-ring': t.ring }}
+                  title={t.label}
+                  onClick={() => onThemeChange(t.id)}
+                  aria-label={`থিম: ${t.label}`}
+                />
+              ))}
+            </div>
             <AuthSlot />
             <span>{dateStr}</span><br />
             বাংলা · বাংলাদেশ

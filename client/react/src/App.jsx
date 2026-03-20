@@ -68,6 +68,10 @@ export default function App() {
     }
   }, [theme]);
 
+  const handleThemeChange = useCallback((id) => {
+    setTheme(id);
+  }, [setTheme]);
+
   // Core search logic — separated from debouncing
   const performSearch = useCallback(async (query) => {
     if (!query || !query.trim()) {
@@ -343,7 +347,7 @@ export default function App() {
         <meta property="og:url" content={pageUrl} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
-      <Masthead onNavigate={handleNavigate} />
+      <Masthead onNavigate={handleNavigate} theme={theme} onThemeChange={handleThemeChange} />
       <SearchBar
         value={searchQuery}
         transliterated={transliterated}
@@ -380,6 +384,8 @@ export default function App() {
             data={wordDetail}
             viewMode={viewMode}
             onTagClick={handleTagClick}
+            theme={theme}
+            onThemeChange={handleThemeChange}
           />
         )}
       </main>
