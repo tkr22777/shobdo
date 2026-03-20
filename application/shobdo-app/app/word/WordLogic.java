@@ -70,6 +70,10 @@ public class WordLogic {
             throw new IllegalArgumentException(Constants.MESSAGES_SPELLING_NULLOREMPTY);
         }
 
+        if (BanglaUtil.containsForeignScript(word.getSpelling())) {
+            throw new IllegalArgumentException(Constants.Messages.ForeignScriptSpelling(word.getSpelling()));
+        }
+
         final Word existingWord = wordStore.getBySpelling(word.getSpelling());
         if (existingWord != null) {
             throw new IllegalArgumentException(Constants.Messages.SpellingExists(word.getSpelling()));

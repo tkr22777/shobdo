@@ -44,6 +44,10 @@ public final class Constants {
             return String.format("Spelling '%s' is an inflected form of another word and cannot be a root entry", spelling);
         }
 
+        public static String ForeignScriptSpelling(final String spelling) {
+            return String.format("Spelling '%s' contains foreign-script characters (e.g. Devanagari, Arabic). Only Bengali characters and common punctuation are allowed.", spelling);
+        }
+
         public static String EntityNotFound(final String entityId) {
             return String.format("Entity not found for id:%s", entityId);
         }
