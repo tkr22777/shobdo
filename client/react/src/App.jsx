@@ -35,8 +35,6 @@ function buildWordUrl(spelling, lang = 'bn', targetLang = null, query = '') {
   return url;
 }
 
-const THEMES = ['green', 'dark', 'blue', 'light'];
-
 function debounce(fn, ms) {
   let t;
   return (...args) => {

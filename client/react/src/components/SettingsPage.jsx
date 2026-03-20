@@ -5,8 +5,6 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 const THEMES = [
   { id: 'green', label: 'সবুজ' },
   { id: 'dark',  label: 'রাত' },
-  { id: 'blue',  label: 'নীল' },
-  { id: 'light', label: 'আলো' },
 ];
 
 function StatusCheck() {
@@ -90,12 +88,11 @@ export default function SettingsPage() {
           শব্দ একটি বাংলা অভিধান অ্যাপ্লিকেশন। এটি বাংলা শব্দের অর্থ, প্রয়োগ ও
           ব্যাকরণগত বৈশিষ্ট্য খুঁজে পেতে সাহায্য করে।
         </p>
-        <p className="settings-meta">শব্দ টিম · MMXXIV · সংস্করণ ০.৯</p>
       </div>
 
       {/* Appearance */}
       <div className="settings-section">
-        <div className="settings-section-title">চেহারা</div>
+        <div className="settings-section-title">থিম</div>
         <div className="theme-picker">
           {THEMES.map(t => (
             <button
