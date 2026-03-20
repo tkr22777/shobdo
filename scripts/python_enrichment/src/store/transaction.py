@@ -103,21 +103,25 @@ class WordTransaction:
     # ------------------------------------------------------------------
 
     def __enter__(self) -> "WordTransaction":
-        if self.snapshot:
-            if self.pre_snapshot_id:
-                # Use a caller-supplied snapshot as the rollback point
-                snap = self._store.get(self.pre_snapshot_id)
-                if snap is None:
-                    raise FileNotFoundError(
-                        f"Pre-snapshot '{self.pre_snapshot_id}' not found."
-                    )
-                self._pre_snap = snap
-                logger.info(f"[{self.label}] Using existing pre-snapshot: {snap['id']}")
+        try:
+            if self.snapshot:
+                if self.pre_snapshot_id:
+                    # Use a caller-supplied snapshot as the rollback point
+                    snap = self._store.get(self.pre_snapshot_id)
+                    if snap is None:
+                        raise FileNotFoundError(
+                            f"Pre-snapshot '{self.pre_snapshot_id}' not found."
+                        )
+                    self._pre_snap = snap
+                    logger.info(f"[{self.label}] Using existing pre-snapshot: {snap['id']}")
+                else:
+                    self._pre_snap = self._store.create(label=f"{self.label}-pre")
+                    logger.info(f"[{self.label}] Pre-snapshot: {self._pre_snap['id']}")
             else:
-                self._pre_snap = self._store.create(label=f"{self.label}-pre")
-                logger.info(f"[{self.label}] Pre-snapshot: {self._pre_snap['id']}")
-        else:
-            logger.info(f"[{self.label}] Snapshot disabled — no rollback available")
+                logger.info(f"[{self.label}] Snapshot disabled — no rollback available")
+        except Exception:
+            self.client.close()
+            raise
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool:

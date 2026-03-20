@@ -25,39 +25,27 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from generation.utils_missing import GEMINI_MODEL, generate_missing_word
 from logger import logger
+from utils import load_json, save_json
+from word_client.client import WordClient, WordNotFoundError
 
 sys.stdout.reconfigure(encoding="utf-8")
 
 
-def load_json(path: Path, default):
+def lookup_root_word(client: WordClient, root: str) -> dict | None:
+    """GET /api/v1/bn/word/{spelling} via shared WordClient — returns payload if found, else None."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return default
-
-
-def save_json(path: Path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-
-
-def lookup_root_word(api_base: str, root: str) -> dict | None:
-    """GET /api/v1/bn/word/{spelling} — returns payload if found, else None."""
-    try:
-        url = f"{api_base}/api/v1/bn/word/{requests.utils.quote(root, safe='')}"
-        resp = requests.get(url, timeout=5)
-        return resp.json() if resp.status_code == 200 else None
-    except requests.exceptions.RequestException:
+        return client.get_by_spelling(root)
+    except WordNotFoundError:
+        return None
+    except Exception:
         return None
 
 
-def process_word(word: str, api_base: str):
+def process_word(word: str, client: WordClient):
     """Call Gemini and parse the response for a single word."""
     raw = generate_missing_word(word)
     try:
@@ -76,7 +64,7 @@ def process_word(word: str, api_base: str):
     # Inflection detected — look up the root in the DB
     if not data.get("valid") and data.get("inflection"):
         root = data.get("root", "")
-        root_payload = lookup_root_word(api_base, root) if root else None
+        root_payload = lookup_root_word(client, root) if root else None
         data["_root_found"] = root_payload is not None
         data["_root_id"] = root_payload.get("id") if root_payload else None
 
@@ -165,8 +153,8 @@ def main():
     processed = errors = 0
     valid_added = inflections_added = discarded_added = 0
 
-    with ThreadPoolExecutor(max_workers=args.threads) as executor:
-        futures = {executor.submit(process_word, w, args.api_base): w for w in words_to_process}
+    with WordClient(args.api_base) as client, ThreadPoolExecutor(max_workers=args.threads) as executor:
+        futures = {executor.submit(process_word, w, client): w for w in words_to_process}
 
         for future in as_completed(futures):
             word = futures[future]

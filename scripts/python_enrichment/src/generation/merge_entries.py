@@ -1,14 +1,13 @@
 """Merge per-worker output files into final generated_entries.json and discarded_words.json.
 
 Usage:
-    python src/merge_entries.py               # merge all workers
-    python src/merge_entries.py --status      # show per-worker progress without merging
-    python src/merge_entries.py --workers-dir data/workers --total-workers 4
+    python src/generation/merge_entries.py               # merge all workers
+    python src/generation/merge_entries.py --status      # show per-worker progress without merging
+    python src/generation/merge_entries.py --workers-dir data/generation --total-workers 4
 """
 
 import argparse
 import glob
-import json
 import os
 import sys
 from pathlib import Path
@@ -16,32 +15,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from logger import logger
+from utils import load_json, save_json
 
 sys.stdout.reconfigure(encoding="utf-8")
 
 
-def load_json_file(path, default):
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return default
-
-
-def save_json_file(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
 def discover_workers(workers_dir: str):
     """Return sorted list of worker IDs found in the workers directory."""
-    pattern = os.path.join(workers_dir, "worker_*_entries.json")
+    pattern = os.path.join(workers_dir, "worker_*", "entries.json")
     paths = glob.glob(pattern)
     ids = []
     for p in paths:
-        name = os.path.basename(p)          # worker_3_entries.json
+        dir_name = os.path.basename(os.path.dirname(p))   # worker_3
         try:
-            wid = int(name.split("_")[1])
+            wid = int(dir_name.split("_")[1])
             ids.append(wid)
         except (IndexError, ValueError):
             pass
@@ -51,7 +38,7 @@ def discover_workers(workers_dir: str):
 def load_input_shard_sizes(input_path: str, total_workers: int):
     """Return how many words each worker owns given the input file and total_workers."""
     try:
-        raw = load_json_file(input_path, [])
+        raw = load_json(input_path, [])
         all_pairs = raw["missing_words"] if isinstance(raw, dict) else raw
         all_words = [w for w, _ in all_pairs]
     except Exception:
@@ -65,7 +52,7 @@ def load_input_shard_sizes(input_path: str, total_workers: int):
 
 def main():
     parser = argparse.ArgumentParser(description="Merge per-worker Gemini output files")
-    parser.add_argument("--workers-dir", default="data/workers")
+    parser.add_argument("--workers-dir", default="data/generation")
     parser.add_argument("--out", default="data/generated_entries.json")
     parser.add_argument("--discarded-out", default="data/discarded_words.json")
     parser.add_argument("--input", default="data/missing_words_compact.json",
@@ -100,11 +87,11 @@ def main():
     grand_shard = 0
 
     for wid in range(total_workers):
-        entries_path = os.path.join(args.workers_dir, f"worker_{wid}_entries.json")
-        dis_path = os.path.join(args.workers_dir, f"worker_{wid}_discarded.json")
+        entries_path = os.path.join(args.workers_dir, f"worker_{wid}", "entries.json")
+        dis_path = os.path.join(args.workers_dir, f"worker_{wid}", "discarded.json")
 
-        entries = load_json_file(entries_path, {})
-        discarded = load_json_file(dis_path, [])
+        entries = load_json(entries_path, {})
+        discarded = load_json(dis_path, [])
         done = len(entries) + len(discarded)
         shard_size = shard_sizes.get(wid, "?")
         remaining = (shard_size - done) if isinstance(shard_size, int) else "?"
@@ -129,10 +116,24 @@ def main():
         f"valid: {grand_valid} | discarded: {grand_discarded}"
     )
 
+    missing_workers = [wid for wid in range(total_workers) if wid not in worker_ids]
+    if missing_workers:
+        logger.warning(
+            f"Workers with no output files: {missing_workers} — their shard will be absent from the merge. "
+            f"Re-run those workers or pass --total-workers to suppress if intentional."
+        )
+
     if args.status or args.dry_run:
         if args.dry_run:
             logger.info("[DRY RUN] Imports OK. Would merge workers into output files. No writes.")
         return
+
+    if missing_workers:
+        logger.error(
+            f"Refusing to merge: {len(missing_workers)} worker(s) missing output ({missing_workers}). "
+            f"Run them first or remove --total-workers to merge only present workers."
+        )
+        sys.exit(1)
 
     # ── Merge ────────────────────────────────────────────────────────────────
     logger.info("Merging worker outputs...")
@@ -143,11 +144,11 @@ def main():
     duplicates = 0
 
     for wid in sorted(worker_ids):
-        entries_path = os.path.join(args.workers_dir, f"worker_{wid}_entries.json")
-        dis_path = os.path.join(args.workers_dir, f"worker_{wid}_discarded.json")
+        entries_path = os.path.join(args.workers_dir, f"worker_{wid}", "entries.json")
+        dis_path = os.path.join(args.workers_dir, f"worker_{wid}", "discarded.json")
 
-        entries = load_json_file(entries_path, {})
-        discarded = load_json_file(dis_path, [])
+        entries = load_json(entries_path, {})
+        discarded = load_json(dis_path, [])
 
         for word, entry_list in entries.items():
             if word in merged_entries:
@@ -162,8 +163,8 @@ def main():
                 merged_discarded.append(item)
                 seen_discarded.add(word)
 
-    save_json_file(args.out, merged_entries)
-    save_json_file(args.discarded_out, merged_discarded)
+    save_json(args.out, merged_entries)
+    save_json(args.discarded_out, merged_discarded)
 
     logger.info(f"Merged — valid entries: {len(merged_entries)} → {args.out}")
     logger.info(f"Merged — discarded words: {len(merged_discarded)} → {args.discarded_out}")

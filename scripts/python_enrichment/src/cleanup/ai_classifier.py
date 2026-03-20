@@ -93,7 +93,7 @@ def _call_ai(words: list[WordInput]) -> list[ClassificationResult]:
                 response_mime_type="application/json",
             ),
         )
-        return _parse_response(response.text, words)
+        # Parse response.text as JSON and return a list of ClassificationResult dicts.
 
     The prompt should instruct the model to return a JSON array:
     [

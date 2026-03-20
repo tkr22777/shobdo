@@ -41,8 +41,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from pymongo import MongoClient
 
 from src.cleanup.ai_classifier import ClassificationResult, classify_batch
-from src.cleanup.archiver import create_snapshot
 from src.logger import setup_logger
+from src.store.snapshot import SnapshotStore
 
 logger = setup_logger("batch_processor")
 
@@ -59,15 +59,15 @@ SAVE_INTERVAL = 5   # save progress every N batches
 
 def load_words(mongo_uri: str, db_name: str) -> list[dict]:
     """Fetch all ACTIVE words (id + spelling only) from MongoDB."""
-    client = MongoClient(mongo_uri)
-    collection = client[db_name]["Words"]
-    words = [
-        {"id": doc["id"], "spelling": doc["spelling"]}
-        for doc in collection.find(
-            {"status": "ACTIVE"},
-            {"id": 1, "spelling": 1, "_id": 0},
-        )
-    ]
+    with MongoClient(mongo_uri) as client:
+        collection = client[db_name]["Words"]
+        words = [
+            {"id": doc["id"], "spelling": doc["spelling"]}
+            for doc in collection.find(
+                {"status": "ACTIVE"},
+                {"id": 1, "spelling": 1, "_id": 0},
+            )
+        ]
     logger.info(f"Loaded {len(words):,} ACTIVE words from MongoDB")
     return words
 
@@ -292,11 +292,10 @@ def main():
             )
         else:
             try:
-                create_snapshot(
+                SnapshotStore(
                     container=args.snapshot_container,
                     db=args.db,
-                    label=args.snapshot_label,
-                )
+                ).create(label=args.snapshot_label)
             except RuntimeError as e:
                 logger.error(f"Snapshot failed: {e}")
                 sys.exit(1)

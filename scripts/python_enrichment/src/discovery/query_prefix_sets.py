@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import settings
 from logger import logger
+from utils import load_json, save_json
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -161,22 +162,6 @@ def query_set(set_index: int, prefix: str, words: list[str],
         "suggested": suggested,
         "raw_count": len(suggested),
     }
-
-
-# ── I/O helpers ───────────────────────────────────────────────────────────────
-
-def load_json(path: str, default):
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return default
-
-
-def save_json(path: str, data):
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────

@@ -175,7 +175,7 @@ class SnapshotStore:
                     metas.append(meta)
                     continue
                 except json.JSONDecodeError:
-                    pass
+                    logger.warning(f"Corrupted meta.json in snapshot '{d.name}' — falling back to directory name heuristic")
             # Fallback: synthesise from directory name
             metas.append({
                 "id": d.name,

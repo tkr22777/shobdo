@@ -40,6 +40,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import urllib.parse
+
 import requests
 
 from src.logger import setup_logger
@@ -142,7 +144,6 @@ class WordClient:
         (the response will include an ``inflectedFrom`` field in that case).
         Raises WordNotFoundError if not found at all.
         """
-        import urllib.parse
         encoded = urllib.parse.quote(spelling, safe="")
         return self._get(f"/api/v1/bn/word/{encoded}")
 
