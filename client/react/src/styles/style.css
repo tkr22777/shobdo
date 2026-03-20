@@ -347,6 +347,57 @@ ul { list-style: none; }
 
 .share-btn:hover { color: var(--accent); }
 
+#wordSearchBox:has(~ .search-suggestions),
+.search-wrap:has(.search-suggestions) #wordSearchBox {
+  border-radius: 100px 100px 0 0;
+  border-bottom-color: transparent;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 12px rgba(28, 21, 16, 0.12);
+  z-index: 100;
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestion-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 1rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.suggestion-item .search-icon {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  color: var(--muted);
+}
+
+.suggestion-item:hover,
+.suggestion-item.highlighted {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+.suggestion-item:first-child {
+  border-top: 1px solid var(--border);
+}
+
 .transliteration-container {
   width: 100%;
   max-width: 520px;

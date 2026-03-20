@@ -47,6 +47,7 @@ export default function App() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [transliterated, setTransliterated] = useState('');
+  const [candidates, setCandidates] = useState([]);
   const [searchResults, setSearchResults] = useState(null); // null = not yet searched
   const [selectedSpelling, setSelectedSpelling] = useState(null);
   const [wordDetail, setWordDetail] = useState(null);
@@ -72,18 +73,33 @@ export default function App() {
     setTheme(id);
   }, [setTheme]);
 
+  // Search directly with a Bengali string — used by candidate selection
+  const performSearchDirect = useCallback(async (bengaliString) => {
+    setCandidates([]);
+    setTransliterated('অনুসন্ধানকৃত শব্দ: ' + bengaliString);
+    try {
+      const results = await searchWords(bengaliString);
+      setSearchResults(results || []);
+    } catch {
+      setSearchResults([]);
+    }
+  }, []);
+
   // Core search logic — separated from debouncing
   const performSearch = useCallback(async (query) => {
     if (!query || !query.trim()) {
       setSearchResults(null);
       setTransliterated('');
+      setCandidates([]);
       return;
     }
     const parser = new RidmikParser();
     const hasEnglish = /[a-z]/i.test(query);
-    const searchString = hasEnglish ? parser.toBangla(query) : query;
+    const allCandidates = hasEnglish ? parser.toCandidates(query) : [];
+    const searchString = hasEnglish ? (allCandidates[0] || parser.toBangla(query)) : query;
 
     setTransliterated(hasEnglish ? 'অনুসন্ধানকৃত শব্দ: ' + searchString : '');
+    setCandidates(hasEnglish && allCandidates.length > 1 ? allCandidates : []);
 
     // Only hit the API if the resolved string is Bengali (no remaining English)
     if (!/[a-z]/i.test(searchString)) {
@@ -133,17 +149,28 @@ export default function App() {
   }, [searchQuery, selectedSpelling, viewMode]);
 
   // Handlers
+  const handleCandidateSelect = useCallback((candidate) => {
+    setSearchQuery(candidate);
+    performSearchDirect(candidate);
+  }, [performSearchDirect]);
+
+  const handleDismissCandidates = useCallback(() => {
+    setCandidates([]);
+  }, []);
+
   const handleSearchChange = useCallback((val) => {
     setSearchQuery(val);
     if (!val.trim()) {
       setSearchResults(null);
       setTransliterated('');
+      setCandidates([]);
       return;
     }
     debouncedSearch(val);
   }, [debouncedSearch]);
 
   const handleWordSelect = useCallback((word) => {
+    setCandidates([]);
     setSelectedSpelling(word.spelling);
     setViewMode('word');
     getWordDetail(word.spelling)
@@ -351,9 +378,12 @@ export default function App() {
       <SearchBar
         value={searchQuery}
         transliterated={transliterated}
+        candidates={candidates}
         onChange={handleSearchChange}
         onSurprise={handleSurprise}
         onShare={handleShare}
+        onCandidateSelect={handleCandidateSelect}
+        onDismissCandidates={handleDismissCandidates}
         inputRef={searchInputRef}
       />
       <main className="main-layout">

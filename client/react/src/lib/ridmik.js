@@ -195,6 +195,42 @@ function BanglaUnicode() {
 function RidmikParser() {
   var unicode = new BanglaUnicode();
 
+  this.toCandidates = function (engWord) {
+    const primary = this.toBangla(engWord);
+    if (!primary) return [];
+
+    const SUBS = {
+      '\u09B8': ['\u09B6', '\u09B7'],  // স → শ ষ
+      '\u09B6': ['\u09B8', '\u09B7'],  // শ → স ষ
+      '\u09B7': ['\u09B6', '\u09B8'],  // ষ → শ স
+      '\u09A8': ['\u09A3'],            // ন → ণ
+      '\u09A3': ['\u09A8'],            // ণ → ন
+      '\u09A4': ['\u099F'],            // ত → ট
+      '\u099F': ['\u09A4'],            // ট → ত
+      '\u09A6': ['\u09A1'],            // দ → ড
+      '\u09A1': ['\u09A6'],            // ড → দ
+      '\u099C': ['\u09AF'],            // জ → য
+      '\u09AF': ['\u099C'],            // য → জ
+    };
+
+    const seen = new Set([primary]);
+    const results = [primary];
+
+    for (let i = 0; i < primary.length; i++) {
+      const alts = SUBS[primary[i]];
+      if (!alts) continue;
+      for (const alt of alts) {
+        const variant = primary.slice(0, i) + alt + primary.slice(i + 1);
+        if (!seen.has(variant)) {
+          seen.add(variant);
+          results.push(variant);
+        }
+      }
+    }
+
+    return results;
+  };
+
   this.toBangla = function (engWord) {
     var st = new StringBuilder('');
     var carry = 0;

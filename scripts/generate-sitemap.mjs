@@ -10,12 +10,13 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
+import { gunzipSync } from 'zlib';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const BSON_PATH    = resolve(__dirname, '../data/mongodump/Dictionary/Words.bson');
+const ARCHIVE_PATH = resolve(__dirname, '../data/mongodump/Dictionary.gz');
 const SITEMAP_PATH = resolve(__dirname, '../client/react/public/sitemap.xml');
 const BASE_URL     = 'https://www.shobdo.info';
 const TODAY        = new Date().toISOString().split('T')[0];
@@ -57,11 +58,14 @@ function skipValue(buf, pos, type) {
   }
 }
 
-function extractSpellings(buf) {
+function extractSpellings(buf, startOffset = 0) {
   const spellings = [];
-  let offset = 0;
+  let offset = startOffset;
 
   while (offset + 4 <= buf.length) {
+    // Skip 0xFFFFFFFF terminators used in mongodump archive format
+    if (buf.readUInt32LE(offset) === 0xFFFFFFFF) { offset += 4; continue; }
+
     const docSize = buf.readInt32LE(offset);
     if (docSize < 5 || offset + docSize > buf.length) break;
 
@@ -139,9 +143,10 @@ function buildSitemap(spellings) {
 // Main
 // ---------------------------------------------------------------------------
 
-console.log(`Reading ${BSON_PATH} …`);
-const buf = readFileSync(BSON_PATH);
-const spellings = extractSpellings(buf);
+console.log(`Reading ${ARCHIVE_PATH} …`);
+const compressed = readFileSync(ARCHIVE_PATH);
+const buf = gunzipSync(compressed);
+const spellings = extractSpellings(buf, 4); // offset 4 skips the 4-byte magic
 console.log(`Found ${spellings.length} words.`);
 
 const xml = buildSitemap(spellings);

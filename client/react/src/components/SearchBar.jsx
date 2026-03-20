@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getRandomWord } from '../api';
 
 const SearchSVG = () => (
@@ -39,8 +39,27 @@ const CheckSVG = () => (
   </svg>
 );
 
-export default function SearchBar({ value, transliterated, onChange, onSurprise, onShare, inputRef }) {
+export default function SearchBar({ value, transliterated, candidates = [], onChange, onSurprise, onShare, onCandidateSelect, onDismissCandidates, inputRef }) {
   const [copied, setCopied] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const wrapRef = useRef(null);
+
+  // Reset highlight when candidates change
+  useEffect(() => {
+    setHighlightedIndex(-1);
+  }, [candidates]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!candidates.length) return;
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        onDismissCandidates?.();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [candidates, onDismissCandidates]);
 
   const handleSurprise = async () => {
     try {
@@ -55,9 +74,29 @@ export default function SearchBar({ value, transliterated, onChange, onSurprise,
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleKeyDown = (e) => {
+    if (!candidates.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.min(i + 1, candidates.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      onCandidateSelect(candidates[highlightedIndex]);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onDismissCandidates?.();
+    }
+  };
+
+  const showDropdown = candidates.length > 1;
+
   return (
     <div className="search-section">
-      <div className="search-wrap">
+      <div className="search-wrap" ref={wrapRef}>
         <SearchSVG />
         <label htmlFor="wordSearchBox" className="sr-only">শব্দ খুঁজুন</label>
         <input
@@ -66,8 +105,12 @@ export default function SearchBar({ value, transliterated, onChange, onSurprise,
           ref={inputRef}
           value={value}
           onChange={e => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="শব্দ খুঁজুন..."
           autoComplete="off"
+          aria-autocomplete="list"
+          aria-expanded={showDropdown}
+          aria-haspopup="listbox"
         />
         <button
           id="surpriseBtn"
@@ -88,6 +131,27 @@ export default function SearchBar({ value, transliterated, onChange, onSurprise,
         >
           {copied ? <CheckSVG /> : <ShareSVG />}
         </button>
+        {showDropdown && (
+          <ul className="search-suggestions" role="listbox" aria-label="বানানের বিকল্পসমূহ">
+            {candidates.map((candidate, idx) => (
+              <li
+                key={candidate}
+                role="option"
+                aria-selected={idx === highlightedIndex}
+                className={`suggestion-item${idx === highlightedIndex ? ' highlighted' : ''}`}
+                onMouseEnter={() => setHighlightedIndex(idx)}
+                onMouseLeave={() => setHighlightedIndex(-1)}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // prevent input blur
+                  onCandidateSelect(candidate);
+                }}
+              >
+                <SearchSVG />
+                {candidate}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="transliteration-container">
         <span
