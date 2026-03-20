@@ -62,6 +62,17 @@ See: https://github.com/tkr22777/shobdo/security/dependabot
 
 ---
 
+## Content & Moderation
+
+### [ ] Vulgarity classification + user filter
+Add a `vulgarityLevel` field to the Word schema (e.g. `NONE`, `MILD`, `EXPLICIT`).
+- **Data**: classify existing 107k words via AI (fits naturally into the cleanup pipeline)
+- **Backend**: store level on Word; filter out `EXPLICIT` (or configurable threshold) in search results when requested
+- **Settings**: toggle in সেটিংস page — "অশ্লীল শব্দ দেখাও / লুকাও"; preference saved to localStorage
+- **Default**: explicit words hidden by default
+
+---
+
 ## UX / Polish
 
 ### [ ] PWA install prompt — surface "Add to Home Screen"
