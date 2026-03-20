@@ -109,6 +109,9 @@ Thumbs.db
 data/mongodump/snapshots/
 data/mongodump/Dictionary/
 
+# Python enrichment — generated data files (local only)
+scripts/python_enrichment/data/
+
 # Build output
 target/
 dist/

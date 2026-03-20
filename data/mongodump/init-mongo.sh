@@ -5,6 +5,5 @@
 set -e
 
 echo "Restoring Shobdo dictionary dump..."
-cd /mongoshobdodump
-mongorestore -d Dictionary ./Dictionary/
+mongorestore --archive=/mongoshobdodump/Dictionary.gz --gzip --drop
 echo "Restore complete."
