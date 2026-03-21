@@ -423,10 +423,9 @@ export default function App() {
           <div className="footer-theme-swatches">
             {[{ id: 'green',      label: 'সবুজ',   bg: '#FBF8F0', ring: '#C4881A' },
               { id: 'dark',       label: 'রাত',    bg: '#1A1510', ring: '#D4A83A' },
-              { id: 'gray',       label: 'পাথর',   bg: '#F4F4F6', ring: '#4A7FA0' },
-              { id: 'dark-gray',  label: 'কয়লা',  bg: '#16161A', ring: '#9580CC' },
+              { id: 'gray',       label: 'পাথর',   bg: '#E4E4E8', ring: '#4A7FA0' },
               { id: 'dark-green', label: 'অরণ্য',  bg: '#0C1A10', ring: '#52D468' },
-              { id: 'dark-red',   label: 'রক্তিম', bg: '#180808', ring: '#E86868' },
+              { id: 'dark-red',   label: 'রক্তিম', bg: '#160404', ring: '#C41C1C' },
             ].map(t => (
               <button
                 key={t.id}
