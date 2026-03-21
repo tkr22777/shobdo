@@ -39,12 +39,14 @@ public class MongoStoreFactory {
     private static final String COLLECTION_USERS = ConfigFactory.load().getString("shobdo.mongodb.database.collection.users");
     private static final String COLLECTION_LIKES = ConfigFactory.load().getString("shobdo.mongodb.database.collection.likes");
     private static final String COLLECTION_INFLECTION_INDEX = ConfigFactory.load().getString("shobdo.mongodb.database.collection.inflectionindex");
+    private static final String COLLECTION_ANALYTICS        = ConfigFactory.load().getString("shobdo.mongodb.database.collection.analytics");
 
     private static MongoCollection<Document> wordCollection;
     private static MongoCollection<Document> userRequestsCollection;
     private static MongoCollection<Document> usersCollection;
     private static MongoCollection<Document> likesCollection;
     private static MongoCollection<Document> inflectionIndexCollection;
+    private static MongoCollection<Document> analyticsCollection;
 
     private MongoStoreFactory() {
     }
@@ -128,5 +130,12 @@ public class MongoStoreFactory {
             inflectionIndexCollection = getDatabase().getCollection(COLLECTION_INFLECTION_INDEX);
         }
         return inflectionIndexCollection;
+    }
+
+    public static synchronized MongoCollection<Document> getAnalyticsCollection() {
+        if (analyticsCollection == null) {
+            analyticsCollection = getDatabase().getCollection(COLLECTION_ANALYTICS);
+        }
+        return analyticsCollection;
     }
 }

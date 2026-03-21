@@ -1,5 +1,7 @@
 package controllers;
 
+import analytics.AnalyticsEvent;
+import analytics.AnalyticsStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
@@ -26,6 +28,7 @@ import java.util.Map;
 
 public class WordController extends Controller {
     private static WordLogic wordLogic;
+    private static AnalyticsStore analyticsStore;
     private static final ShobdoLogger logger = new ShobdoLogger(WordController.class);
 
     public Result index() {
@@ -38,6 +41,21 @@ public class WordController extends Controller {
             MongoStoreFactory.getInflectionIndexCollection()
         );
         wordLogic = new WordLogic(storeMongoDB, WordCache.getCache());
+        analyticsStore = new AnalyticsStore(MongoStoreFactory.getAnalyticsCollection());
+    }
+
+    private String realIp() {
+        final String forwarded = request().getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isEmpty()) {
+            // X-Forwarded-For can be a comma-separated list; take the first (originating) IP
+            return forwarded.split(",")[0].trim();
+        }
+        return request().remoteAddress();
+    }
+
+    private String referrer() {
+        final String ref = request().getHeader("Referer");
+        return (ref != null && !ref.isEmpty()) ? ref : null;
     }
 
     //CREATE
@@ -62,14 +80,26 @@ public class WordController extends Controller {
     //READ word of the day — same word for all users on a given UTC date
     public Result getWordOfDay() {
         return ControllerUtils.executeEndpoint("", "", "getWordOfDay", new HashMap<>(),
-            () -> ok(wordLogic.getWordOfDay().jsonNode())
+            () -> {
+                final Word word = wordLogic.getWordOfDay();
+                analyticsStore.record(AnalyticsEvent.builder()
+                    .event(AnalyticsEvent.WOTD).ts(new java.util.Date())
+                    .ip(realIp()).word(word.getSpelling()).referrer(referrer()).status(200).build());
+                return ok(word.jsonNode());
+            }
         );
     }
 
     //READ random
     public Result getRandomWord() {
         return ControllerUtils.executeEndpoint("", "", "getRandomWord", new HashMap<>(),
-            () -> ok(wordLogic.getRandomWord().jsonNode())
+            () -> {
+                final Word word = wordLogic.getRandomWord();
+                analyticsStore.record(AnalyticsEvent.builder()
+                    .event(AnalyticsEvent.RANDOM).ts(new java.util.Date())
+                    .ip(realIp()).word(word.getSpelling()).referrer(referrer()).status(200).build());
+                return ok(word.jsonNode());
+            }
         );
     }
 
@@ -169,15 +199,25 @@ public class WordController extends Controller {
                     return badRequest("Unsupported language: " + lang);
                 }
                 try {
-                    return ok(wordLogic.getWordBySpelling(spelling).jsonNode());
+                    final Word word = wordLogic.getWordBySpelling(spelling);
+                    analyticsStore.record(AnalyticsEvent.builder()
+                        .event(AnalyticsEvent.WORD_LOOKUP).ts(new java.util.Date())
+                        .ip(realIp()).word(spelling).referrer(referrer()).status(200).build());
+                    return ok(word.jsonNode());
                 } catch (EntityDoesNotExist e) {
                     final InflectionIndex idx = wordLogic.findInflectionBySpelling(spelling);
                     if (idx != null) {
                         final Word rootWord = wordLogic.getWordById(idx.getRootId());
                         final ObjectNode response = (ObjectNode) rootWord.jsonNode();
                         response.put("inflectedFrom", spelling);
+                        analyticsStore.record(AnalyticsEvent.builder()
+                            .event(AnalyticsEvent.WORD_LOOKUP).ts(new java.util.Date())
+                            .ip(realIp()).word(spelling).referrer(referrer()).status(200).build());
                         return ok(response);
                     }
+                    analyticsStore.record(AnalyticsEvent.builder()
+                        .event(AnalyticsEvent.WORD_LOOKUP).ts(new java.util.Date())
+                        .ip(realIp()).word(spelling).referrer(referrer()).status(404).build());
                     throw e;
                 }
             }
@@ -234,6 +274,9 @@ public class WordController extends Controller {
                     return badRequest();
                 }
                 final String searchString = body.get(Constants.KEY_SEARCH_STRING).asText();
+                analyticsStore.record(AnalyticsEvent.builder()
+                    .event(AnalyticsEvent.SEARCH).ts(new java.util.Date())
+                    .ip(realIp()).word(searchString).referrer(referrer()).status(200).build());
                 return ok(Json.toJson(
                     wordLogic.searchWords(searchString).stream()
                         .map(w -> { java.util.Map<String,String> m = new java.util.LinkedHashMap<>(); m.put("id", w.getId()); m.put("spelling", w.getSpelling()); return m; })
