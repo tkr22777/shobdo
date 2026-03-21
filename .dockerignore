@@ -1,0 +1,27 @@
+# Git history — not needed in any build stage
+.git/
+
+# MongoDB data dumps — not needed in image
+data/
+
+# Python enrichment scripts and their data — not needed in image
+scripts/
+
+# sbt / Play compiled artifacts — let Docker cache these per-stage
+application/shobdo-app/target/
+application/shobdo-app/project/target/
+application/shobdo-app/project/project/
+
+# React build output and deps — rebuilt inside Docker
+client/react/node_modules/
+client/react/dist/
+client/react/.env*
+
+# Old vanilla HTML frontend — not used in combined image
+client/html/
+
+# Local dev / IDE
+.DS_Store
+**/.DS_Store
+*.log
+.env*

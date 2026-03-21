@@ -17,7 +17,7 @@ COPY application/shobdo-app/project /app/project/
 RUN sbt update
 
 COPY application/shobdo-app/ /app/
-RUN sbt clean dist
+RUN sbt dist
 
 # ── Stage 2: Build React frontend ────────────────────────────────────────────
 FROM node:20-alpine AS node-build
