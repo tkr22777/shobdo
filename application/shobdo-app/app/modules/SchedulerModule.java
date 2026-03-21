@@ -14,9 +14,6 @@ import word.caches.WordCache;
 import word.stores.WordStoreMongoImpl;
 
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +38,6 @@ public class SchedulerModule extends AbstractModule {
 
         private final ActorSystem actorSystem;
         private final ExecutionContext executionContext;
-        private static final String DISABLE_PING_ENV = "DISABLE_PERIODIC_PING";
 
         @Inject
         public TaskScheduler(ActorSystem actorSystem,
@@ -81,56 +77,6 @@ public class SchedulerModule extends AbstractModule {
                 () -> wordLogic.fillRandomWordPool(),
                 executionContext
             );
-
-            // Check if pinging is disabled via environment variable
-            boolean pingDisabled = Boolean.parseBoolean(System.getenv(DISABLE_PING_ENV));
-
-            if (pingDisabled) {
-                log.info("Periodic ping task is disabled via " + DISABLE_PING_ENV + " environment variable");
-            } else {
-                // Schedule the periodic task only if not disabled
-                this.schedulePeriodicTask();
-            }
-
-        }
-
-        /**
-         * Periodic task: ping render domains to keep them alive
-         */
-        private void schedulePeriodicTask() {
-            // Run task every 10 seconds
-            actorSystem.scheduler().schedule(
-                Duration.create(10, TimeUnit.SECONDS),    // Start after 10 seconds
-                Duration.create(10, TimeUnit.SECONDS),    // Run every 10 seconds
-                () -> {
-                    pingUrl("https://www.shobdo.info");
-                    WordCache.getCache().printCacheInfo();
-                },
-                executionContext
-            );
-        }
-
-        private void pingUrl(String urlStr) {
-            try {
-                log.info("Pinging URL: " + urlStr);
-                
-                URL url = new URL(urlStr);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                
-                int responseCode = connection.getResponseCode();
-                connection.disconnect();
-                
-                if (responseCode >= 200 && responseCode < 300) {
-                    log.info("Successfully pinged " + urlStr + ", response code: " + responseCode);
-                } else {
-                    log.error("Failed to ping " + urlStr + ", response code: " + responseCode);
-                }
-            } catch (IOException e) {
-                log.error("Error pinging " + urlStr + ": " + e.getMessage(), e);
-            }
         }
     }
 } 

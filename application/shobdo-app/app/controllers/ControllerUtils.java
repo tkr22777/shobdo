@@ -53,14 +53,16 @@ import java.util.function.Supplier;
                                           final Map<String, String> parameters,
                                           final Throwable throwable) {
 
-        log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
-            transactionId, parentRequestId, endpoint, parameters), throwable);
-
         if (throwable instanceof EntityDoesNotExist) {
+            log.info(String.format("[endpoint=%s] not found: %s", endpoint, throwable.getMessage()));
             return Results.notFound(throwable.getMessage());
         } else if (throwable instanceof IllegalArgumentException) {
+            log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+                transactionId, parentRequestId, endpoint, parameters), throwable);
             return Results.badRequest(throwable.getMessage());
         } else {
+            log.error(String.format("[X-TransactionId=%s][X-Parent-Request-ID=%s][endpoint=%s][Parameters:%s]",
+                transactionId, parentRequestId, endpoint, parameters), throwable);
             return Results.internalServerError(throwable.getMessage());
         }
     }
